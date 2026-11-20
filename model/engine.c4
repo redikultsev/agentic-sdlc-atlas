@@ -1,297 +1,282 @@
 model {
 
+  // ================= Люди и внешний мир =================
   operator = human 'Оператор' {
     technology 'Operator'
-    description 'Человек над флотом агентов: ставит задачи, решает в воротах, читает отчёты. Под активным присмотром держит 2–4 агента (атлас X10).'
-  }
-  github = external 'GitHub' {
-    technology 'Git hosting'
-    description 'Задачи (issues), запросы на слияние (PR), CI, защита веток.'
+    description 'Человек над агентами. Решает в воротах через карточки решений: одна строка вопроса, рекомендация, кнопки.'
   }
   prod = external 'Прод' {
     technology 'Production'
     description 'Работающие сервисы и их данные.'
   }
   monitoring = external 'Мониторинг' {
-    technology 'Monitoring'
-    description 'Ошибки, алерты и метрики работающих сервисов.'
+    technology 'Sentry, логи, метрики'
+    description 'Ошибки и алерты работающих сервисов.'
   }
 
-  engine = system 'Движок агентского цикла' {
+  // ================= Хранилища: где что лежит =================
+  tracker = store 'Задачи' {
+    #built
+    technology 'GitHub Issues · Jira'
+    description 'Центр конвейера. Каждая работа — задача с номером, размером (S/M/L), риском (R0/R1/R2) и состоянием. Всё остальное ссылается на её номер. Инструмент подключается адаптером.'
+  }
+  docs = store 'Спеки и планы' {
+    #idea
+    technology 'файлы в репозитории или тело задачи'
+    description 'Спека — что значит «готово». План — как делаем и чем докажем. Для L — ещё документ исследования кода.'
+  }
+  changes = store 'Изменения' {
+    #built
+    technology 'PR · MR'
+    description 'Предлагаемое изменение кода на ветке, со ссылкой на задачу. Здесь же ревью и вердикты.'
+  }
+  ci = store 'Результаты проверок' {
+    #planned
+    technology 'CI'
+    description 'Тесты, линт, типы, сборка, скрытые тесты — с выводом, привязанным к коммиту.'
+  }
+  releases = store 'Выкатки' {
+    #built
+    technology 'Dokploy'
+    description 'Какая версия где работает и чем кончилась выкатка.'
+  }
+
+  engine = system 'Конвейер' {
     description '''
-      **Черновик v0, гипотеза.** Статус каждой части:
-      `built` — есть сейчас, `planned` — решено строить, `idea` — только идея.
-      Доказательства — в атласе, номер области в поле `stage`.
+      **Черновик v1.** Девять стадий, к которым сходятся лидеры (Stripe, Anthropic, Spotify, Google, Cognition и др.),
+      и решения Владельца от 2026-11-20. Статус части: `built` — есть, `planned` — решено строить, `idea` — идея.
     '''
 
-    // ---------- Сквозные части ----------
+    // ================= Сквозные части =================
+    cards = platform 'Карточки решений' {
+      #idea
+      technology 'Decision cards'
+      description 'Единственный способ, которым конвейер обращается к Оператору: что решить, рекомендация с причиной, кнопки, контекст свёрнут. Пока — Claude Desktop.'
+    }
     orchestrator = platform 'Оркестратор' {
       #idea
       technology 'Orchestrator'
-      description 'Ведёт задачу по шагам. Куда идти дальше, решает код по вердикту в JSON, а не по тексту агента. После рестарта продолжает с того же места.'
-      metadata {
-        stage 'X1'
-      }
+      description 'Ведёт задачу по стадиям. Куда дальше — решает код по вердикту в JSON. Держит лимит: не больше 3 задач одновременно ждут Оператора. Движок ещё не выбран.'
     }
     sandbox = platform 'Песочница' {
       #idea
       technology 'Sandbox'
-      description 'Изолированная среда на одну задачу: своё ядро, сеть закрыта по умолчанию, ключи подставляются снаружи. Токена с правом слияния внутри нет.'
-      metadata {
-        stage 'X2'
-      }
+      description 'Одноразовая изолированная среда на задачу: полный набор инструментов, узкие права, ключей с правом слияния нет.'
     }
-    traces = platform 'Трассы и цена' {
+    traces = platform 'Записи сессий' {
       #idea
-      technology 'Observability'
-      description 'Запись каждой сессии, вызова инструмента, решения и затрат. Отсюда меряем время Оператора на одно изменение.'
-      metadata {
-        stage 'X8'
-      }
+      technology 'Traces'
+      description 'Что делал каждый агент, сколько стоило, сколько времени Оператора ушло на задачу.'
     }
 
-    // ---------- Фазы цикла ----------
-    planning = phase '1. Планирование' {
-      technology 'Planning'
-      description 'Что делать и в каком порядке: входящие задачи, дубли, приоритеты, решение «берём в работу».'
-      metadata {
-        stage 'S0 S1'
-      }
+    // ================= 1. Приём задачи =================
+    intake = phase '1. Приём задачи' {
+      technology 'Intake'
+      description 'Сигнал становится задачей. Агент предлагает размер и риск, Оператор берёт в работу.'
       triage = agent 'Сортировщик' {
         #idea
         technology 'Triage'
-        description 'Склеивает дубли и предлагает метки. Сам ничего не закрывает: ложные авто-закрытия — известный провал (атлас S0).'
-      }
-      backlog = store 'Бэклог' {
-        #idea
-        technology 'Backlog'
-        description 'Очередь задач. Находки агентов по дороге попадают сюда же, но без права на запуск.'
+        description 'Склеивает дубли, предлагает размер S/M/L и риск R0/R1/R2 с причиной. Сам ничего не закрывает.'
       }
       admit = gate 'Взять в работу' {
         #idea
-        technology 'Approval gate'
-        description 'Оператор ставит метку «можно агенту», и задача уходит в цикл.'
+        technology 'Gate'
+        description 'Оператор видит размер и риск, может поправить и жмёт «в работу».'
       }
-      triage -> backlog 'кладёт с предложением'
-      admit -> backlog 'разрешает запуск'
+      triage -> admit 'размер и риск'
     }
 
-    requirements = phase '2. Требования' {
-      technology 'Requirements'
-      description 'Что именно должно получиться и как поймём, что готово.'
-      metadata {
-        stage 'S2'
-      }
+    // ================= 2. Спецификация =================
+    spec = phase '2. Спецификация' {
+      technology 'Spec'
+      description 'Только для M и L. Агент уточняет и пишет, что значит «готово».'
       interviewer = agent 'Интервьюер' {
         #idea
-        technology 'Clarification'
-        description 'Задаёт Оператору вопросы по недоопределённой задаче. Вопросы от параллельных агентов собираются пачкой.'
+        technology 'Clarify'
+        description 'Задаёт вопросы по недоопределённому, пишет спеку: зачем, критерии приёмки, что нельзя менять.'
       }
-      brief = store 'Бриф' {
+      specGate = gate 'Утвердить спеку' {
         #idea
-        technology 'Spec'
-        description 'Пять полей: результат, границы, доказательство готовности, класс риска, форма отчёта.'
+        technology 'Gate'
+        description 'M и L: Оператор утверждает спеку.'
       }
-      interviewer -> brief 'ответы Оператора'
+      interviewer -> specGate 'спека'
     }
 
-    design = phase '3. Проектирование' {
-      technology 'Design'
-      description 'Как сделать: разобраться в существующем коде и разбить работу на срезы.'
-      metadata {
-        stage 'S14 S3 S4'
-      }
+    // ================= 3. План =================
+    plan = phase '3. План' {
+      technology 'Plan'
+      description 'Только для M и L. Как делаем, срезами, и чем докажем готовность.'
       researcher = agent 'Исследователь кода' {
         #idea
-        technology 'Codebase research'
-        description 'Проход только на чтение: нужные файлы, потоки, инварианты. Итог сжимается в короткий документ (атлас S14).'
+        technology 'Research'
+        description 'Только L: отдельный проход на чтение, итог — короткий документ о затронутых модулях и инвариантах.'
       }
       planner = agent 'Планировщик' {
         #idea
-        technology 'Planning agent'
-        description 'План срезами. У каждого среза есть критерии приёмки и команда проверки (атлас S4).'
+        technology 'Plan'
+        description 'План срезами: файлы, порядок, риски, команда проверки у каждого среза.'
       }
-      planGate = gate 'Утверждение плана' {
+      planGate = gate 'Утвердить план' {
         #idea
-        technology 'Approval gate'
-        description 'Только для класса риска R2: необратимое или уходит наружу.'
+        technology 'Gate'
+        description 'M и L: главные ворота Оператора — ошибку замысла дешевле поймать до кода.'
       }
-      researcher -> planner 'карта кода'
-      planner -> planGate 'если R2'
+      researcher -> planner 'L: документ исследования'
+      planner -> planGate 'план'
     }
 
-    development = phase '4. Разработка' {
-      technology 'Development'
-      description 'Агент пишет код одного среза.'
-      metadata {
-        stage 'S5'
-      }
+    // ================= 4. Реализация =================
+    implement = phase '4. Реализация' {
+      technology 'Implement'
+      description 'Агент пишет изменение в песочнице. S приходит сюда сразу из приёма.'
       implementer = agent 'Исполнитель' {
         #built
         technology 'Coding agent'
-        description 'Пишет код одного среза в свежем контексте и своей копии репозитория (worktree).'
+        description 'Читает нужный код, пишет изменение одного среза в свежем контексте.'
       }
-      checks = script 'Проверки' {
-        #planned
-        technology 'Lint, tests'
-        description 'Одна команда, быстрый и полный режим. Хук не даёт закончить ход с правками без прогона.'
-      }
-      implementer -> checks 'запускает'
     }
 
-    testing = phase '5. Тестирование и ревью' {
-      technology 'Testing & Review'
-      description 'Доказать, что изменение правильное и ничего не сломало.'
-      metadata {
-        stage 'S6 S7'
+    // ================= 5. Самопроверка =================
+    verify = phase '5. Самопроверка' {
+      technology 'Self-verify'
+      description 'Агент не говорит «готово», пока проверки не зелёные. Круги ограничены.'
+      checks = script 'Проверки' {
+        #planned
+        technology 'Tests, lint, build'
+        description 'Тесты, линт, типы, сборка. Запускаются сами, а не по слову агента.'
       }
       holdout = script 'Скрытые тесты' {
         #idea
-        technology 'Holdout tests'
-        description 'Сценарии, которых агент не видит и не может править: видимые тесты агенты подгоняют (атлас S6).'
+        technology 'Holdout'
+        description 'Сценарии, которых агент не видит и не может править.'
       }
-      browserCheck = agent 'Проверка в браузере' {
+      evidence = agent 'Доказательства' {
         #idea
-        technology 'E2E check'
-        description 'Проходит экран как пользователь, снимки на трёх размерах.'
+        technology 'Evidence'
+        description 'Снимки экрана, видео, вывод команд — то, что Оператор смотрит вместо кода.'
       }
-      reviewCorrect = agent 'Ревьюер: корректность' {
+      checks -> evidence 'зелёное'
+      holdout -> evidence 'зелёное'
+    }
+
+    // ================= 6. ИИ-ревью =================
+    aiReview = phase '6. ИИ-ревью' {
+      technology 'AI review'
+      description 'Агенты-ревьюеры со свежим контекстом сверяют со спекой и стандартами. Одобрение агента не равно одобрению человека.'
+      reviewers = agent 'Ревьюеры' {
         #built
-        technology 'Code review'
-        description 'Свежий контекст. Сверяет со стандартами репозитория и с задачей.'
-      }
-      reviewSecurity = agent 'Ревьюер: безопасность' {
-        #idea
-        technology 'Security review'
-        description 'Поломка соседнего кода, утечка мимо флага, секреты.'
+        technology 'Review'
+        description 'Корректность, безопасность, соответствие спеке. Замечания по важности, шум отфильтрован.'
       }
       judge = agent 'Судья' {
         #built
         technology 'Verdict'
-        description 'Сводит находки в вердикт по схеме: pass — дальше, fix — поправить, block — стоп.'
+        description 'Сводит замечания в вердикт JSON: pass / fix / block.'
       }
-      reviewCorrect -> judge 'находки'
-      reviewSecurity -> judge 'находки'
-      holdout -> judge 'результат'
-      browserCheck -> judge 'снимки'
+      reviewers -> judge 'замечания'
     }
 
-    deployment = phase '6. Релиз и развёртывание' {
-      technology 'Release & Deployment'
-      description 'Слить изменение, применить миграции, выкатить и сообщить, что изменилось.'
-      metadata {
-        stage 'S8 S15 S9 S16'
-      }
-      land = script 'Слияние' {
-        #planned
-        technology 'Merge'
-        description 'Слияние делает скрипт, а не агент: голова PR не сдвинулась, ревью было на этой голове, CI зелёный (атлас S8).'
-      }
-      mergeGuard = script 'Запрет push в main' {
-        #built
-        technology 'Branch protection'
-        description 'Обёртки gh и git: агент не может слить PR или запушить в main.'
-      }
-      migration = script 'Миграция на копии' {
+    // ================= 7. Слияние =================
+    merge = phase '7. Слияние' {
+      technology 'Merge'
+      description 'По риску: R0 сливается само, R1 — Оператор по доказательствам, R2 — Оператор читает код.'
+      mergeGate = gate 'Слить?' {
         #idea
-        technology 'DB migration'
-        description 'Миграцию применяет CI, сначала на копии базы. Боевых ключей у агента нет (атлас S15).'
+        technology 'Gate'
+        description 'R1: карточка с отчётом и доказательствами. R2: ещё и код.'
       }
-      deploy = script 'Выкатка' {
+      land = script 'Скрипт слияния' {
+        #planned
+        technology 'Merge script'
+        description 'Сливает только если голова PR та же, ревью было на ней и CI зелёный. Агент сам не сливает.'
+      }
+      mergeGate -> land 'да'
+    }
+
+    // ================= 8. Выкатка и наблюдение =================
+    deploy = phase '8. Выкатка и наблюдение' {
+      technology 'Deploy & watch'
+      description 'R0 и R1 уходят в прод сразу после слияния, R2 — по «да» Оператора. Дозор сравнивает метрики до и после.'
+      prodGate = gate 'Выкатить R2?' {
+        #idea
+        technology 'Gate'
+        description 'Только R2: миграции, инфраструктура, деньги, секреты.'
+      }
+      deployer = script 'Выкатка' {
         #built
         technology 'Deploy'
-        description 'Через Dokploy.'
+        description 'Выкатывает и умеет откатить одним шагом.'
       }
-      releaseNotes = agent 'Заметки к релизу' {
+      watcher = agent 'Дозор' {
         #idea
-        technology 'Release notes'
-        description 'Черновик «что изменилось» для того, кто просил. Уходит только после «да» Оператора (атлас S16).'
+        technology 'Watch'
+        description 'Только чтение: сравнивает метрики до и после, при регрессе предлагает откат карточкой.'
       }
-      land -> deploy 'после слияния'
-      migration -> deploy 'если есть миграция'
-      deploy -> releaseNotes 'выкачено'
+      prodGate -> deployer 'да'
     }
 
-    operations = phase '7. Мониторинг и сопровождение' {
-      technology 'Operations & Maintenance'
-      description 'Следить, что выкаченное работает, и держать код в порядке со временем.'
-      metadata {
-        stage 'S10 S11 S17 S18'
-      }
-      watcher = agent 'Дозор после выкатки' {
-        #idea
-        technology 'Post-deploy watch'
-        description 'Только чтение: сверяет метрики до и после, предлагает откат. Откат делает скрипт после «да».'
-      }
-      upkeep = agent 'Уборка' {
-        #idea
-        technology 'Maintenance'
-        description 'Обновления зависимостей, мёртвый код, старые флаги. Что убрать, находит детерминированный инструмент, правит агент.'
-      }
-    }
-
-    feedback = phase '8. Отчёт и улучшение' {
-      technology 'Feedback & Improvement'
-      description 'Отчитаться Оператору и сделать так, чтобы ошибка не повторилась.'
-      metadata {
-        stage 'S12 S13'
-      }
-      reporter = agent 'Отчёт' {
-        #planned
-        technology 'Report'
-        description 'Итог до 50 слов, доказательства, что не проверено. 22% поправок Оператора — «непонятно, длинно».'
-      }
-      reportCheck = script 'Проверка отчёта' {
-        #idea
-        technology 'Report lint'
-        description 'Скрипт: длина первого абзаца, термины без расшифровки, строка «не проверено». Красный — ход не заканчивается.'
-      }
-      corrections = store 'Журнал поправок' {
-        #idea
-        technology 'Corrections log'
-        description 'Каждая поправка Оператора в тот же день.'
-      }
-      retro = agent 'Ретроспектива' {
+    // ================= 9. Разбор и обучение =================
+    learn = phase '9. Разбор и обучение' {
+      technology 'Learn'
+      description 'Ошибки и поправки становятся новыми задачами, проверками и правилами.'
+      retro = agent 'Разбор' {
         #idea
         technology 'Retro'
-        description 'Раз в неделю: что повторилось дважды, поднимается на уровень — из текста правила в проверку или в устройство. Правило принимается только по замеру (атлас S13).'
+        description 'Раз в неделю: что повторилось дважды — предложение правила, проверки или новой задачи.'
       }
-      reporter -> reportCheck 'итог'
-      corrections -> retro 'раз в неделю'
+      adopt = gate 'Принять правило?' {
+        #idea
+        technology 'Gate'
+        description 'Оператор выбирает, что из предложенного принять.'
+      }
+      retro -> adopt 'предложения'
     }
   }
 
-  // ---------- Основной поток слева направо ----------
-  engine.planning.backlog .handoff engine.requirements.interviewer 'задача'
-  engine.requirements.brief .handoff engine.design.researcher 'бриф'
-  engine.design.planner .handoff engine.development.implementer 'план срезами'
-  engine.development.checks .handoff engine.testing.reviewCorrect 'PR'
-  engine.development.checks .handoff engine.testing.reviewSecurity 'PR'
-  engine.testing.judge .verdict engine.deployment.land 'pass'
-  engine.deployment.deploy .handoff engine.operations.watcher 'выкачено'
-  engine.deployment.releaseNotes .handoff engine.feedback.reporter 'что изменилось'
+  // ================= Основной поток =================
+  monitoring -> engine.intake.triage 'алерт'
+  operator -> engine.intake.admit 'в работу'
+  engine.intake.triage -> tracker 'задача'
+  engine.intake.admit .handoff engine.spec.interviewer 'M, L'
+  engine.intake.admit .handoff engine.implement.implementer 'S: сразу код'
+  engine.spec.interviewer -> docs 'спека'
+  operator -> engine.spec.specGate 'утверждает'
+  engine.spec.specGate .handoff engine.plan.researcher 'L'
+  engine.spec.specGate .handoff engine.plan.planner 'M'
+  engine.plan.planner -> docs 'план'
+  operator -> engine.plan.planGate 'утверждает'
+  engine.plan.planGate .handoff engine.implement.implementer 'план'
+  engine.implement.implementer -> changes 'PR'
+  engine.implement.implementer .handoff engine.verify.checks 'прогон'
+  engine.verify.checks -> ci 'результаты'
+  engine.verify.evidence .handoff engine.aiReview.reviewers 'PR + доказательства'
+  engine.aiReview.judge -> changes 'вердикт'
+  engine.aiReview.judge .verdict engine.merge.land 'pass, R0'
+  engine.aiReview.judge .verdict engine.merge.mergeGate 'pass, R1/R2'
+  operator -> engine.merge.mergeGate 'смотрит доказательства'
+  engine.merge.land -> changes 'слияние'
+  engine.merge.land .handoff engine.deploy.deployer 'R0, R1'
+  engine.merge.land .handoff engine.deploy.prodGate 'R2'
+  operator -> engine.deploy.prodGate 'выкатывает'
+  engine.deploy.deployer -> releases 'версия'
+  engine.deploy.deployer -> prod 'выкатка'
+  prod -> engine.deploy.watcher 'метрики'
+  engine.deploy.watcher .handoff engine.learn.retro 'итог выкатки'
+  operator -> engine.learn.adopt 'выбирает'
 
-  // ---------- Петли назад ----------
-  engine.testing.judge .verdict engine.development.implementer 'fix: что поправить'
-  engine.operations.watcher -> engine.planning.backlog 'регресс → новая задача'
-  engine.operations.upkeep -> engine.planning.backlog 'находки'
-  engine.feedback.retro -> engine.orchestrator 'новое правило или проверка'
+  // ================= Петли назад =================
+  engine.verify.checks .verdict engine.implement.implementer 'красное: чинить, не больше 2 кругов'
+  engine.aiReview.judge .verdict engine.implement.implementer 'fix'
+  engine.spec.interviewer -> operator 'вопросы'
+  engine.deploy.watcher -> operator 'регресс: откатить?'
+  engine.learn.retro -> tracker 'новые задачи'
+  engine.learn.adopt -> engine.orchestrator 'новое правило или проверка'
 
-  // ---------- Оператор ----------
-  operator -> engine.planning.admit 'берёт в работу'
-  engine.requirements.interviewer -> operator 'вопросы пачкой'
-  operator -> engine.design.planGate 'утверждает R2'
-  engine.feedback.reportCheck -> operator 'отчёт'
-  operator -> engine.feedback.corrections 'поправка'
-
-  // ---------- Внешние системы ----------
-  monitoring -> engine.planning.triage 'ошибка'
-  github -> engine.planning.triage 'issue'
-  engine.deployment.land -> github 'merge'
-  engine.deployment.deploy -> prod 'выкатывает'
-  prod -> engine.operations.watcher 'метрики'
-
-  // ---------- Сквозные ----------
-  engine.orchestrator -> engine.development.implementer 'запускает в песочнице'
-  engine.orchestrator .reads engine.traces 'пишет'
+  // ================= Сквозные =================
+  engine.orchestrator -> engine.implement.implementer 'запускает в песочнице'
+  engine.orchestrator -> engine.cards 'вопросы Оператору'
+  engine.cards -> operator 'карточка'
+  engine.orchestrator -> engine.traces 'пишет'
+  engine.traces -> engine.learn.retro 'записи сессий'
 }

@@ -1,170 +1,171 @@
 views {
 
   view index {
-    title '0. Весь цикл'
+    title '0. Весь конвейер'
     description '''
-      Восемь фаз цикла разработки слева направо, Оператор сверху, GitHub и прод снизу.
-      Клик по фазе открывает её устройство. Петли назад, вопросы и отчёты Оператору показаны на картинках фаз. Термины — в GLOSSARY.md.
+      **Как читать:** стадии слева направо; серые цилиндры — где лежат задачи, спеки, PR, проверки, выкатки; Оператор — с краю, его стрелки идут в ворота стадий.
+      Клик по стадии — её устройство. Петли назад — на картинках стадий.
 
-      **Цвет:** фиолетовый — агент, зелёный — скрипт, красный — ворота (решает Оператор),
-      оранжевый — человек, серый — хранилище.
+      **Цвет:** фиолетовый — агент, зелёный — скрипт, красный — решает Оператор, серый — хранилище.
 
-      **Фазы** (названия по SDLC):
-      1. **Планирование** (Planning) — что делать и в каком порядке.
-      2. **Требования** (Requirements) — что должно получиться и как поймём, что готово.
-      3. **Проектирование** (Design) — разобраться в коде и разбить работу на срезы.
-      4. **Разработка** (Development) — код одного среза и проверки.
-      5. **Тестирование и ревью** (Testing & Review) — доказать, что правильно и ничего не сломано.
-      6. **Релиз и развёртывание** (Release & Deployment) — слить, мигрировать, выкатить, сообщить.
-      7. **Мониторинг и сопровождение** (Operations & Maintenance) — следить за прод и держать код в порядке.
-      8. **Отчёт и улучшение** (Feedback & Improvement) — отчитаться и не повторить ошибку.
+      **Размер задачи:** S — сразу код; M — спека и план; L — ещё исследование кода.
+      **Риск:** R0 сливается и выкатывается сам; R1 — Оператор смотрит доказательства; R2 — Оператор читает код и выкатывает сам.
     '''
     include
       operator,
-      engine.planning,
-      engine.requirements,
-      engine.design,
-      engine.development,
-      engine.testing,
-      engine.deployment,
-      engine.operations,
-      engine.feedback,
-      github,
+      engine.intake,
+      engine.spec,
+      engine.plan,
+      engine.implement,
+      engine.verify,
+      engine.aiReview,
+      engine.merge,
+      engine.deploy,
+      engine.learn,
+      tracker,
+      docs,
+      changes,
+      ci,
+      releases,
       prod
-    // Петли назад (регресс → новая задача, fix → разработка) видны на картинках фаз:
-    // на общей картине они ломают порядок слева направо. Вопросы и отчёт Оператору — тоже там.
-    exclude engine.operations -> engine.planning, engine.testing -> engine.development, monitoring -> *, github -> *, engine.requirements -> operator, engine.feedback -> operator
-    rank source {
-      operator
-    }
-    rank same {
-      engine.planning,
-      engine.requirements,
-      engine.design,
-      engine.development,
-      engine.testing,
-      engine.deployment,
-      engine.operations,
-      engine.feedback
-    }
-    rank sink {
-      github,
-      prod
-    }
-    autoLayout TopBottom 140 60
+    exclude
+      engine.intake -> engine.implement,
+      engine.verify -> engine.implement,
+      engine.aiReview -> engine.implement,
+      engine.spec -> operator,
+      engine.deploy -> operator,
+      engine.learn -> tracker,
+      prod -> *,
+      monitoring -> *
+    autoLayout LeftRight 60 80
   }
 
-  view planning of engine.planning {
-    title '1. Планирование'
-    include *, -> engine.planning.* ->
+  view intake of engine.intake {
+    title '1. Приём задачи'
+    include *, -> engine.intake.* ->
     autoLayout LeftRight
   }
-
-  view requirements of engine.requirements {
-    title '2. Требования'
-    include *, -> engine.requirements.* ->
+  view spec of engine.spec {
+    title '2. Спецификация'
+    include *, -> engine.spec.* ->
     autoLayout LeftRight
   }
-
-  view design of engine.design {
-    title '3. Проектирование'
-    include *, -> engine.design.* ->
+  view plan of engine.plan {
+    title '3. План'
+    include *, -> engine.plan.* ->
     autoLayout LeftRight
   }
-
-  view development of engine.development {
-    title '4. Разработка'
-    include *, -> engine.development.* ->, engine.sandbox
+  view implement of engine.implement {
+    title '4. Реализация'
+    include *, -> engine.implement.* ->, engine.sandbox
     autoLayout LeftRight
   }
-
-  view testing of engine.testing {
-    title '5. Тестирование и ревью'
-    include *, -> engine.testing.* ->
+  view verify of engine.verify {
+    title '5. Самопроверка'
+    include *, -> engine.verify.* ->
     autoLayout LeftRight
   }
-
-  view deployment of engine.deployment {
-    title '6. Релиз и развёртывание'
-    include *, -> engine.deployment.* ->
+  view aiReview of engine.aiReview {
+    title '6. ИИ-ревью'
+    include *, -> engine.aiReview.* ->
     autoLayout LeftRight
   }
-
-  view operations of engine.operations {
-    title '7. Мониторинг и сопровождение'
-    include *, -> engine.operations.* ->
+  view merge of engine.merge {
+    title '7. Слияние'
+    include *, -> engine.merge.* ->
     autoLayout LeftRight
   }
-
-  view feedback of engine.feedback {
-    title '8. Отчёт и улучшение'
-    include *, -> engine.feedback.* ->
+  view deploy of engine.deploy {
+    title '8. Выкатка и наблюдение'
+    include *, -> engine.deploy.* ->
+    autoLayout LeftRight
+  }
+  view learn of engine.learn {
+    title '9. Разбор и обучение'
+    include *, -> engine.learn.* ->
     autoLayout LeftRight
   }
 
   view platform {
-    title '9. Сквозные части'
-    description 'Части, на которых работают все фазы: оркестратор, песочница, трассы.'
-    include engine.orchestrator, engine.sandbox, engine.traces, -> engine.orchestrator ->, engine.orchestrator ->
+    title '10. Сквозные части'
+    description 'На чём работают все стадии: оркестратор, песочница, карточки решений, записи сессий.'
+    include engine.orchestrator, engine.sandbox, engine.cards, engine.traces, operator, engine.implement.implementer, engine.learn.retro
     autoLayout LeftRight
   }
 
   view status {
-    title '10. Что есть, что в планах'
-    description 'Все части движка. Метка `built` — есть сейчас, `planned` — решено строить, `idea` — только идея (бледные).'
-    include engine.**
+    title '11. Что есть, что в планах'
+    description 'Все части. Бледные — только идея.'
+    include engine.**, tracker, docs, changes, ci, releases
     exclude
-      engine.planning,
-      engine.requirements,
-      engine.design,
-      engine.development,
-      engine.testing,
-      engine.deployment,
-      engine.operations,
-      engine.feedback
+      engine.intake,
+      engine.spec,
+      engine.plan,
+      engine.implement,
+      engine.verify,
+      engine.aiReview,
+      engine.merge,
+      engine.deploy,
+      engine.learn
     style element.tag = #idea {
       opacity 30%
     }
     autoLayout LeftRight
   }
 
-  dynamic view feature {
-    title '11. Сценарий: фича от задачи до прода'
-    description 'Путь одной задачи. Ветка R2 добавляет утверждение плана, цикл ревью — не больше трёх кругов.'
-    operator -> engine.planning.admit 'берёт в работу'
-    engine.planning.backlog -> engine.requirements.interviewer 'задача'
-    engine.requirements.interviewer -> engine.requirements.brief 'бриф'
-    engine.requirements.brief -> engine.design.researcher 'бриф'
-    engine.design.researcher -> engine.design.planner 'карта кода'
-    alt 'класс риска' {
-      when 'R2: необратимо или наружу' {
-        engine.design.planner -> engine.design.planGate 'план'
-        operator -> engine.design.planGate 'утверждает'
+  dynamic view task {
+    title '12. Путь одной задачи'
+    description 'Ветвление по размеру (S/M/L) и по риску (R0/R1/R2), циклы доработки ограничены.'
+    monitoring -> engine.intake.triage 'алерт или идея'
+    engine.intake.triage -> tracker 'задача, размер и риск'
+    operator -> engine.intake.admit 'в работу'
+    alt 'размер' {
+      when 'S' {
+        engine.intake.admit -> engine.implement.implementer 'сразу код'
       }
-      else 'R1: код за проверками' {
-        engine.design.planner -> engine.development.implementer 'план'
+      else 'M или L' {
+        engine.intake.admit -> engine.spec.interviewer 'уточнить'
+        engine.spec.interviewer -> operator 'вопросы'
+        engine.spec.interviewer -> engine.spec.specGate 'спека'
+        operator -> engine.spec.specGate 'утверждает'
+        opt 'только L' {
+          engine.spec.specGate -> engine.plan.researcher 'исследовать код'
+          engine.plan.researcher -> engine.plan.planner 'документ'
+        }
+        engine.plan.planner -> engine.plan.planGate 'план'
+        operator -> engine.plan.planGate 'утверждает'
+        engine.plan.planGate -> engine.implement.implementer 'план'
       }
     }
     loop 'пока судья не скажет pass, не больше 3 раз' {
-      engine.development.implementer -> engine.development.checks 'прогон'
-      par {
-        engine.development.checks -> engine.testing.reviewCorrect 'PR'
-        engine.development.checks -> engine.testing.reviewSecurity 'PR'
-      }
-      engine.testing.reviewCorrect -> engine.testing.judge 'находки' {
-        notes '''
-          Вердикт отдаётся **JSON по схеме**, маршрут выбирает код.
-          Сейчас в cezar — метка в тексте, это главное слабое место.
-        '''
-      }
-      engine.testing.judge -> engine.development.implementer 'fix: что поправить'
+      engine.implement.implementer -> engine.verify.checks 'прогон'
+      engine.verify.checks -> engine.verify.evidence 'зелёное'
+      engine.verify.evidence -> engine.aiReview.reviewers 'PR + доказательства'
+      engine.aiReview.reviewers -> engine.aiReview.judge 'замечания'
+      engine.aiReview.judge -> engine.implement.implementer 'fix'
     }
-    engine.testing.judge -> engine.deployment.land 'pass'
-    engine.deployment.land -> engine.deployment.deploy 'слияние, если голова PR та же'
-    engine.deployment.deploy -> prod 'выкатка'
-    prod -> engine.operations.watcher 'метрики до и после'
-    engine.deployment.releaseNotes -> engine.feedback.reporter 'что изменилось'
-    engine.feedback.reporter -> engine.feedback.reportCheck 'итог'
-    engine.feedback.reportCheck -> operator 'отчёт до 50 слов'
+    alt 'риск' {
+      when 'R0' {
+        engine.aiReview.judge -> engine.merge.land 'pass'
+        engine.merge.land -> engine.deploy.deployer 'сразу'
+      }
+      if 'R1' {
+        engine.aiReview.judge -> engine.merge.mergeGate 'pass'
+        operator -> engine.merge.mergeGate 'доказательства → да'
+        engine.merge.mergeGate -> engine.merge.land 'слить'
+        engine.merge.land -> engine.deploy.deployer 'сразу'
+      }
+      else 'R2' {
+        engine.aiReview.judge -> engine.merge.mergeGate 'pass'
+        operator -> engine.merge.mergeGate 'код → да'
+        engine.merge.mergeGate -> engine.merge.land 'слить'
+        engine.merge.land -> engine.deploy.prodGate 'ждёт'
+        operator -> engine.deploy.prodGate 'выкатить'
+        engine.deploy.prodGate -> engine.deploy.deployer 'да'
+      }
+    }
+    engine.deploy.deployer -> prod 'выкатка'
+    prod -> engine.deploy.watcher 'метрики до и после'
+    engine.deploy.watcher -> engine.learn.retro 'итог'
   }
 }
