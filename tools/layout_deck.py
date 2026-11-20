@@ -20,7 +20,7 @@ LAYOUTS = {
         'engine.spec': (0, 1), 'operator': (0, 3),
         'engine.plan.scenarioWriter': (1, 0), 'engine.plan.researcher': (1, 1),
         'engine.plan.planner': (1, 2), 'engine.plan.planGate': (1, 3),
-        'docs': (2, 0.5), 'tracker': (2, 2), 'engine.implement': (2, 3),
+        'docs': (2, 0, 335), 'tracker': (2, 2), 'engine.implement': (2, 3),
     },
     'verifyDeck': {
         'engine.implement': (0, 0.75),
@@ -39,12 +39,17 @@ LAYOUTS = {
 def lay(view):
     grid = LAYOUTS[view['id']]
     nodes = {n['id']: n for n in view['nodes']}
-    for nid, (c, r) in grid.items():
+    for nid, pos in grid.items():  # (column, row) or (column, row, height in px) for a tall block
         n = nodes[nid]
+        c, r = pos[0], pos[1]
         dx, dy = c * COL - n['x'], r * ROW - n['y']
         n['x'] += dx; n['y'] += dy
         if n.get('labelBBox'):
             n['labelBBox']['x'] += dx; n['labelBBox']['y'] += dy
+        if len(pos) > 2:
+            grow = pos[2] - n['height']; n['height'] = pos[2]
+            if n.get('labelBBox'):
+                n['labelBBox']['y'] += grow / 2
     for n in view['nodes']:  # containers
         kids = [nodes[k] for k in n.get('children') or []]
         if not kids:
@@ -74,14 +79,17 @@ def lay(view):
     # spread edge ends that share an anchor point (incoming and outgoing alike), ordered by where the other end is
     groups = {}
     for e, a, b, vertical in ends:
-        groups.setdefault(tuple(a), []).append((a, b, vertical))
-        groups.setdefault(tuple(b), []).append((b, a, vertical))
+        sn, tn = nodes[e['source']], nodes[e['target']]
+        side = lambda n: n['width'] if vertical else n['height']
+        groups.setdefault(tuple(a), []).append((a, b, vertical, side(sn)))
+        groups.setdefault(tuple(b), []).append((b, a, vertical, side(tn)))
     for items in groups.values():
         if len(items) > 1:
             axis = lambda it: 0 if it[2] else 1
             items.sort(key=lambda it: it[1][axis(it)])
-            for k, (pt, other, vertical) in enumerate(items):
-                pt[axis((pt, other, vertical))] += (k - (len(items) - 1) / 2) * 36
+            step = min(60, items[0][3] * 0.8 / (len(items) - 1))  # spread over most of the block side
+            for k, it in enumerate(items):
+                it[0][axis(it)] += (k - (len(items) - 1) / 2) * step
     for e, a, b, vertical in ends:
         if vertical:
             k = (b[1] - a[1]) * 0.5; c1, c2 = [a[0], a[1] + k], [b[0], b[1] - k]
