@@ -57,25 +57,25 @@
       }
     ]
   },
-  "hash": "zvVPOH1yw_Dv0rfoNdI2QrehjJda1fp8mYyHZobUHlo",
+  "hash": "Hacvl6iF_pRUyI-r3kzUdy4P3HT-1TVlut_JhIMBtZQ",
   "bounds": {
     "x": -40,
     "y": -100,
     "width": 1120,
-    "height": 1135.0
+    "height": 875
   },
   "nodes": [
     {
-      "id": "scenarios",
+      "id": "docs",
       "parent": null,
       "level": 0,
       "children": [],
       "inEdges": [],
       "outEdges": [
-        "1u49t5c"
+        "6nxiza"
       ],
-      "title": "Acceptance scenarios",
-      "modelRef": "scenarios",
+      "title": "Specs, plans and decisions",
+      "modelRef": "docs",
       "shape": "storage",
       "color": "storecolor",
       "style": {
@@ -90,7 +90,7 @@
         "idea"
       ],
       "notation": "Store",
-      "technology": "outside the repository",
+      "technology": "files in the repo or the work item body",
       "kind": "store",
       "isCustomized": true,
       "x": 800,
@@ -98,9 +98,9 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 792,
-        "y": -605,
-        "width": 150,
+        "x": 832,
+        "y": -138,
+        "width": 175,
         "height": 66
       }
     },
@@ -135,12 +135,12 @@
       "isCustomized": true,
       "navigateTo": "implementDeck",
       "x": 0,
-      "y": 200,
+      "y": 150.0,
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -860,
-        "y": -135,
+        "x": -831,
+        "y": -356.0,
         "width": 166,
         "height": 32
       }
@@ -151,21 +151,19 @@
       "level": 0,
       "children": [
         "engine.verify.checks",
-        "engine.verify.validator",
-        "engine.verify.evidence"
+        "engine.verify.validator"
       ],
       "inEdges": [
-        "1u49t5c",
+        "6nxiza",
         "1qavfc9"
       ],
       "outEdges": [
         "vuzkks",
-        "f2t5e0",
         "gz7qvd",
+        "1aqce60",
         "at7sow",
         "utj7lu",
-        "h606r9",
-        "13ogeia"
+        "z9ka67"
       ],
       "title": "5. Self-verify",
       "modelRef": "engine.verify",
@@ -189,10 +187,10 @@
       "x": 360,
       "y": -60,
       "width": 330,
-      "height": 835,
+      "height": 535.0,
       "labelBBox": {
-        "x": 358,
-        "y": -621,
+        "x": 25,
+        "y": -370,
         "width": 88,
         "height": 15
       }
@@ -208,7 +206,6 @@
       "outEdges": [
         "qt1ejl",
         "vuzkks",
-        "f2t5e0",
         "gz7qvd"
       ],
       "title": "CI checks",
@@ -240,8 +237,8 @@
       "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": 414,
-        "y": -572,
+        "x": 81,
+        "y": -531,
         "width": 127,
         "height": 32
       }
@@ -252,13 +249,14 @@
       "level": 1,
       "children": [],
       "inEdges": [
-        "1u49t5c",
+        "6nxiza",
         "qt1ejl"
       ],
       "outEdges": [
-        "tx559j",
+        "1aqce60",
         "at7sow",
-        "utj7lu"
+        "utj7lu",
+        "z9ka67"
       ],
       "title": "Validator",
       "modelRef": "engine.verify.validator",
@@ -276,9 +274,9 @@
         "idea"
       ],
       "metadata": {
-        "in": "The change after green CI, the hidden scenarios",
-        "does": "Starts the app, plays each scenario as a user",
-        "out": "Pass, or fail with the scenario that broke"
+        "in": "The change after green CI, the acceptance scenarios",
+        "does": "Plays each scenario as a user, records evidence",
+        "out": "Pass with evidence on the PR, or fail with the scenario that broke"
       },
       "notation": "Agent (LLM)",
       "technology": "Fresh context, own sandbox",
@@ -289,8 +287,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 0,
-        "y": -272.0,
+        "x": 77,
+        "y": -21.0,
         "width": 115,
         "height": 32
       }
@@ -328,25 +326,25 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 370,
-        "y": 49,
+        "x": -35,
+        "y": -691,
         "width": 174,
         "height": 32
       }
     },
     {
-      "id": "engine.orchestrator",
+      "id": "changes",
       "parent": null,
       "level": 0,
       "children": [],
       "inEdges": [
-        "f2t5e0"
+        "1aqce60"
       ],
       "outEdges": [],
-      "title": "Orchestrator",
-      "modelRef": "engine.orchestrator",
-      "shape": "rectangle",
-      "color": "sky",
+      "title": "Change sets",
+      "modelRef": "changes",
+      "shape": "storage",
+      "color": "storecolor",
       "style": {
         "opacity": 15,
         "size": "sm",
@@ -356,67 +354,20 @@
         "txt": ""
       },
       "tags": [
-        "idea"
+        "built"
       ],
-      "notation": "Cross-cutting part",
-      "technology": "Orchestrator",
-      "kind": "platform",
+      "notation": "Store",
+      "technology": "PR \u00b7 MR",
+      "kind": "store",
       "isCustomized": true,
-      "x": 0,
+      "x": 800,
       "y": 600,
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -423,
-        "y": 464,
-        "width": 160,
-        "height": 32
-      }
-    },
-    {
-      "id": "engine.verify.evidence",
-      "parent": "engine.verify",
-      "level": 1,
-      "children": [],
-      "inEdges": [
-        "tx559j"
-      ],
-      "outEdges": [
-        "h606r9",
-        "13ogeia"
-      ],
-      "title": "Evidence",
-      "modelRef": "engine.verify.evidence",
-      "shape": "rectangle",
-      "color": "indigo",
-      "style": {
-        "opacity": 15,
-        "size": "sm",
-        "textSize": "xl"
-      },
-      "description": {
-        "txt": ""
-      },
-      "tags": [
-        "idea"
-      ],
-      "metadata": {
-        "in": "The change that passed CI and the Validator",
-        "does": "Records screenshots, video, command output",
-        "out": "Evidence attached to the PR"
-      },
-      "notation": "Agent (LLM)",
-      "technology": "Evidence",
-      "kind": "agent",
-      "isCustomized": true,
-      "x": 400,
-      "y": 600,
-      "width": 240,
-      "height": 135,
-      "labelBBox": {
-        "x": -436,
-        "y": 28,
-        "width": 119,
+        "x": -28,
+        "y": 649,
+        "width": 161,
         "height": 32
       }
     },
@@ -453,48 +404,9 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -34,
-        "y": -388,
+        "x": -5,
+        "y": 264,
         "width": 115,
-        "height": 32
-      }
-    },
-    {
-      "id": "changes",
-      "parent": null,
-      "level": 0,
-      "children": [],
-      "inEdges": [
-        "h606r9"
-      ],
-      "outEdges": [],
-      "title": "Change sets",
-      "modelRef": "changes",
-      "shape": "storage",
-      "color": "storecolor",
-      "style": {
-        "opacity": 15,
-        "size": "sm",
-        "textSize": "xl"
-      },
-      "description": {
-        "txt": ""
-      },
-      "tags": [
-        "built"
-      ],
-      "notation": "Store",
-      "technology": "PR \u00b7 MR",
-      "kind": "store",
-      "isCustomized": true,
-      "x": 800,
-      "y": 600,
-      "width": 240,
-      "height": 135,
-      "labelBBox": {
-        "x": -498,
-        "y": 213,
-        "width": 161,
         "height": 32
       }
     },
@@ -504,7 +416,7 @@
       "level": 0,
       "children": [],
       "inEdges": [
-        "13ogeia"
+        "z9ka67"
       ],
       "outEdges": [],
       "title": "6. AI review",
@@ -526,12 +438,12 @@
       "isCustomized": true,
       "navigateTo": "aiReviewDeck",
       "x": 400,
-      "y": 860.0,
+      "y": 600,
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -893,
-        "y": 288.0,
+        "x": -423,
+        "y": 279,
         "width": 150,
         "height": 32
       }
@@ -539,10 +451,10 @@
   ],
   "edges": [
     {
-      "id": "1u49t5c",
-      "source": "scenarios",
+      "id": "6nxiza",
+      "source": "docs",
       "target": "engine.verify.validator",
-      "label": "hidden scenarios",
+      "label": "scenarios",
       "points": [
         [
           800,
@@ -554,22 +466,22 @@
         ],
         [
           720,
-          350
+          332
         ],
         [
           640,
-          350
+          332
         ]
       ],
       "labelBBox": {
-        "x": 660,
-        "y": 278,
-        "width": 119,
+        "x": 684,
+        "y": 269,
+        "width": 73,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1yiwc6o"
+        "q184ex"
       ],
       "color": "gray",
       "line": "dotted",
@@ -585,30 +497,30 @@
       "points": [
         [
           240,
-          232
+          182
         ],
         [
           320,
-          232
+          182
         ],
         [
           320,
-          32
+          50
         ],
         [
           400,
-          32
+          50
         ]
       ],
       "labelBBox": {
         "x": 267,
-        "y": 101,
+        "y": 85,
         "width": 106,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "8la1bl"
+        "25ynci"
       ],
       "color": "primary",
       "line": "dashed",
@@ -647,45 +559,7 @@
       },
       "parent": "engine.verify",
       "relations": [
-        "18pqr4w"
-      ],
-      "color": "gray",
-      "line": "dashed",
-      "head": "normal",
-      "isLabelCustomized": true
-    },
-    {
-      "id": "tx559j",
-      "source": "engine.verify.validator",
-      "target": "engine.verify.evidence",
-      "label": "pass",
-      "points": [
-        [
-          520,
-          435
-        ],
-        [
-          520,
-          518
-        ],
-        [
-          520,
-          518
-        ],
-        [
-          520,
-          600
-        ]
-      ],
-      "labelBBox": {
-        "x": 466,
-        "y": 505,
-        "width": 42,
-        "height": 25
-      },
-      "parent": "engine.verify",
-      "relations": [
-        "1952bwh"
+        "8ahb5l"
       ],
       "color": "gray",
       "line": "dashed",
@@ -723,50 +597,11 @@
       },
       "parent": null,
       "relations": [
-        "1yp0ef7"
+        "wbmy4i"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "isLabelCustomized": true
-    },
-    {
-      "id": "f2t5e0",
-      "source": "engine.verify.checks",
-      "target": "engine.orchestrator",
-      "label": "red after 3 rounds",
-      "points": [
-        [
-          400,
-          104
-        ],
-        [
-          320,
-          104
-        ],
-        [
-          320,
-          668
-        ],
-        [
-          240,
-          668
-        ]
-      ],
-      "labelBBox": {
-        "x": 258,
-        "y": 355,
-        "width": 125,
-        "height": 25
-      },
-      "parent": null,
-      "relations": [
-        "2nwjz9"
-      ],
-      "color": "red",
-      "line": "dashed",
-      "head": "normal",
-      "kind": "verdict",
       "isLabelCustomized": true
     },
     {
@@ -777,35 +612,73 @@
       "points": [
         [
           400,
-          68
+          86
         ],
         [
           320,
-          68
+          86
         ],
         [
           320,
-          268
+          218
         ],
         [
           240,
-          268
+          218
         ]
       ],
       "labelBBox": {
         "x": 236,
-        "y": 137,
+        "y": 121,
         "width": 169,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1a4cra"
+        "1x9b1xw"
       ],
       "color": "red",
       "line": "dashed",
       "head": "normal",
       "kind": "verdict",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1aqce60",
+      "source": "engine.verify.validator",
+      "target": "changes",
+      "label": "evidence on the PR",
+      "points": [
+        [
+          640,
+          404
+        ],
+        [
+          720,
+          404
+        ],
+        [
+          720,
+          668
+        ],
+        [
+          800,
+          668
+        ]
+      ],
+      "labelBBox": {
+        "x": 654,
+        "y": 505,
+        "width": 133,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1nx5p13"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
       "isLabelCustomized": true
     },
     {
@@ -816,11 +689,11 @@
       "points": [
         [
           640,
-          386
+          368
         ],
         [
           720,
-          386
+          368
         ],
         [
           720,
@@ -833,13 +706,13 @@
       ],
       "labelBBox": {
         "x": 643,
-        "y": 396,
+        "y": 387,
         "width": 154,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "2wpzhr"
+        "d2c3b5"
       ],
       "color": "gray",
       "line": "dashed",
@@ -862,22 +735,22 @@
         ],
         [
           320,
-          304
+          254
         ],
         [
           240,
-          304
+          254
         ]
       ],
       "labelBBox": {
         "x": 243,
-        "y": 305,
+        "y": 280,
         "width": 154,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "uz2rxx"
+        "1r0wlw"
       ],
       "color": "red",
       "line": "dashed",
@@ -886,75 +759,37 @@
       "isLabelCustomized": true
     },
     {
-      "id": "h606r9",
-      "source": "engine.verify.evidence",
-      "target": "changes",
-      "label": "evidence on the PR",
-      "points": [
-        [
-          640,
-          668
-        ],
-        [
-          720,
-          668
-        ],
-        [
-          720,
-          668
-        ],
-        [
-          800,
-          668
-        ]
-      ],
-      "labelBBox": {
-        "x": 654,
-        "y": 637,
-        "width": 133,
-        "height": 25
-      },
-      "parent": null,
-      "relations": [
-        "1kdy0e3"
-      ],
-      "color": "gray",
-      "line": "dashed",
-      "head": "normal",
-      "isLabelCustomized": true
-    },
-    {
-      "id": "13ogeia",
-      "source": "engine.verify.evidence",
+      "id": "z9ka67",
+      "source": "engine.verify.validator",
       "target": "engine.aiReview",
       "label": "PR + evidence",
       "points": [
         [
           520,
-          735
+          435
         ],
         [
           520,
-          798
+          518
         ],
         [
           520,
-          798
+          518
         ],
         [
           520,
-          860
+          600
         ]
       ],
       "labelBBox": {
         "x": 407,
-        "y": 785,
+        "y": 505,
         "width": 101,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "i358cu"
+        "5i1qdd"
       ],
       "color": "primary",
       "line": "dashed",

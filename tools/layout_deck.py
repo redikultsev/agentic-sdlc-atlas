@@ -20,13 +20,12 @@ LAYOUTS = {
         'engine.spec': (0, 1), 'operator': (0, 3),
         'engine.plan.scenarioWriter': (1, 0), 'engine.plan.researcher': (1, 1),
         'engine.plan.planner': (1, 2), 'engine.plan.planGate': (1, 3),
-        'scenarios': (2, 0), 'docs': (2, 1), 'tracker': (2, 2), 'engine.implement': (2, 3),
+        'docs': (2, 0.5), 'tracker': (2, 2), 'engine.implement': (2, 3),
     },
     'verifyDeck': {
-        'engine.implement': (0, 1), 'engine.orchestrator': (0, 3),
-        'engine.verify.checks': (1, 0), 'engine.verify.validator': (1, 1.5), 'engine.verify.evidence': (1, 3),
-        'engine.aiReview': (1, 4.3),
-        'ci': (2, 0), 'scenarios': (2, 1), 'engine.sandbox': (2, 2), 'changes': (2, 3),
+        'engine.implement': (0, 0.75),
+        'engine.verify.checks': (1, 0), 'engine.verify.validator': (1, 1.5), 'engine.aiReview': (1, 3),
+        'ci': (2, 0), 'docs': (2, 1), 'engine.sandbox': (2, 2), 'changes': (2, 3),
     },
     'implementDeck': {
         'engine.orchestrator': (1, 0), 'engine.sandbox': (2, 0),

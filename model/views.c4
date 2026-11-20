@@ -150,8 +150,8 @@ views {
     }
     loop 'until the judge says pass, at most 3 times' {
       engine.implement.implementer -> engine.verify.checks 'run'
-      engine.verify.checks -> engine.verify.evidence 'green'
-      engine.verify.evidence -> engine.aiReview.reviewers 'PR + evidence'
+      engine.verify.checks -> engine.verify.validator 'green'
+      engine.verify.validator -> engine.aiReview.reviewers 'PR + evidence'
       engine.aiReview.reviewers -> engine.aiReview.judge 'findings'
       engine.aiReview.judge -> engine.implement.implementer 'fix'
     }

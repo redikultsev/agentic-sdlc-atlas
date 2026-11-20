@@ -131,7 +131,7 @@ layout: default
 <div class="stg">
 <div class="dg"><likec4-view view-id="planDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs n4">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Scenario writer</p><dl class="eg3"><dt>In</dt><dd>The approved spec: acceptance criteria</dd><dt>Does</dt><dd>Writes user-level scenarios, no code</dd><dt>Out</dt><dd>Hidden acceptance scenarios</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Scenario writer</p><dl class="eg3"><dt>In</dt><dd>The approved spec: acceptance criteria</dd><dt>Does</dt><dd>Writes user-level scenarios, no code</dd><dt>Out</dt><dd>Acceptance scenarios next to the spec</dd></dl></div>
   <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Codebase researcher</p><dl class="eg3"><dt>In</dt><dd>An approved L spec</dd><dt>Does</dt><dd>Reads the code only, changes nothing</dd><dt>Out</dt><dd>Research: affected modules, what must stay true</dd></dl></div>
   <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Planner</p><dl class="eg3"><dt>In</dt><dd>The spec, past decisions, research (L)</dd><dt>Does</dt><dd>Splits the work into slices</dd><dt>Out</dt><dd>Plan; one sub-issue per slice with "blocked by" links</dd></dl></div>
   <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Approve plan</p><dl class="eg3"><dt>In</dt><dd>The plan</dd><dt>Does</dt><dd>The Operator approves or edits it</dd><dt>Out</dt><dd>The work item goes to Implement</dd></dl></div>
@@ -165,14 +165,13 @@ layout: default
 
 # 5. Self-verify
 
-<div class="lead">CI runs outside the sandbox, then a separate Validator plays hidden scenarios. Rounds are capped.</div>
+<div class="lead">CI runs outside the sandbox, then a separate Validator plays the acceptance scenarios and records evidence. Rounds are capped.</div>
 
 <div class="stg">
 <div class="dg"><likec4-view view-id="verifyDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-<div class="pcs n3">
+<div class="pcs n2">
   <div class="pc"><div class="pc-top"><span class="pk k-script">Script</span><span class="ps">planned</span></div><p class="pn">CI checks</p><dl class="eg3"><dt>In</dt><dd>The pushed branch</dd><dt>Does</dt><dd>Runs the full test suite, lint, types, build</dd><dt>Out</dt><dd>Green: on to the Validator. Red: fix, at most 3 rounds</dd></dl></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Validator</p><dl class="eg3"><dt>In</dt><dd>The change after green CI, the hidden scenarios</dd><dt>Does</dt><dd>Starts the app, plays each scenario as a user</dd><dt>Out</dt><dd>Pass, or fail with the scenario that broke</dd></dl></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Evidence</p><dl class="eg3"><dt>In</dt><dd>The change that passed CI and the Validator</dd><dt>Does</dt><dd>Records screenshots, video, command output</dd><dt>Out</dt><dd>Evidence attached to the PR</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Validator</p><dl class="eg3"><dt>In</dt><dd>The change after green CI, the acceptance scenarios</dd><dt>Does</dt><dd>Plays each scenario as a user, records evidence</dd><dt>Out</dt><dd>Pass with evidence on the PR, or fail with the scenario that broke</dd></dl></div>
 </div>
 </div>
 
@@ -356,7 +355,7 @@ layout: default
 | 16 | Several agents on one work item | One fresh Implementer session per slice. Each slice is a sub-issue of the work item with "blocked by" links; the Orchestrator works the frontier (slices whose blockers are done) and runs frontier slices with no shared files in parallel, each in its own sandbox. It merges slice branches; a conflict goes back to the Implementer. Revised 2026-11-20: slices moved from the plan document to tracker sub-issues; a sandbox per parallel slice instead of a worktree (Stripe, Ramp: worktrees do not scale) |
 | 17 | What Triage does before sizing | Works it out alone from the request, alerts, logs and code; never asks people. Checks duplicates, that the behaviour is not already built, and the register of rejected requests; reproduces a bug; writes down assumptions where something stays unclear. Proposes an outcome: for the agent, for a human, won't do. The Operator decides at Accept. Revised 2026-11-20: "needs info" (questions to the requester) removed by decision 19 |
 | 19 | Who resolves ambiguity | Agents resolve it themselves from the sources they can read (request, alerts, logs, code, past decisions), write down their assumptions and go on. People are reached only at the gates, where the Operator sees the assumptions and can correct them. One exception: the Interviewer in Spec asks the Operator about business choices, few and short, by the presentation rules (format still open) |
-| 20 | Who writes code and tests, and how they stay honest | One agent, the Implementer, is the only one that changes code: per slice it writes unit tests first, then code, in its own sandbox. Independence is in checking: a Scenario writer in Plan turns acceptance criteria into end-to-end scenarios kept outside the repository; after CI (outside the sandbox) a separate Validator with a fresh context and its own sandbox plays them against the running app and never edits code |
+| 20 | Who writes code and tests, and how they stay honest | One agent, the Implementer, is the only one that changes code: per slice it writes unit tests first, then code, in its own sandbox. A Scenario writer in Plan turns acceptance criteria into end-to-end scenarios in business language, without knowing the implementation; they sit next to the spec and the Implementer reads them. After CI (outside the sandbox) a separate Validator with a fresh context and its own sandbox plays them against the running app, records evidence for the PR and never edits code. Revised 2026-11-20: scenarios are not hidden and have no store of their own; Evidence merged into the Validator |
 | 21 | Sandbox rules | A disposable sandbox per agent session; everything that changes or runs code runs inside. Network closed by default; push only through a proxy to one branch; no merge rights; the authoritative CI runs outside |
 | 18 | How to check the model for gaps | After the deck walkthrough, every stage answers five questions: what triggers it, what it reads and writes, what it triggers next, where a human re-enters, what stops two runs doing the same work |
 
