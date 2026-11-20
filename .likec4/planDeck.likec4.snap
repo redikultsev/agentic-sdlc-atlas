@@ -57,12 +57,12 @@
       }
     ]
   },
-  "hash": "zfoBZ7BtizHMKuJ1sni7R4FtPLyBTJI7JOHNlJjAIFg",
+  "hash": "NF2Ofl7g0XePGhz9eoILAuuQdU8P0fuDVa5x94MGy1A",
   "bounds": {
     "x": -40,
     "y": -100,
     "width": 1120,
-    "height": 915
+    "height": 715
   },
   "nodes": [
     {
@@ -92,12 +92,12 @@
       "kind": "human",
       "isCustomized": true,
       "x": 0,
-      "y": 600,
+      "y": 400,
       "width": 240,
       "height": 135,
       "labelBBox": {
         "x": 63,
-        "y": 200,
+        "y": 0,
         "width": 115,
         "height": 32
       }
@@ -108,12 +108,10 @@
       "level": 0,
       "children": [],
       "inEdges": [
-        "cg1d7x",
         "1x8ps76",
         "50urxi"
       ],
       "outEdges": [
-        "uo7sgd",
         "33gp1i"
       ],
       "title": "Specs, plans and decisions",
@@ -138,10 +136,10 @@
       "x": 800,
       "y": 0,
       "width": 240,
-      "height": 335,
+      "height": 135,
       "labelBBox": {
         "x": 542,
-        "y": -317.0,
+        "y": -417,
         "width": 175,
         "height": 66
       }
@@ -153,7 +151,6 @@
       "children": [],
       "inEdges": [],
       "outEdges": [
-        "12kv8cz",
         "1tjism4",
         "1kl98ig"
       ],
@@ -176,12 +173,12 @@
       "isCustomized": true,
       "navigateTo": "specDeck",
       "x": 0,
-      "y": 200,
+      "y": 0,
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -829,
-        "y": 249,
+        "x": -728,
+        "y": 49,
         "width": 99,
         "height": 32
       }
@@ -191,21 +188,17 @@
       "parent": null,
       "level": 0,
       "children": [
-        "engine.plan.scenarioWriter",
         "engine.plan.researcher",
         "engine.plan.planner",
         "engine.plan.planGate"
       ],
       "inEdges": [
         "1te0nzn",
-        "uo7sgd",
         "33gp1i",
-        "12kv8cz",
         "1tjism4",
         "1kl98ig"
       ],
       "outEdges": [
-        "cg1d7x",
         "1x8ps76",
         "3l7a9x",
         "50urxi",
@@ -233,59 +226,12 @@
       "x": 360,
       "y": -60,
       "width": 320,
-      "height": 835,
+      "height": 635,
       "labelBBox": {
-        "x": -204,
+        "x": -283,
         "y": -248,
         "width": 46,
         "height": 15
-      }
-    },
-    {
-      "id": "engine.plan.scenarioWriter",
-      "parent": "engine.plan",
-      "level": 1,
-      "children": [],
-      "inEdges": [
-        "uo7sgd",
-        "12kv8cz"
-      ],
-      "outEdges": [
-        "cg1d7x"
-      ],
-      "title": "Scenario writer",
-      "modelRef": "engine.plan.scenarioWriter",
-      "shape": "rectangle",
-      "color": "indigo",
-      "style": {
-        "opacity": 15,
-        "size": "sm",
-        "textSize": "xl"
-      },
-      "description": {
-        "txt": ""
-      },
-      "tags": [
-        "idea"
-      ],
-      "metadata": {
-        "in": "The approved spec: acceptance criteria",
-        "does": "Writes user-level scenarios, no code",
-        "out": "Acceptance scenarios next to the spec"
-      },
-      "notation": "Agent (LLM)",
-      "technology": "Acceptance scenarios",
-      "kind": "agent",
-      "isCustomized": true,
-      "x": 400,
-      "y": 0,
-      "width": 240,
-      "height": 135,
-      "labelBBox": {
-        "x": -185,
-        "y": -200,
-        "width": 191,
-        "height": 32
       }
     },
     {
@@ -325,12 +271,12 @@
       "kind": "agent",
       "isCustomized": true,
       "x": 400,
-      "y": 200,
+      "y": 0,
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -449,
-        "y": -17,
+        "x": -238,
+        "y": -217,
         "width": 138,
         "height": 66
       }
@@ -375,12 +321,12 @@
       "kind": "agent",
       "isCustomized": true,
       "x": 400,
-      "y": 400,
+      "y": 200,
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -430,
-        "y": 0,
+        "x": -219,
+        "y": -200,
         "width": 101,
         "height": 32
       }
@@ -422,12 +368,12 @@
       "kind": "gate",
       "isCustomized": true,
       "x": 400,
-      "y": 600,
+      "y": 400,
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -464,
-        "y": 0,
+        "x": -253,
+        "y": -200,
         "width": 169,
         "height": 32
       }
@@ -461,12 +407,12 @@
       "kind": "store",
       "isCustomized": true,
       "x": 800,
-      "y": 400,
+      "y": 200,
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -401,
-        "y": -200,
+        "x": -190,
+        "y": -400,
         "width": 144,
         "height": 32
       }
@@ -499,12 +445,12 @@
       "isCustomized": true,
       "navigateTo": "implementDeck",
       "x": 800,
-      "y": 600,
+      "y": 400,
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -63,
-        "y": -228,
+        "x": 148,
+        "y": -428,
         "width": 166,
         "height": 32
       }
@@ -519,73 +465,34 @@
       "points": [
         [
           240,
-          668
+          468
         ],
         [
           320,
-          668
+          468
         ],
         [
           320,
-          668
+          468
         ],
         [
           400,
-          668
+          468
         ]
       ],
       "labelBBox": {
         "x": 285,
-        "y": 637,
+        "y": 437,
         "width": 70,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "3qld09"
+        "1hfuoj7"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "isLabelCustomized": true
-    },
-    {
-      "id": "uo7sgd",
-      "source": "docs",
-      "target": "engine.plan.scenarioWriter",
-      "label": "acceptance criteria",
-      "points": [
-        [
-          800,
-          48
-        ],
-        [
-          720,
-          48
-        ],
-        [
-          720,
-          38
-        ],
-        [
-          640,
-          38
-        ]
-      ],
-      "labelBBox": {
-        "x": 654,
-        "y": 12,
-        "width": 132,
-        "height": 25
-      },
-      "parent": null,
-      "relations": [
-        "19lldds"
-      ],
-      "color": "gray",
-      "line": "dotted",
-      "head": "normal",
-      "kind": "reads",
       "isLabelCustomized": true
     },
     {
@@ -596,74 +503,35 @@
       "points": [
         [
           800,
-          228
+          68
         ],
         [
           720,
-          228
+          68
         ],
         [
           720,
-          414
+          214
         ],
         [
           640,
-          414
+          214
         ]
       ],
       "labelBBox": {
         "x": 666,
-        "y": 290,
+        "y": 110,
         "width": 109,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "pwo5oo"
+        "w8w2ej"
       ],
       "color": "gray",
       "line": "dotted",
       "head": "normal",
       "kind": "reads",
-      "isLabelCustomized": true
-    },
-    {
-      "id": "12kv8cz",
-      "source": "engine.spec",
-      "target": "engine.plan.scenarioWriter",
-      "label": "M, L",
-      "points": [
-        [
-          240,
-          214
-        ],
-        [
-          320,
-          214
-        ],
-        [
-          320,
-          68
-        ],
-        [
-          400,
-          68
-        ]
-      ],
-      "labelBBox": {
-        "x": 301,
-        "y": 110,
-        "width": 38,
-        "height": 25
-      },
-      "parent": null,
-      "relations": [
-        "1m0yedh"
-      ],
-      "color": "primary",
-      "line": "dashed",
-      "head": "normal",
-      "kind": "handoff",
       "isLabelCustomized": true
     },
     {
@@ -674,24 +542,24 @@
       "points": [
         [
           240,
-          268
+          38
         ],
         [
           320,
-          268
+          38
         ],
         [
           320,
-          268
+          68
         ],
         [
           400,
-          268
+          68
         ]
       ],
       "labelBBox": {
         "x": 310,
-        "y": 237,
+        "y": 22,
         "width": 20,
         "height": 25
       },
@@ -713,24 +581,24 @@
       "points": [
         [
           240,
-          322
+          98
         ],
         [
           320,
-          322
+          98
         ],
         [
           320,
-          468
+          268
         ],
         [
           400,
-          468
+          268
         ]
       ],
       "labelBBox": {
         "x": 308,
-        "y": 364,
+        "y": 152,
         "width": 24,
         "height": 25
       },
@@ -752,6 +620,44 @@
       "points": [
         [
           520,
+          135
+        ],
+        [
+          520,
+          168
+        ],
+        [
+          520,
+          168
+        ],
+        [
+          520,
+          200
+        ]
+      ],
+      "labelBBox": {
+        "x": 359,
+        "y": 155,
+        "width": 149,
+        "height": 25
+      },
+      "parent": "engine.plan",
+      "relations": [
+        "r3t4ux"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "mwi4h0",
+      "source": "engine.plan.planner",
+      "target": "engine.plan.planGate",
+      "label": "plan",
+      "points": [
+        [
+          520,
           335
         ],
         [
@@ -768,90 +674,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 359,
-        "y": 355,
-        "width": 149,
-        "height": 25
-      },
-      "parent": "engine.plan",
-      "relations": [
-        "ifurpa"
-      ],
-      "color": "gray",
-      "line": "dashed",
-      "head": "normal",
-      "isLabelCustomized": true
-    },
-    {
-      "id": "mwi4h0",
-      "source": "engine.plan.planner",
-      "target": "engine.plan.planGate",
-      "label": "plan",
-      "points": [
-        [
-          520,
-          535
-        ],
-        [
-          520,
-          568
-        ],
-        [
-          520,
-          568
-        ],
-        [
-          520,
-          600
-        ]
-      ],
-      "labelBBox": {
         "x": 468,
-        "y": 555,
+        "y": 355,
         "width": 40,
         "height": 25
       },
       "parent": "engine.plan",
       "relations": [
-        "wglv2t"
-      ],
-      "color": "gray",
-      "line": "dashed",
-      "head": "normal",
-      "isLabelCustomized": true
-    },
-    {
-      "id": "cg1d7x",
-      "source": "engine.plan.scenarioWriter",
-      "target": "docs",
-      "label": "scenarios",
-      "points": [
-        [
-          640,
-          98
-        ],
-        [
-          720,
-          98
-        ],
-        [
-          720,
-          108
-        ],
-        [
-          800,
-          108
-        ]
-      ],
-      "labelBBox": {
-        "x": 684,
-        "y": 72,
-        "width": 73,
-        "height": 25
-      },
-      "parent": null,
-      "relations": [
-        "wawz8h"
+        "228p2s"
       ],
       "color": "gray",
       "line": "dashed",
@@ -866,30 +696,30 @@
       "points": [
         [
           640,
-          268
+          68
         ],
         [
           720,
-          268
+          68
         ],
         [
           720,
-          168
+          14
         ],
         [
           800,
-          168
+          14
         ]
       ],
       "labelBBox": {
         "x": 653,
-        "y": 187,
+        "y": 10,
         "width": 134,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1bywtz6"
+        "41hzv1"
       ],
       "color": "gray",
       "line": "dashed",
@@ -904,30 +734,30 @@
       "points": [
         [
           640,
-          522
+          322
         ],
         [
           720,
-          522
+          322
         ],
         [
           720,
-          468
+          268
         ],
         [
           800,
-          468
+          268
         ]
       ],
       "labelBBox": {
         "x": 626,
-        "y": 464,
+        "y": 264,
         "width": 188,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "17doww4"
+        "19bqoi1"
       ],
       "color": "gray",
       "line": "dashed",
@@ -942,30 +772,30 @@
       "points": [
         [
           640,
-          468
+          268
         ],
         [
           720,
-          468
+          268
         ],
         [
           720,
-          288
+          122
         ],
         [
           800,
-          288
+          122
         ]
       ],
       "labelBBox": {
         "x": 683,
-        "y": 347,
+        "y": 164,
         "width": 74,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1uwl03t"
+        "dkeauk"
       ],
       "color": "gray",
       "line": "dashed",
@@ -980,30 +810,30 @@
       "points": [
         [
           640,
-          668
+          468
         ],
         [
           720,
-          668
+          468
         ],
         [
           720,
-          668
+          468
         ],
         [
           800,
-          668
+          468
         ]
       ],
       "labelBBox": {
         "x": 700,
-        "y": 637,
+        "y": 437,
         "width": 40,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "t19jwh"
+        "1mpyema"
       ],
       "color": "primary",
       "line": "dashed",

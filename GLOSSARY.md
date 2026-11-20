@@ -7,10 +7,10 @@ Terms used in this project. Stage names follow the convergent pipeline of leadin
 | # | Stage | What happens | Who |
 |---|---|---|---|
 | 1 | Intake | A signal becomes a work item; an agent proposes size and risk, the Operator accepts | agent + Operator |
-| 2 | Spec | M and L only: what "done" means — acceptance criteria, constraints | agent, Operator approves |
+| 2 | Spec | M and L only: what "done" means — acceptance criteria with key examples, constraints | agent, Operator approves |
 | 3 | Plan | M and L only: how we do it in slices and how we prove it; for L, codebase research first | agent, Operator approves |
 | 4 | Implement | The only agent that changes code writes it, slice by slice, unit tests first, in its sandbox | agent |
-| 5 | Self-verify | CI outside the sandbox, then a separate Validator plays the acceptance scenarios and records evidence; rounds are capped | script + agent |
+| 5 | Self-verify | CI outside the sandbox, then a separate Validator checks the acceptance criteria on the running app and records evidence; rounds are capped | script + agent |
 | 6 | AI review | Reviewer agents and a judge with a pass / fix / block verdict | agents |
 | 7 | Merge | By risk: R0 merges itself, R1 the Operator on evidence, R2 the Operator reads the code | script + Operator |
 | 8 | Deploy & watch | R0 and R1 right away, R2 on a yes; a watcher compares metrics before and after | script + agent |
@@ -66,8 +66,8 @@ The agent proposes size and risk at intake; the Operator may correct them.
 | **Change set** | A proposed modification on a branch: PR in GitHub, MR in GitLab (CDEvents: change) |
 | **PR head** | The last commit of a PR. An approval counts only for the head the reviewer saw |
 | **Verdict** | The judge's decision as schema JSON: `pass`, `fix` or `block`. Code picks the next step from it |
-| **Acceptance scenarios** | End-to-end scenarios in business language, written from the spec before code without knowing the implementation; kept next to the spec; the Implementer reads them, the Validator plays them |
-| **Validator** | A separate agent with a fresh context and its own sandbox: plays the acceptance scenarios against the running app, records evidence, never edits code |
+| **Acceptance criteria** | Rules for "done", observable from outside, each with 2–3 key examples: input → expected result, boundary values, what must not happen |
+| **Validator** | A separate agent with a fresh context and its own sandbox: checks the acceptance criteria on the running app, records evidence, never edits code |
 | **Slice** | A piece of the plan that can be built and checked on its own ("vertical slice"). The Planner cuts the work into slices; each one runs in a fresh Implementer session in its own sandbox; independent slices run in parallel |
 | **Blocked by** | A link between slice sub-issues: this slice starts only after that one is done |
 | **Frontier** | The slices whose blockers are all done; they can start now, in parallel |

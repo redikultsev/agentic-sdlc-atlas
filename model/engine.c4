@@ -27,7 +27,7 @@ model {
   docs = store 'Specs, plans and decisions' {
     #idea
     technology 'files in the repo or the work item body'
-    description 'Per work item: the spec (what "done" means), acceptance scenarios, the plan (how we do it and prove it), for L a codebase research document. Per project: decision records (ADR) and the register of rejected requests, so new work does not contradict old choices and rejected ideas are not argued twice.'
+    description 'Per work item: the spec (what "done" means: acceptance criteria with key examples), the plan (how we do it and prove it), for L a codebase research document. Per project: decision records (ADR) and the register of rejected requests, so new work does not contradict old choices and rejected ideas are not argued twice.'
   }
   changes = store 'Change sets' {
     #built
@@ -107,11 +107,11 @@ model {
       interviewer = agent 'Interviewer' {
         #idea
         technology 'Clarify'
-        description 'Asks about what is underspecified, writes the spec: why, acceptance criteria, what must not change.'
+        description 'Asks about what is underspecified, writes the spec: why, what must not change, and acceptance criteria. Each criterion is observable from outside and carries 2–3 key examples (input → expected result, boundary values, what must not happen); few criteria, at the level of behaviour.'
         metadata {
           in 'An accepted M or L work item'
           does 'Asks the Operator about what is unclear'
-          out 'Spec: why, acceptance criteria, what must not change'
+          out 'Spec: why, criteria with key examples, what must not change'
         }
       }
       specGate = gate 'Approve spec' {
@@ -131,16 +131,6 @@ model {
     plan = phase '3. Plan' {
       technology 'Plan & decompose'
       description 'M and L only. How we do it, in slices, and how we prove it is done.'
-      scenarioWriter = agent 'Scenario writer' {
-        #idea
-        technology 'Acceptance scenarios'
-        description 'Turns the acceptance criteria of the spec into end-to-end scenarios in business language: what a user does and sees, written without knowing the implementation. Works in parallel with the Planner. Scenarios sit next to the spec; the Implementer reads them but does not change them.'
-        metadata {
-          in 'The approved spec: acceptance criteria'
-          does 'Writes user-level scenarios, no code'
-          out 'Acceptance scenarios next to the spec'
-        }
-      }
       researcher = agent 'Codebase researcher' {
         #idea
         technology 'Research'
@@ -194,7 +184,7 @@ model {
     // ================= 5. Self-verify =================
     verify = phase '5. Self-verify' {
       technology 'Self-verification'
-      description 'CI runs outside the sandbox, then a separate Validator plays the acceptance scenarios and records evidence. Rounds are capped.'
+      description 'CI runs outside the sandbox, then a separate Validator checks the acceptance criteria on the running app and records evidence. Rounds are capped.'
       checks = script 'CI checks' {
         #planned
         technology 'CI outside the sandbox'
@@ -208,11 +198,11 @@ model {
       validator = agent 'Validator' {
         #idea
         technology 'Fresh context, own sandbox'
-        description 'A separate agent with a fresh context and its own sandbox. Starts the app, plays the acceptance scenarios as a user and records screenshots, video and command output as it goes. Never edits code: it gives a verdict and attaches the evidence to the PR.'
+        description 'A separate agent with a fresh context and its own sandbox. Starts the app, checks each acceptance criterion and its key examples as a user and records screenshots, video and command output as it goes. Never edits code: it gives a verdict and attaches the evidence to the PR.'
         metadata {
-          in 'The change after green CI, the acceptance scenarios'
-          does 'Plays each scenario as a user, records evidence'
-          out 'Pass with evidence on the PR, or fail with the scenario that broke'
+          in 'The change after green CI, the acceptance criteria'
+          does 'Checks each criterion and its examples as a user, records evidence'
+          out 'Pass with evidence on the PR, or fail with the criterion that broke'
         }
       }
       checks -> validator 'green'
@@ -306,21 +296,18 @@ model {
   operator -> engine.spec.specGate 'approves'
   engine.spec.specGate .handoff engine.plan.researcher 'L'
   engine.spec.specGate .handoff engine.plan.planner 'M'
-  engine.spec.specGate .handoff engine.plan.scenarioWriter 'M, L'
-  docs .reads engine.plan.scenarioWriter 'acceptance criteria'
-  engine.plan.scenarioWriter -> docs 'scenarios'
   engine.plan.planner -> docs 'plan, ADR'
   docs .reads engine.plan.planner 'spec, decisions'
   engine.plan.planner -> tracker 'slice sub-issues, blocked by'
   engine.plan.researcher -> docs 'research document'
-  docs .reads engine.implement.implementer 'plan, scenarios'
+  docs .reads engine.implement.implementer 'plan, criteria'
   docs .reads engine.aiReview.reviewers 'spec'
   operator -> engine.plan.planGate 'approves'
   engine.plan.planGate .handoff engine.implement.implementer 'plan'
   engine.implement.implementer -> changes 'PR'
   engine.implement.implementer .handoff engine.verify.checks 'pushed branch'
   engine.verify.checks -> ci 'results'
-  docs .reads engine.verify.validator 'scenarios'
+  docs .reads engine.verify.validator 'acceptance criteria'
   engine.verify.validator .verdict engine.implement.implementer 'fail: fix, same 3 rounds'
   engine.verify.validator -> engine.sandbox 'runs the app in its own'
   engine.verify.validator -> changes 'evidence on the PR'

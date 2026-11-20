@@ -57,7 +57,7 @@
       }
     ]
   },
-  "hash": "Hacvl6iF_pRUyI-r3kzUdy4P3HT-1TVlut_JhIMBtZQ",
+  "hash": "-Kgc3CQm_XzYETCxTV-DpUQwYogMGdh-y6429uJDvS0",
   "bounds": {
     "x": -40,
     "y": -100,
@@ -139,7 +139,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -831,
+        "x": -890,
         "y": -356.0,
         "width": 166,
         "height": 32
@@ -189,7 +189,7 @@
       "width": 330,
       "height": 535.0,
       "labelBBox": {
-        "x": 25,
+        "x": -34,
         "y": -370,
         "width": 88,
         "height": 15
@@ -237,7 +237,7 @@
       "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": 81,
+        "x": 22,
         "y": -531,
         "width": 127,
         "height": 32
@@ -274,9 +274,9 @@
         "idea"
       ],
       "metadata": {
-        "in": "The change after green CI, the acceptance scenarios",
-        "does": "Plays each scenario as a user, records evidence",
-        "out": "Pass with evidence on the PR, or fail with the scenario that broke"
+        "in": "The change after green CI, the acceptance criteria",
+        "does": "Checks each criterion and its examples as a user, records evidence",
+        "out": "Pass with evidence on the PR, or fail with the criterion that broke"
       },
       "notation": "Agent (LLM)",
       "technology": "Fresh context, own sandbox",
@@ -287,7 +287,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 77,
+        "x": 18,
         "y": -21.0,
         "width": 115,
         "height": 32
@@ -326,7 +326,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -35,
+        "x": -94,
         "y": -691,
         "width": 174,
         "height": 32
@@ -365,7 +365,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -28,
+        "x": -87,
         "y": 649,
         "width": 161,
         "height": 32
@@ -404,7 +404,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -5,
+        "x": -64,
         "y": 264,
         "width": 115,
         "height": 32
@@ -442,7 +442,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -423,
+        "x": -482,
         "y": 279,
         "width": 150,
         "height": 32
@@ -454,7 +454,7 @@
       "id": "6nxiza",
       "source": "docs",
       "target": "engine.verify.validator",
-      "label": "scenarios",
+      "label": "acceptance criteria",
       "points": [
         [
           800,
@@ -474,14 +474,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 684,
+        "x": 654,
         "y": 260,
-        "width": 73,
+        "width": 132,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "q184ex"
+        "1e79xiy"
       ],
       "color": "gray",
       "line": "dotted",
@@ -520,7 +520,7 @@
       },
       "parent": null,
       "relations": [
-        "25ynci"
+        "uov12t"
       ],
       "color": "primary",
       "line": "dashed",
@@ -597,7 +597,7 @@
       },
       "parent": null,
       "relations": [
-        "wbmy4i"
+        "1vluio7"
       ],
       "color": "gray",
       "line": "dashed",
@@ -635,7 +635,7 @@
       },
       "parent": null,
       "relations": [
-        "1x9b1xw"
+        "1rox7mb"
       ],
       "color": "red",
       "line": "dashed",
@@ -674,7 +674,7 @@
       },
       "parent": null,
       "relations": [
-        "1nx5p13"
+        "hz1lnb"
       ],
       "color": "gray",
       "line": "dashed",
@@ -712,7 +712,7 @@
       },
       "parent": null,
       "relations": [
-        "d2c3b5"
+        "1eoo32"
       ],
       "color": "gray",
       "line": "dashed",
@@ -750,7 +750,7 @@
       },
       "parent": null,
       "relations": [
-        "1r0wlw"
+        "k3dchl"
       ],
       "color": "red",
       "line": "dashed",
@@ -789,7 +789,7 @@
       },
       "parent": null,
       "relations": [
-        "5i1qdd"
+        "1kijp0v"
       ],
       "color": "primary",
       "line": "dashed",
