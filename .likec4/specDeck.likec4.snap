@@ -1,0 +1,848 @@
+{
+  "_type": "element",
+  "tags": null,
+  "links": null,
+  "viewOf": "engine.spec",
+  "_stage": "layouted",
+  "sourcePath": "model/deck-views.c4",
+  "description": null,
+  "title": "2. Spec",
+  "id": "specDeck",
+  "autoLayout": {
+    "direction": "LR",
+    "nodeSep": 50,
+    "rankSep": 40
+  },
+  "notation": {
+    "nodes": [
+      {
+        "title": "Human",
+        "shape": "person",
+        "color": "amber",
+        "kinds": [
+          "human"
+        ]
+      },
+      {
+        "title": "Agent (LLM)",
+        "shape": "rectangle",
+        "color": "indigo",
+        "kinds": [
+          "agent"
+        ]
+      },
+      {
+        "title": "Gate: the Operator decides",
+        "shape": "rectangle",
+        "color": "red",
+        "kinds": [
+          "gate"
+        ]
+      },
+      {
+        "title": "Pipeline stage",
+        "shape": "rectangle",
+        "color": "slate",
+        "kinds": [
+          "phase"
+        ]
+      },
+      {
+        "title": "Store",
+        "shape": "storage",
+        "color": "storecolor",
+        "kinds": [
+          "store"
+        ]
+      }
+    ]
+  },
+  "hash": "PoHG4YeCI_fRrJ15sqHyoYOn1cK8B7nAQFm5-oF3VsQ",
+  "bounds": {
+    "x": -40,
+    "y": -100,
+    "width": 1120,
+    "height": 715
+  },
+  "nodes": [
+    {
+      "id": "operator",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "6unc8v"
+      ],
+      "outEdges": [
+        "1bqi1kj"
+      ],
+      "title": "Operator",
+      "modelRef": "operator",
+      "shape": "person",
+      "color": "amber",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Human",
+      "technology": "Human",
+      "kind": "human",
+      "isCustomized": true,
+      "x": 0,
+      "y": 200,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -283,
+        "y": 249,
+        "width": 115,
+        "height": 32
+      }
+    },
+    {
+      "id": "docs",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "a1w5vo"
+      ],
+      "outEdges": [
+        "1yjhsh0",
+        "ry0c03"
+      ],
+      "title": "Specs, plans and decisions",
+      "modelRef": "docs",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "notation": "Store",
+      "technology": "files in the repo or the work item body",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 800,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 105,
+        "y": -421,
+        "width": 175,
+        "height": 66
+      }
+    },
+    {
+      "id": "engine.intake",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1ti5mub"
+      ],
+      "title": "1. Intake",
+      "modelRef": "engine.intake",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Intake & triage",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "intakeDeck",
+      "x": 0,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 64,
+        "y": -188,
+        "width": 111,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.spec",
+      "parent": null,
+      "level": 0,
+      "children": [
+        "engine.spec.interviewer",
+        "engine.spec.specGate",
+        "engine.spec.testWriter"
+      ],
+      "inEdges": [
+        "1bqi1kj",
+        "1yjhsh0",
+        "ry0c03",
+        "1ti5mub"
+      ],
+      "outEdges": [
+        "6unc8v",
+        "a1w5vo",
+        "1jc0uzk",
+        "tmlrua"
+      ],
+      "title": "2. Spec",
+      "modelRef": "engine.spec",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Specification",
+      "kind": "phase",
+      "depth": 1,
+      "isCustomized": true,
+      "navigateTo": "spec",
+      "x": 360,
+      "y": -60,
+      "width": 320,
+      "height": 635,
+      "labelBBox": {
+        "x": 60,
+        "y": -237,
+        "width": 46,
+        "height": 15
+      }
+    },
+    {
+      "id": "engine.spec.interviewer",
+      "parent": "engine.spec",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1yjhsh0",
+        "1ti5mub"
+      ],
+      "outEdges": [
+        "11vl35y",
+        "6unc8v",
+        "a1w5vo"
+      ],
+      "title": "Interviewer",
+      "modelRef": "engine.spec.interviewer",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "An accepted M or L work item",
+        "does": "Asks the Operator about what is unclear",
+        "out": "Spec: why, acceptance criteria, what must not change"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "Clarify",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": 400,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 104,
+        "y": -188,
+        "width": 141,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.spec.specGate",
+      "parent": "engine.spec",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1bqi1kj",
+        "11vl35y"
+      ],
+      "outEdges": [
+        "12yjim9",
+        "1jc0uzk"
+      ],
+      "title": "Approve spec",
+      "modelRef": "engine.spec.specGate",
+      "shape": "rectangle",
+      "color": "red",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "The spec",
+        "does": "The Operator approves or edits it",
+        "out": "M \u2192 Plan; L \u2192 codebase research"
+      },
+      "notation": "Gate: the Operator decides",
+      "technology": "Gate",
+      "kind": "gate",
+      "isCustomized": true,
+      "x": 400,
+      "y": 200,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -295,
+        "y": 12,
+        "width": 175,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.spec.testWriter",
+      "parent": "engine.spec",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "ry0c03",
+        "12yjim9"
+      ],
+      "outEdges": [
+        "tmlrua"
+      ],
+      "title": "Test writer",
+      "modelRef": "engine.spec.testWriter",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "The approved spec",
+        "does": "Writes tests from the acceptance criteria",
+        "out": "Holdout tests, hidden from the Implementer"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "Holdout tests",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": 400,
+      "y": 400,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -687,
+        "y": 212,
+        "width": 135,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.plan",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1jc0uzk"
+      ],
+      "outEdges": [],
+      "title": "3. Plan",
+      "modelRef": "engine.plan",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Plan & decompose",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "planDeck",
+      "x": 800,
+      "y": 200,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -265,
+        "y": 249,
+        "width": 91,
+        "height": 32
+      }
+    },
+    {
+      "id": "ci",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "tmlrua"
+      ],
+      "outEdges": [],
+      "title": "Check results",
+      "modelRef": "ci",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "planned"
+      ],
+      "notation": "Store",
+      "technology": "CI",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 800,
+      "y": 400,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -710,
+        "y": 212,
+        "width": 174,
+        "height": 32
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "1bqi1kj",
+      "source": "operator",
+      "target": "engine.spec.specGate",
+      "label": "approves",
+      "points": [
+        [
+          240,
+          286
+        ],
+        [
+          320,
+          286
+        ],
+        [
+          320,
+          268
+        ],
+        [
+          400,
+          268
+        ]
+      ],
+      "labelBBox": {
+        "x": 285,
+        "y": 246,
+        "width": 70,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "rcasje"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1yjhsh0",
+      "source": "docs",
+      "target": "engine.spec.interviewer",
+      "label": "past decisions",
+      "points": [
+        [
+          800,
+          32
+        ],
+        [
+          720,
+          32
+        ],
+        [
+          720,
+          50
+        ],
+        [
+          640,
+          50
+        ]
+      ],
+      "labelBBox": {
+        "x": 669,
+        "y": 10,
+        "width": 102,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "5qcd7r"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "ry0c03",
+      "source": "docs",
+      "target": "engine.spec.testWriter",
+      "label": "acceptance criteria",
+      "points": [
+        [
+          800,
+          104
+        ],
+        [
+          720,
+          104
+        ],
+        [
+          720,
+          450
+        ],
+        [
+          640,
+          450
+        ]
+      ],
+      "labelBBox": {
+        "x": 654,
+        "y": 246,
+        "width": 132,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1f4f6vd"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1ti5mub",
+      "source": "engine.intake",
+      "target": "engine.spec.interviewer",
+      "label": "M, L",
+      "points": [
+        [
+          240,
+          68
+        ],
+        [
+          320,
+          68
+        ],
+        [
+          320,
+          50
+        ],
+        [
+          400,
+          50
+        ]
+      ],
+      "labelBBox": {
+        "x": 301,
+        "y": 28,
+        "width": 38,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "lhnbjo"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "11vl35y",
+      "source": "engine.spec.interviewer",
+      "target": "engine.spec.specGate",
+      "label": "spec",
+      "points": [
+        [
+          520,
+          135
+        ],
+        [
+          520,
+          168
+        ],
+        [
+          520,
+          168
+        ],
+        [
+          520,
+          200
+        ]
+      ],
+      "labelBBox": {
+        "x": 466,
+        "y": 155,
+        "width": 42,
+        "height": 25
+      },
+      "parent": "engine.spec",
+      "relations": [
+        "f3ax1u"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "12yjim9",
+      "source": "engine.spec.specGate",
+      "target": "engine.spec.testWriter",
+      "label": "approved spec",
+      "points": [
+        [
+          520,
+          335
+        ],
+        [
+          520,
+          368
+        ],
+        [
+          520,
+          368
+        ],
+        [
+          520,
+          400
+        ]
+      ],
+      "labelBBox": {
+        "x": 403,
+        "y": 355,
+        "width": 105,
+        "height": 25
+      },
+      "parent": "engine.spec",
+      "relations": [
+        "1qq5ydu"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "6unc8v",
+      "source": "engine.spec.interviewer",
+      "target": "operator",
+      "label": "questions",
+      "points": [
+        [
+          400,
+          86
+        ],
+        [
+          320,
+          86
+        ],
+        [
+          320,
+          250
+        ],
+        [
+          240,
+          250
+        ]
+      ],
+      "labelBBox": {
+        "x": 283,
+        "y": 137,
+        "width": 74,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "4yptsn"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "a1w5vo",
+      "source": "engine.spec.interviewer",
+      "target": "docs",
+      "label": "spec",
+      "points": [
+        [
+          640,
+          86
+        ],
+        [
+          720,
+          86
+        ],
+        [
+          720,
+          68
+        ],
+        [
+          800,
+          68
+        ]
+      ],
+      "labelBBox": {
+        "x": 699,
+        "y": 46,
+        "width": 42,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1xiq9gm"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1jc0uzk",
+      "source": "engine.spec.specGate",
+      "target": "engine.plan",
+      "label": "[...]",
+      "points": [
+        [
+          640,
+          268
+        ],
+        [
+          720,
+          268
+        ],
+        [
+          720,
+          268
+        ],
+        [
+          800,
+          268
+        ]
+      ],
+      "labelBBox": {
+        "x": 704,
+        "y": 237,
+        "width": 33,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "v4sdjc",
+        "ycgj3"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "tmlrua",
+      "source": "engine.spec.testWriter",
+      "target": "ci",
+      "label": "holdout tests",
+      "points": [
+        [
+          640,
+          486
+        ],
+        [
+          720,
+          486
+        ],
+        [
+          720,
+          468
+        ],
+        [
+          800,
+          468
+        ]
+      ],
+      "labelBBox": {
+        "x": 672,
+        "y": 446,
+        "width": 95,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "13ryebj"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    }
+  ],
+  "_layout": "manual"
+}

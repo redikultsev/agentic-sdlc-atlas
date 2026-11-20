@@ -107,17 +107,18 @@ layout: default
 
 # 2. Spec
 
-<div class="lead">M and L only. The agent clarifies and writes what "done" means.</div>
+<div class="lead">M and L only. The agent clarifies and writes what "done" means; a second agent turns it into hidden tests.</div>
 
 <div class="stg">
 <div class="dg"><likec4-view view-id="specDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs">
   <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Interviewer</p><dl class="eg3"><dt>In</dt><dd>An accepted M or L work item</dd><dt>Does</dt><dd>Asks the Operator about what is unclear</dd><dt>Out</dt><dd>Spec: why, acceptance criteria, what must not change</dd></dl></div>
   <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Approve spec</p><dl class="eg3"><dt>In</dt><dd>The spec</dd><dt>Does</dt><dd>The Operator approves or edits it</dd><dt>Out</dt><dd>M → Plan; L → codebase research</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Test writer</p><dl class="eg3"><dt>In</dt><dd>The approved spec</dd><dt>Does</dt><dd>Writes tests from the acceptance criteria</dd><dt>Out</dt><dd>Holdout tests, hidden from the Implementer</dd></dl></div>
 </div>
 </div>
 
-<p class="sf"><b>Work item states:</b> Clarifying → SpecReview &nbsp;·&nbsp; <b>The Operator decides:</b> Approve spec</p>
+<p class="sf"><b>Work item states:</b> Clarifying → SpecReview → (holdout tests written) &nbsp;·&nbsp; <b>The Operator decides:</b> Approve spec</p>
 
 
 ---
@@ -169,9 +170,9 @@ layout: default
 <div class="stg">
 <div class="dg"><likec4-view view-id="verifyDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs">
-  <div class="pc"><div class="pc-top"><span class="pk k-script">Script</span><span class="ps">planned</span></div><p class="pn">Checks</p><p class="pd">Tests, lint, types, build. They run by themselves, not on the agent word.</p></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-script">Script</span><span class="ps">idea</span></div><p class="pn">Holdout tests</p><p class="pd">Scenarios the agent cannot see or edit.</p></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Evidence</p><p class="pd">Screenshots, video, command output: what the Operator looks at instead of code.</p></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-script">Script</span><span class="ps">planned</span></div><p class="pn">Checks</p><dl class="eg3"><dt>In</dt><dd>A slice or the whole change</dd><dt>Does</dt><dd>Runs tests, lint, types, build</dd><dt>Out</dt><dd>Green: on to holdout. Red: fix, at most 3 rounds</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-script">Script</span><span class="ps">idea</span></div><p class="pn">Holdout tests</p><dl class="eg3"><dt>In</dt><dd>The change after green checks</dd><dt>Does</dt><dd>Runs the hidden tests from the spec</dd><dt>Out</dt><dd>Green: on to evidence. Red: fix, same 3 rounds</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Evidence</p><dl class="eg3"><dt>In</dt><dd>The change with all checks green</dd><dt>Does</dt><dd>Records screenshots, video, command output</dd><dt>Out</dt><dd>Evidence attached to the PR</dd></dl></div>
 </div>
 </div>
 

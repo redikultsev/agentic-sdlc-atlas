@@ -14,7 +14,7 @@ STATUS = {'built': 'built', 'planned': 'planned', 'idea': 'idea'}
 STAGES = ['intake', 'spec', 'plan', 'implement', 'verify', 'aiReview', 'merge', 'deploy', 'learn']
 STATES = {  # which task states (docs/states.md) live in each stage
     'intake': 'New → Triaged → Accepted / ForHuman / Cancelled',
-    'spec': 'Clarifying → SpecReview',
+    'spec': 'Clarifying → SpecReview → (holdout tests written)',
     'plan': 'Researching (L) → Planning → PlanReview',
     'implement': 'Implementing',
     'verify': 'Verifying (round ≤ 3, else Blocked)',

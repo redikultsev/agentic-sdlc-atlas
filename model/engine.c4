@@ -37,7 +37,7 @@ model {
   ci = store 'Check results' {
     #planned
     technology 'CI'
-    description 'Tests, lint, types, build, holdout tests, with output tied to the commit.'
+    description 'Check output tied to the commit: tests, lint, types, build, holdout tests. Also keeps the holdout tests themselves, where the Implementer cannot read them.'
   }
   releases = store 'Deployments' {
     #built
@@ -103,7 +103,7 @@ model {
     // ================= 2. Spec =================
     spec = phase '2. Spec' {
       technology 'Specification'
-      description 'M and L only. The agent clarifies and writes what "done" means.'
+      description 'M and L only. The agent clarifies and writes what "done" means; a second agent turns it into hidden tests.'
       interviewer = agent 'Interviewer' {
         #idea
         technology 'Clarify'
@@ -124,7 +124,18 @@ model {
           out 'M → Plan; L → codebase research'
         }
       }
+      testWriter = agent 'Test writer' {
+        #idea
+        technology 'Holdout tests'
+        description 'Turns the acceptance criteria of the spec into holdout tests, right after the spec is approved, in parallel with planning. The tests go to CI only, so the Implementer cannot see or fit the code to them.'
+        metadata {
+          in 'The approved spec'
+          does 'Writes tests from the acceptance criteria'
+          out 'Holdout tests, hidden from the Implementer'
+        }
+      }
       interviewer -> specGate 'spec'
+      specGate -> testWriter 'approved spec'
     }
 
     // ================= 3. Plan =================
@@ -189,18 +200,33 @@ model {
         #planned
         technology 'Tests, lint, build'
         description 'Tests, lint, types, build. They run by themselves, not on the agent word.'
+        metadata {
+          in 'A slice or the whole change'
+          does 'Runs tests, lint, types, build'
+          out 'Green: on to holdout. Red: fix, at most 3 rounds'
+        }
       }
       holdout = script 'Holdout tests' {
         #idea
         technology 'Holdout'
-        description 'Scenarios the agent cannot see or edit.'
+        description 'Scenarios the agent cannot see or edit, written by the Test writer from the acceptance criteria.'
+        metadata {
+          in 'The change after green checks'
+          does 'Runs the hidden tests from the spec'
+          out 'Green: on to evidence. Red: fix, same 3 rounds'
+        }
       }
       evidence = agent 'Evidence' {
         #idea
         technology 'Evidence'
         description 'Screenshots, video, command output: what the Operator looks at instead of code.'
+        metadata {
+          in 'The change with all checks green'
+          does 'Records screenshots, video, command output'
+          out 'Evidence attached to the PR'
+        }
       }
-      checks -> evidence 'green'
+      checks -> holdout 'green'
       holdout -> evidence 'green'
     }
 
@@ -292,6 +318,8 @@ model {
   operator -> engine.spec.specGate 'approves'
   engine.spec.specGate .handoff engine.plan.researcher 'L'
   engine.spec.specGate .handoff engine.plan.planner 'M'
+  docs .reads engine.spec.testWriter 'acceptance criteria'
+  engine.spec.testWriter -> ci 'holdout tests'
   engine.plan.planner -> docs 'plan, ADR'
   docs .reads engine.plan.planner 'spec, decisions'
   engine.plan.planner -> tracker 'slice sub-issues, blocked by'
@@ -303,6 +331,10 @@ model {
   engine.implement.implementer -> changes 'PR'
   engine.implement.implementer .handoff engine.verify.checks 'run'
   engine.verify.checks -> ci 'results'
+  ci .reads engine.verify.holdout 'holdout tests'
+  engine.verify.holdout .verdict engine.implement.implementer 'red: fix, same 3 rounds'
+  engine.verify.evidence -> changes 'evidence on the PR'
+  engine.verify.checks .verdict engine.orchestrator 'red after 3 rounds'
   engine.verify.evidence .handoff engine.aiReview.reviewers 'PR + evidence'
   engine.aiReview.judge -> changes 'verdict'
   engine.aiReview.judge .verdict engine.merge.land 'pass, R0'

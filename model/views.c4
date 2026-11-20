@@ -43,6 +43,9 @@ views {
       engine.merge -> changes,
       prod -> *,
       docs -> *,
+      ci -> *,
+      engine.spec -> ci,
+      engine.verify -> changes,
       tracker -> *,
       monitoring -> *
     autoLayout LeftRight 60 80

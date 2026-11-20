@@ -16,6 +16,11 @@ PAD_X, PAD_TOP, PAD_BOTTOM = 40, 60, 40   # container padding around its childre
 
 # view id -> {element id: (column, row)}; containers are sized around their children
 LAYOUTS = {
+    'specDeck': {
+        'engine.intake': (0, 0), 'operator': (0, 1),
+        'engine.spec.interviewer': (1, 0), 'engine.spec.specGate': (1, 1), 'engine.spec.testWriter': (1, 2),
+        'docs': (2, 0), 'engine.plan': (2, 1), 'ci': (2, 2),
+    },
     'planDeck': {
         'engine.spec': (0, 0), 'operator': (0, 2),
         'engine.plan.researcher': (1, 0), 'engine.plan.planner': (1, 1), 'engine.plan.planGate': (1, 2),
