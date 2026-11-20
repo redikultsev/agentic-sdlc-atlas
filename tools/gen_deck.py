@@ -12,15 +12,15 @@ KIND = {'agent': 'agent', 'script': 'script', 'gate': 'Operator decides', 'store
         'platform': 'cross-cutting', 'human': 'human', 'external': 'external', 'phase': 'stage'}
 STATUS = {'built': 'built', 'planned': 'planned', 'idea': 'idea'}
 STAGES = ['intake', 'spec', 'plan', 'implement', 'verify', 'aiReview', 'merge', 'deploy', 'learn']
-STATES = {  # which task states (docs/states.md) live in each stage
-    'intake': 'New → Triaged → Accepted / ForHuman / Cancelled',
-    'spec': 'Clarifying → SpecReview',
-    'plan': 'Researching (L) → Planning → PlanReview',
+STATES = {  # which work item states (docs/states.md) live in each stage
+    'intake': 'New → Triaged → on to Spec or Implement / ForHuman / Cancelled',
+    'spec': 'Specifying → SpecReview',
+    'plan': 'Planning (L: research first) → PlanReview',
     'implement': 'Implementing',
     'verify': 'Verifying (fix rounds ≤ 3 per work item, else Blocked)',
-    'aiReview': 'Verifying → MergeReview (R1/R2) or Merged (R0)',
-    'merge': 'MergeReview → Merged',
-    'deploy': 'Merged → Live → Done / RolledBack',
+    'aiReview': 'Verifying → MergeReview (R1/R2) or Live (R0)',
+    'merge': 'MergeReview → Live',
+    'deploy': 'Live → Done / RolledBack',
     'learn': 'new work items in New',
 }
 
@@ -71,7 +71,34 @@ layout: default
 """
 
 states_md = (root / 'docs' / 'states.md').read_text()
-blocks = re.findall(r'### (.*?)\n\n```mermaid\n(.*?)```', states_md, re.S)
+st_rows = [[c.strip() for c in l.strip().strip('|').split('|')] for l in states_md.splitlines()
+           if re.match(r'\| [A-Z]\w+ \| (\d|exit) \|', l)]
+END = {'Done', 'Cancelled', 'RolledBack', 'ForHuman'}  # grey: the pipeline is finished with it
+def chip(name, who, waits, cls=''):
+    kind = 'end' if name in END else ('op' if waits.startswith('**yes') else 'ag')
+    who = '' if who in ('—', '-') else f'<i>{who}</i>'
+    return f'<div class="sc sc-{kind} {cls}"><b>{name}</b>{who}</div>'
+EXITS = {'Blocked': 'Operator decides → back to Implementing, or Cancelled',
+         'RolledBack': 'the cause becomes a new work item in New',
+         'ForHuman': 'Triage outcome: a human does it, the pipeline tracks it',
+         'Cancelled': '"won\'t do" at Triage, or from Blocked'}
+def states_slide():
+    cols = []
+    for i, key in enumerate(STAGES, 1):
+        rows = [r for r in st_rows if r[1] == str(i)]
+        body = '<span class="sa">↓</span>'.join(chip(r[0], r[3], r[4]) for r in rows)
+        if key == 'aiReview':
+            v = next(r for r in st_rows if r[0] == 'Verifying')
+            body = chip(v[0], 'Validator, inside Verifying', v[4], 'sc-shared')
+        if key == 'learn':
+            body = '<p class="sn">Creates work items in <b>New</b></p>'
+        cols.append(f'<div class="scol"><h4>{title("engine." + key)}</h4>{body}</div>')
+    exits = ''.join(f'<div class="sx">{chip(r[0], r[3], r[4])}<p>{EXITS[r[0]]}</p></div>' for r in st_rows if r[1] == 'exit')
+    return ('---\nlayout: default\n---\n\n# Work item states\n\n'
+            '<div class="lead">Where a work item is now and who it waits for. Left to right along the stages; a red state waits for the Operator</div>\n\n'
+            f'<div class="sg">{"".join(cols)}</div>\n\n<h4 class="sxh">Exits</h4>\n<div class="sxs">{exits}</div>\n\n'
+            '<p class="sl"><span class="dot op"></span>waits for the Operator, at most 3 work items at once '
+            '<span class="dot ag"></span>agents work <span class="dot end"></span>out of the pipeline</p>\n\n' + part('07-states-note'))
 dec = (root / 'docs' / 'decisions.md').read_text()
 dec_rows = [l for l in dec.splitlines() if re.match(r'\| \d+ \|', l)]
 dec_tbl = '| # | Question | Decision |\n|---|---|---|\n' + '\n'.join(
@@ -81,7 +108,7 @@ out = [part('00-title'), part('02-how-to-read'),
        "---\n\n# Whole pipeline\n\n<div class=\"dg\"><likec4-view view-id=\"index\" color-scheme=\"light\" browser=\"true\" class=\"view-wide\"></likec4-view><span class=\"hint\">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>\n\n" + part('03-overview-note'),
        part('04-artifacts'), part('05-size-risk')]
 out += [stage_slide(k) for k in STAGES]
-out += [*["---\n\n# Work item states\n\n**" + t + "**\n\n```mermaid {scale: 0.42}\n" + m + "```\n\n" + part('07-states-note') for t, m in blocks],
+out += [states_slide(),
         "---\n\n# Cross-cutting parts\n\n<div class=\"dg\"><likec4-view view-id=\"platform\" color-scheme=\"light\" browser=\"true\" class=\"view-wide\"></likec4-view><span class=\"hint\">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>\n",
         "---\nlayout: default\n---\n\n# Decisions\n\n<div class=\"small\">\n\n" + dec_tbl + "\n\n</div>\n",
         part('08-open')]

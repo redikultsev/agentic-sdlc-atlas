@@ -98,7 +98,7 @@ layout: default
 </div>
 </div>
 
-<p class="sf"><b>Work item states:</b> New → Triaged → Accepted / ForHuman / Cancelled &nbsp;·&nbsp; <b>The Operator decides:</b> Accept</p>
+<p class="sf"><b>Work item states:</b> New → Triaged → on to Spec or Implement / ForHuman / Cancelled &nbsp;·&nbsp; <b>The Operator decides:</b> Accept</p>
 
 
 ---
@@ -117,7 +117,7 @@ layout: default
 </div>
 </div>
 
-<p class="sf"><b>Work item states:</b> Clarifying → SpecReview &nbsp;·&nbsp; <b>The Operator decides:</b> Approve spec</p>
+<p class="sf"><b>Work item states:</b> Specifying → SpecReview &nbsp;·&nbsp; <b>The Operator decides:</b> Approve spec</p>
 
 
 ---
@@ -137,7 +137,7 @@ layout: default
 </div>
 </div>
 
-<p class="sf"><b>Work item states:</b> Researching (L) → Planning → PlanReview &nbsp;·&nbsp; <b>The Operator decides:</b> Approve plan</p>
+<p class="sf"><b>Work item states:</b> Planning (L: research first) → PlanReview &nbsp;·&nbsp; <b>The Operator decides:</b> Approve plan</p>
 
 
 ---
@@ -192,7 +192,7 @@ layout: default
 </div>
 </div>
 
-<p class="sf"><b>Work item states:</b> Verifying → MergeReview (R1/R2) or Merged (R0) &nbsp;·&nbsp; <b>The Operator decides:</b> nothing, this stage runs without a human</p>
+<p class="sf"><b>Work item states:</b> Verifying → MergeReview (R1/R2) or Live (R0) &nbsp;·&nbsp; <b>The Operator decides:</b> nothing, this stage runs without a human</p>
 
 
 ---
@@ -212,7 +212,7 @@ layout: default
 </div>
 </div>
 
-<p class="sf"><b>Work item states:</b> MergeReview → Merged &nbsp;·&nbsp; <b>The Operator decides:</b> Merge?</p>
+<p class="sf"><b>Work item states:</b> MergeReview → Live &nbsp;·&nbsp; <b>The Operator decides:</b> Merge?</p>
 
 
 ---
@@ -231,7 +231,7 @@ layout: default
 </div>
 </div>
 
-<p class="sf"><b>Work item states:</b> Merged → Live → Done / RolledBack &nbsp;·&nbsp; <b>The Operator decides:</b> nothing, this stage runs without a human</p>
+<p class="sf"><b>Work item states:</b> Live → Done / RolledBack &nbsp;·&nbsp; <b>The Operator decides:</b> nothing, this stage runs without a human</p>
 
 
 ---
@@ -253,60 +253,21 @@ layout: default
 
 
 ---
-
-# Work item states
-
-**Part 1. Preparation: from signal to approved plan**
-
-```mermaid {scale: 0.42}
-stateDiagram-v2
-  direction LR
-  [*] --> New: signal
-  New --> Triaged: checked, sized, outcome proposed
-  Triaged --> Accepted: Operator, for the agent
-  Triaged --> ForHuman: Operator, for a human
-  Triaged --> Cancelled: "won't do"
-  Accepted --> Implementing: S
-  Accepted --> Clarifying: M or L
-  Clarifying --> SpecReview: spec ready
-  SpecReview --> Clarifying: "clarify"
-  SpecReview --> Researching: approved, L
-  SpecReview --> Planning: approved, M
-  Researching --> Planning
-  Planning --> PlanReview
-  PlanReview --> Planning: "redo"
-  PlanReview --> Implementing: approved, slice sub-issues created
-```
-
-<div class="small">The state lives in the tracker: a <code>state:…</code> label in GitHub, a status in Jira. At most 3 work items wait for the Operator at once. <b>Draft, awaiting approval.</b></div>
-
+layout: default
 ---
 
 # Work item states
 
-**Part 2. Execution: from code to production**
+<div class="lead">Where a work item is now and who it waits for. Left to right along the stages; a red state waits for the Operator</div>
 
-```mermaid {scale: 0.42}
-stateDiagram-v2
-  direction LR
-  Implementing --> Verifying: change ready
-  Verifying --> Implementing: red or fix, round ≤ 3
-  Verifying --> Blocked: out of rounds or block verdict
-  Verifying --> Merged: pass, auto-merge rules match (R0)
-  Verifying --> MergeReview: pass, R1/R2
-  MergeReview --> Implementing: "changes" + comment
-  MergeReview --> Merged: "merge"
-  MergeReview --> Implementing: queue red or conflict
-  Merged --> Live: deployed to everyone
-  Live --> Done: watch window over, no regression
-  Live --> RolledBack: regression, the Watcher rolled back
-  Blocked --> Accepted: Operator sorted it out
-  Blocked --> Cancelled
-  Done --> [*]
-  RolledBack --> [*]: new work item for the cause
-```
+<div class="sg"><div class="scol"><h4>1. Intake</h4><div class="sc sc-ag "><b>New</b><i>Triage agent</i></div><span class="sa">↓</span><div class="sc sc-op "><b>Triaged</b><i>Operator</i></div></div><div class="scol"><h4>2. Spec</h4><div class="sc sc-op "><b>Specifying</b><i>Interviewer</i></div><span class="sa">↓</span><div class="sc sc-op "><b>SpecReview</b><i>Operator</i></div></div><div class="scol"><h4>3. Plan</h4><div class="sc sc-ag "><b>Planning</b><i>Researcher, Planner</i></div><span class="sa">↓</span><div class="sc sc-op "><b>PlanReview</b><i>Operator</i></div></div><div class="scol"><h4>4. Implement</h4><div class="sc sc-ag "><b>Implementing</b><i>Implementer</i></div></div><div class="scol"><h4>5. Checks & review</h4><div class="sc sc-ag "><b>Verifying</b><i>CI, AI reviewer, Validator</i></div></div><div class="scol"><h4>6. Acceptance</h4><div class="sc sc-ag sc-shared"><b>Verifying</b><i>Validator, inside Verifying</i></div></div><div class="scol"><h4>7. Merge</h4><div class="sc sc-op "><b>MergeReview</b><i>Operator</i></div></div><div class="scol"><h4>8. Deploy & watch</h4><div class="sc sc-ag "><b>Live</b><i>Watcher</i></div><span class="sa">↓</span><div class="sc sc-end "><b>Done</b></div></div><div class="scol"><h4>9. Learn</h4><p class="sn">Creates work items in <b>New</b></p></div></div>
 
-<div class="small">The state lives in the tracker: a <code>state:…</code> label in GitHub, a status in Jira. At most 3 work items wait for the Operator at once. <b>Draft, awaiting approval.</b></div>
+<h4 class="sxh">Exits</h4>
+<div class="sxs"><div class="sx"><div class="sc sc-op "><b>Blocked</b><i>Operator</i></div><p>Operator decides → back to Implementing, or Cancelled</p></div><div class="sx"><div class="sc sc-end "><b>RolledBack</b></div><p>the cause becomes a new work item in New</p></div><div class="sx"><div class="sc sc-end "><b>ForHuman</b><i>a human</i></div><p>Triage outcome: a human does it, the pipeline tracks it</p></div><div class="sx"><div class="sc sc-end "><b>Cancelled</b></div><p>"won't do" at Triage, or from Blocked</p></div></div>
+
+<p class="sl"><span class="dot op"></span>waits for the Operator, at most 3 work items at once <span class="dot ag"></span>agents work <span class="dot end"></span>out of the pipeline</p>
+
+<div class="fine">The state lives in the tracker: a <code>state:…</code> label in GitHub, a status in Jira. Transitions and the tracker mapping: <code>docs/states.md</code>. <b>Draft, awaiting approval.</b></div>
 
 ---
 

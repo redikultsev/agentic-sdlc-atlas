@@ -72,3 +72,24 @@ details summary { cursor: pointer; color: #6b7280; font-size: 0.85rem; }
 .pcs.n3 .pc { padding: 8px 14px; }
 .pcs.n3 .pc .pn { margin: 2px 0 0; font-size: 18px; }
 .pcs.n3 .eg3 { row-gap: 0; line-height: 1.25; margin-top: 2px; }
+/* work item states slide */
+.sg { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 8px; margin-top: 18px; }
+.scol { display: flex; flex-direction: column; align-items: stretch; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 6px 14px; }
+.scol h4 { margin: 0 0 12px; font-size: 16px; line-height: 1.2; font-weight: 600; color: #334155; text-align: center; min-height: 36px; }
+.sc { border-radius: 8px; border: 2px solid var(--s); background: var(--f); padding: 10px 4px; text-align: center; }
+.sc b { display: block; font-size: 15px; letter-spacing: -0.01em; white-space: nowrap; color: var(--t); font-weight: 700; }
+.sc i { display: block; font-style: normal; font-size: 13px; line-height: 1.25; color: #475569; margin-top: 2px; }
+.sc-op { --s: #e11d48; --f: #fff1f2; --t: #be123c; }
+.sc-ag { --s: #6366f1; --f: #eef2ff; --t: #4338ca; }
+.sc-end { --s: #94a3b8; --f: #f1f5f9; --t: #334155; }
+.sc-shared { border-style: dashed; }
+.sa { display: block; text-align: center; color: #94a3b8; font-size: 16px; line-height: 1; margin: 4px 0; }
+.sn { margin: 8px 4px 0; font-size: 15px; line-height: 1.3; color: #475569; text-align: center; }
+.sxh { margin: 28px 0 10px; font-size: 16px; font-weight: 600; color: #334155; }
+.sxs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.sx { display: flex; align-items: center; gap: 10px; }
+.sx .sc { flex: none; width: 120px; }
+.sx p { margin: 0; font-size: 15px; line-height: 1.3; color: #334155; }
+.sl { margin-top: 18px; font-size: 15px; color: #334155; text-align: center; }
+.sl .dot { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin: 0 6px 0 18px; border: 2px solid; }
+.dot.op { background: #fff1f2; border-color: #e11d48; } .dot.ag { background: #eef2ff; border-color: #6366f1; } .dot.end { background: #f1f5f9; border-color: #94a3b8; }
