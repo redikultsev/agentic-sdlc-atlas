@@ -1,15 +1,15 @@
 views {
 
   view index {
-    title '0. Весь конвейер'
+    title '0. Whole pipeline'
     description '''
-      **Как читать:** стадии слева направо; серые цилиндры — где лежат задачи, спеки, PR, проверки, выкатки; Оператор — с краю, его стрелки идут в ворота стадий.
-      Клик по стадии — её устройство. Петли назад — на картинках стадий.
+      **How to read:** stages left to right; grey cylinders show where work items, specs, PRs, checks and deployments live; the Operator's arrows go into stage gates.
+      Click a stage to open it. Loops back are shown on the stage views.
 
-      **Цвет:** фиолетовый — агент, зелёный — скрипт, красный — решает Оператор, серый — хранилище.
+      **Colour:** purple = agent, green = script, red = the Operator decides, grey = store.
 
-      **Размер задачи:** S — сразу код; M — спека и план; L — ещё исследование кода.
-      **Риск:** R0 сливается и выкатывается сам; R1 — Оператор смотрит доказательства; R2 — Оператор читает код и выкатывает сам.
+      **Size:** S = straight to code; M = spec and plan; L = plus codebase research.
+      **Risk:** R0 merges and deploys itself; R1 = the Operator checks the evidence; R2 = the Operator reads the code and deploys.
     '''
     include
       operator,
@@ -41,61 +41,61 @@ views {
   }
 
   view intake of engine.intake {
-    title '1. Приём задачи'
+    title '1. Intake'
     include *, -> engine.intake.* ->
     autoLayout LeftRight
   }
   view spec of engine.spec {
-    title '2. Спецификация'
+    title '2. Spec'
     include *, -> engine.spec.* ->
     autoLayout LeftRight
   }
   view plan of engine.plan {
-    title '3. План'
+    title '3. Plan'
     include *, -> engine.plan.* ->
     autoLayout LeftRight
   }
   view implement of engine.implement {
-    title '4. Реализация'
+    title '4. Implement'
     include *, -> engine.implement.* ->, engine.sandbox
     autoLayout LeftRight
   }
   view verify of engine.verify {
-    title '5. Самопроверка'
+    title '5. Self-verify'
     include *, -> engine.verify.* ->
     autoLayout LeftRight
   }
   view aiReview of engine.aiReview {
-    title '6. ИИ-ревью'
+    title '6. AI review'
     include *, -> engine.aiReview.* ->
     autoLayout LeftRight
   }
   view merge of engine.merge {
-    title '7. Слияние'
+    title '7. Merge'
     include *, -> engine.merge.* ->
     autoLayout LeftRight
   }
   view deploy of engine.deploy {
-    title '8. Выкатка и наблюдение'
+    title '8. Deploy & watch'
     include *, -> engine.deploy.* ->
     autoLayout LeftRight
   }
   view learn of engine.learn {
-    title '9. Разбор и обучение'
+    title '9. Learn'
     include *, -> engine.learn.* ->
     autoLayout LeftRight
   }
 
   view platform {
-    title '10. Сквозные части'
-    description 'На чём работают все стадии: оркестратор, песочница, карточки решений, записи сессий.'
+    title '10. Cross-cutting parts'
+    description 'What every stage runs on: orchestrator, sandbox, decision requests, session traces.'
     include engine.orchestrator, engine.sandbox, engine.cards, engine.traces, operator, engine.implement.implementer, engine.learn.retro
     autoLayout LeftRight
   }
 
   view status {
-    title '11. Что есть, что в планах'
-    description 'Все части. Бледные — только идея.'
+    title '11. Built vs planned'
+    description 'All parts. Faded = idea only.'
     include engine.**, tracker, docs, changes, ci, releases
     exclude
       engine.intake,
@@ -114,58 +114,58 @@ views {
   }
 
   dynamic view task {
-    title '12. Путь одной задачи'
-    description 'Ветвление по размеру (S/M/L) и по риску (R0/R1/R2), циклы доработки ограничены.'
-    monitoring -> engine.intake.triage 'алерт или идея'
-    engine.intake.triage -> tracker 'задача, размер и риск'
-    operator -> engine.intake.admit 'в работу'
-    alt 'размер' {
+    title '12. Life of one work item'
+    description 'Branches by size (S/M/L) and risk (R0/R1/R2); fix loops are capped.'
+    monitoring -> engine.intake.triage 'alert or idea'
+    engine.intake.triage -> tracker 'work item, size and risk'
+    operator -> engine.intake.admit 'accepts'
+    alt 'size' {
       when 'S' {
-        engine.intake.admit -> engine.implement.implementer 'сразу код'
+        engine.intake.admit -> engine.implement.implementer 'straight to code'
       }
-      else 'M или L' {
-        engine.intake.admit -> engine.spec.interviewer 'уточнить'
-        engine.spec.interviewer -> operator 'вопросы'
-        engine.spec.interviewer -> engine.spec.specGate 'спека'
-        operator -> engine.spec.specGate 'утверждает'
-        opt 'только L' {
-          engine.spec.specGate -> engine.plan.researcher 'исследовать код'
-          engine.plan.researcher -> engine.plan.planner 'документ'
+      else 'M or L' {
+        engine.intake.admit -> engine.spec.interviewer 'clarify'
+        engine.spec.interviewer -> operator 'questions'
+        engine.spec.interviewer -> engine.spec.specGate 'spec'
+        operator -> engine.spec.specGate 'approves'
+        opt 'L only' {
+          engine.spec.specGate -> engine.plan.researcher 'research the code'
+          engine.plan.researcher -> engine.plan.planner 'document'
         }
-        engine.plan.planner -> engine.plan.planGate 'план'
-        operator -> engine.plan.planGate 'утверждает'
-        engine.plan.planGate -> engine.implement.implementer 'план'
+        engine.plan.planner -> engine.plan.planGate 'plan'
+        operator -> engine.plan.planGate 'approves'
+        engine.plan.planGate -> engine.implement.implementer 'plan'
       }
     }
-    loop 'пока судья не скажет pass, не больше 3 раз' {
-      engine.implement.implementer -> engine.verify.checks 'прогон'
-      engine.verify.checks -> engine.verify.evidence 'зелёное'
-      engine.verify.evidence -> engine.aiReview.reviewers 'PR + доказательства'
-      engine.aiReview.reviewers -> engine.aiReview.judge 'замечания'
+    loop 'until the judge says pass, at most 3 times' {
+      engine.implement.implementer -> engine.verify.checks 'run'
+      engine.verify.checks -> engine.verify.evidence 'green'
+      engine.verify.evidence -> engine.aiReview.reviewers 'PR + evidence'
+      engine.aiReview.reviewers -> engine.aiReview.judge 'findings'
       engine.aiReview.judge -> engine.implement.implementer 'fix'
     }
-    alt 'риск' {
+    alt 'risk' {
       when 'R0' {
         engine.aiReview.judge -> engine.merge.land 'pass'
-        engine.merge.land -> engine.deploy.deployer 'сразу'
+        engine.merge.land -> engine.deploy.deployer 'right away'
       }
       if 'R1' {
         engine.aiReview.judge -> engine.merge.mergeGate 'pass'
-        operator -> engine.merge.mergeGate 'доказательства → да'
-        engine.merge.mergeGate -> engine.merge.land 'слить'
-        engine.merge.land -> engine.deploy.deployer 'сразу'
+        operator -> engine.merge.mergeGate 'evidence → yes'
+        engine.merge.mergeGate -> engine.merge.land 'merge'
+        engine.merge.land -> engine.deploy.deployer 'right away'
       }
       else 'R2' {
         engine.aiReview.judge -> engine.merge.mergeGate 'pass'
-        operator -> engine.merge.mergeGate 'код → да'
-        engine.merge.mergeGate -> engine.merge.land 'слить'
-        engine.merge.land -> engine.deploy.prodGate 'ждёт'
-        operator -> engine.deploy.prodGate 'выкатить'
-        engine.deploy.prodGate -> engine.deploy.deployer 'да'
+        operator -> engine.merge.mergeGate 'code → yes'
+        engine.merge.mergeGate -> engine.merge.land 'merge'
+        engine.merge.land -> engine.deploy.prodGate 'waits'
+        operator -> engine.deploy.prodGate 'deploy'
+        engine.deploy.prodGate -> engine.deploy.deployer 'yes'
       }
     }
-    engine.deploy.deployer -> prod 'выкатка'
-    prod -> engine.deploy.watcher 'метрики до и после'
-    engine.deploy.watcher -> engine.learn.retro 'итог'
+    engine.deploy.deployer -> prod 'rollout'
+    prod -> engine.deploy.watcher 'metrics before and after'
+    engine.deploy.watcher -> engine.learn.retro 'outcome'
   }
 }

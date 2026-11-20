@@ -1,1 +1,1 @@
-<div class="small">Состояние живёт в трекере: в GitHub — метка <code>state:…</code>, в Jira — статус. Не больше 3 задач одновременно в состояниях «ждёт Оператора». <b>Черновик — ждёт утверждения.</b></div>
+<div class="small">The state lives in the tracker: a <code>state:…</code> label in GitHub, a status in Jira. At most 3 work items wait for the Operator at once. <b>Draft, awaiting approval.</b></div>

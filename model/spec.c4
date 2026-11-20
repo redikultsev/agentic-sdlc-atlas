@@ -1,69 +1,69 @@
 specification {
   element system {
-    notation 'Система'
+    notation 'System'
     style {
       color primary
     }
   }
-  // Кто делает работу
+  // Who does the work
   element phase {
-    notation 'Фаза цикла'
+    notation 'Pipeline stage'
     style {
       color slate
       shape rectangle
     }
   }
   element agent {
-    notation 'Агент (LLM)'
+    notation 'Agent (LLM)'
     style {
       color indigo
       shape rectangle
     }
   }
   element script {
-    notation 'Скрипт или проверка (без LLM)'
+    notation 'Script or check (no LLM)'
     style {
       color green
       shape component
     }
   }
   element gate {
-    notation 'Ворота: человек решает'
+    notation 'Gate: the Operator decides'
     style {
       color red
       shape rectangle
     }
   }
   element human {
-    notation 'Человек'
+    notation 'Human'
     style {
       color amber
       shape person
     }
   }
   element store {
-    notation 'Хранилище состояния'
+    notation 'Store'
     style {
       color gray
       shape storage
     }
   }
   element external {
-    notation 'Внешняя система'
+    notation 'External system'
     style {
       color slate
       shape rectangle
     }
   }
   element platform {
-    notation 'Сквозная часть движка'
+    notation 'Cross-cutting part'
     style {
       color sky
       shape rectangle
     }
   }
 
-  // Статус части
+  // Part status
   tag built {
     color green
   }
@@ -75,16 +75,16 @@ specification {
   }
 
   relationship handoff {
-    notation 'Передача работы'
+    notation 'Hand-off'
     color primary
   }
   relationship verdict {
-    notation 'Вердикт (JSON по схеме)'
+    notation 'Verdict (schema JSON)'
     color red
     line dashed
   }
   relationship reads {
-    notation 'Чтение'
+    notation 'Read'
     color gray
     line dotted
   }

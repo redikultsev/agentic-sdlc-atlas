@@ -1,15 +1,15 @@
 ---
 
-# Что движется и где лежит
+# What moves and where it lives
 
-Сигнал → **задача** → спека → план → **изменение** → результаты проверок → ревью → слитое изменение → **выкатка** → инцидент → снова сигнал
+Signal → **work item** → spec → plan → **change set** → check results → review → merged change → **deployment** → incident → signal again
 
-| Хранилище | Что в нём | Сейчас |
+| Store | What it holds | Today |
 |---|---|---|
-| **Задачи** | центр: номер, размер, риск, состояние; всё ссылается на номер | GitHub Issues · Jira |
-| **Спеки и планы** | что значит «готово», как делаем | файлы в репозитории или тело задачи |
-| **Изменения** | PR, ревью, вердикты | PR · MR |
-| **Результаты проверок** | вывод тестов, привязанный к коммиту | CI |
-| **Выкатки** | какая версия где и чем кончилось | Dokploy |
+| **Work items** | the hub: number, size, risk, state; everything links to the number | GitHub Issues · Jira |
+| **Specs and plans** | what "done" means, how we do it | files in the repo or the work item body |
+| **Change sets** | PR, reviews, verdicts | PR · MR |
+| **Check results** | test output tied to the commit | CI |
+| **Deployments** | which version runs where and how it ended | Dokploy |
 
-Названия артефактов — из стандарта CDEvents (CD Foundation): ticket, change, build, release, incident.
+Artifact names follow the CDEvents standard (CD Foundation): ticket, change, build, release, incident.

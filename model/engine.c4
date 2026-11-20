@@ -1,282 +1,282 @@
 model {
 
-  // ================= Люди и внешний мир =================
-  operator = human 'Оператор' {
-    technology 'Operator'
-    description 'Человек над агентами. Решает в воротах через карточки решений: одна строка вопроса, рекомендация, кнопки.'
+  // ================= People and the outside world =================
+  operator = human 'Operator' {
+    technology 'Human'
+    description 'The person over the agents. Decides at the gates; everything is shown by the presentation rules (decision type sets the depth, a real before/after case, what was not verified on top).'
   }
-  prod = external 'Прод' {
-    technology 'Production'
-    description 'Работающие сервисы и их данные.'
+  prod = external 'Production' {
+    technology 'Running services'
+    description 'Running services and their data.'
   }
-  monitoring = external 'Мониторинг' {
-    technology 'Sentry, логи, метрики'
-    description 'Ошибки и алерты работающих сервисов.'
+  monitoring = external 'Monitoring' {
+    technology 'Errors, logs, metrics'
+    description 'Errors and alerts from running services.'
   }
 
-  // ================= Хранилища: где что лежит =================
-  tracker = store 'Задачи' {
+  // ================= Stores: where things live =================
+  tracker = store 'Work items' {
     #built
     technology 'GitHub Issues · Jira'
-    description 'Центр конвейера. Каждая работа — задача с номером, размером (S/M/L), риском (R0/R1/R2) и состоянием. Всё остальное ссылается на её номер. Инструмент подключается адаптером.'
+    description 'The hub of the pipeline. Every piece of work is a work item with a number, size (S/M/L), risk (R0/R1/R2) and state. Everything else links to its number. Each tracker plugs in through an adapter.'
   }
-  docs = store 'Спеки и планы' {
+  docs = store 'Specs and plans' {
     #idea
-    technology 'файлы в репозитории или тело задачи'
-    description 'Спека — что значит «готово». План — как делаем и чем докажем. Для L — ещё документ исследования кода.'
+    technology 'files in the repo or the work item body'
+    description 'Spec: what "done" means. Plan: how we do it and how we prove it. For L, also a codebase research document.'
   }
-  changes = store 'Изменения' {
+  changes = store 'Change sets' {
     #built
     technology 'PR · MR'
-    description 'Предлагаемое изменение кода на ветке, со ссылкой на задачу. Здесь же ревью и вердикты.'
+    description 'A proposed code change on a branch, linked to its work item. Reviews and verdicts live here too.'
   }
-  ci = store 'Результаты проверок' {
+  ci = store 'Check results' {
     #planned
     technology 'CI'
-    description 'Тесты, линт, типы, сборка, скрытые тесты — с выводом, привязанным к коммиту.'
+    description 'Tests, lint, types, build, holdout tests, with output tied to the commit.'
   }
-  releases = store 'Выкатки' {
+  releases = store 'Deployments' {
     #built
     technology 'Dokploy'
-    description 'Какая версия где работает и чем кончилась выкатка.'
+    description 'Which version runs where and how the rollout ended.'
   }
 
-  engine = system 'Конвейер' {
+  engine = system 'Pipeline' {
     description '''
-      **Черновик v1.** Девять стадий, к которым сходятся лидеры (Stripe, Anthropic, Spotify, Google, Cognition и др.),
-      и принятые решения (docs/decisions.md). Статус части: `built` — есть, `planned` — решено строить, `idea` — идея.
+      **Draft v1.** Nine stages that leading teams converge on (Stripe, Anthropic, Spotify, Google, Cognition and others)
+      and the decisions in docs/decisions.md. Part status: `built` exists, `planned` decided to build, `idea` an idea.
     '''
 
-    // ================= Сквозные части =================
-    cards = platform 'Карточки решений' {
+    // ================= Cross-cutting parts =================
+    cards = platform 'Decision requests' {
       #idea
-      technology 'Decision cards'
-      description 'Единственный способ, которым конвейер обращается к Оператору: что решить, рекомендация с причиной, кнопки, контекст свёрнут. Пока — Claude Desktop.'
+      technology 'Decision requests'
+      description 'The only way the pipeline asks the Operator to decide. Shown by the presentation rules. For now: Claude Desktop.'
     }
-    orchestrator = platform 'Оркестратор' {
+    orchestrator = platform 'Orchestrator' {
       #idea
       technology 'Orchestrator'
-      description 'Ведёт задачу по стадиям. Куда дальше — решает код по вердикту в JSON. Держит лимит: не больше 3 задач одновременно ждут Оператора. Движок ещё не выбран.'
+      description 'Moves a work item through the stages. Code decides the next step from a JSON verdict, never from agent prose. Enforces the limit: at most 3 work items wait for the Operator at once. Engine not chosen yet.'
     }
-    sandbox = platform 'Песочница' {
+    sandbox = platform 'Sandbox' {
       #idea
       technology 'Sandbox'
-      description 'Одноразовая изолированная среда на задачу: полный набор инструментов, узкие права, ключей с правом слияния нет.'
+      description 'A disposable isolated environment per work item: full toolchain, narrow rights, no credentials that can merge.'
     }
-    traces = platform 'Записи сессий' {
+    traces = platform 'Session traces' {
       #idea
       technology 'Traces'
-      description 'Что делал каждый агент, сколько стоило, сколько времени Оператора ушло на задачу.'
+      description 'What each agent did, what it cost, how much Operator time the work item took.'
     }
 
-    // ================= 1. Приём задачи =================
-    intake = phase '1. Приём задачи' {
-      technology 'Intake'
-      description 'Сигнал становится задачей. Агент предлагает размер и риск, Оператор берёт в работу.'
-      triage = agent 'Сортировщик' {
+    // ================= 1. Intake =================
+    intake = phase '1. Intake' {
+      technology 'Intake & triage'
+      description 'A signal becomes a work item. An agent proposes size and risk; the Operator accepts it.'
+      triage = agent 'Triage' {
         #idea
-        technology 'Triage'
-        description 'Склеивает дубли, предлагает размер S/M/L и риск R0/R1/R2 с причиной. Сам ничего не закрывает.'
+        technology 'Triage agent'
+        description 'Merges duplicates, proposes size S/M/L and risk R0/R1/R2 with a reason. Never closes anything itself.'
       }
-      admit = gate 'Взять в работу' {
+      admit = gate 'Accept' {
         #idea
         technology 'Gate'
-        description 'Оператор видит размер и риск, может поправить и жмёт «в работу».'
+        description 'The Operator sees size and risk, may correct them, and accepts the work item.'
       }
-      triage -> admit 'размер и риск'
+      triage -> admit 'size and risk'
     }
 
-    // ================= 2. Спецификация =================
-    spec = phase '2. Спецификация' {
-      technology 'Spec'
-      description 'Только для M и L. Агент уточняет и пишет, что значит «готово».'
-      interviewer = agent 'Интервьюер' {
+    // ================= 2. Spec =================
+    spec = phase '2. Spec' {
+      technology 'Specification'
+      description 'M and L only. The agent clarifies and writes what "done" means.'
+      interviewer = agent 'Interviewer' {
         #idea
         technology 'Clarify'
-        description 'Задаёт вопросы по недоопределённому, пишет спеку: зачем, критерии приёмки, что нельзя менять.'
+        description 'Asks about what is underspecified, writes the spec: why, acceptance criteria, what must not change.'
       }
-      specGate = gate 'Утвердить спеку' {
+      specGate = gate 'Approve spec' {
         #idea
         technology 'Gate'
-        description 'M и L: Оператор утверждает спеку.'
+        description 'M and L: the Operator approves the spec.'
       }
-      interviewer -> specGate 'спека'
+      interviewer -> specGate 'spec'
     }
 
-    // ================= 3. План =================
-    plan = phase '3. План' {
-      technology 'Plan'
-      description 'Только для M и L. Как делаем, срезами, и чем докажем готовность.'
-      researcher = agent 'Исследователь кода' {
+    // ================= 3. Plan =================
+    plan = phase '3. Plan' {
+      technology 'Plan & decompose'
+      description 'M and L only. How we do it, in slices, and how we prove it is done.'
+      researcher = agent 'Codebase researcher' {
         #idea
         technology 'Research'
-        description 'Только L: отдельный проход на чтение, итог — короткий документ о затронутых модулях и инвариантах.'
+        description 'L only: a separate read-only pass; the result is a short document on affected modules and invariants.'
       }
-      planner = agent 'Планировщик' {
+      planner = agent 'Planner' {
         #idea
-        technology 'Plan'
-        description 'План срезами: файлы, порядок, риски, команда проверки у каждого среза.'
+        technology 'Planning agent'
+        description 'A plan in slices: files, order, risks, a check command for each slice.'
       }
-      planGate = gate 'Утвердить план' {
+      planGate = gate 'Approve plan' {
         #idea
         technology 'Gate'
-        description 'M и L: главные ворота Оператора — ошибку замысла дешевле поймать до кода.'
+        description 'M and L: the main Operator gate. A wrong idea is cheaper to catch before code.'
       }
-      researcher -> planner 'L: документ исследования'
-      planner -> planGate 'план'
+      researcher -> planner 'L: research document'
+      planner -> planGate 'plan'
     }
 
-    // ================= 4. Реализация =================
-    implement = phase '4. Реализация' {
-      technology 'Implement'
-      description 'Агент пишет изменение в песочнице. S приходит сюда сразу из приёма.'
-      implementer = agent 'Исполнитель' {
+    // ================= 4. Implement =================
+    implement = phase '4. Implement' {
+      technology 'Implement in sandbox'
+      description 'The agent writes the change in the sandbox. S comes here straight from intake.'
+      implementer = agent 'Implementer' {
         #built
         technology 'Coding agent'
-        description 'Читает нужный код, пишет изменение одного среза в свежем контексте.'
+        description 'Reads the code it needs and writes one slice in a fresh context.'
       }
     }
 
-    // ================= 5. Самопроверка =================
-    verify = phase '5. Самопроверка' {
-      technology 'Self-verify'
-      description 'Агент не говорит «готово», пока проверки не зелёные. Круги ограничены.'
-      checks = script 'Проверки' {
+    // ================= 5. Self-verify =================
+    verify = phase '5. Self-verify' {
+      technology 'Self-verification'
+      description 'The agent never says "done" until checks are green. Rounds are capped.'
+      checks = script 'Checks' {
         #planned
         technology 'Tests, lint, build'
-        description 'Тесты, линт, типы, сборка. Запускаются сами, а не по слову агента.'
+        description 'Tests, lint, types, build. They run by themselves, not on the agent word.'
       }
-      holdout = script 'Скрытые тесты' {
+      holdout = script 'Holdout tests' {
         #idea
         technology 'Holdout'
-        description 'Сценарии, которых агент не видит и не может править.'
+        description 'Scenarios the agent cannot see or edit.'
       }
-      evidence = agent 'Доказательства' {
+      evidence = agent 'Evidence' {
         #idea
         technology 'Evidence'
-        description 'Снимки экрана, видео, вывод команд — то, что Оператор смотрит вместо кода.'
+        description 'Screenshots, video, command output: what the Operator looks at instead of code.'
       }
-      checks -> evidence 'зелёное'
-      holdout -> evidence 'зелёное'
+      checks -> evidence 'green'
+      holdout -> evidence 'green'
     }
 
-    // ================= 6. ИИ-ревью =================
-    aiReview = phase '6. ИИ-ревью' {
-      technology 'AI review'
-      description 'Агенты-ревьюеры со свежим контекстом сверяют со спекой и стандартами. Одобрение агента не равно одобрению человека.'
-      reviewers = agent 'Ревьюеры' {
+    // ================= 6. AI review =================
+    aiReview = phase '6. AI review' {
+      technology 'AI review & autofix'
+      description 'Reviewer agents with a fresh context check against the spec and standards. An agent approval is not a human approval.'
+      reviewers = agent 'Reviewers' {
         #built
         technology 'Review'
-        description 'Корректность, безопасность, соответствие спеке. Замечания по важности, шум отфильтрован.'
+        description 'Correctness, security, match with the spec. Findings ranked by severity, noise filtered out.'
       }
-      judge = agent 'Судья' {
+      judge = agent 'Judge' {
         #built
         technology 'Verdict'
-        description 'Сводит замечания в вердикт JSON: pass / fix / block.'
+        description 'Turns findings into a JSON verdict: pass / fix / block.'
       }
-      reviewers -> judge 'замечания'
+      reviewers -> judge 'findings'
     }
 
-    // ================= 7. Слияние =================
-    merge = phase '7. Слияние' {
+    // ================= 7. Merge =================
+    merge = phase '7. Merge' {
       technology 'Merge'
-      description 'По риску: R0 сливается само, R1 — Оператор по доказательствам, R2 — Оператор читает код.'
-      mergeGate = gate 'Слить?' {
+      description 'By risk: R0 merges itself, R1 the Operator merges on evidence, R2 the Operator reads the code.'
+      mergeGate = gate 'Merge?' {
         #idea
         technology 'Gate'
-        description 'R1: карточка с отчётом и доказательствами. R2: ещё и код.'
+        description 'R1: report with evidence. R2: plus the code.'
       }
-      land = script 'Скрипт слияния' {
+      land = script 'Merge script' {
         #planned
         technology 'Merge script'
-        description 'Сливает только если голова PR та же, ревью было на ней и CI зелёный. Агент сам не сливает.'
+        description 'Merges only if the PR head is unchanged, the review was on that head and CI is green. The agent never merges.'
       }
-      mergeGate -> land 'да'
+      mergeGate -> land 'yes'
     }
 
-    // ================= 8. Выкатка и наблюдение =================
-    deploy = phase '8. Выкатка и наблюдение' {
-      technology 'Deploy & watch'
-      description 'R0 и R1 уходят в прод сразу после слияния, R2 — по «да» Оператора. Дозор сравнивает метрики до и после.'
-      prodGate = gate 'Выкатить R2?' {
+    // ================= 8. Deploy & watch =================
+    deploy = phase '8. Deploy & watch' {
+      technology 'Release, deploy & watch'
+      description 'R0 and R1 go to production right after merge, R2 on the Operator yes. A watcher compares metrics before and after.'
+      prodGate = gate 'Deploy R2?' {
         #idea
         technology 'Gate'
-        description 'Только R2: миграции, инфраструктура, деньги, секреты.'
+        description 'R2 only: migrations, infrastructure, money, secrets.'
       }
-      deployer = script 'Выкатка' {
+      deployer = script 'Deploy' {
         #built
         technology 'Deploy'
-        description 'Выкатывает и умеет откатить одним шагом.'
+        description 'Deploys and can roll back in one step.'
       }
-      watcher = agent 'Дозор' {
+      watcher = agent 'Watcher' {
         #idea
         technology 'Watch'
-        description 'Только чтение: сравнивает метрики до и после, при регрессе предлагает откат карточкой.'
+        description 'Read-only: compares metrics before and after; on a regression proposes a rollback to the Operator.'
       }
-      prodGate -> deployer 'да'
+      prodGate -> deployer 'yes'
     }
 
-    // ================= 9. Разбор и обучение =================
-    learn = phase '9. Разбор и обучение' {
-      technology 'Learn'
-      description 'Ошибки и поправки становятся новыми задачами, проверками и правилами.'
-      retro = agent 'Разбор' {
+    // ================= 9. Learn =================
+    learn = phase '9. Learn' {
+      technology 'Learn & close the loop'
+      description 'Mistakes and corrections become new work items, checks and rules.'
+      retro = agent 'Retro' {
         #idea
         technology 'Retro'
-        description 'Раз в неделю: что повторилось дважды — предложение правила, проверки или новой задачи.'
+        description 'Weekly: what repeated twice becomes a proposed rule, check or work item.'
       }
-      adopt = gate 'Принять правило?' {
+      adopt = gate 'Adopt rule?' {
         #idea
         technology 'Gate'
-        description 'Оператор выбирает, что из предложенного принять.'
+        description 'The Operator picks which proposals to adopt.'
       }
-      retro -> adopt 'предложения'
+      retro -> adopt 'proposals'
     }
   }
 
-  // ================= Основной поток =================
-  monitoring -> engine.intake.triage 'алерт'
-  operator -> engine.intake.admit 'в работу'
-  engine.intake.triage -> tracker 'задача'
+  // ================= Main flow =================
+  monitoring -> engine.intake.triage 'alert'
+  operator -> engine.intake.admit 'accepts'
+  engine.intake.triage -> tracker 'work item'
   engine.intake.admit .handoff engine.spec.interviewer 'M, L'
-  engine.intake.admit .handoff engine.implement.implementer 'S: сразу код'
-  engine.spec.interviewer -> docs 'спека'
-  operator -> engine.spec.specGate 'утверждает'
+  engine.intake.admit .handoff engine.implement.implementer 'S: straight to code'
+  engine.spec.interviewer -> docs 'spec'
+  operator -> engine.spec.specGate 'approves'
   engine.spec.specGate .handoff engine.plan.researcher 'L'
   engine.spec.specGate .handoff engine.plan.planner 'M'
-  engine.plan.planner -> docs 'план'
-  operator -> engine.plan.planGate 'утверждает'
-  engine.plan.planGate .handoff engine.implement.implementer 'план'
+  engine.plan.planner -> docs 'plan'
+  operator -> engine.plan.planGate 'approves'
+  engine.plan.planGate .handoff engine.implement.implementer 'plan'
   engine.implement.implementer -> changes 'PR'
-  engine.implement.implementer .handoff engine.verify.checks 'прогон'
-  engine.verify.checks -> ci 'результаты'
-  engine.verify.evidence .handoff engine.aiReview.reviewers 'PR + доказательства'
-  engine.aiReview.judge -> changes 'вердикт'
+  engine.implement.implementer .handoff engine.verify.checks 'run'
+  engine.verify.checks -> ci 'results'
+  engine.verify.evidence .handoff engine.aiReview.reviewers 'PR + evidence'
+  engine.aiReview.judge -> changes 'verdict'
   engine.aiReview.judge .verdict engine.merge.land 'pass, R0'
   engine.aiReview.judge .verdict engine.merge.mergeGate 'pass, R1/R2'
-  operator -> engine.merge.mergeGate 'смотрит доказательства'
-  engine.merge.land -> changes 'слияние'
+  operator -> engine.merge.mergeGate 'reviews evidence'
+  engine.merge.land -> changes 'merge'
   engine.merge.land .handoff engine.deploy.deployer 'R0, R1'
   engine.merge.land .handoff engine.deploy.prodGate 'R2'
-  operator -> engine.deploy.prodGate 'выкатывает'
-  engine.deploy.deployer -> releases 'версия'
-  engine.deploy.deployer -> prod 'выкатка'
-  prod -> engine.deploy.watcher 'метрики'
-  engine.deploy.watcher .handoff engine.learn.retro 'итог выкатки'
-  operator -> engine.learn.adopt 'выбирает'
+  operator -> engine.deploy.prodGate 'deploys'
+  engine.deploy.deployer -> releases 'version'
+  engine.deploy.deployer -> prod 'rollout'
+  prod -> engine.deploy.watcher 'metrics'
+  engine.deploy.watcher .handoff engine.learn.retro 'rollout outcome'
+  operator -> engine.learn.adopt 'chooses'
 
-  // ================= Петли назад =================
-  engine.verify.checks .verdict engine.implement.implementer 'красное: чинить, не больше 2 кругов'
+  // ================= Loops back =================
+  engine.verify.checks .verdict engine.implement.implementer 'red: fix, at most 2 rounds'
   engine.aiReview.judge .verdict engine.implement.implementer 'fix'
-  engine.spec.interviewer -> operator 'вопросы'
-  engine.deploy.watcher -> operator 'регресс: откатить?'
-  engine.learn.retro -> tracker 'новые задачи'
-  engine.learn.adopt -> engine.orchestrator 'новое правило или проверка'
+  engine.spec.interviewer -> operator 'questions'
+  engine.deploy.watcher -> operator 'regression: roll back?'
+  engine.learn.retro -> tracker 'new work items'
+  engine.learn.adopt -> engine.orchestrator 'new rule or check'
 
-  // ================= Сквозные =================
-  engine.orchestrator -> engine.implement.implementer 'запускает в песочнице'
-  engine.orchestrator -> engine.cards 'вопросы Оператору'
-  engine.cards -> operator 'карточка'
-  engine.orchestrator -> engine.traces 'пишет'
-  engine.traces -> engine.learn.retro 'записи сессий'
+  // ================= Cross-cutting =================
+  engine.orchestrator -> engine.implement.implementer 'runs in sandbox'
+  engine.orchestrator -> engine.cards 'asks the Operator'
+  engine.cards -> operator 'decision request'
+  engine.orchestrator -> engine.traces 'writes'
+  engine.traces -> engine.learn.retro 'session traces'
 }

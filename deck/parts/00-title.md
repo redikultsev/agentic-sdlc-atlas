@@ -1,15 +1,15 @@
 ---
 theme: default
-title: Конвейер разработки на агентах
-info: Как задача проходит путь от сигнала до прода с агентами и где решает человек. Собирается из модели, не править руками.
+title: Agentic development pipeline
+info: How a work item travels from a signal to production with agents, and where the human decides. Generated from the model; do not edit by hand.
 colorSchema: light
 aspectRatio: 16/9
 canvasWidth: 1280
 mdc: true
 ---
 
-# Конвейер разработки на агентах
+# Agentic development pipeline
 
-Как задача проходит путь от сигнала до прода, кто что делает и где решает человек
+How a work item travels from a signal to production, who does what, and where the human decides
 
-<div class="muted">Черновик v1 · собрано из модели в репозитории · обновляется вместе с ней</div>
+<div class="muted">Draft v1 · generated from the model in this repository · updated with it</div>

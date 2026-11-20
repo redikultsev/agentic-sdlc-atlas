@@ -1,30 +1,30 @@
 ---
 
-# Размер задачи и риск
+# Work item size and risk
 
 <div class="grid2">
 <div>
 
-**Размер** — что записывается и утверждается. Код агент читает всегда.
+**Size** decides what is written down and approved. The agent always reads the code.
 
-| | Что | Оператор утверждает |
+| | What | The Operator approves |
 |---|---|---|
-| **S** | мелочь | ничего, сразу код |
-| **M** | фича в модуле | спеку и план |
-| **L** | много модулей | исследование, спеку, план |
+| **S** | small | nothing, straight to code |
+| **M** | a feature in one module | spec and plan |
+| **L** | many modules | research, spec, plan |
 
 </div>
 <div>
 
-**Риск** — как сливать и выкатывать.
+**Risk** decides how to merge and deploy.
 
-| | Что | Слияние | Прод |
+| | What | Merge | Production |
 |---|---|---|---|
-| **R0** | обратимо, наружу не уходит | само | сразу |
-| **R1** | обычный код за проверками | Оператор по доказательствам | сразу |
-| **R2** | необратимо или наружу | Оператор читает код | Оператор |
+| **R0** | reversible, stays inside | itself | right away |
+| **R1** | regular code behind checks | Operator, on evidence | right away |
+| **R2** | irreversible or leaves the system | Operator reads the code | Operator |
 
 </div>
 </div>
 
-Размер и риск предлагает агент с причиной, Оператор правит, когда берёт задачу в работу.
+The agent proposes size and risk with a reason; the Operator corrects them when accepting the work item.

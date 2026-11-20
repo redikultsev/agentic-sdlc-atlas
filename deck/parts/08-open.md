@@ -1,10 +1,10 @@
 ---
 
-# Что открыто
+# Open questions
 
-1. **Движок**, на котором собирать конвейер: свой поверх готового или готовый чужой, только если подходит полностью.
-2. **Состояния задачи** — черновик, ждёт утверждения.
-3. **Замер на реальных задачах:** время Оператора, доля задач без ручной помощи, откаты, $ на изменение.
-4. **Глубокий разбор** главных тем исследования: проверка, до которой агент не дотянется, ловля ложного «готово», права агентов в песочнице.
+1. **Engine** to build the pipeline on: our own on top of an existing one, or an existing one only if it fits completely.
+2. **Work item states** — draft, awaiting approval.
+3. **Measurement on real work items:** Operator time, share done without manual help, rollbacks, $ per change.
+4. **Deep dives** on the key research topics: verification the agent cannot reach, catching false "done", agent rights in the sandbox.
 
-<div class="muted">Модель, исследования и эта презентация — в одном репозитории. Презентация собирается из модели командой <code>npm run deck:build</code>.</div>
+<div class="muted">Model, research and this deck live in one repository. The deck is built from the model with <code>npm run deck:gen</code>.</div>

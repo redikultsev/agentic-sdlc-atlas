@@ -1,32 +1,32 @@
-# Конвейер разработки на агентах
+# Agentic development pipeline
 
-Всё по теме в одном месте: как устроен конвейер, почему так решено, на каких исследованиях это стоит, и презентация для показа.
+Everything on the topic in one place: how the pipeline works, why it was decided that way, the research behind it, and a deck to present it.
 
-## Что где
+## What is where
 
-| Папка | Что | Как смотреть |
+| Path | What | How to view |
 |---|---|---|
-| `model/` | Модель конвейера на [LikeC4](https://likec4.dev): стадии, части, связи, хранилища, путь задачи. Источник для всех схем | `npm run dev` — интерактивные схемы с переходом вглубь |
-| `docs/decisions.md` | Принятые решения: что, что отвергли, почему | — |
-| `docs/states.md` | Состояния задачи и переходы, привязка к GitHub Issues и Jira | — |
-| `deck/` | Презентация для разбора и показа коллегам. `deck/slides.md` **собирается** из модели и `docs/`, руками не править; править `deck/parts/` | `npm run deck:dev` |
-| `research/atlas/` | Атлас: что известно в мире о каждой стадии (964 кандидата, 30 областей), сырые данные исследований | `research/atlas/README.md` |
-| `GLOSSARY.md` | Термины: стадии, размер и риск, хранилища | — |
+| `model/` | The pipeline model in [LikeC4](https://likec4.dev): stages, parts, links, stores, life of a work item. Source of every diagram | `npm run dev` — interactive diagrams with drill-down |
+| `docs/decisions.md` | Decisions: what, what was rejected, why | — |
+| `docs/states.md` | Work item states and transitions, mapped to GitHub Issues and Jira | — |
+| `deck/` | The deck for walkthroughs and colleagues. `deck/slides.md` is **generated** from the model and `docs/`; do not edit it, edit `deck/parts/` | `npm run deck:dev` |
+| `research/atlas/` | The atlas: what is known about each stage (964 candidates, 30 areas) and raw research data | `research/atlas/README.md` |
+| `GLOSSARY.md` | Terms: stages, size and risk, stores | — |
 
-## Как держать актуальным
+## Keeping it current
 
-Одна правка — один источник:
-- поменялось устройство → `model/*.c4`;
-- поменялось решение → `docs/decisions.md`;
-- поменялись состояния → `docs/states.md`;
-- текст вводных слайдов → `deck/parts/`.
+One change, one source:
+- the design changed → `model/*.c4`;
+- a decision changed → `docs/decisions.md`;
+- states changed → `docs/states.md`;
+- intro slide text → `deck/parts/`.
 
-Затем:
+Then:
 
 ```bash
-npm run deck:gen   # проверка модели, картинки схем, пересборка slides.md
+npm run deck:gen   # check the model, export diagram images, regenerate slides.md
 ```
 
-и коммит вместе с пересобранными `deck/slides.md` и `deck/public/views/`. `npm run build` дополнительно собирает статичные сайты в `dist/`.
+and commit together with the regenerated `deck/slides.md` and `deck/public/views/`. `npm run build` also builds static sites into `dist/`.
 
-Черновик v1. Статусы частей: есть · решено строить · идея.
+Draft v1. Part status: built · planned · idea.

@@ -1,83 +1,75 @@
-# Глоссарий
+# Glossary
 
-Термины документа. Фазы названы так, как их принято называть в SDLC (Software Development Life Cycle, жизненный цикл разработки ПО). Английский термин дан для поиска и для атласа.
+Terms used in this project. Stage names follow the convergent pipeline of leading teams; artifact names follow the CDEvents standard (CD Foundation).
 
-## Стадии конвейера
+## Stages
 
-Девять стадий, к которым сходятся лидеры (Stripe, Anthropic, Spotify, Google, Cognition и другие).
+| # | Stage | What happens | Who |
+|---|---|---|---|
+| 1 | Intake | A signal becomes a work item; an agent proposes size and risk, the Operator accepts | agent + Operator |
+| 2 | Spec | M and L only: what "done" means — acceptance criteria, constraints | agent, Operator approves |
+| 3 | Plan | M and L only: how we do it in slices and how we prove it; for L, codebase research first | agent, Operator approves |
+| 4 | Implement | The agent writes the change in a sandbox | agent |
+| 5 | Self-verify | Tests, lint, build, holdout tests, evidence; rounds are capped | scripts + agent |
+| 6 | AI review | Reviewer agents and a judge with a pass / fix / block verdict | agents |
+| 7 | Merge | By risk: R0 merges itself, R1 the Operator on evidence, R2 the Operator reads the code | script + Operator |
+| 8 | Deploy & watch | R0 and R1 right away, R2 on a yes; a watcher compares metrics before and after | script + agent |
+| 9 | Learn | Mistakes and corrections become new work items, checks and rules | agent, Operator chooses |
 
-| № | Стадия | По-английски | Что происходит | Кто |
-|---|---|---|---|---|
-| 1 | Приём задачи | Intake | Сигнал становится задачей; агент предлагает размер и риск, Оператор берёт в работу | агент + Оператор |
-| 2 | Спецификация | Spec | Только M и L: что значит «готово» — критерии приёмки, ограничения | агент, Оператор утверждает |
-| 3 | План | Plan | Только M и L: как делаем срезами, чем докажем; для L — ещё исследование кода | агент, Оператор утверждает |
-| 4 | Реализация | Implement | Агент пишет изменение в песочнице | агент |
-| 5 | Самопроверка | Self-verify | Тесты, линт, сборка, скрытые тесты, доказательства; круги ограничены | скрипты + агент |
-| 6 | ИИ-ревью | AI review | Агенты-ревьюеры и судья с вердиктом pass / fix / block | агенты |
-| 7 | Слияние | Merge | По риску: R0 само, R1 — Оператор по доказательствам, R2 — Оператор читает код | скрипт + Оператор |
-| 8 | Выкатка и наблюдение | Deploy & watch | R0 и R1 сразу, R2 — по «да»; дозор сравнивает метрики до и после | скрипт + агент |
-| 9 | Разбор и обучение | Learn | Ошибки и поправки — в новые задачи, проверки, правила | агент, Оператор выбирает |
+## Size and risk
 
-## Размер задачи и риск
-
-| Метка | Значение |
+| Label | Meaning |
 |---|---|
-| **S** | Мелочь. Агент читает код и сразу пишет изменение, ничего отдельно не утверждается |
-| **M** | Фича в пределах модуля. Спека и план, Оператор утверждает |
-| **L** | Задевает много модулей. Ещё документ исследования кода отдельным проходом |
-| **R0** | Обратимо и наружу не уходит (доки, тесты). Сливается и выкатывается само |
-| **R1** | Обычный код за проверками. Оператор читает отчёт с доказательствами и жмёт «да» |
-| **R2** | Необратимо или наружу (миграции, инфраструктура, деньги, секреты). Оператор читает код и выкатывает сам |
+| **S** | Small. The agent reads the code and writes the change; nothing is approved separately |
+| **M** | A feature within one module. Spec and plan, the Operator approves |
+| **L** | Touches many modules. Plus a codebase research document from a separate pass |
+| **R0** | Reversible and does not leave the system (docs, tests). Merges and deploys itself |
+| **R1** | Regular code behind checks. The Operator reads the report with evidence and says yes |
+| **R2** | Irreversible or leaves the system (migrations, infrastructure, money, secrets). The Operator reads the code and deploys |
 
-Размер и риск предлагает агент на приёме, Оператор может поправить.
+The agent proposes size and risk at intake; the Operator may correct them.
 
-## Где что лежит
+## Where things live
 
-| Хранилище | Что в нём | Сейчас |
+| Store | What it holds | Today |
 |---|---|---|
-| Задачи | Задача с номером, размером, риском, состоянием. Центр конвейера | GitHub Issues · Jira |
-| Спеки и планы | Спека, план, документ исследования | файлы в репозитории или тело задачи |
-| Изменения | PR, ревью, вердикты | PR (GitHub) · MR |
-| Результаты проверок | Вывод тестов и проверок, привязанный к коммиту | CI |
-| Выкатки | Какая версия где и чем кончилось | Dokploy |
+| Work items | Number, size, risk, state. The pipeline hub | GitHub Issues · Jira |
+| Specs and plans | Spec, plan, research document | files in the repo or the work item body |
+| Change sets | PR, reviews, verdicts | PR (GitHub) · MR |
+| Check results | Test and check output tied to the commit | CI |
+| Deployments | Which version runs where and how it ended | Dokploy |
 
-## Кто делает работу
+## Who does the work
 
-| Термин | Что это | На картинке |
+| Term | What it is | On the diagrams |
 |---|---|---|
-| **Оператор** | Человек над агентами: ставит задачи, решает в воротах, читает отчёты | оранжевый, фигура человека |
-| **Агент** | LLM, которая работает сама: читает, пишет, вызывает инструменты | фиолетовый |
-| **Скрипт** | Проверка или действие без LLM. Отвечает одинаково на одном входе | зелёный |
-| **Ворота** (gate) | Место, где без решения Оператора дальше не идём | красный |
-| **Хранилище** | Где лежит состояние задачи вне головы агента: бэклог, бриф, журнал | серый цилиндр |
-| **Сквозная часть** | То, на чём работают все фазы: оркестратор, песочница, трассы | голубой |
+| **Operator** | The human over the agents: accepts work, decides at gates, reads reports | orange, person icon |
+| **Agent** | An LLM that works on its own: reads, writes, calls tools | purple |
+| **Script** | A check or action with no LLM. Same input, same answer | green |
+| **Gate** | A point where nothing moves without the Operator's decision | red |
+| **Store** | Where the state of the work lives outside the agent's head | grey cylinder |
+| **Cross-cutting part** | What every stage runs on: orchestrator, sandbox, traces | light blue |
 
-## Статус части
+## Part status
 
-| Метка | Значение |
+| Tag | Meaning |
 |---|---|
-| `built` | Есть и работает сейчас |
-| `planned` | Решено строить |
-| `idea` | Только идея, решения нет |
+| `built` | Exists and works today |
+| `planned` | Decided to build |
+| `idea` | Idea only, no decision |
 
-## Понятия
+## Concepts
 
-| Термин | Что это | Пример |
-|---|---|---|
-| **Бриф** | Описание задачи из пяти полей: результат, границы, доказательство готовности, класс риска, форма отчёта | «Результат: кнопка экспорта. Границы: только модуль отчётов. Доказательство: тест экспорта зелёный. Риск: R1. Отчёт: итог до 50 слов» |
-| **Класс риска** | Сколько участия человека нужно изменению. R0 — обратимо и наружу не уходит. R1 — код за проверками, откатывается в один шаг. R2 — необратимо или уходит наружу | R0 — черновик отчёта. R1 — новая фича. R2 — миграция базы, письмо клиенту |
-| **Срез** | Кусок работы, который можно сделать и проверить отдельно | «Сначала API экспорта с тестом, потом кнопка» |
-| **PR** (pull request) | Запрос на слияние изменения в основную ветку | — |
-| **Слияние** (merge) | Изменение из PR попадает в основную ветку | — |
-| **Голова PR** | Последний коммит в PR. Одобрение действует только на ту голову, которую видел ревьюер | Агент дописал коммит после ревью — одобрение больше не считается |
-| **Вердикт** | Решение судьи в виде JSON по схеме: `pass`, `fix` или `block`. Куда идти дальше, решает код по этому полю | `{"verdict": "fix", "reasons": [...]}` |
-| **Скрытые тесты** (holdout) | Тесты, которых агент не видит и не может править | — |
-| **CI** | Проверки, которые сервер запускает сам на каждый PR | — |
-| **Миграция** | Изменение структуры или данных базы | Добавить колонку, перенести данные |
-| **Откат** (rollback) | Вернуть прошлую версию после неудачной выкатки | — |
-| **Песочница** (sandbox) | Изолированная среда на одну задачу: агент не дотянется до чужих файлов, сети и ключей | — |
-| **Worktree** | Отдельная копия репозитория на одну задачу, чтобы параллельные агенты не мешали друг другу | — |
-| **Оркестратор** | Программа, которая ведёт задачу по шагам и решает, какой шаг следующий | — |
-| **Трассы** | Запись того, что делал агент: вызовы, решения, цена | — |
-| **Ретроспектива** | Регулярный разбор: что пошло не так и что поменять в процессе | — |
-| **Атлас** | Отдельная база знаний: что известно в мире о каждой стадии. Номер области атласа (S0–S18, X1–X11) стоит у частей в поле `stage` | `S6` — тестирование |
+| Term | What it is |
+|---|---|
+| **Work item** | A tracked unit of work with one number; everything else links to it (CDEvents: ticket) |
+| **Change set** | A proposed modification on a branch: PR in GitHub, MR in GitLab (CDEvents: change) |
+| **PR head** | The last commit of a PR. An approval counts only for the head the reviewer saw |
+| **Verdict** | The judge's decision as schema JSON: `pass`, `fix` or `block`. Code picks the next step from it |
+| **Holdout tests** | Tests the agent cannot see or edit |
+| **Slice** | A piece of work that can be built and checked on its own |
+| **Sandbox** | An isolated environment per work item: the agent cannot reach other files, networks or credentials |
+| **Orchestrator** | The program that moves a work item through the stages |
+| **Traces** | A record of what the agent did: calls, decisions, cost |
+| **Rollback** | Return to the previous version after a failed rollout |
+| **Atlas** | The knowledge base in `research/atlas/`: what the world knows about each stage (areas S0–S18, X1–X11) |

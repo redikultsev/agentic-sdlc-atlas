@@ -1,1 +1,1 @@
-Ветвление по размеру (S / M / L) и по риску (R0 / R1 / R2). Цикл «проверки → ревью → доработка» — не больше 3 кругов, потом задача застревает и ждёт Оператора.
+Branches by size (S / M / L) and risk (R0 / R1 / R2). The "checks → review → fix" loop runs at most 3 times; then the work item is blocked and waits for the Operator.

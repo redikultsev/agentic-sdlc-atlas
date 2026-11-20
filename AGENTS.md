@@ -1,10 +1,11 @@
 # AGENTS.md
 
-Репозиторий проекта «конвейер разработки на агентах». Структура и источники — в [README.md](README.md).
+The "agentic development pipeline" project. Structure and sources: [README.md](README.md).
 
-Правила:
-1. **Один источник на факт.** Устройство — `model/*.c4`, решения — `docs/decisions.md`, состояния — `docs/states.md`. `deck/slides.md` и `deck/public/views/` — сгенерированы, руками не править.
-2. **После любой правки источника** — `npm run deck:gen` и коммит вместе с сгенерированным. Презентация и схемы всегда совпадают с моделью.
-3. **Решение изменилось** — правка строки в `docs/decisions.md` с датой пересмотра; отменённое помечается «отменено» с причиной, не удаляется.
-4. **Ничего личного:** ни имён, ни работодателей, ни клиентов, ни названий личных проектов, ни путей машины. Человек в схемах — «Оператор». Репозиторий показывают коллегам.
-5. **Исследования** кладутся в `research/`, с источником и датой у каждого факта.
+Rules:
+1. **English only** in every file and commit message of this repository.
+2. **One source per fact.** Design: `model/*.c4`; decisions: `docs/decisions.md`; states: `docs/states.md`. `deck/slides.md` and `deck/public/views/` are generated; never edit them by hand.
+3. **After any change to a source** run `npm run deck:gen` and commit together with the generated files. The deck and the diagrams always match the model.
+4. **A decision changed:** edit its row in `docs/decisions.md` with the revision date; a cancelled one is marked "cancelled" with the reason, never deleted.
+5. **Nothing personal:** no names, employers, clients, personal project names or machine paths. The human in the diagrams is "the Operator". The repository is shown to colleagues.
+6. **Research** goes to `research/`, with a source and a date for every fact.

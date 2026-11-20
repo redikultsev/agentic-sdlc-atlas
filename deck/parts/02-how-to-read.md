@@ -1,26 +1,26 @@
 ---
 
-# Как читать схемы
+# How to read the diagrams
 
 <div class="grid2">
 <div>
 
-| Цвет | Кто |
+| Colour | Who |
 |---|---|
-| фиолетовый | **агент** — модель, работает сама |
-| зелёный | **скрипт** — проверка или действие без модели |
-| красный | **ворота** — решает Оператор |
-| оранжевый | **Оператор** — человек над агентами |
-| серый цилиндр | **хранилище** — где лежат задачи, PR, проверки |
+| purple | **agent** — an LLM working on its own |
+| green | **script** — a check or action with no LLM |
+| red | **gate** — the Operator decides |
+| orange | **Operator** — the human over the agents |
+| grey cylinder | **store** — where work items, PRs and checks live |
 
 </div>
 <div>
 
-- Стадии идут **слева направо**.
-- Клик по стадии на интерактивной схеме открывает её устройство.
-- Петли назад («чинить», «новая задача») показаны на схемах стадий.
-- Инструмент (GitHub, Jira, Dokploy) — только подпись. Схема от инструментов не зависит.
-- Статус части: **есть** · **решено строить** · **идея**.
+- Stages run **left to right**.
+- Click a stage in the interactive diagram to open it.
+- Loops back ("fix", "new work item") are shown on the stage views.
+- Tools (GitHub, Jira, Dokploy) are only labels. The design does not depend on them.
+- Part status: **built** · **planned** · **idea**.
 
 </div>
 </div>

@@ -1,13 +1,13 @@
 ---
 
-# Зачем
+# Why
 
-<div class="lead">Писать код агенты уже умеют. Узкое место — проверка и внимание человека.</div>
+<div class="lead">Agents can already write code. The bottleneck is verification and human attention.</div>
 
-| Что видно у лидеров | Цифра | Источник |
+| What leading teams see | Figure | Source |
 |---|---|---|
-| Коммитов с ИИ сильно больше, релизов — чуть больше | +240% коммитов, +30% релизов | NBER, 500 тыс. разработчиков |
-| Разработчики с ИИ были медленнее, но думали, что быстрее | −19% | METR, контролируемый эксперимент |
-| С ИИ поставок больше, а стабильность хуже | — | DORA 2025 |
+| Far more commits with AI, only slightly more releases | +240% commits, +30% releases | NBER, 500k developers |
+| Developers with AI were slower but believed they were faster | −19% | METR, randomized controlled trial |
+| AI raises throughput but hurts delivery stability | — | DORA 2025 |
 
-**Цель конвейера:** доверять результату при минимуме участия человека. Мерим время Оператора на изменение, долю задач без ручной помощи, откаты и $ на изменение.
+**Goal:** trust the result with minimal human involvement. We measure Operator time per change, the share of work items done without manual help, rollbacks, and $ per change.

@@ -1,1 +1,1 @@
-Девять стадий, к которым сходятся Stripe, Anthropic, Spotify, Google, Cognition, AWS AI-DLC и другие. Снизу — хранилища.
+Nine stages that Stripe, Anthropic, Spotify, Google, Cognition, AWS AI-DLC and others converge on. Stores at the bottom.

@@ -1,150 +1,150 @@
 ---
 theme: default
-title: Конвейер разработки на агентах
-info: Как задача проходит путь от сигнала до прода с агентами и где решает человек. Собирается из модели, не править руками.
+title: Agentic development pipeline
+info: How a work item travels from a signal to production with agents, and where the human decides. Generated from the model; do not edit by hand.
 colorSchema: light
 aspectRatio: 16/9
 canvasWidth: 1280
 mdc: true
 ---
 
-# Конвейер разработки на агентах
+# Agentic development pipeline
 
-Как задача проходит путь от сигнала до прода, кто что делает и где решает человек
+How a work item travels from a signal to production, who does what, and where the human decides
 
-<div class="muted">Черновик v1 · собрано из модели в репозитории · обновляется вместе с ней</div>
+<div class="muted">Draft v1 · generated from the model in this repository · updated with it</div>
 
 ---
 
-# Зачем
+# Why
 
-<div class="lead">Писать код агенты уже умеют. Узкое место — проверка и внимание человека.</div>
+<div class="lead">Agents can already write code. The bottleneck is verification and human attention.</div>
 
-| Что видно у лидеров | Цифра | Источник |
+| What leading teams see | Figure | Source |
 |---|---|---|
-| Коммитов с ИИ сильно больше, релизов — чуть больше | +240% коммитов, +30% релизов | NBER, 500 тыс. разработчиков |
-| Разработчики с ИИ были медленнее, но думали, что быстрее | −19% | METR, контролируемый эксперимент |
-| С ИИ поставок больше, а стабильность хуже | — | DORA 2025 |
+| Far more commits with AI, only slightly more releases | +240% commits, +30% releases | NBER, 500k developers |
+| Developers with AI were slower but believed they were faster | −19% | METR, randomized controlled trial |
+| AI raises throughput but hurts delivery stability | — | DORA 2025 |
 
-**Цель конвейера:** доверять результату при минимуме участия человека. Мерим время Оператора на изменение, долю задач без ручной помощи, откаты и $ на изменение.
+**Goal:** trust the result with minimal human involvement. We measure Operator time per change, the share of work items done without manual help, rollbacks, and $ per change.
 
 ---
 
-# Как читать схемы
+# How to read the diagrams
 
 <div class="grid2">
 <div>
 
-| Цвет | Кто |
+| Colour | Who |
 |---|---|
-| фиолетовый | **агент** — модель, работает сама |
-| зелёный | **скрипт** — проверка или действие без модели |
-| красный | **ворота** — решает Оператор |
-| оранжевый | **Оператор** — человек над агентами |
-| серый цилиндр | **хранилище** — где лежат задачи, PR, проверки |
+| purple | **agent** — an LLM working on its own |
+| green | **script** — a check or action with no LLM |
+| red | **gate** — the Operator decides |
+| orange | **Operator** — the human over the agents |
+| grey cylinder | **store** — where work items, PRs and checks live |
 
 </div>
 <div>
 
-- Стадии идут **слева направо**.
-- Клик по стадии на интерактивной схеме открывает её устройство.
-- Петли назад («чинить», «новая задача») показаны на схемах стадий.
-- Инструмент (GitHub, Jira, Dokploy) — только подпись. Схема от инструментов не зависит.
-- Статус части: **есть** · **решено строить** · **идея**.
+- Stages run **left to right**.
+- Click a stage in the interactive diagram to open it.
+- Loops back ("fix", "new work item") are shown on the stage views.
+- Tools (GitHub, Jira, Dokploy) are only labels. The design does not depend on them.
+- Part status: **built** · **planned** · **idea**.
 
 </div>
 </div>
 
 ---
 
-# Весь конвейер
+# Whole pipeline
 
 <img src="/views/index.png" class="view-wide" />
 
-Девять стадий, к которым сходятся Stripe, Anthropic, Spotify, Google, Cognition, AWS AI-DLC и другие. Снизу — хранилища.
+Nine stages that Stripe, Anthropic, Spotify, Google, Cognition, AWS AI-DLC and others converge on. Stores at the bottom.
 
 ---
 
-# Что движется и где лежит
+# What moves and where it lives
 
-Сигнал → **задача** → спека → план → **изменение** → результаты проверок → ревью → слитое изменение → **выкатка** → инцидент → снова сигнал
+Signal → **work item** → spec → plan → **change set** → check results → review → merged change → **deployment** → incident → signal again
 
-| Хранилище | Что в нём | Сейчас |
+| Store | What it holds | Today |
 |---|---|---|
-| **Задачи** | центр: номер, размер, риск, состояние; всё ссылается на номер | GitHub Issues · Jira |
-| **Спеки и планы** | что значит «готово», как делаем | файлы в репозитории или тело задачи |
-| **Изменения** | PR, ревью, вердикты | PR · MR |
-| **Результаты проверок** | вывод тестов, привязанный к коммиту | CI |
-| **Выкатки** | какая версия где и чем кончилось | Dokploy |
+| **Work items** | the hub: number, size, risk, state; everything links to the number | GitHub Issues · Jira |
+| **Specs and plans** | what "done" means, how we do it | files in the repo or the work item body |
+| **Change sets** | PR, reviews, verdicts | PR · MR |
+| **Check results** | test output tied to the commit | CI |
+| **Deployments** | which version runs where and how it ended | Dokploy |
 
-Названия артефактов — из стандарта CDEvents (CD Foundation): ticket, change, build, release, incident.
+Artifact names follow the CDEvents standard (CD Foundation): ticket, change, build, release, incident.
 
 ---
 
-# Размер задачи и риск
+# Work item size and risk
 
 <div class="grid2">
 <div>
 
-**Размер** — что записывается и утверждается. Код агент читает всегда.
+**Size** decides what is written down and approved. The agent always reads the code.
 
-| | Что | Оператор утверждает |
+| | What | The Operator approves |
 |---|---|---|
-| **S** | мелочь | ничего, сразу код |
-| **M** | фича в модуле | спеку и план |
-| **L** | много модулей | исследование, спеку, план |
+| **S** | small | nothing, straight to code |
+| **M** | a feature in one module | spec and plan |
+| **L** | many modules | research, spec, plan |
 
 </div>
 <div>
 
-**Риск** — как сливать и выкатывать.
+**Risk** decides how to merge and deploy.
 
-| | Что | Слияние | Прод |
+| | What | Merge | Production |
 |---|---|---|---|
-| **R0** | обратимо, наружу не уходит | само | сразу |
-| **R1** | обычный код за проверками | Оператор по доказательствам | сразу |
-| **R2** | необратимо или наружу | Оператор читает код | Оператор |
+| **R0** | reversible, stays inside | itself | right away |
+| **R1** | regular code behind checks | Operator, on evidence | right away |
+| **R2** | irreversible or leaves the system | Operator reads the code | Operator |
 
 </div>
 </div>
 
-Размер и риск предлагает агент с причиной, Оператор правит, когда берёт задачу в работу.
+The agent proposes size and risk with a reason; the Operator corrects them when accepting the work item.
 
 ---
 layout: default
 ---
 
-# 1. Приём задачи
+# 1. Intake
 
-<div class="lead">Сигнал становится задачей. Агент предлагает размер и риск, Оператор берёт в работу.</div>
+<div class="lead">A signal becomes a work item. An agent proposes size and risk; the Operator accepts it.</div>
 
 <div class="grid2">
 <div>
 
 <img src="/views/intake.png" class="view" />
 
-**Состояния задачи:** New → Triaged → Accepted / Cancelled
+**Work item states:** New → Triaged → Accepted / Cancelled
 
-**Решает Оператор:** Взять в работу
+**The Operator decides:** Accept
 
 </div>
 <div>
 
-| Часть | Кто | Статус | Что делает |
+| Part | Who | Status | What it does |
 |---|---|---|---|
-| **Сортировщик** | агент | идея | Склеивает дубли, предлагает размер S/M/L и риск R0/R1/R2 с причиной. Сам ничего не закрывает. |
-| **Взять в работу** | решает Оператор | идея | Оператор видит размер и риск, может поправить и жмёт «в работу». |
+| **Triage** | agent | idea | Merges duplicates, proposes size S/M/L and risk R0/R1/R2 with a reason. Never closes anything itself. |
+| **Accept** | Operator decides | idea | The Operator sees size and risk, may correct them, and accepts the work item. |
 
-<details><summary>Вход и выход стадии</summary>
+<details><summary>Stage inputs and outputs</summary>
 
-**Приходит:**
-- Мониторинг → Сортировщик: алерт
-- Оператор → Взять в работу: в работу
+**In:**
+- Monitoring → Triage: alert
+- Operator → Accept: accepts
 
-**Уходит:**
-- Сортировщик → Задачи: задача
-- Взять в работу → Интервьюер: M, L
-- Взять в работу → Исполнитель: S: сразу код
+**Out:**
+- Triage → Work items: work item
+- Accept → Interviewer: M, L
+- Accept → Implementer: S: straight to code
 
 </details>
 </div>
@@ -155,38 +155,38 @@ layout: default
 layout: default
 ---
 
-# 2. Спецификация
+# 2. Spec
 
-<div class="lead">Только для M и L. Агент уточняет и пишет, что значит «готово».</div>
+<div class="lead">M and L only. The agent clarifies and writes what "done" means.</div>
 
 <div class="grid2">
 <div>
 
 <img src="/views/spec.png" class="view" />
 
-**Состояния задачи:** Clarifying → SpecReview
+**Work item states:** Clarifying → SpecReview
 
-**Решает Оператор:** Утвердить спеку
+**The Operator decides:** Approve spec
 
 </div>
 <div>
 
-| Часть | Кто | Статус | Что делает |
+| Part | Who | Status | What it does |
 |---|---|---|---|
-| **Интервьюер** | агент | идея | Задаёт вопросы по недоопределённому, пишет спеку: зачем, критерии приёмки, что нельзя менять. |
-| **Утвердить спеку** | решает Оператор | идея | M и L: Оператор утверждает спеку. |
+| **Interviewer** | agent | idea | Asks about what is underspecified, writes the spec: why, acceptance criteria, what must not change. |
+| **Approve spec** | Operator decides | idea | M and L: the Operator approves the spec. |
 
-<details><summary>Вход и выход стадии</summary>
+<details><summary>Stage inputs and outputs</summary>
 
-**Приходит:**
-- Взять в работу → Интервьюер: M, L
-- Оператор → Утвердить спеку: утверждает
+**In:**
+- Accept → Interviewer: M, L
+- Operator → Approve spec: approves
 
-**Уходит:**
-- Интервьюер → Спеки и планы: спека
-- Утвердить спеку → Исследователь кода: L
-- Утвердить спеку → Планировщик: M
-- Интервьюер → Оператор: вопросы
+**Out:**
+- Interviewer → Specs and plans: spec
+- Approve spec → Codebase researcher: L
+- Approve spec → Planner: M
+- Interviewer → Operator: questions
 
 </details>
 </div>
@@ -197,38 +197,38 @@ layout: default
 layout: default
 ---
 
-# 3. План
+# 3. Plan
 
-<div class="lead">Только для M и L. Как делаем, срезами, и чем докажем готовность.</div>
+<div class="lead">M and L only. How we do it, in slices, and how we prove it is done.</div>
 
 <div class="grid2">
 <div>
 
 <img src="/views/plan.png" class="view" />
 
-**Состояния задачи:** Researching (L) → Planning → PlanReview
+**Work item states:** Researching (L) → Planning → PlanReview
 
-**Решает Оператор:** Утвердить план
+**The Operator decides:** Approve plan
 
 </div>
 <div>
 
-| Часть | Кто | Статус | Что делает |
+| Part | Who | Status | What it does |
 |---|---|---|---|
-| **Исследователь кода** | агент | идея | Только L: отдельный проход на чтение, итог — короткий документ о затронутых модулях и инвариантах. |
-| **Планировщик** | агент | идея | План срезами: файлы, порядок, риски, команда проверки у каждого среза. |
-| **Утвердить план** | решает Оператор | идея | M и L: главные ворота Оператора — ошибку замысла дешевле поймать до кода. |
+| **Codebase researcher** | agent | idea | L only: a separate read-only pass; the result is a short document on affected modules and invariants. |
+| **Planner** | agent | idea | A plan in slices: files, order, risks, a check command for each slice. |
+| **Approve plan** | Operator decides | idea | M and L: the main Operator gate. A wrong idea is cheaper to catch before code. |
 
-<details><summary>Вход и выход стадии</summary>
+<details><summary>Stage inputs and outputs</summary>
 
-**Приходит:**
-- Утвердить спеку → Исследователь кода: L
-- Утвердить спеку → Планировщик: M
-- Оператор → Утвердить план: утверждает
+**In:**
+- Approve spec → Codebase researcher: L
+- Approve spec → Planner: M
+- Operator → Approve plan: approves
 
-**Уходит:**
-- Планировщик → Спеки и планы: план
-- Утвердить план → Исполнитель: план
+**Out:**
+- Planner → Specs and plans: plan
+- Approve plan → Implementer: plan
 
 </details>
 </div>
@@ -239,38 +239,38 @@ layout: default
 layout: default
 ---
 
-# 4. Реализация
+# 4. Implement
 
-<div class="lead">Агент пишет изменение в песочнице. S приходит сюда сразу из приёма.</div>
+<div class="lead">The agent writes the change in the sandbox. S comes here straight from intake.</div>
 
 <div class="grid2">
 <div>
 
 <img src="/views/implement.png" class="view" />
 
-**Состояния задачи:** Implementing
+**Work item states:** Implementing
 
-**Решает Оператор:** ничего — стадия идёт без человека
+**The Operator decides:** nothing — this stage runs without a human
 
 </div>
 <div>
 
-| Часть | Кто | Статус | Что делает |
+| Part | Who | Status | What it does |
 |---|---|---|---|
-| **Исполнитель** | агент | есть | Читает нужный код, пишет изменение одного среза в свежем контексте. |
+| **Implementer** | agent | built | Reads the code it needs and writes one slice in a fresh context. |
 
-<details><summary>Вход и выход стадии</summary>
+<details><summary>Stage inputs and outputs</summary>
 
-**Приходит:**
-- Взять в работу → Исполнитель: S: сразу код
-- Утвердить план → Исполнитель: план
-- Проверки → Исполнитель: красное: чинить, не больше 2 кругов
-- Судья → Исполнитель: fix
-- Оркестратор → Исполнитель: запускает в песочнице
+**In:**
+- Accept → Implementer: S: straight to code
+- Approve plan → Implementer: plan
+- Checks → Implementer: red: fix, at most 2 rounds
+- Judge → Implementer: fix
+- Orchestrator → Implementer: runs in sandbox
 
-**Уходит:**
-- Исполнитель → Изменения: PR
-- Исполнитель → Проверки: прогон
+**Out:**
+- Implementer → Change sets: PR
+- Implementer → Checks: run
 
 </details>
 </div>
@@ -281,37 +281,37 @@ layout: default
 layout: default
 ---
 
-# 5. Самопроверка
+# 5. Self-verify
 
-<div class="lead">Агент не говорит «готово», пока проверки не зелёные. Круги ограничены.</div>
+<div class="lead">The agent never says "done" until checks are green. Rounds are capped.</div>
 
 <div class="grid2">
 <div>
 
 <img src="/views/verify.png" class="view" />
 
-**Состояния задачи:** Verifying (круг ≤ 3, иначе Blocked)
+**Work item states:** Verifying (round ≤ 3, else Blocked)
 
-**Решает Оператор:** ничего — стадия идёт без человека
+**The Operator decides:** nothing — this stage runs without a human
 
 </div>
 <div>
 
-| Часть | Кто | Статус | Что делает |
+| Part | Who | Status | What it does |
 |---|---|---|---|
-| **Проверки** | скрипт | решено строить | Тесты, линт, типы, сборка. Запускаются сами, а не по слову агента. |
-| **Скрытые тесты** | скрипт | идея | Сценарии, которых агент не видит и не может править. |
-| **Доказательства** | агент | идея | Снимки экрана, видео, вывод команд — то, что Оператор смотрит вместо кода. |
+| **Checks** | script | planned | Tests, lint, types, build. They run by themselves, not on the agent word. |
+| **Holdout tests** | script | idea | Scenarios the agent cannot see or edit. |
+| **Evidence** | agent | idea | Screenshots, video, command output: what the Operator looks at instead of code. |
 
-<details><summary>Вход и выход стадии</summary>
+<details><summary>Stage inputs and outputs</summary>
 
-**Приходит:**
-- Исполнитель → Проверки: прогон
+**In:**
+- Implementer → Checks: run
 
-**Уходит:**
-- Проверки → Результаты проверок: результаты
-- Доказательства → Ревьюеры: PR + доказательства
-- Проверки → Исполнитель: красное: чинить, не больше 2 кругов
+**Out:**
+- Checks → Check results: results
+- Evidence → Reviewers: PR + evidence
+- Checks → Implementer: red: fix, at most 2 rounds
 
 </details>
 </div>
@@ -322,37 +322,37 @@ layout: default
 layout: default
 ---
 
-# 6. ИИ-ревью
+# 6. AI review
 
-<div class="lead">Агенты-ревьюеры со свежим контекстом сверяют со спекой и стандартами. Одобрение агента не равно одобрению человека.</div>
+<div class="lead">Reviewer agents with a fresh context check against the spec and standards. An agent approval is not a human approval.</div>
 
 <div class="grid2">
 <div>
 
 <img src="/views/aiReview.png" class="view" />
 
-**Состояния задачи:** Verifying → MergeReview (R1/R2) или Merged (R0)
+**Work item states:** Verifying → MergeReview (R1/R2) or Merged (R0)
 
-**Решает Оператор:** ничего — стадия идёт без человека
+**The Operator decides:** nothing — this stage runs without a human
 
 </div>
 <div>
 
-| Часть | Кто | Статус | Что делает |
+| Part | Who | Status | What it does |
 |---|---|---|---|
-| **Ревьюеры** | агент | есть | Корректность, безопасность, соответствие спеке. Замечания по важности, шум отфильтрован. |
-| **Судья** | агент | есть | Сводит замечания в вердикт JSON: pass / fix / block. |
+| **Reviewers** | agent | built | Correctness, security, match with the spec. Findings ranked by severity, noise filtered out. |
+| **Judge** | agent | built | Turns findings into a JSON verdict: pass / fix / block. |
 
-<details><summary>Вход и выход стадии</summary>
+<details><summary>Stage inputs and outputs</summary>
 
-**Приходит:**
-- Доказательства → Ревьюеры: PR + доказательства
+**In:**
+- Evidence → Reviewers: PR + evidence
 
-**Уходит:**
-- Судья → Изменения: вердикт
-- Судья → Скрипт слияния: pass, R0
-- Судья → Слить?: pass, R1/R2
-- Судья → Исполнитель: fix
+**Out:**
+- Judge → Change sets: verdict
+- Judge → Merge script: pass, R0
+- Judge → Merge?: pass, R1/R2
+- Judge → Implementer: fix
 
 </details>
 </div>
@@ -363,38 +363,38 @@ layout: default
 layout: default
 ---
 
-# 7. Слияние
+# 7. Merge
 
-<div class="lead">По риску: R0 сливается само, R1 — Оператор по доказательствам, R2 — Оператор читает код.</div>
+<div class="lead">By risk: R0 merges itself, R1 the Operator merges on evidence, R2 the Operator reads the code.</div>
 
 <div class="grid2">
 <div>
 
 <img src="/views/merge.png" class="view" />
 
-**Состояния задачи:** MergeReview → Merged
+**Work item states:** MergeReview → Merged
 
-**Решает Оператор:** Слить?
+**The Operator decides:** Merge?
 
 </div>
 <div>
 
-| Часть | Кто | Статус | Что делает |
+| Part | Who | Status | What it does |
 |---|---|---|---|
-| **Слить?** | решает Оператор | идея | R1: карточка с отчётом и доказательствами. R2: ещё и код. |
-| **Скрипт слияния** | скрипт | решено строить | Сливает только если голова PR та же, ревью было на ней и CI зелёный. Агент сам не сливает. |
+| **Merge?** | Operator decides | idea | R1: report with evidence. R2: plus the code. |
+| **Merge script** | script | planned | Merges only if the PR head is unchanged, the review was on that head and CI is green. The agent never merges. |
 
-<details><summary>Вход и выход стадии</summary>
+<details><summary>Stage inputs and outputs</summary>
 
-**Приходит:**
-- Судья → Скрипт слияния: pass, R0
-- Судья → Слить?: pass, R1/R2
-- Оператор → Слить?: смотрит доказательства
+**In:**
+- Judge → Merge script: pass, R0
+- Judge → Merge?: pass, R1/R2
+- Operator → Merge?: reviews evidence
 
-**Уходит:**
-- Скрипт слияния → Изменения: слияние
-- Скрипт слияния → Выкатка: R0, R1
-- Скрипт слияния → Выкатить R2?: R2
+**Out:**
+- Merge script → Change sets: merge
+- Merge script → Deploy: R0, R1
+- Merge script → Deploy R2?: R2
 
 </details>
 </div>
@@ -405,41 +405,41 @@ layout: default
 layout: default
 ---
 
-# 8. Выкатка и наблюдение
+# 8. Deploy & watch
 
-<div class="lead">R0 и R1 уходят в прод сразу после слияния, R2 — по «да» Оператора. Дозор сравнивает метрики до и после.</div>
+<div class="lead">R0 and R1 go to production right after merge, R2 on the Operator yes. A watcher compares metrics before and after.</div>
 
 <div class="grid2">
 <div>
 
 <img src="/views/deploy.png" class="view" />
 
-**Состояния задачи:** Merged → DeployReview (R2) → Live → Done / RolledBack
+**Work item states:** Merged → DeployReview (R2) → Live → Done / RolledBack
 
-**Решает Оператор:** Выкатить R2?
+**The Operator decides:** Deploy R2?
 
 </div>
 <div>
 
-| Часть | Кто | Статус | Что делает |
+| Part | Who | Status | What it does |
 |---|---|---|---|
-| **Выкатить R2?** | решает Оператор | идея | Только R2: миграции, инфраструктура, деньги, секреты. |
-| **Выкатка** | скрипт | есть | Выкатывает и умеет откатить одним шагом. |
-| **Дозор** | агент | идея | Только чтение: сравнивает метрики до и после, при регрессе предлагает откат карточкой. |
+| **Deploy R2?** | Operator decides | idea | R2 only: migrations, infrastructure, money, secrets. |
+| **Deploy** | script | built | Deploys and can roll back in one step. |
+| **Watcher** | agent | idea | Read-only: compares metrics before and after; on a regression proposes a rollback to the Operator. |
 
-<details><summary>Вход и выход стадии</summary>
+<details><summary>Stage inputs and outputs</summary>
 
-**Приходит:**
-- Скрипт слияния → Выкатка: R0, R1
-- Скрипт слияния → Выкатить R2?: R2
-- Оператор → Выкатить R2?: выкатывает
-- Прод → Дозор: метрики
+**In:**
+- Merge script → Deploy: R0, R1
+- Merge script → Deploy R2?: R2
+- Operator → Deploy R2?: deploys
+- Production → Watcher: metrics
 
-**Уходит:**
-- Выкатка → Выкатки: версия
-- Выкатка → Прод: выкатка
-- Дозор → Разбор: итог выкатки
-- Дозор → Оператор: регресс: откатить?
+**Out:**
+- Deploy → Deployments: version
+- Deploy → Production: rollout
+- Watcher → Retro: rollout outcome
+- Watcher → Operator: regression: roll back?
 
 </details>
 </div>
@@ -450,37 +450,37 @@ layout: default
 layout: default
 ---
 
-# 9. Разбор и обучение
+# 9. Learn
 
-<div class="lead">Ошибки и поправки становятся новыми задачами, проверками и правилами.</div>
+<div class="lead">Mistakes and corrections become new work items, checks and rules.</div>
 
 <div class="grid2">
 <div>
 
 <img src="/views/learn.png" class="view" />
 
-**Состояния задачи:** новые задачи в New
+**Work item states:** new work items in New
 
-**Решает Оператор:** Принять правило?
+**The Operator decides:** Adopt rule?
 
 </div>
 <div>
 
-| Часть | Кто | Статус | Что делает |
+| Part | Who | Status | What it does |
 |---|---|---|---|
-| **Разбор** | агент | идея | Раз в неделю: что повторилось дважды — предложение правила, проверки или новой задачи. |
-| **Принять правило?** | решает Оператор | идея | Оператор выбирает, что из предложенного принять. |
+| **Retro** | agent | idea | Weekly: what repeated twice becomes a proposed rule, check or work item. |
+| **Adopt rule?** | Operator decides | idea | The Operator picks which proposals to adopt. |
 
-<details><summary>Вход и выход стадии</summary>
+<details><summary>Stage inputs and outputs</summary>
 
-**Приходит:**
-- Дозор → Разбор: итог выкатки
-- Оператор → Принять правило?: выбирает
-- Записи сессий → Разбор: записи сессий
+**In:**
+- Watcher → Retro: rollout outcome
+- Operator → Adopt rule?: chooses
+- Session traces → Retro: session traces
 
-**Уходит:**
-- Разбор → Задачи: новые задачи
-- Принять правило? → Оркестратор: новое правило или проверка
+**Out:**
+- Retro → Work items: new work items
+- Adopt rule? → Orchestrator: new rule or check
 
 </details>
 </div>
@@ -489,71 +489,71 @@ layout: default
 
 ---
 
-# Путь одной задачи
+# Life of one work item
 
 <img src="/views/task.png" class="view-wide" />
 
-Ветвление по размеру (S / M / L) и по риску (R0 / R1 / R2). Цикл «проверки → ревью → доработка» — не больше 3 кругов, потом задача застревает и ждёт Оператора.
+Branches by size (S / M / L) and risk (R0 / R1 / R2). The "checks → review → fix" loop runs at most 3 times; then the work item is blocked and waits for the Operator.
 
 ---
 
-# Состояния задачи
+# Work item states
 
-**Часть 1. Подготовка: от сигнала до утверждённого плана**
+**Part 1. Preparation: from signal to approved plan**
 
 ```mermaid {scale: 0.42}
 stateDiagram-v2
   direction LR
-  [*] --> New: сигнал
-  New --> Triaged: агент оценил S/M/L и R
-  Triaged --> Accepted: Оператор «в работу»
-  Triaged --> Cancelled: «не делаем»
+  [*] --> New: signal
+  New --> Triaged: agent proposed S/M/L and R
+  Triaged --> Accepted: Operator accepts
+  Triaged --> Cancelled: "won't do"
   Accepted --> Implementing: S
-  Accepted --> Clarifying: M или L
-  Clarifying --> SpecReview: спека готова
-  SpecReview --> Clarifying: «уточни»
-  SpecReview --> Researching: утверждено, L
-  SpecReview --> Planning: утверждено, M
+  Accepted --> Clarifying: M or L
+  Clarifying --> SpecReview: spec ready
+  SpecReview --> Clarifying: "clarify"
+  SpecReview --> Researching: approved, L
+  SpecReview --> Planning: approved, M
   Researching --> Planning
   Planning --> PlanReview
-  PlanReview --> Planning: «переделай»
-  PlanReview --> Implementing: утверждено
+  PlanReview --> Planning: "redo"
+  PlanReview --> Implementing: approved
 ```
 
-<div class="small">Состояние живёт в трекере: в GitHub — метка <code>state:…</code>, в Jira — статус. Не больше 3 задач одновременно в состояниях «ждёт Оператора». <b>Черновик — ждёт утверждения.</b></div>
+<div class="small">The state lives in the tracker: a <code>state:…</code> label in GitHub, a status in Jira. At most 3 work items wait for the Operator at once. <b>Draft, awaiting approval.</b></div>
 
 ---
 
-# Состояния задачи
+# Work item states
 
-**Часть 2. Исполнение: от кода до прода**
+**Part 2. Execution: from code to production**
 
 ```mermaid {scale: 0.42}
 stateDiagram-v2
   direction LR
-  Implementing --> Verifying: изменение готово
-  Verifying --> Implementing: красное или fix, круг ≤ 3
-  Verifying --> Blocked: круги кончились
+  Implementing --> Verifying: change ready
+  Verifying --> Implementing: red or fix, round ≤ 3
+  Verifying --> Blocked: out of rounds
   Verifying --> Merged: pass, R0
   Verifying --> MergeReview: pass, R1/R2
-  MergeReview --> Implementing: «правки»
-  MergeReview --> Merged: «слить»
-  Merged --> Live: R0/R1 сразу
+  MergeReview --> Implementing: "changes"
+  MergeReview --> Merged: "merge"
+  Merged --> Live: R0/R1 right away
   Merged --> DeployReview: R2
-  DeployReview --> Live: «выкатить»
-  Live --> Done: регресса нет
-  Live --> RolledBack: регресс, «откатить»
-  Blocked --> Accepted: Оператор разобрался
+  DeployReview --> Live: "deploy"
+  Live --> Done: no regression
+  Live --> RolledBack: regression, "roll back"
+  Blocked --> Accepted: Operator sorted it out
   Blocked --> Cancelled
   Done --> [*]
-  RolledBack --> [*]: новая задача на причину
+  RolledBack --> [*]: new work item for the cause
 ```
 
-<div class="small">Состояние живёт в трекере: в GitHub — метка <code>state:…</code>, в Jira — статус. Не больше 3 задач одновременно в состояниях «ждёт Оператора». <b>Черновик — ждёт утверждения.</b></div>
+<div class="small">The state lives in the tracker: a <code>state:…</code> label in GitHub, a status in Jira. At most 3 work items wait for the Operator at once. <b>Draft, awaiting approval.</b></div>
 
 ---
 
-# Сквозные части
+# Cross-cutting parts
 
 <img src="/views/platform.png" class="view-wide" />
 
@@ -562,35 +562,36 @@ stateDiagram-v2
 layout: default
 ---
 
-# Принятые решения
+# Decisions
 
 <div class="small">
 
-| # | Вопрос | Решение |
+| # | Question | Decision |
 |---|---|---|
-| 1 | Где главные ворота человека | На спеке и плане, до кода. Слияние — по классу риска |
-| 2 | Насколько подробна спека | По размеру задачи. Агент всегда читает код и строит план; размер решает, что записывается и что утверждает Оператор. S — сразу код; M — спека и план; L — ещё документ исследования кода |
-| 3 | Что смотреть перед слиянием | Доказательства: вывод проверок, снимки, видео. Код — только у рискованного |
-| 4 | Где центр конвейера | Трекер задач: спека, сессии агентов, PR ссылаются на номер задачи |
-| 5 | Трекер | Два с первого дня: GitHub Issues и Jira, через общий слой «задачи»; инструмент — адаптер |
-| 6 | Как сливать по риску | R0 — само при зелёных проверках и ИИ-ревью; R1 — Оператор по доказательствам; R2 — Оператор читает код |
-| 7 | Кто ставит размер и риск | Агент предлагает с причиной, Оператор правит, когда берёт задачу |
-| 8 | Когда изменение уходит в прод | R0 и R1 — сразу после слияния, дозор сравнивает метрики и предлагает откат. R2 выкатывает Оператор |
-| 9 | Сколько задач параллельно | Не больше N задач (начинаем с 3) одновременно ждут Оператора, дальше новые не стартуют |
-| 10 | С каких репозиториев начинаем | Сразу личные и рабочие |
-| 11 | Как конвейер говорит с Оператором | По универсальным правилам подачи: тип решения задаёт объём, пример «было → стало» обязателен, «не проверено» наверху, вид по задаче. Рекомендация в мелком — первой, в большом — после фактов |
-| 12 | Где Оператор работает с конвейером | Пока в Claude Desktop |
+| 1 | Where the main human gates sit | On the spec and plan, before code. Merge by risk class |
+| 2 | How heavy the spec is | By work item size. The agent always reads the code and plans; size decides what is written down and what the Operator approves. S: straight to code; M: spec and plan; L: plus a codebase research document |
+| 3 | What to look at before merge | Evidence: check output, screenshots, video. Code only for risky changes |
+| 4 | Where the pipeline hub is | The tracker: spec, agent sessions and PRs link to the work item number |
+| 5 | Tracker | Two from day one: GitHub Issues and Jira, behind a common "work items" layer; each tool is an adapter |
+| 6 | How to merge by risk | R0 merges itself on green checks and AI review; R1 the Operator merges on evidence; R2 the Operator reads the code |
+| 7 | Who sets size and risk | The agent proposes with a reason; the Operator corrects when accepting the work item |
+| 8 | When a change goes to production | R0 and R1 right after merge; a watcher compares metrics and proposes a rollback. R2 the Operator deploys |
+| 9 | How many work items in parallel | At most N (start with 3) wait for the Operator at once; beyond that new ones do not start |
+| 10 | Which repositories first | Personal and work ones at once |
+| 11 | How the pipeline talks to the Operator | By universal presentation rules: decision type sets the depth, a real before/after case is mandatory, "not verified" on top, form chosen by the task. Recommendation first for small decisions, after the facts for big ones |
+| 12 | Where the Operator works with the pipeline | Claude Desktop for now |
+| 13 | Language | Everything in the project in English: model, docs, deck, research |
 
 </div>
 
 
 ---
 
-# Что открыто
+# Open questions
 
-1. **Движок**, на котором собирать конвейер: свой поверх готового или готовый чужой, только если подходит полностью.
-2. **Состояния задачи** — черновик, ждёт утверждения.
-3. **Замер на реальных задачах:** время Оператора, доля задач без ручной помощи, откаты, $ на изменение.
-4. **Глубокий разбор** главных тем исследования: проверка, до которой агент не дотянется, ловля ложного «готово», права агентов в песочнице.
+1. **Engine** to build the pipeline on: our own on top of an existing one, or an existing one only if it fits completely.
+2. **Work item states** — draft, awaiting approval.
+3. **Measurement on real work items:** Operator time, share done without manual help, rollbacks, $ per change.
+4. **Deep dives** on the key research topics: verification the agent cannot reach, catching false "done", agent rights in the sandbox.
 
-<div class="muted">Модель, исследования и эта презентация — в одном репозитории. Презентация собирается из модели командой <code>npm run deck:build</code>.</div>
+<div class="muted">Model, research and this deck live in one repository. The deck is built from the model with <code>npm run deck:gen</code>.</div>
