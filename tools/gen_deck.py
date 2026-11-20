@@ -82,7 +82,7 @@ dec_rows = [l for l in dec.splitlines() if re.match(r'\| \d+ \|', l)]
 dec_tbl = '| # | Question | Decision |\n|---|---|---|\n' + '\n'.join(
     '| ' + ' | '.join(c.strip() for c in l.strip('|').split('|')[:3]) + ' |' for l in dec_rows)
 
-out = [part('00-title'), part('01-why'), part('02-how-to-read'),
+out = [part('00-title'), part('02-how-to-read'),
        "---\n\n# Whole pipeline\n\n<img src=\"/views/index.png\" class=\"view-wide\" />\n\n" + part('03-overview-note'),
        part('04-artifacts'), part('05-size-risk')]
 out += [stage_slide(k) for k in STAGES]
