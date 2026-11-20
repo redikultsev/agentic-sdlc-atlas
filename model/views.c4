@@ -1,0 +1,108 @@
+views {
+
+  view index {
+    title 'L0. Весь цикл'
+    description '''
+      Семь фаз и сквозные части движка. Клик по фазе — её устройство.
+      Цвет: синий — агент, зелёный — скрипт, красный — ворота Оператора.
+    '''
+    include
+      operator,
+      github,
+      prod,
+      monitoring,
+      engine.intake,
+      engine.understand,
+      engine.build,
+      engine.verify,
+      engine.ship,
+      engine.operate,
+      engine.learn
+    exclude monitoring -> *, github -> *
+    autoLayout TopBottom
+  }
+
+  view intake of engine.intake {
+    title 'L1. Приём'
+    include *, -> engine.intake.* ->
+  }
+
+  view understand of engine.understand {
+    title 'L1. Понимание и план'
+    include *, -> engine.understand.* ->
+  }
+
+  view build of engine.build {
+    title 'L1. Сборка'
+    include *, -> engine.build.* ->, engine.sandbox
+  }
+
+  view verify of engine.verify {
+    title 'L1. Проверка и ревью'
+    include *, -> engine.verify.* ->
+  }
+
+  view ship of engine.ship {
+    title 'L1. Слияние и выкатка'
+    include *, -> engine.ship.* ->
+  }
+
+  view operate of engine.operate {
+    title 'L1. Эксплуатация'
+    include *, -> engine.operate.* ->
+  }
+
+  view learn of engine.learn {
+    title 'L1. Отчёт и обучение'
+    include *, -> engine.learn.* ->
+  }
+
+  view status {
+    title 'Что есть, что в планах'
+    description 'Все части движка. Зелёная метка — есть сейчас, жёлтая — решено строить, серая — идея.'
+    include engine.**
+    exclude engine.intake, engine.understand, engine.build, engine.verify, engine.ship, engine.operate, engine.learn
+    style element.tag = #idea {
+      opacity 30%
+    }
+  }
+
+  dynamic view feature {
+    title 'Сценарий: фича от задачи до прода'
+    description 'Путь одной задачи класса R1. Ветка R2 добавляет утверждение плана.'
+    operator -> engine.intake.admit 'пропускает задачу'
+    engine.intake.queue -> engine.understand.researcher 'задача'
+    engine.understand.researcher -> engine.understand.planner 'карта кода'
+    alt 'класс риска' {
+      when 'R2: необратимо или наружу' {
+        engine.understand.planner -> engine.understand.planGate 'план'
+        operator -> engine.understand.planGate 'утверждает'
+      }
+      else 'R1: код за проверками' {
+        engine.understand.planner -> engine.understand.brief 'план'
+      }
+    }
+    engine.understand.brief -> engine.build.implementer 'бриф'
+    loop 'пока судья не скажет pass, не больше 3 раз' {
+      engine.build.implementer -> engine.build.checks 'прогон'
+      par {
+        engine.build.checks -> engine.verify.reviewCorrect 'PR'
+        engine.build.checks -> engine.verify.reviewSecurity 'PR'
+      }
+      engine.verify.reviewCorrect -> engine.verify.judge 'находки' {
+        notes '''
+          Вердикт отдаётся **JSON по схеме**, маршрут выбирает код.
+          Сейчас в cezar — метка в тексте, это главное слабое место.
+        '''
+      }
+      engine.verify.judge -> engine.build.implementer 'fix: что поправить'
+    }
+    engine.verify.judge -> engine.ship.land 'pass'
+    engine.ship.land -> engine.ship.deploy 'merge, если голова PR та же'
+    engine.ship.deploy -> prod 'выкатка'
+    prod -> engine.operate.watcher 'метрики до и после'
+    engine.ship.releaseNotes -> engine.learn.reporter 'что выкачено'
+    engine.learn.reporter -> engine.learn.reportCheck 'итог'
+    engine.learn.reportCheck -> operator 'отчёт до 50 слов'
+  }
+}

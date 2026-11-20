@@ -1,0 +1,91 @@
+specification {
+  element system {
+    notation 'Система'
+    style {
+      color primary
+    }
+  }
+  // Кто делает работу
+  element phase {
+    notation 'Фаза цикла'
+    style {
+      color slate
+      shape rectangle
+    }
+  }
+  element agent {
+    notation 'Агент (LLM)'
+    style {
+      color indigo
+      shape rectangle
+    }
+  }
+  element script {
+    notation 'Скрипт или проверка (без LLM)'
+    style {
+      color green
+      shape component
+    }
+  }
+  element gate {
+    notation 'Ворота: человек решает'
+    style {
+      color red
+      shape rectangle
+    }
+  }
+  element human {
+    notation 'Человек'
+    style {
+      color amber
+      shape person
+    }
+  }
+  element store {
+    notation 'Хранилище состояния'
+    style {
+      color gray
+      shape storage
+    }
+  }
+  element external {
+    notation 'Внешняя система'
+    style {
+      color slate
+      shape rectangle
+    }
+  }
+  element platform {
+    notation 'Сквозная часть движка'
+    style {
+      color sky
+      shape rectangle
+    }
+  }
+
+  // Статус части
+  tag built {
+    color green
+  }
+  tag planned {
+    color amber
+  }
+  tag idea {
+    color gray
+  }
+
+  relationship handoff {
+    notation 'Передача работы'
+    color primary
+  }
+  relationship verdict {
+    notation 'Вердикт (JSON по схеме)'
+    color red
+    line dashed
+  }
+  relationship reads {
+    notation 'Чтение'
+    color gray
+    line dotted
+  }
+}

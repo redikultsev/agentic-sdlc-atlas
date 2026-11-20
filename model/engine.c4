@@ -1,0 +1,233 @@
+model {
+
+  operator = human 'Оператор' {
+    description 'Один человек над флотом агентов. Потолок по атласу X10: 2–4 агента под активным присмотром.'
+  }
+  github = external 'GitHub' {
+    description 'Issues, PR, CI, защита веток'
+  }
+  prod = external 'Прод' {
+    description 'Работающие сервисы и их данные'
+  }
+  monitoring = external 'Мониторинг' {
+    description 'Ошибки, алерты, метрики'
+  }
+
+  engine = system 'Движок агентского цикла' {
+    description '''
+      **Черновик v0, гипотеза.** Каждая часть помечена статусом:
+      `built` есть сейчас, `planned` решено строить, `idea` только идея.
+      Доказательства — в атласе, номер области в поле `stage`.
+    '''
+
+    // ---------- Сквозное ----------
+    orchestrator = platform 'Оркестратор' {
+      #idea
+      description 'Ведёт задачу по графу шагов. Маршрут выбирает код по JSON-вердикту, а не по тексту агента. Надёжное продолжение после рестарта.'
+      metadata {
+        stage 'X1'
+      }
+    }
+    sandbox = platform 'Песочница на задачу' {
+      #idea
+      description 'Своё ядро на агента, сеть закрыта по умолчанию, ключи подставляет прокси снаружи. В песочнице нет токена с правом merge.'
+      metadata {
+        stage 'X2'
+      }
+    }
+    traces = platform 'Трассы и цена' {
+      #idea
+      description 'Каждая сессия, вызов инструмента, решение и $ — в одном месте. Отсюда меряем время Оператора на изменение.'
+      metadata {
+        stage 'X8'
+      }
+    }
+
+    // ---------- Фазы ----------
+    intake = phase 'Приём' {
+      metadata {
+        stage 'S0'
+      }
+      triage = agent 'Сортировщик' {
+        #idea
+        description 'Склеивает дубли, ставит предложение метки. Сам ничего не закрывает: ложные авто-закрытия — известный провал (атлас S0).'
+      }
+      queue = store 'Очередь задач' {
+        #idea
+        description 'Задачи с меткой «можно агенту». Находки по дороге попадают сюда же, но без права на запуск.'
+      }
+      admit = gate 'Метка «можно агенту»' {
+        #idea
+        description 'Оператор пропускает задачу в работу.'
+      }
+      triage -> queue 'кладёт с предложением'
+      admit -> queue 'разрешает запуск'
+    }
+
+    understand = phase 'Понимание и план' {
+      metadata {
+        stage 'S14 S2 S3 S4'
+      }
+      researcher = agent 'Исследователь кода' {
+        #idea
+        description 'Отдельный проход только на чтение: карта нужных файлов, потоков, инвариантов. Сжимается в короткий документ (атлас S14).'
+      }
+      interviewer = agent 'Интервьюер' {
+        #idea
+        description 'Задаёт Оператору вопросы по недоопределённой задаче. Вопросы от параллельных агентов собираются пачкой (атлас S2).'
+      }
+      planner = agent 'Планировщик' {
+        #idea
+        description 'План срезами: у каждого среза критерии приёмки и команда проверки (атлас S4).'
+      }
+      brief = store 'Бриф задачи' {
+        #idea
+        description 'Пять полей: результат, границы, доказательство, класс риска, форма отчёта.'
+      }
+      planGate = gate 'Утверждение плана' {
+        #idea
+        description 'Только для класса R2: необратимое или наружу.'
+      }
+      researcher -> planner 'карта кода'
+      interviewer -> brief 'ответы Оператора'
+      planner -> brief 'план срезами'
+      brief -> planGate 'если R2'
+    }
+
+    build = phase 'Сборка' {
+      metadata {
+        stage 'S5'
+      }
+      implementer = agent 'Исполнитель' {
+        #built
+        description 'Пишет код одного среза в свежем контексте, в своём worktree.'
+      }
+      checks = script 'Проверки репозитория' {
+        #planned
+        description 'Одна команда, быстрый и полный режим. Хук не даёт закончить ход с правками без прогона.'
+      }
+      implementer -> checks 'запускает'
+    }
+
+    verify = phase 'Проверка и ревью' {
+      metadata {
+        stage 'S6 S7'
+      }
+      holdout = script 'Скрытые тесты' {
+        #idea
+        description 'Сценарии, которых агент не видит и не может править. Агенты подгоняют видимые тесты (атлас S6).'
+      }
+      browserCheck = agent 'Проверка в браузере' {
+        #idea
+        description 'Проходит экран как пользователь, снимки на трёх размерах.'
+      }
+      reviewCorrect = agent 'Ревьюер: корректность' {
+        #built
+        description 'Свежий контекст, оси Standards и Spec.'
+      }
+      reviewSecurity = agent 'Ревьюер: безопасность' {
+        #idea
+        description 'Поломка соседнего кода, утечка мимо флага, секреты.'
+      }
+      judge = agent 'Судья' {
+        #built
+        description 'Сводит ревью в вердикт по схеме: pass / fix / block.'
+      }
+      reviewCorrect -> judge 'находки'
+      reviewSecurity -> judge 'находки'
+      holdout -> judge 'результат'
+      browserCheck -> judge 'снимки'
+    }
+
+    ship = phase 'Слияние и выкатка' {
+      metadata {
+        stage 'S8 S15 S9 S16'
+      }
+      land = script 'Скрипт слияния' {
+        #planned
+        description 'Merge решает скрипт: голова PR не сдвинулась, ревью на этой голове, CI зелёный. Агент merge не делает (атлас S8).'
+      }
+      mergeGuard = script 'Запрет push в main' {
+        #built
+        description 'Обёртки gh и git: агент не может влить PR или запушить в main.'
+      }
+      migration = script 'Прогон миграции на копии' {
+        #idea
+        description 'Миграцию применяет CI, сначала на копии базы. У агента нет боевых ключей (атлас S15).'
+      }
+      deploy = script 'Выкатка' {
+        #built
+        description 'Через Dokploy.'
+      }
+      releaseNotes = agent 'Заметки к релизу' {
+        #idea
+        description 'Черновик «что изменилось» для того, кто просил. Уходит только после «да» Оператора (атлас S16).'
+      }
+      land -> deploy 'после слияния'
+      migration -> deploy 'если есть миграция'
+      deploy -> releaseNotes 'выкачено'
+    }
+
+    operate = phase 'Эксплуатация' {
+      metadata {
+        stage 'S10 S11 S17 S18'
+      }
+      watcher = agent 'Дозор после выкатки' {
+        #idea
+        description 'Только чтение: сверяет метрики до и после, предлагает откат. Откат делает скрипт по «да».'
+      }
+      upkeep = agent 'Уборка' {
+        #idea
+        description 'Обновления зависимостей, мёртвый код, старые флаги. Находит детерминированный инструмент, правит агент.'
+      }
+    }
+
+    learn = phase 'Отчёт и обучение' {
+      metadata {
+        stage 'S12 S13'
+      }
+      reporter = agent 'Отчёт Оператору' {
+        #planned
+        description 'Итог до 50 слов, доказательства, что не проверено. 22% поправок Оператора — «непонятно, длинно».'
+      }
+      reportCheck = script 'Проверка формы отчёта' {
+        #idea
+        description 'Скрипт: длина первого абзаца, термины без расшифровки, строка «не проверено». Красный — ход не заканчивается.'
+      }
+      corrections = store 'Журнал поправок' {
+        #idea
+        description 'Каждая поправка Оператора в тот же день.'
+      }
+      retro = agent 'Недельный разбор' {
+        #idea
+        description 'Повтор дважды — правило поднимается на уровень: проза → проверка → устройство. Правило допускается только по замеру (атлас S13).'
+      }
+      reporter -> reportCheck 'итог'
+      corrections -> retro 'раз в неделю'
+    }
+  }
+
+  // ---------- Потоки между фазами ----------
+  operator -> engine.intake.admit 'пропускает задачу'
+  monitoring -> engine.intake.triage 'ошибка'
+  github -> engine.intake.triage 'issue'
+  engine.intake.queue .handoff engine.understand.researcher 'задача'
+  engine.understand.brief .handoff engine.build.implementer 'бриф и план'
+  engine.build.checks .handoff engine.verify.reviewCorrect 'PR'
+  engine.build.checks .handoff engine.verify.reviewSecurity 'PR'
+  engine.verify.judge .verdict engine.build.implementer 'fix: что поправить'
+  engine.verify.judge .verdict engine.ship.land 'pass'
+  engine.ship.land -> github 'merge'
+  engine.ship.deploy -> prod 'выкатывает'
+  prod -> engine.operate.watcher 'метрики'
+  engine.operate.watcher -> engine.intake.queue 'регресс → задача'
+  engine.operate.upkeep -> engine.intake.queue 'находки'
+  engine.ship.releaseNotes -> engine.learn.reporter 'что выкачено'
+  engine.learn.reportCheck -> operator 'отчёт'
+  operator -> engine.learn.corrections 'поправка'
+  engine.learn.retro -> engine.orchestrator 'новое правило или проверка'
+  operator -> engine.understand.planGate 'утверждает'
+  engine.understand.interviewer -> operator 'вопросы пачкой'
+  engine.orchestrator -> engine.build.implementer 'запускает в песочнице'
+  engine.orchestrator .reads engine.traces 'пишет'
+}
