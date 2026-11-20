@@ -1,4 +1,5 @@
 specification {
+  color storecolor #cbd5e1
   element system {
     notation 'System'
     style {
@@ -44,7 +45,7 @@ specification {
   element store {
     notation 'Store'
     style {
-      color gray
+      color storecolor
       shape storage
     }
   }

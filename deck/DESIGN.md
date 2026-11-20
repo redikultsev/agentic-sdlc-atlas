@@ -28,4 +28,6 @@ Every slide follows these rules. Check a slide against them before committing it
 
 ## Palette
 
-13. **Tailwind 700 palette, white titles, contrast ≥ 5:1** (WCAG AA is 4.5:1). Set once in `likec4.config.json`, so diagrams, slides and the legend share it. Agent indigo `#4f46e5`, script emerald `#047857`, gate rose `#be123c`, Operator orange `#c2410c`, store slate `#475569`, stage slate `#334155`, cross-cutting sky `#0369a1`, hand-off blue `#2563eb`. The LikeC4 default palette was 3.8:1 and was replaced on 2026-11-20.
+13. **Tailwind 700 palette, white titles, contrast ≥ 5:1** (WCAG AA is 4.5:1). Set once in `likec4.config.json`, so diagrams, slides and the legend share it. Agent indigo `#4f46e5`, script emerald `#047857`, gate rose `#be123c`, Operator orange `#c2410c`, store light slate `#cbd5e1` with dark text, stage dark slate `#1e293b`, cross-cutting sky `#0369a1`, hand-off blue `#2563eb`. The LikeC4 default palette was 3.8:1 and was replaced on 2026-11-20.
+
+14. **Neighbouring kinds must differ by colour, not only by shape.** Stages are dark, stores are light, so they never blend.
