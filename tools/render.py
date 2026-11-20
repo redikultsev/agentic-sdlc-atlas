@@ -7,15 +7,18 @@ AREAS = {
  'S0': 'Intake & signals', 'S1': 'Product discovery', 'S2': 'Requirements & spec', 'S3': 'Architecture & design',
  'S4': 'Planning & decomposition', 'S5': 'Implementation', 'S6': 'Verification & testing', 'S7': 'Code review',
  'S8': 'Integration & merge', 'S9': 'Delivery & deploy', 'S10': 'Operations & incidents', 'S11': 'Maintenance & evolution',
- 'S12': 'Reporting to humans', 'S13': 'Process self-improvement', 'X1': 'Orchestration engines', 'X2': 'Isolation & security',
- 'X3': 'Human in the loop', 'X4': 'Context & knowledge', 'X5': 'Multi-agent systems', 'X6': 'Economics', 'X7': 'Measurement & evidence',
+ 'S12': 'Reporting to humans', 'S13': 'Process self-improvement', 'X1': 'Orchestration runtime', 'X2': 'Isolation & security',
+ 'X3': 'Human in the loop', 'X4': 'Context & knowledge', 'X5': 'Multi-agent topology', 'X6': 'Economics', 'X7': 'Measurement & evidence',
+ 'S14': 'Codebase comprehension', 'S15': 'Data & schema migrations', 'S16': 'Release & change communication', 'S17': 'Decommissioning',
+ 'S18': 'Performance optimization', 'X8': 'Pipeline observability', 'X9': 'Tool design for agents', 'X10': 'Human operator role', 'X11': 'Provenance & licensing',
 }
 def slug(s): return re.sub(r'[^a-z0-9]+', '-', s.lower()).strip('-')
 def cell(s): return str(s).replace('|', '\\|').replace('\n', ' ')
 def fname(aid): return f"{aid.lower()}-{slug(AREAS.get(aid, aid))}.md"
 
 (out / 'areas').mkdir(parents=True, exist_ok=True)
-areas = sorted(data['areas'], key=lambda r: (r['area_id'][0] != 'S', int(re.sub(r'\D', '', r['area_id']) or 0)))
+ORDER = ['S0','S1','S14','S2','S3','S4','S5','S6','S7','S8','S15','S9','S16','S10','S18','S11','S17','S12','S13'] + [f'X{i}' for i in range(1, 12)]
+areas = sorted(data['areas'], key=lambda r: ORDER.index(r['area_id']) if r['area_id'] in ORDER else 99)
 total = 0
 for r in areas:
     aid = r['area_id']; title = AREAS.get(aid, aid)
@@ -54,7 +57,7 @@ idx = '\n'.join(f"| [{r['area_id']}](areas/{fname(r['area_id'])}) | {AREAS.get(r
 
 What the world knows about AI agents doing the whole software lifecycle: from the first signal that something should be built to production watch and the process improving itself. Every entry has a primary source, the date of the work itself, and an evidence level.
 
-Status: phase F1 (broad sweep), {total} candidates in {len(areas)} areas. Nothing here is verified in depth yet.
+Stages are listed in lifecycle order; ids are stable and do not change when areas are added.\n\nStatus: phase F1 (broad sweep), {total} candidates in {len(areas)} areas. Nothing here is verified in depth yet.
 
 ## Evidence levels
 
