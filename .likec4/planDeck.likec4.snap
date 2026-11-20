@@ -96,7 +96,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 63,
+        "x": 63.0,
         "y": 0,
         "width": 115,
         "height": 32
@@ -138,7 +138,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 542,
+        "x": 542.0,
         "y": -417,
         "width": 175,
         "height": 66
@@ -177,7 +177,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -728,
+        "x": -728.0,
         "y": 49,
         "width": 99,
         "height": 32
@@ -275,7 +275,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -238,
+        "x": -238.0,
         "y": -217,
         "width": 138,
         "height": 66
@@ -325,7 +325,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -219,
+        "x": -219.0,
         "y": -200,
         "width": 101,
         "height": 32
@@ -372,7 +372,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -253,
+        "x": -253.0,
         "y": -200,
         "width": 169,
         "height": 32
@@ -411,7 +411,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -190,
+        "x": -190.0,
         "y": -400,
         "width": 144,
         "height": 32
@@ -449,7 +449,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 148,
+        "x": 148.0,
         "y": -428,
         "width": 166,
         "height": 32

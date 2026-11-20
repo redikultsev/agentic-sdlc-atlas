@@ -59,9 +59,9 @@
   },
   "hash": "zTMrCJqLR8kglrLqvrsrFCfPtfl75P0TwF9IF9xHT9U",
   "bounds": {
-    "x": -40,
+    "x": -280.0,
     "y": -100,
-    "width": 1120,
+    "width": 1610.0,
     "height": 1135.0
   },
   "nodes": [
@@ -91,12 +91,12 @@
       "technology": "Human",
       "kind": "human",
       "isCustomized": true,
-      "x": 0,
+      "x": -240.0,
       "y": 300.0,
-      "width": 240,
+      "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": -371,
+        "x": -606.0,
         "y": -145.0,
         "width": 115,
         "height": 32
@@ -130,12 +130,12 @@
       "technology": "files in the repo or the work item body",
       "kind": "store",
       "isCustomized": true,
-      "x": 800,
+      "x": 1040.0,
       "y": 0,
-      "width": 240,
+      "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": 832,
+        "x": 1077.0,
         "y": 32,
         "width": 175,
         "height": 66
@@ -168,12 +168,12 @@
       "kind": "phase",
       "isCustomized": true,
       "navigateTo": "aiReviewDeck",
-      "x": 0,
+      "x": -240.0,
       "y": 0,
-      "width": 240,
+      "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": 29,
+        "x": -206.0,
         "y": -136,
         "width": 181,
         "height": 32
@@ -218,12 +218,12 @@
       "depth": 1,
       "isCustomized": true,
       "navigateTo": "merge",
-      "x": 360,
+      "x": 268.0,
       "y": -60,
-      "width": 412,
+      "width": 514.0,
       "height": 835,
       "labelBBox": {
-        "x": -23,
+        "x": -115.0,
         "y": -153,
         "width": 57,
         "height": 15
@@ -271,7 +271,7 @@
       "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": 21,
+        "x": 21.0,
         "y": -153,
         "width": 150,
         "height": 66
@@ -316,10 +316,10 @@
       "isCustomized": true,
       "x": 400,
       "y": 300.0,
-      "width": 240,
+      "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": -319,
+        "x": -314.0,
         "y": 71.0,
         "width": 99,
         "height": 32
@@ -368,7 +368,7 @@
       "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": -681,
+        "x": -681.0,
         "y": 386,
         "width": 169,
         "height": 32
@@ -402,12 +402,12 @@
       "technology": "PR \u00b7 MR",
       "kind": "store",
       "isCustomized": true,
-      "x": 800,
+      "x": 1040.0,
       "y": 600,
-      "width": 240,
+      "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": -703,
+        "x": -458.0,
         "y": 386,
         "width": 166,
         "height": 32
@@ -441,12 +441,12 @@
       "kind": "phase",
       "isCustomized": true,
       "navigateTo": "implementDeck",
-      "x": 0,
+      "x": -240.0,
       "y": 600,
-      "width": 240,
+      "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": -1503,
+        "x": -1738.0,
         "y": 571,
         "width": 166,
         "height": 32
@@ -481,10 +481,10 @@
       "navigateTo": "deployDeck",
       "x": 400,
       "y": 860.0,
-      "width": 240,
+      "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": -1081,
+        "x": -1076.0,
         "y": 444.0,
         "width": 122,
         "height": 66
@@ -499,15 +499,15 @@
       "label": "decides",
       "points": [
         [
-          240,
+          10,
           368
         ],
         [
-          320,
+          205,
           368
         ],
         [
-          320,
+          205,
           338
         ],
         [
@@ -516,7 +516,7 @@
         ]
       ],
       "labelBBox": {
-        "x": 290,
+        "x": 174,
         "y": 322,
         "width": 61,
         "height": 25
@@ -537,15 +537,15 @@
       "label": "auto-merge rules",
       "points": [
         [
-          800,
+          1040,
           68
         ],
         [
-          725,
+          845,
           68
         ],
         [
-          725,
+          845,
           68
         ],
         [
@@ -554,7 +554,7 @@
         ]
       ],
       "labelBBox": {
-        "x": 664,
+        "x": 784,
         "y": 37,
         "width": 121,
         "height": 25
@@ -576,15 +576,15 @@
       "label": "pass",
       "points": [
         [
-          240,
+          10,
           68
         ],
         [
-          320,
+          205,
           68
         ],
         [
-          320,
+          205,
           68
         ],
         [
@@ -593,7 +593,7 @@
         ]
       ],
       "labelBBox": {
-        "x": 299,
+        "x": 184,
         "y": 37,
         "width": 42,
         "height": 25
@@ -615,24 +615,24 @@
       "label": "no match",
       "points": [
         [
-          520,
+          525,
           135
         ],
         [
-          520,
+          525,
           218
         ],
         [
-          520,
+          525,
           218
         ],
         [
-          520,
+          525,
           300
         ]
       ],
       "labelBBox": {
-        "x": 437,
+        "x": 442,
         "y": 205,
         "width": 71,
         "height": 25
@@ -657,11 +657,11 @@
           108
         ],
         [
-          760,
+          730,
           108
         ],
         [
-          760,
+          730,
           627
         ],
         [
@@ -670,7 +670,7 @@
         ]
       ],
       "labelBBox": {
-        "x": 744,
+        "x": 654,
         "y": 355,
         "width": 112,
         "height": 25
@@ -691,24 +691,24 @@
       "label": "merge",
       "points": [
         [
-          520,
+          525,
           435
         ],
         [
-          520,
+          525,
           518
         ],
         [
-          520,
+          525,
           518
         ],
         [
-          520,
+          525,
           600
         ]
       ],
       "labelBBox": {
-        "x": 456,
+        "x": 461,
         "y": 505,
         "width": 52,
         "height": 25
@@ -733,20 +733,20 @@
           398
         ],
         [
-          320,
+          205,
           398
         ],
         [
-          320,
+          205,
           638
         ],
         [
-          240,
+          10,
           638
         ]
       ],
       "labelBBox": {
-        "x": 250,
+        "x": 135,
         "y": 487,
         "width": 140,
         "height": 25
@@ -772,20 +772,20 @@
           668
         ],
         [
-          725,
+          845,
           668
         ],
         [
-          725,
+          845,
           668
         ],
         [
-          800,
+          1040,
           668
         ]
       ],
       "labelBBox": {
-        "x": 699,
+        "x": 819,
         "y": 637,
         "width": 52,
         "height": 25
@@ -810,20 +810,20 @@
           668
         ],
         [
-          320,
+          205,
           668
         ],
         [
-          320,
+          205,
           698
         ],
         [
-          240,
+          10,
           698
         ]
       ],
       "labelBBox": {
-        "x": 270,
+        "x": 155,
         "y": 652,
         "width": 100,
         "height": 25
@@ -845,24 +845,24 @@
       "label": "merged",
       "points": [
         [
-          520,
+          525,
           735
         ],
         [
-          520,
+          525,
           798
         ],
         [
-          520,
+          525,
           798
         ],
         [
-          520,
+          525,
           860
         ]
       ],
       "labelBBox": {
-        "x": 448,
+        "x": 453,
         "y": 785,
         "width": 60,
         "height": 25
