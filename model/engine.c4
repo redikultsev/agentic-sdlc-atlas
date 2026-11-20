@@ -82,9 +82,9 @@ model {
         technology 'Triage agent'
         description 'Merges duplicates, proposes size S/M/L and risk R0/R1/R2 with a reason. Never closes anything itself.'
         metadata {
-          in 'Alert: "500 on /export, 42 times in an hour"'
-          does 'Finds no duplicate, reads the export code'
-          out 'Draft: S · R1, "no check for an empty report"'
+          in 'Request: "we need CSV export of the report"'
+          does 'Finds no duplicate, reads the reports module'
+          out 'Work item #231: M · R1, "one module, no data changes"'
         }
       }
       admit = gate 'Accept' {
@@ -94,7 +94,7 @@ model {
         metadata {
           in 'The draft with size, risk and the reason'
           does 'The Operator accepts, corrects or cancels'
-          out 'Work item #231, state Accepted'
+          out '#231 Accepted, goes to Spec (M)'
         }
       }
       triage -> admit 'size and risk'
@@ -108,11 +108,21 @@ model {
         #idea
         technology 'Clarify'
         description 'Asks about what is underspecified, writes the spec: why, acceptance criteria, what must not change.'
+        metadata {
+          in '#231 "CSV export of the report", M · R1'
+          does 'Asks: which columns? keep the filter? row limit?'
+          out 'Spec: Export button; visible columns and current filter; up to 100k rows; PDF export unchanged'
+        }
       }
       specGate = gate 'Approve spec' {
         #idea
         technology 'Gate'
         description 'M and L: the Operator approves the spec.'
+        metadata {
+          in 'The spec with its acceptance criteria'
+          does 'The Operator approves or edits it'
+          out '#231 goes to Plan'
+        }
       }
       interviewer -> specGate 'spec'
     }
