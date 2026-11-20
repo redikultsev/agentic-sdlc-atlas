@@ -23,12 +23,12 @@ LAYOUTS = {
     },
     'verifyDeck': {
         'engine.implement': (0, 0.75),
-        'engine.verify.checks': (1, 0), 'engine.verify.validator': (1, 1.5), 'engine.aiReview': (1, 3),
+        'engine.verify.checks': (1, 0), 'engine.verify.reviewer': (1, 1.5), 'engine.aiReview': (1, 3),
         'ci': (2, 0), 'docs': (2, 1), 'engine.sandbox': (2, 2), 'changes': (2, 3),
     },
     'aiReviewDeck': {
         'engine.verify': (0, 0), 'docs': (0, 1),
-        'engine.aiReview.reviewer': (1, 0.5),
+        'engine.aiReview.validator': (1, 0.5),
         'engine.implement': (2, -0.5), 'changes': (2, 0.5), 'engine.merge': (2, 1.5), 'engine.sandbox': (1, 2),
     },
     'implementDeck': {

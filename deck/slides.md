@@ -162,33 +162,33 @@ layout: default
 layout: default
 ---
 
-# 5. Self-verify
+# 5. Checks & review
 
-<div class="lead">CI runs outside the sandbox, then a separate Validator checks the acceptance criteria on the running app and records evidence. Rounds are capped.</div>
+<div class="lead">Cheap and deterministic first: CI outside the sandbox, then one AI reviewer reads the code. Their findings change code, so they run before the expensive acceptance pass.</div>
 
 <div class="stg">
 <div class="dg"><likec4-view view-id="verifyDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs n2">
-  <div class="pc"><div class="pc-top"><span class="pk k-script">Script</span><span class="ps">planned</span></div><p class="pn">CI checks</p><dl class="eg3"><dt>In</dt><dd>The pushed branch</dd><dt>Does</dt><dd>Runs the full test suite, lint, types, build</dd><dt>Out</dt><dd>Green: on to the Validator. Red: fix, at most 3 rounds</dd></dl></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Validator</p><dl class="eg3"><dt>In</dt><dd>The change after green CI, the acceptance criteria</dd><dt>Does</dt><dd>Checks each criterion and its examples as a user, records evidence</dd><dt>Out</dt><dd>Pass with evidence on the PR, or fail with the criterion that broke</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-script">Script</span><span class="ps">planned</span></div><p class="pn">CI checks</p><dl class="eg3"><dt>In</dt><dd>The pushed branch</dd><dt>Does</dt><dd>Runs the full test suite, lint, types, build</dd><dt>Out</dt><dd>Green: on to the AI reviewer. Red: fix</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">AI reviewer</p><dl class="eg3"><dt>In</dt><dd>The PR after green CI, the spec, the code around it</dd><dt>Does</dt><dd>Finds and re-checks issues, skips nits, explains the change</dd><dt>Out</dt><dd>Pass: on to acceptance. Fix or block; for R1/R2 an explanation in the PR</dd></dl></div>
 </div>
 </div>
 
-<p class="sf"><b>Work item states:</b> Verifying (round ≤ 3, else Blocked) &nbsp;·&nbsp; <b>The Operator decides:</b> nothing, this stage runs without a human</p>
+<p class="sf"><b>Work item states:</b> Verifying (fix rounds ≤ 3 per work item, else Blocked) &nbsp;·&nbsp; <b>The Operator decides:</b> nothing, this stage runs without a human</p>
 
 
 ---
 layout: default
 ---
 
-# 6. AI review
+# 6. Acceptance
 
-<div class="lead">One reviewer agent with a fresh context checks the PR against the spec and the code, re-checks its findings and gives a verdict. An agent approval is not a human approval.</div>
+<div class="lead">Last and most expensive: a separate Validator checks the acceptance criteria on the running app, as a user, and records evidence. It runs on code that will not change again.</div>
 
 <div class="stg">
 <div class="dg"><likec4-view view-id="aiReviewDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs n1">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">AI reviewer</p><dl class="eg3"><dt>In</dt><dd>The PR with evidence, the spec, the code around it</dd><dt>Does</dt><dd>Finds and re-checks issues, skips nits, explains the change</dd><dt>Out</dt><dd>Verdict pass, fix or block; for R1/R2 an explanation in the PR</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Validator</p><dl class="eg3"><dt>In</dt><dd>The reviewed PR, the acceptance criteria</dd><dt>Does</dt><dd>Checks each criterion and its examples as a user, records evidence</dd><dt>Out</dt><dd>Pass with evidence on the PR, or fail with the criterion that broke</dd></dl></div>
 </div>
 </div>
 
@@ -356,6 +356,7 @@ layout: default
 | 20 | Who writes code and tests, and how they stay honest | One agent, the Implementer, is the only one that changes code: per slice it writes unit tests first, then code, in its own sandbox. What "done" means lives in one place: the acceptance criteria of the spec, each with 2–3 key examples. After CI (outside the sandbox) a separate Validator with a fresh context and its own sandbox checks those criteria on the running app, records evidence for the PR and never edits code. Revised 2026-11-20: no separate scenarios (first hidden, then visible); Evidence merged into the Validator |
 | 21 | Sandbox rules | A disposable sandbox per agent session; everything that changes or runs code runs inside. Network closed by default; push only through a proxy to one branch; no merge rights; the authoritative CI runs outside |
 | 22 | How AI review is built | One AI reviewer agent: fresh context, own sandbox, a different model family than the Implementer. It reads the PR, evidence, spec and surrounding code, re-checks each finding (by running the code where it can), skips style and nits by a "what not to flag" list, gives a JSON verdict and for R1/R2 explains the change to the Operator. All fix rounds share one limit of 3; a block verdict or the limit sends the work item to Blocked |
+| 23 | Order of checks after the code | CI → AI reviewer (white-box, stage 5 "Checks & review") → Validator (black-box, stage 6 "Acceptance"). The Validator does not see the reviewer's verdict. After any fix, the reviewer reviews only the new diff and the Validator re-checks the criteria the fix touched |
 | 18 | How to check the model for gaps | After the deck walkthrough, every stage answers five questions: what triggers it, what it reads and writes, what it triggers next, where a human re-enters, what stops two runs doing the same work |
 
 </div>

@@ -17,7 +17,7 @@ STATES = {  # which task states (docs/states.md) live in each stage
     'spec': 'Clarifying → SpecReview',
     'plan': 'Researching (L) → Planning → PlanReview',
     'implement': 'Implementing',
-    'verify': 'Verifying (round ≤ 3, else Blocked)',
+    'verify': 'Verifying (fix rounds ≤ 3 per work item, else Blocked)',
     'aiReview': 'Verifying → MergeReview (R1/R2) or Merged (R0)',
     'merge': 'MergeReview → Merged',
     'deploy': 'Merged → DeployReview (R2) → Live → Done / RolledBack',

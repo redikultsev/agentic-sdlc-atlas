@@ -4,7 +4,7 @@ Where the project stands and what comes next. Update it at the end of every work
 
 ## Now (2026-11-20)
 
-**Deck walkthrough with the owner, slide by slide.** Slides 1–5 are accepted; stage slides 6–14 got a new template; continue reviewing from slide 6 ("What moves and where it lives"). For each slide: show it, say what it claims and what could be better, collect corrections, apply them to the source, regenerate, check in the browser, commit.
+**Deck walkthrough with the owner, slide by slide.** Slides 1–11 are reviewed (stages 1–6 reworked with research: Triage works alone, slices as sub-issues, one writer plus independent checks, CI → AI reviewer → Validator). Continue from slide 12 (7. Merge).
 
 Run both views from the repository root:
 

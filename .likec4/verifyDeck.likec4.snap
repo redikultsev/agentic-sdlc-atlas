@@ -57,7 +57,7 @@
       }
     ]
   },
-  "hash": "baNftC6gKofG3lZL-CoKqRq_m8Qt9IZJLk6OY9ht_1M",
+  "hash": "7QuUa8gYOWRSv_xOyi-iNBhjpajZUgsDJqyRBGnPI_k",
   "bounds": {
     "x": -40,
     "y": -100,
@@ -72,7 +72,7 @@
       "children": [],
       "inEdges": [],
       "outEdges": [
-        "6nxiza"
+        "14upjj9"
       ],
       "title": "Specs, plans and decisions",
       "modelRef": "docs",
@@ -111,7 +111,7 @@
       "children": [],
       "inEdges": [
         "gz7qvd",
-        "utj7lu"
+        "opxgxd"
       ],
       "outEdges": [
         "1qavfc9"
@@ -139,7 +139,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -890,
+        "x": -824,
         "y": -356.0,
         "width": 166,
         "height": 32
@@ -151,21 +151,21 @@
       "level": 0,
       "children": [
         "engine.verify.checks",
-        "engine.verify.validator"
+        "engine.verify.reviewer"
       ],
       "inEdges": [
-        "6nxiza",
+        "14upjj9",
         "1qavfc9"
       ],
       "outEdges": [
         "vuzkks",
         "gz7qvd",
-        "1aqce60",
-        "at7sow",
-        "utj7lu",
-        "z9ka67"
+        "z6udnv",
+        "5vljxv",
+        "opxgxd",
+        "1ci384s"
       ],
-      "title": "5. Self-verify",
+      "title": "5. Checks & review",
       "modelRef": "engine.verify",
       "shape": "rectangle",
       "color": "slate",
@@ -179,7 +179,7 @@
       },
       "tags": [],
       "notation": "Pipeline stage",
-      "technology": "Self-verification",
+      "technology": "White-box checks",
       "kind": "phase",
       "depth": 1,
       "isCustomized": true,
@@ -189,9 +189,9 @@
       "width": 330,
       "height": 535.0,
       "labelBBox": {
-        "x": -34,
+        "x": 56,
         "y": -370,
-        "width": 88,
+        "width": 120,
         "height": 15
       }
     },
@@ -204,7 +204,7 @@
         "1qavfc9"
       ],
       "outEdges": [
-        "qt1ejl",
+        "1vgrfsi",
         "vuzkks",
         "gz7qvd"
       ],
@@ -226,7 +226,7 @@
       "metadata": {
         "in": "The pushed branch",
         "does": "Runs the full test suite, lint, types, build",
-        "out": "Green: on to the Validator. Red: fix, at most 3 rounds"
+        "out": "Green: on to the AI reviewer. Red: fix"
       },
       "notation": "Script or check (no LLM)",
       "technology": "CI outside the sandbox",
@@ -237,29 +237,29 @@
       "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": 22,
+        "x": 112,
         "y": -531,
         "width": 127,
         "height": 32
       }
     },
     {
-      "id": "engine.verify.validator",
+      "id": "engine.verify.reviewer",
       "parent": "engine.verify",
       "level": 1,
       "children": [],
       "inEdges": [
-        "6nxiza",
-        "qt1ejl"
+        "14upjj9",
+        "1vgrfsi"
       ],
       "outEdges": [
-        "1aqce60",
-        "at7sow",
-        "utj7lu",
-        "z9ka67"
+        "z6udnv",
+        "5vljxv",
+        "opxgxd",
+        "1ci384s"
       ],
-      "title": "Validator",
-      "modelRef": "engine.verify.validator",
+      "title": "AI reviewer",
+      "modelRef": "engine.verify.reviewer",
       "shape": "rectangle",
       "color": "indigo",
       "style": {
@@ -271,15 +271,15 @@
         "txt": ""
       },
       "tags": [
-        "idea"
+        "built"
       ],
       "metadata": {
-        "in": "The change after green CI, the acceptance criteria",
-        "does": "Checks each criterion and its examples as a user, records evidence",
-        "out": "Pass with evidence on the PR, or fail with the criterion that broke"
+        "in": "The PR after green CI, the spec, the code around it",
+        "does": "Finds and re-checks issues, skips nits, explains the change",
+        "out": "Pass: on to acceptance. Fix or block; for R1/R2 an explanation in the PR"
       },
       "notation": "Agent (LLM)",
-      "technology": "Fresh context, own sandbox",
+      "technology": "One agent, other model family",
       "kind": "agent",
       "isCustomized": true,
       "x": 400,
@@ -287,9 +287,9 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 18,
+        "x": 93,
         "y": -21.0,
-        "width": 115,
+        "width": 144,
         "height": 32
       }
     },
@@ -326,7 +326,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -94,
+        "x": -28,
         "y": -691,
         "width": 174,
         "height": 32
@@ -338,7 +338,7 @@
       "level": 0,
       "children": [],
       "inEdges": [
-        "1aqce60"
+        "z6udnv"
       ],
       "outEdges": [],
       "title": "Pull requests",
@@ -365,7 +365,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -90,
+        "x": -24,
         "y": 649,
         "width": 166,
         "height": 32
@@ -377,7 +377,7 @@
       "level": 0,
       "children": [],
       "inEdges": [
-        "at7sow"
+        "5vljxv"
       ],
       "outEdges": [],
       "title": "Sandbox",
@@ -404,7 +404,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -64,
+        "x": 2,
         "y": 264,
         "width": 115,
         "height": 32
@@ -416,10 +416,10 @@
       "level": 0,
       "children": [],
       "inEdges": [
-        "z9ka67"
+        "1ci384s"
       ],
       "outEdges": [],
-      "title": "6. AI review",
+      "title": "6. Acceptance",
       "modelRef": "engine.aiReview",
       "shape": "rectangle",
       "color": "slate",
@@ -433,7 +433,7 @@
       },
       "tags": [],
       "notation": "Pipeline stage",
-      "technology": "AI review & autofix",
+      "technology": "Black-box validation",
       "kind": "phase",
       "isCustomized": true,
       "navigateTo": "aiReviewDeck",
@@ -442,19 +442,19 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -482,
+        "x": -432,
         "y": 279,
-        "width": 150,
+        "width": 181,
         "height": 32
       }
     }
   ],
   "edges": [
     {
-      "id": "6nxiza",
+      "id": "14upjj9",
       "source": "docs",
-      "target": "engine.verify.validator",
-      "label": "acceptance criteria",
+      "target": "engine.verify.reviewer",
+      "label": "spec",
       "points": [
         [
           800,
@@ -474,14 +474,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 654,
+        "x": 699,
         "y": 260,
-        "width": 132,
+        "width": 42,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1e79xiy"
+        "1fiaobo"
       ],
       "color": "gray",
       "line": "dotted",
@@ -529,9 +529,9 @@
       "isLabelCustomized": true
     },
     {
-      "id": "qt1ejl",
+      "id": "1vgrfsi",
       "source": "engine.verify.checks",
-      "target": "engine.verify.validator",
+      "target": "engine.verify.reviewer",
       "label": "green",
       "points": [
         [
@@ -559,7 +559,7 @@
       },
       "parent": "engine.verify",
       "relations": [
-        "8ahb5l"
+        "ij346i"
       ],
       "color": "gray",
       "line": "dashed",
@@ -644,10 +644,10 @@
       "isLabelCustomized": true
     },
     {
-      "id": "1aqce60",
-      "source": "engine.verify.validator",
+      "id": "z6udnv",
+      "source": "engine.verify.reviewer",
       "target": "changes",
-      "label": "evidence on the PR",
+      "label": "findings, verdict, explanation",
       "points": [
         [
           640,
@@ -667,14 +667,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 654,
+        "x": 624,
         "y": 514,
-        "width": 133,
+        "width": 193,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "hz1lnb"
+        "19ji4yy"
       ],
       "color": "gray",
       "line": "dashed",
@@ -682,10 +682,10 @@
       "isLabelCustomized": true
     },
     {
-      "id": "at7sow",
-      "source": "engine.verify.validator",
+      "id": "5vljxv",
+      "source": "engine.verify.reviewer",
       "target": "engine.sandbox",
-      "label": "runs the app in its own",
+      "label": "re-checks findings in its own",
       "points": [
         [
           640,
@@ -705,14 +705,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 643,
+        "x": 624,
         "y": 387,
-        "width": 154,
+        "width": 191,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1eoo32"
+        "1hjgyri"
       ],
       "color": "gray",
       "line": "dashed",
@@ -720,10 +720,10 @@
       "isLabelCustomized": true
     },
     {
-      "id": "utj7lu",
-      "source": "engine.verify.validator",
+      "id": "opxgxd",
+      "source": "engine.verify.reviewer",
       "target": "engine.implement",
-      "label": "fail: fix, same 3 rounds",
+      "label": "fix, same 3 rounds",
       "points": [
         [
           400,
@@ -743,14 +743,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 243,
+        "x": 256,
         "y": 289,
-        "width": 154,
+        "width": 128,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "k3dchl"
+        "195hbsd"
       ],
       "color": "red",
       "line": "dashed",
@@ -759,10 +759,10 @@
       "isLabelCustomized": true
     },
     {
-      "id": "z9ka67",
-      "source": "engine.verify.validator",
+      "id": "1ci384s",
+      "source": "engine.verify.reviewer",
       "target": "engine.aiReview",
-      "label": "PR + evidence",
+      "label": "pass: PR",
       "points": [
         [
           520,
@@ -782,14 +782,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 407,
+        "x": 442,
         "y": 505,
-        "width": 101,
+        "width": 66,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1d2e7j0"
+        "1alo3do"
       ],
       "color": "primary",
       "line": "dashed",

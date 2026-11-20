@@ -10,8 +10,8 @@ Terms used in this project. Stage names follow the convergent pipeline of leadin
 | 2 | Spec | M and L only: what "done" means — acceptance criteria with key examples, constraints | agent, Operator approves |
 | 3 | Plan | M and L only: how we do it in slices and how we prove it; for L, codebase research first | agent, Operator approves |
 | 4 | Implement | The only agent that changes code writes it, slice by slice, unit tests first, in its sandbox | agent |
-| 5 | Self-verify | CI outside the sandbox, then a separate Validator checks the acceptance criteria on the running app and records evidence; rounds are capped | script + agent |
-| 6 | AI review | One reviewer agent re-checks its findings, gives a pass / fix / block verdict and explains the change | agent |
+| 5 | Checks & review | CI outside the sandbox, then one AI reviewer reads the code, re-checks its findings, gives a pass / fix / block verdict and explains the change | script + agent |
+| 6 | Acceptance | A separate Validator, blind to the reviewer's verdict, checks the acceptance criteria on the running app and records evidence | agent |
 | 7 | Merge | By risk: R0 merges itself, R1 the Operator on evidence, R2 the Operator reads the code | script + Operator |
 | 8 | Deploy & watch | R0 and R1 right away, R2 on a yes; a watcher compares metrics before and after | script + agent |
 | 9 | Learn | Mistakes and corrections become new work items, checks and rules | agent, Operator chooses |

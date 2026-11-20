@@ -72,12 +72,12 @@ views {
     autoLayout LeftRight
   }
   view verify of engine.verify {
-    title '5. Self-verify'
+    title '5. Checks & review'
     include *, -> engine.verify.* ->
     autoLayout LeftRight
   }
   view aiReview of engine.aiReview {
-    title '6. AI review'
+    title '6. Acceptance'
     include *, -> engine.aiReview.* ->
     autoLayout LeftRight
   }
@@ -148,25 +148,25 @@ views {
         engine.plan.planGate -> engine.implement.implementer 'plan'
       }
     }
-    loop 'until the reviewer says pass, at most 3 fix rounds' {
+    loop 'until both pass, at most 3 fix rounds' {
       engine.implement.implementer -> engine.verify.checks 'run'
-      engine.verify.checks -> engine.verify.validator 'green'
-      engine.verify.validator -> engine.aiReview.reviewer 'PR + evidence'
-      engine.aiReview.reviewer -> engine.implement.implementer 'fix'
+      engine.verify.checks -> engine.verify.reviewer 'green'
+      engine.verify.reviewer -> engine.aiReview.validator 'pass'
+      engine.aiReview.validator -> engine.implement.implementer 'fail: fix'
     }
     alt 'risk' {
       when 'R0' {
-        engine.aiReview.reviewer -> engine.merge.land 'pass'
+        engine.aiReview.validator -> engine.merge.land 'pass'
         engine.merge.land -> engine.deploy.deployer 'right away'
       }
       if 'R1' {
-        engine.aiReview.reviewer -> engine.merge.mergeGate 'pass + explanation'
+        engine.aiReview.validator -> engine.merge.mergeGate 'pass + evidence + explanation'
         operator -> engine.merge.mergeGate 'evidence → yes'
         engine.merge.mergeGate -> engine.merge.land 'merge'
         engine.merge.land -> engine.deploy.deployer 'right away'
       }
       else 'R2' {
-        engine.aiReview.reviewer -> engine.merge.mergeGate 'pass + explanation'
+        engine.aiReview.validator -> engine.merge.mergeGate 'pass + evidence + explanation'
         operator -> engine.merge.mergeGate 'code → yes'
         engine.merge.mergeGate -> engine.merge.land 'merge'
         engine.merge.land -> engine.deploy.prodGate 'waits'

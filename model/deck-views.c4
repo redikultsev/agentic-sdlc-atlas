@@ -67,14 +67,14 @@ views {
     autoLayout LeftRight 40 50
   }
   view verifyDeck of engine.verify {
-    title '5. Self-verify'
+    title '5. Checks & review'
     include * with { description '' }
     include -> engine.verify.* ->
     style * { size small textSize xlarge }
     autoLayout LeftRight 40 50
   }
   view aiReviewDeck of engine.aiReview {
-    title '6. AI review'
+    title '6. Acceptance'
     include * with { description '' }
     include -> engine.aiReview.* ->
     style * { size small textSize xlarge }

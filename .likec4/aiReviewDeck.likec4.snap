@@ -49,7 +49,7 @@
       }
     ]
   },
-  "hash": "aOWADNa8MwVW5ao69JIyl4TVxgOzn-ZWGqZx-puOCQo",
+  "hash": "pgVu_pS1bIxVU4MvvfHuy_0nv7YwvSuaXGr3yzVZUIY",
   "bounds": {
     "x": -40,
     "y": -140.0,
@@ -64,7 +64,7 @@
       "children": [],
       "inEdges": [],
       "outEdges": [
-        "1o0i480"
+        "562iyb"
       ],
       "title": "Specs, plans and decisions",
       "modelRef": "docs",
@@ -103,9 +103,9 @@
       "children": [],
       "inEdges": [],
       "outEdges": [
-        "91nq7g"
+        "c3zkov"
       ],
-      "title": "5. Self-verify",
+      "title": "5. Checks & review",
       "modelRef": "engine.verify",
       "shape": "rectangle",
       "color": "slate",
@@ -119,7 +119,7 @@
       },
       "tags": [],
       "notation": "Pipeline stage",
-      "technology": "Self-verification",
+      "technology": "White-box checks",
       "kind": "phase",
       "isCustomized": true,
       "navigateTo": "verifyDeck",
@@ -128,10 +128,10 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 40,
-        "y": -321,
-        "width": 160,
-        "height": 32
+        "x": 56,
+        "y": -338,
+        "width": 129,
+        "height": 66
       }
     },
     {
@@ -139,19 +139,19 @@
       "parent": null,
       "level": 0,
       "children": [
-        "engine.aiReview.reviewer"
+        "engine.aiReview.validator"
       ],
       "inEdges": [
-        "1o0i480",
-        "91nq7g"
+        "562iyb",
+        "c3zkov"
       ],
       "outEdges": [
-        "tflz1q",
-        "18my21i",
-        "147e784",
-        "1ip7sg3"
+        "31g7vh",
+        "41xdx",
+        "19mu3uv",
+        "zdwt3k"
       ],
-      "title": "6. AI review",
+      "title": "6. Acceptance",
       "modelRef": "engine.aiReview",
       "shape": "rectangle",
       "color": "slate",
@@ -165,7 +165,7 @@
       },
       "tags": [],
       "notation": "Pipeline stage",
-      "technology": "AI review & autofix",
+      "technology": "Black-box validation",
       "kind": "phase",
       "depth": 1,
       "isCustomized": true,
@@ -175,29 +175,29 @@
       "width": 320,
       "height": 235.0,
       "labelBBox": {
-        "x": -3,
+        "x": -34,
         "y": -278.0,
-        "width": 74,
+        "width": 93,
         "height": 15
       }
     },
     {
-      "id": "engine.aiReview.reviewer",
+      "id": "engine.aiReview.validator",
       "parent": "engine.aiReview",
       "level": 1,
       "children": [],
       "inEdges": [
-        "1o0i480",
-        "91nq7g"
+        "562iyb",
+        "c3zkov"
       ],
       "outEdges": [
-        "tflz1q",
-        "18my21i",
-        "147e784",
-        "1ip7sg3"
+        "31g7vh",
+        "41xdx",
+        "19mu3uv",
+        "zdwt3k"
       ],
-      "title": "AI reviewer",
-      "modelRef": "engine.aiReview.reviewer",
+      "title": "Validator",
+      "modelRef": "engine.aiReview.validator",
       "shape": "rectangle",
       "color": "indigo",
       "style": {
@@ -209,15 +209,15 @@
         "txt": ""
       },
       "tags": [
-        "built"
+        "idea"
       ],
       "metadata": {
-        "in": "The PR with evidence, the spec, the code around it",
-        "does": "Finds and re-checks issues, skips nits, explains the change",
-        "out": "Verdict pass, fix or block; for R1/R2 an explanation in the PR"
+        "in": "The reviewed PR, the acceptance criteria",
+        "does": "Checks each criterion and its examples as a user, records evidence",
+        "out": "Pass with evidence on the PR, or fail with the criterion that broke"
       },
       "notation": "Agent (LLM)",
-      "technology": "One agent, other model family",
+      "technology": "Fresh context, own sandbox",
       "kind": "agent",
       "isCustomized": true,
       "x": 400,
@@ -225,9 +225,9 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 47,
+        "x": 31,
         "y": -221.0,
-        "width": 144,
+        "width": 115,
         "height": 32
       }
     },
@@ -237,7 +237,7 @@
       "level": 0,
       "children": [],
       "inEdges": [
-        "tflz1q"
+        "31g7vh"
       ],
       "outEdges": [],
       "title": "Pull requests",
@@ -264,7 +264,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -57,
+        "x": -49,
         "y": 149.0,
         "width": 166,
         "height": 32
@@ -276,7 +276,7 @@
       "level": 0,
       "children": [],
       "inEdges": [
-        "18my21i"
+        "41xdx"
       ],
       "outEdges": [],
       "title": "Sandbox",
@@ -303,7 +303,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -431,
+        "x": -423,
         "y": 264,
         "width": 115,
         "height": 32
@@ -315,7 +315,7 @@
       "level": 0,
       "children": [],
       "inEdges": [
-        "147e784"
+        "19mu3uv"
       ],
       "outEdges": [],
       "title": "4. Implement",
@@ -341,7 +341,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -57,
+        "x": -49,
         "y": -421.0,
         "width": 166,
         "height": 32
@@ -353,7 +353,7 @@
       "level": 0,
       "children": [],
       "inEdges": [
-        "1ip7sg3"
+        "zdwt3k"
       ],
       "outEdges": [],
       "title": "7. Merge",
@@ -379,7 +379,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -31,
+        "x": -23,
         "y": -206.0,
         "width": 115,
         "height": 32
@@ -388,10 +388,10 @@
   ],
   "edges": [
     {
-      "id": "1o0i480",
+      "id": "562iyb",
       "source": "docs",
-      "target": "engine.aiReview.reviewer",
-      "label": "spec",
+      "target": "engine.aiReview.validator",
+      "label": "acceptance criteria",
       "points": [
         [
           240,
@@ -411,14 +411,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 299,
+        "x": 254,
         "y": 202,
-        "width": 42,
+        "width": 132,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "gbxb4x"
+        "1l2opr3"
       ],
       "color": "gray",
       "line": "dotted",
@@ -427,10 +427,10 @@
       "isLabelCustomized": true
     },
     {
-      "id": "91nq7g",
+      "id": "c3zkov",
       "source": "engine.verify",
-      "target": "engine.aiReview.reviewer",
-      "label": "PR + evidence",
+      "target": "engine.aiReview.validator",
+      "label": "pass: PR",
       "points": [
         [
           240,
@@ -450,14 +450,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 270,
+        "x": 287,
         "y": 72,
-        "width": 101,
+        "width": 66,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1d2e7j0"
+        "1alo3do"
       ],
       "color": "primary",
       "line": "dashed",
@@ -466,10 +466,10 @@
       "isLabelCustomized": true
     },
     {
-      "id": "tflz1q",
-      "source": "engine.aiReview.reviewer",
+      "id": "31g7vh",
+      "source": "engine.aiReview.validator",
       "target": "changes",
-      "label": "findings, verdict, explanation",
+      "label": "evidence on the PR",
       "points": [
         [
           640,
@@ -489,14 +489,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 624,
+        "x": 654,
         "y": 137,
-        "width": 193,
+        "width": 133,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "5zyi5r"
+        "1yqzgj6"
       ],
       "color": "gray",
       "line": "dashed",
@@ -504,10 +504,10 @@
       "isLabelCustomized": true
     },
     {
-      "id": "18my21i",
-      "source": "engine.aiReview.reviewer",
+      "id": "41xdx",
+      "source": "engine.aiReview.validator",
       "target": "engine.sandbox",
-      "label": "re-checks findings in its own",
+      "label": "runs the app in its own",
       "points": [
         [
           520,
@@ -527,14 +527,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 317,
+        "x": 354,
         "y": 305,
-        "width": 191,
+        "width": 154,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "18pez8b"
+        "1lnjnjf"
       ],
       "color": "gray",
       "line": "dashed",
@@ -542,10 +542,10 @@
       "isLabelCustomized": true
     },
     {
-      "id": "147e784",
-      "source": "engine.aiReview.reviewer",
+      "id": "19mu3uv",
+      "source": "engine.aiReview.validator",
       "target": "engine.implement",
-      "label": "fix, same 3 rounds",
+      "label": "fail: fix, same 3 rounds",
       "points": [
         [
           640,
@@ -565,14 +565,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 656,
+        "x": 643,
         "y": 10,
-        "width": 128,
+        "width": 154,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1gi2vew"
+        "rih398"
       ],
       "color": "red",
       "line": "dashed",
@@ -581,8 +581,8 @@
       "isLabelCustomized": true
     },
     {
-      "id": "1ip7sg3",
-      "source": "engine.aiReview.reviewer",
+      "id": "zdwt3k",
+      "source": "engine.aiReview.validator",
       "target": "engine.merge",
       "label": "[...]",
       "points": [
@@ -611,13 +611,12 @@
       },
       "parent": null,
       "relations": [
-        "1ysetut",
-        "j05suk"
+        "deplkm",
+        "eer6lb"
       ],
-      "color": "red",
+      "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "kind": "verdict",
       "isLabelCustomized": true
     }
   ],

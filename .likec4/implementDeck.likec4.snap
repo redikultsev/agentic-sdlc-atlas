@@ -49,7 +49,7 @@
       }
     ]
   },
-  "hash": "nEdxziL6n1xVjIzr-MWe4509xIOZa8t4B4XoqnoBNw8",
+  "hash": "KnGNzJZSszdWitDHOPma3dnQAGbiheLSlgAdEPiCyYw",
   "bounds": {
     "x": -40,
     "y": -40,
@@ -224,7 +224,7 @@
         "ct709w",
         "rn1qz4"
       ],
-      "title": "5. Self-verify",
+      "title": "5. Checks & review",
       "modelRef": "engine.verify",
       "shape": "rectangle",
       "color": "slate",
@@ -238,7 +238,7 @@
       },
       "tags": [],
       "notation": "Pipeline stage",
-      "technology": "Self-verification",
+      "technology": "White-box checks",
       "kind": "phase",
       "isCustomized": true,
       "navigateTo": "verifyDeck",
@@ -247,10 +247,10 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 412,
-        "y": -56,
-        "width": 160,
-        "height": 32
+        "x": 402,
+        "y": -73,
+        "width": 129,
+        "height": 66
       }
     },
     {
@@ -263,7 +263,7 @@
         "7syj35",
         "z03atx"
       ],
-      "title": "6. AI review",
+      "title": "6. Acceptance",
       "modelRef": "engine.aiReview",
       "shape": "rectangle",
       "color": "slate",
@@ -277,7 +277,7 @@
       },
       "tags": [],
       "notation": "Pipeline stage",
-      "technology": "AI review & autofix",
+      "technology": "Black-box validation",
       "kind": "phase",
       "isCustomized": true,
       "navigateTo": "aiReviewDeck",
@@ -286,9 +286,9 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 45,
+        "x": 29,
         "y": 464,
-        "width": 150,
+        "width": 181,
         "height": 32
       }
     },
@@ -336,7 +336,7 @@
       "width": 320,
       "height": 235,
       "labelBBox": {
-        "x": -30,
+        "x": -56,
         "y": -148,
         "width": 81,
         "height": 15
@@ -389,7 +389,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 12,
+        "x": -14,
         "y": -91,
         "width": 160,
         "height": 32
@@ -428,7 +428,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -45,
+        "x": -108,
         "y": 109,
         "width": 166,
         "height": 32
@@ -470,7 +470,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -19,
+        "x": -82,
         "y": -130,
         "width": 115,
         "height": 32
@@ -664,8 +664,8 @@
       },
       "parent": null,
       "relations": [
-        "k3dchl",
-        "17el8cy"
+        "17el8cy",
+        "195hbsd"
       ],
       "color": "red",
       "line": "dashed",
@@ -677,7 +677,7 @@
       "id": "7syj35",
       "source": "engine.aiReview",
       "target": "engine.implement.implementer",
-      "label": "fix, same 3 rounds",
+      "label": "fail: fix, same 3 rounds",
       "points": [
         [
           240,
@@ -697,14 +697,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 256,
+        "x": 243,
         "y": 579,
-        "width": 128,
+        "width": 154,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1gi2vew"
+        "rih398"
       ],
       "color": "red",
       "line": "dashed",
@@ -869,7 +869,7 @@
       "id": "rn1qz4",
       "source": "engine.verify",
       "target": "engine.sandbox",
-      "label": "runs the app in its own",
+      "label": "re-checks findings in its own",
       "points": [
         [
           920,
@@ -889,14 +889,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 754,
+        "x": 717,
         "y": 155,
-        "width": 154,
+        "width": 191,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1eoo32"
+        "1hjgyri"
       ],
       "color": "gray",
       "line": "dashed",
@@ -907,7 +907,7 @@
       "id": "z03atx",
       "source": "engine.aiReview",
       "target": "engine.sandbox",
-      "label": "re-checks findings in its own",
+      "label": "runs the app in its own",
       "points": [
         [
           240,
@@ -927,14 +927,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 424,
+        "x": 443,
         "y": 349,
-        "width": 191,
+        "width": 154,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "18pez8b"
+        "1lnjnjf"
       ],
       "color": "gray",
       "line": "dashed",

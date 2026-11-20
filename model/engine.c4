@@ -181,10 +181,10 @@ model {
       }
     }
 
-    // ================= 5. Self-verify =================
-    verify = phase '5. Self-verify' {
-      technology 'Self-verification'
-      description 'CI runs outside the sandbox, then a separate Validator checks the acceptance criteria on the running app and records evidence. Rounds are capped.'
+    // ================= 5. Checks & review =================
+    verify = phase '5. Checks & review' {
+      technology 'White-box checks'
+      description 'Cheap and deterministic first: CI outside the sandbox, then one AI reviewer reads the code. Their findings change code, so they run before the expensive acceptance pass.'
       checks = script 'CI checks' {
         #planned
         technology 'CI outside the sandbox'
@@ -192,34 +192,34 @@ model {
         metadata {
           in 'The pushed branch'
           does 'Runs the full test suite, lint, types, build'
-          out 'Green: on to the Validator. Red: fix, at most 3 rounds'
+          out 'Green: on to the AI reviewer. Red: fix'
         }
       }
-      validator = agent 'Validator' {
-        #idea
-        technology 'Fresh context, own sandbox'
-        description 'A separate agent with a fresh context and its own sandbox. Starts the app, checks each acceptance criterion and its key examples as a user and records screenshots, video and command output as it goes. Never edits code: it gives a verdict and attaches the evidence to the PR.'
-        metadata {
-          in 'The change after green CI, the acceptance criteria'
-          does 'Checks each criterion and its examples as a user, records evidence'
-          out 'Pass with evidence on the PR, or fail with the criterion that broke'
-        }
-      }
-      checks -> validator 'green'
-    }
-
-    // ================= 6. AI review =================
-    aiReview = phase '6. AI review' {
-      technology 'AI review & autofix'
-      description 'One reviewer agent with a fresh context checks the PR against the spec and the code, re-checks its findings and gives a verdict. An agent approval is not a human approval.'
       reviewer = agent 'AI reviewer' {
         #built
         technology 'One agent, other model family'
-        description 'One agent with a fresh context and its own sandbox, on a different model family than the Implementer. Reads the PR, the evidence, the spec and the code around the change; checks correctness, security and match with the spec; re-checks each finding, by running the code where it can, before reporting it. Skips style and nits by a "what not to flag" list. Gives a JSON verdict (pass / fix / block) and, for R1/R2, an explanation for the Operator by the presentation rules: before → after, why, what is not verified.'
+        description 'One agent with a fresh context and its own sandbox, on a different model family than the Implementer. Reads the PR, the spec and the code around the change; checks correctness, security and match with the spec; re-checks each finding, by running the code where it can, before reporting it. Skips style and nits by a "what not to flag" list. Gives a JSON verdict (pass / fix / block) and, for R1/R2, an explanation for the Operator by the presentation rules: before → after, why, what is not verified. After a fix it reviews only the new diff.'
         metadata {
-          in 'The PR with evidence, the spec, the code around it'
+          in 'The PR after green CI, the spec, the code around it'
           does 'Finds and re-checks issues, skips nits, explains the change'
-          out 'Verdict pass, fix or block; for R1/R2 an explanation in the PR'
+          out 'Pass: on to acceptance. Fix or block; for R1/R2 an explanation in the PR'
+        }
+      }
+      checks -> reviewer 'green'
+    }
+
+    // ================= 6. Acceptance =================
+    aiReview = phase '6. Acceptance' {
+      technology 'Black-box validation'
+      description 'Last and most expensive: a separate Validator checks the acceptance criteria on the running app, as a user, and records evidence. It runs on code that will not change again.'
+      validator = agent 'Validator' {
+        #idea
+        technology 'Fresh context, own sandbox'
+        description 'A separate agent with a fresh context and its own sandbox. Does not see the AI reviewer\'s verdict. Starts the app, checks each acceptance criterion and its key examples as a user and records screenshots, video and command output as it goes. Never edits code: it gives a verdict and attaches the evidence to the PR. After a fix it re-checks the criteria the fix touched.'
+        metadata {
+          in 'The reviewed PR, the acceptance criteria'
+          does 'Checks each criterion and its examples as a user, records evidence'
+          out 'Pass with evidence on the PR, or fail with the criterion that broke'
         }
       }
     }
@@ -300,21 +300,21 @@ model {
   engine.plan.planner -> tracker 'slice sub-issues, blocked by'
   engine.plan.researcher -> docs 'research document'
   docs .reads engine.implement.implementer 'plan, criteria'
-  docs .reads engine.aiReview.reviewer 'spec'
+  docs .reads engine.verify.reviewer 'spec'
   operator -> engine.plan.planGate 'approves'
   engine.plan.planGate .handoff engine.implement.implementer 'plan'
   engine.implement.implementer -> changes 'PR'
   engine.implement.implementer .handoff engine.verify.checks 'pushed branch'
   engine.verify.checks -> ci 'results'
-  docs .reads engine.verify.validator 'acceptance criteria'
-  engine.verify.validator .verdict engine.implement.implementer 'fail: fix, same 3 rounds'
-  engine.verify.validator -> engine.sandbox 'runs the app in its own'
-  engine.verify.validator -> changes 'evidence on the PR'
-  engine.verify.validator .handoff engine.aiReview.reviewer 'PR + evidence'
-  engine.aiReview.reviewer -> changes 'findings, verdict, explanation'
-  engine.aiReview.reviewer .verdict engine.merge.land 'pass, R0'
-  engine.aiReview.reviewer .verdict engine.merge.mergeGate 'pass, R1/R2 + explanation'
-  engine.aiReview.reviewer -> engine.sandbox 're-checks findings in its own'
+  docs .reads engine.aiReview.validator 'acceptance criteria'
+  engine.aiReview.validator .verdict engine.implement.implementer 'fail: fix, same 3 rounds'
+  engine.aiReview.validator -> engine.sandbox 'runs the app in its own'
+  engine.aiReview.validator -> changes 'evidence on the PR'
+  engine.verify.reviewer .handoff engine.aiReview.validator 'pass: PR'
+  engine.verify.reviewer -> changes 'findings, verdict, explanation'
+  engine.aiReview.validator .verdict engine.merge.land 'pass, R0'
+  engine.aiReview.validator .handoff engine.merge.mergeGate 'pass, R1/R2: PR + evidence + explanation'
+  engine.verify.reviewer -> engine.sandbox 're-checks findings in its own'
   operator -> engine.merge.mergeGate 'reviews evidence'
   engine.merge.land -> changes 'merge'
   engine.merge.land .handoff engine.deploy.deployer 'R0, R1'
@@ -328,7 +328,7 @@ model {
 
   // ================= Loops back =================
   engine.verify.checks .verdict engine.implement.implementer 'red: fix, at most 3 rounds'
-  engine.aiReview.reviewer .verdict engine.implement.implementer 'fix, same 3 rounds'
+  engine.verify.reviewer .verdict engine.implement.implementer 'fix, same 3 rounds'
   engine.spec.interviewer -> operator 'questions'
   engine.deploy.watcher -> operator 'regression: roll back?'
   engine.learn.retro -> engine.intake.triage 'proposed work items'

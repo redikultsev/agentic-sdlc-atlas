@@ -61,7 +61,7 @@ stateDiagram-v2
 | Planning | Plan in progress | Planner | no | `state:planning` | In Progress |
 | PlanReview | Plan awaiting approval | Operator | **yes** | `state:plan-review` | In Review |
 | Implementing | Writing the change | Implementer | no | `state:implementing` | In Progress |
-| Verifying | Checks and AI review | CI, Validator, AI reviewer | no | `state:verifying` | In Progress |
+| Verifying | CI, AI review, then acceptance | CI, AI reviewer, Validator | no | `state:verifying` | In Progress |
 | MergeReview | Awaiting merge (R1/R2) | Operator | **yes** | `state:merge-review` | In Review |
 | Merged | Merged | Deploy | no | `state:merged` | Done (dev) |
 | DeployReview | Deployment awaiting approval (R2) | Operator | **yes** | `state:deploy-review` | Awaiting Deploy |
