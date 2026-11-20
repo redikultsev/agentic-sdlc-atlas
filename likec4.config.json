@@ -1,0 +1,115 @@
+{
+  "$schema": "https://likec4.dev/schemas/config.json",
+  "name": "agentic-pipeline",
+  "title": "Agentic development pipeline",
+  "styles": {
+    "theme": {
+      "colors": {
+        "primary": {
+          "elements": {
+            "fill": "#2563eb",
+            "stroke": "#1d4ed8",
+            "hiContrast": "#ffffff",
+            "loContrast": "#dbeafe"
+          },
+          "relationships": {
+            "line": "#2563eb",
+            "label": "#111827",
+            "labelBg": "rgba(255,255,255,0.92)"
+          }
+        },
+        "indigo": {
+          "elements": {
+            "fill": "#4f46e5",
+            "stroke": "#3730a3",
+            "hiContrast": "#ffffff",
+            "loContrast": "#e0e7ff"
+          },
+          "relationships": {
+            "line": "#4f46e5",
+            "label": "#111827",
+            "labelBg": "rgba(255,255,255,0.92)"
+          }
+        },
+        "green": {
+          "elements": {
+            "fill": "#047857",
+            "stroke": "#065f46",
+            "hiContrast": "#ffffff",
+            "loContrast": "#d1fae5"
+          },
+          "relationships": {
+            "line": "#047857",
+            "label": "#111827",
+            "labelBg": "rgba(255,255,255,0.92)"
+          }
+        },
+        "red": {
+          "elements": {
+            "fill": "#be123c",
+            "stroke": "#9f1239",
+            "hiContrast": "#ffffff",
+            "loContrast": "#ffe4e6"
+          },
+          "relationships": {
+            "line": "#be123c",
+            "label": "#111827",
+            "labelBg": "rgba(255,255,255,0.92)"
+          }
+        },
+        "amber": {
+          "elements": {
+            "fill": "#c2410c",
+            "stroke": "#9a3412",
+            "hiContrast": "#ffffff",
+            "loContrast": "#ffedd5"
+          },
+          "relationships": {
+            "line": "#c2410c",
+            "label": "#111827",
+            "labelBg": "rgba(255,255,255,0.92)"
+          }
+        },
+        "gray": {
+          "elements": {
+            "fill": "#475569",
+            "stroke": "#334155",
+            "hiContrast": "#ffffff",
+            "loContrast": "#e2e8f0"
+          },
+          "relationships": {
+            "line": "#475569",
+            "label": "#111827",
+            "labelBg": "rgba(255,255,255,0.92)"
+          }
+        },
+        "slate": {
+          "elements": {
+            "fill": "#334155",
+            "stroke": "#1e293b",
+            "hiContrast": "#ffffff",
+            "loContrast": "#cbd5e1"
+          },
+          "relationships": {
+            "line": "#334155",
+            "label": "#111827",
+            "labelBg": "rgba(255,255,255,0.92)"
+          }
+        },
+        "sky": {
+          "elements": {
+            "fill": "#0369a1",
+            "stroke": "#075985",
+            "hiContrast": "#ffffff",
+            "loContrast": "#e0f2fe"
+          },
+          "relationships": {
+            "line": "#0369a1",
+            "label": "#111827",
+            "labelBg": "rgba(255,255,255,0.92)"
+          }
+        }
+      }
+    }
+  }
+}

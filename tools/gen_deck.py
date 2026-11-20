@@ -5,6 +5,8 @@ import json, re, sys, pathlib
 
 root = pathlib.Path(__file__).resolve().parent.parent
 model = json.loads(pathlib.Path(sys.argv[1]).read_text())
+if isinstance(model, list):  # named projects export as a list
+    model = model[0]
 E, R = model['elements'], model['relations']
 KIND = {'agent': 'agent', 'script': 'script', 'gate': 'Operator decides', 'store': 'store',
         'platform': 'cross-cutting', 'human': 'human', 'external': 'external', 'phase': 'stage'}

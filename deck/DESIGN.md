@@ -25,3 +25,7 @@ Every slide follows these rules. Check a slide against them before committing it
 ## Process
 
 12. **Check in the browser** at the real slide size before committing. Look for: uneven spacing, misalignment, overflow, tiny text, empty areas.
+
+## Palette
+
+13. **Tailwind 700 palette, white titles, contrast ≥ 5:1** (WCAG AA is 4.5:1). Set once in `likec4.config.json`, so diagrams, slides and the legend share it. Agent indigo `#4f46e5`, script emerald `#047857`, gate rose `#be123c`, Operator orange `#c2410c`, store slate `#475569`, stage slate `#334155`, cross-cutting sky `#0369a1`, hand-off blue `#2563eb`. The LikeC4 default palette was 3.8:1 and was replaced on 2026-11-20.
