@@ -67,7 +67,7 @@ The agent proposes size and risk at intake; the Operator may correct them.
 | **PR head** | The last commit of a PR. An approval counts only for the head the reviewer saw |
 | **Verdict** | The judge's decision as schema JSON: `pass`, `fix` or `block`. Code picks the next step from it |
 | **Holdout tests** | Tests the agent cannot see or edit |
-| **Slice** | A piece of work that can be built and checked on its own |
+| **Slice** | A piece of the plan that can be built and checked on its own ("vertical slice"). The Planner cuts the work into slices; each one runs in a fresh Implementer session; independent slices run in parallel |
 | **Sandbox** | An isolated environment per work item: the agent cannot reach other files, networks or credentials |
 | **Orchestrator** | The program that moves a work item through the stages |
 | **Traces** | A record of what the agent did: calls, decisions, cost |

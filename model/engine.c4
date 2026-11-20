@@ -60,12 +60,12 @@ model {
     orchestrator = platform 'Orchestrator' {
       #idea
       technology 'Orchestrator'
-      description 'Moves a work item through the stages. Code decides the next step from a JSON verdict, never from agent prose. Enforces the limit: at most 3 work items wait for the Operator at once. Engine not chosen yet.'
+      description 'Moves a work item through the stages. Code decides the next step from a JSON verdict, never from agent prose. Starts one fresh Implementer session per slice: slices with no dependency and no shared files run in parallel, each in its own worktree; the rest in plan order. Merges slice branches into the work item branch; a conflict goes back to the Implementer. Enforces the limit: at most 3 work items wait for the Operator at once. Engine not chosen yet.'
     }
     sandbox = platform 'Sandbox' {
       #idea
       technology 'Sandbox'
-      description 'A disposable isolated environment per work item: full toolchain, narrow rights, no credentials that can merge.'
+      description 'A disposable isolated environment per work item, a worktree per parallel slice: full toolchain, narrow rights, no credentials that can merge.'
     }
     traces = platform 'Session traces' {
       #idea
@@ -144,11 +144,11 @@ model {
       planner = agent 'Planner' {
         #idea
         technology 'Planning agent'
-        description 'A plan in slices: files, order, risks, a check command for each slice.'
+        description 'A plan in slices: for each slice the files, what it depends on, risks and a check command.'
         metadata {
           in 'The spec, past decisions, research (L)'
           does 'Splits the work into slices'
-          out 'Plan: per slice the files, order, risks and a check command'
+          out 'Plan: slices with files, dependencies, risks and a check command'
         }
       }
       planGate = gate 'Approve plan' {
@@ -175,7 +175,7 @@ model {
         description 'Reads the code it needs and writes one slice in a fresh context.'
         metadata {
           in 'The plan (for S, the work item) and the code'
-          does 'Slice by slice: a fresh context, writes the slice, runs its check'
+          does 'One slice per fresh session, writes it, runs its check; independent slices in parallel'
           out 'Commits on a branch, a PR'
         }
       }
@@ -322,7 +322,7 @@ model {
   engine.learn.adopt -> engine.orchestrator 'new rule or check'
 
   // ================= Cross-cutting =================
-  engine.orchestrator -> engine.implement.implementer 'runs in sandbox'
+  engine.orchestrator -> engine.implement.implementer 'a session per slice'
   engine.orchestrator -> engine.sandbox 'creates per work item'
   engine.implement.implementer -> engine.sandbox 'works inside'
   engine.orchestrator -> engine.cards 'asks the Operator'

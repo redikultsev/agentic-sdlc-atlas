@@ -268,7 +268,7 @@
       "metadata": {
         "in": "The spec, past decisions, research (L)",
         "does": "Splits the work into slices",
-        "out": "Plan: per slice the files, order, risks and a check command"
+        "out": "Plan: slices with files, dependencies, risks and a check command"
       },
       "notation": "Agent (LLM)",
       "technology": "Planning agent",

@@ -131,7 +131,7 @@ layout: default
 <div class="dg"><likec4-view view-id="planDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs">
   <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Codebase researcher</p><dl class="eg3"><dt>In</dt><dd>An approved L spec</dd><dt>Does</dt><dd>Reads the code only, changes nothing</dd><dt>Out</dt><dd>Research: affected modules, what must stay true</dd></dl></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Planner</p><dl class="eg3"><dt>In</dt><dd>The spec, past decisions, research (L)</dd><dt>Does</dt><dd>Splits the work into slices</dd><dt>Out</dt><dd>Plan: per slice the files, order, risks and a check command</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Planner</p><dl class="eg3"><dt>In</dt><dd>The spec, past decisions, research (L)</dd><dt>Does</dt><dd>Splits the work into slices</dd><dt>Out</dt><dd>Plan: slices with files, dependencies, risks and a check command</dd></dl></div>
   <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Approve plan</p><dl class="eg3"><dt>In</dt><dd>The plan</dd><dt>Does</dt><dd>The Operator approves or edits it</dd><dt>Out</dt><dd>The work item goes to Implement</dd></dl></div>
 </div>
 </div>
@@ -150,7 +150,7 @@ layout: default
 <div class="stg">
 <div class="dg"><likec4-view view-id="implementDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Implementer</p><dl class="eg3"><dt>In</dt><dd>The plan (for S, the work item) and the code</dd><dt>Does</dt><dd>Slice by slice: a fresh context, writes the slice, runs its check</dd><dt>Out</dt><dd>Commits on a branch, a PR</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Implementer</p><dl class="eg3"><dt>In</dt><dd>The plan (for S, the work item) and the code</dd><dt>Does</dt><dd>One slice per fresh session, writes it, runs its check; independent slices in parallel</dd><dt>Out</dt><dd>Commits on a branch, a PR</dd></dl></div>
 </div>
 </div>
 
@@ -348,6 +348,9 @@ layout: default
 | 11 | How the pipeline talks to the Operator | By universal presentation rules: decision type sets the depth, a real before/after case is mandatory, "not verified" on top, form chosen by the task. Recommendation first for small decisions, after the facts for big ones |
 | 12 | Where the Operator works with the pipeline | Claude Desktop for now |
 | 13 | Language | Everything in the project in English: model, docs, deck, research |
+| 14 | Specs and decisions store | Holds per work item spec, plan and research, and per project decision records (ADR). Interviewer and Planner read past decisions; Implementer reads the plan; AI review reads the spec |
+| 15 | Fix rounds before Blocked | At most 3 rounds of fix after red checks, then the work item is Blocked and waits for the Operator |
+| 16 | Several agents on one work item | One fresh Implementer session per slice. Slices with no dependency and no shared files run in parallel, each in its own worktree; the rest in plan order. The Orchestrator merges slice branches; a conflict goes back to the Implementer |
 
 </div>
 

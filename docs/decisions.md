@@ -19,6 +19,9 @@ Basis: research on how leading teams build agentic pipelines (`research/atlas/re
 | 11 | How the pipeline talks to the Operator | By universal presentation rules: decision type sets the depth, a real before/after case is mandatory, "not verified" on top, form chosen by the task. Recommendation first for small decisions, after the facts for big ones | Card templates for 7 decision types; a one-line question | Research on presenting decisions (`research/atlas/research/2026-11-decision-presentation.json`) | 2026-11-20 |
 | 12 | Where the Operator works with the pipeline | Claude Desktop for now | — | The engine is not chosen yet | 2026-11-20 |
 | 13 | Language | Everything in the project in English: model, docs, deck, research | Russian | The material is shown to colleagues | 2026-11-20 |
+| 14 | Specs and decisions store | Holds per work item spec, plan and research, and per project decision records (ADR). Interviewer and Planner read past decisions; Implementer reads the plan; AI review reads the spec | A separate ADR store; no decision log (rules in AGENTS.md only) | One store keeps the overview simple; without ADRs the "why" behind old choices is lost | 2026-11-20 |
+| 15 | Fix rounds before Blocked | At most 3 rounds of fix after red checks, then the work item is Blocked and waits for the Operator | 2 rounds | Matches the work item states; a common cap in the researched pipelines | 2026-11-20 |
+| 16 | Several agents on one work item | One fresh Implementer session per slice. Slices with no dependency and no shared files run in parallel, each in its own worktree; the rest in plan order. The Orchestrator merges slice branches; a conflict goes back to the Implementer | Sequential only; a free-form team of agents | Faster on big work items; dependencies and file overlap are declared in the plan, so code, not an agent, decides what runs in parallel. Parallel agents on shared code make clashing decisions (Cognition) | 2026-11-20 |
 
 ## Open
 

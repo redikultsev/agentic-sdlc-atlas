@@ -49,7 +49,7 @@
       }
     ]
   },
-  "hash": "nY3SMioI6CYIdX2ryuZ4u-VTjoknEBgx35o0MlhvoaI",
+  "hash": "w_5szPQtB3nRO-Rh_lcicF4PzbxgglAebOT7lqxP9iA",
   "bounds": {
     "x": -40,
     "y": -40,
@@ -207,7 +207,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -55,
+        "x": -56,
         "y": 64,
         "width": 160,
         "height": 32
@@ -295,7 +295,7 @@
       "width": 320,
       "height": 235,
       "labelBBox": {
-        "x": -28,
+        "x": -29,
         "y": 170,
         "width": 81,
         "height": 15
@@ -336,7 +336,7 @@
       ],
       "metadata": {
         "in": "The plan (for S, the work item) and the code",
-        "does": "Slice by slice: a fresh context, writes the slice, runs its check",
+        "does": "One slice per fresh session, writes it, runs its check; independent slices in parallel",
         "out": "Commits on a branch, a PR"
       },
       "notation": "Agent (LLM)",
@@ -348,7 +348,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 14,
+        "x": 13,
         "y": 227,
         "width": 160,
         "height": 32
@@ -387,7 +387,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -62,
+        "x": -63,
         "y": 62,
         "width": 175,
         "height": 66
@@ -426,7 +426,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -55,
+        "x": -56,
         "y": 94,
         "width": 161,
         "height": 32
@@ -466,7 +466,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -32,
+        "x": -33,
         "y": 49,
         "width": 115,
         "height": 32
@@ -478,7 +478,7 @@
       "id": "1e4ekzh",
       "source": "engine.orchestrator",
       "target": "engine.implement.implementer",
-      "label": "runs in sandbox",
+      "label": "a session per slice",
       "points": [
         [
           520,
@@ -498,9 +498,9 @@
         ]
       ],
       "labelBBox": {
-        "x": 396,
+        "x": 381,
         "y": 255,
-        "width": 112,
+        "width": 127,
         "height": 25
       },
       "parent": null,
@@ -594,7 +594,7 @@
       "id": "ct709w",
       "source": "engine.verify",
       "target": "engine.implement.implementer",
-      "label": "red: fix, at most 2 rounds",
+      "label": "red: fix, at most 3 rounds",
       "points": [
         [
           800,
