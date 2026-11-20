@@ -1,0 +1,724 @@
+{
+  "_type": "element",
+  "tags": null,
+  "links": null,
+  "viewOf": "engine.plan",
+  "_stage": "layouted",
+  "sourcePath": "model/deck-views.c4",
+  "description": null,
+  "title": "3. Plan",
+  "id": "planDeck",
+  "autoLayout": {
+    "direction": "TB",
+    "nodeSep": 50,
+    "rankSep": 40
+  },
+  "notation": {
+    "nodes": [
+      {
+        "title": "Human",
+        "shape": "person",
+        "color": "amber",
+        "kinds": [
+          "human"
+        ]
+      },
+      {
+        "title": "Agent (LLM)",
+        "shape": "rectangle",
+        "color": "indigo",
+        "kinds": [
+          "agent"
+        ]
+      },
+      {
+        "title": "Gate: the Operator decides",
+        "shape": "rectangle",
+        "color": "red",
+        "kinds": [
+          "gate"
+        ]
+      },
+      {
+        "title": "Pipeline stage",
+        "shape": "rectangle",
+        "color": "slate",
+        "kinds": [
+          "phase"
+        ]
+      },
+      {
+        "title": "Store",
+        "shape": "storage",
+        "color": "storecolor",
+        "kinds": [
+          "store"
+        ]
+      }
+    ]
+  },
+  "hash": "zkctCTnwz4DLVxVmplPJB7imcxs_5dGhrrff8vfoTZo",
+  "bounds": {
+    "x": -40,
+    "y": -100,
+    "width": 1120,
+    "height": 715
+  },
+  "nodes": [
+    {
+      "id": "operator",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1te0nzn"
+      ],
+      "title": "Operator",
+      "modelRef": "operator",
+      "shape": "person",
+      "color": "amber",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Human",
+      "technology": "Human",
+      "kind": "human",
+      "isCustomized": true,
+      "x": 0,
+      "y": 400,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 63,
+        "y": 0,
+        "width": 115,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.spec",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1tjism4",
+        "1kl98ig"
+      ],
+      "title": "2. Spec",
+      "modelRef": "engine.spec",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Specification",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "specDeck",
+      "x": 0,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -367,
+        "y": 49,
+        "width": 99,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.plan",
+      "parent": null,
+      "level": 0,
+      "children": [
+        "engine.plan.researcher",
+        "engine.plan.planner",
+        "engine.plan.planGate"
+      ],
+      "inEdges": [
+        "1te0nzn",
+        "1tjism4",
+        "1kl98ig"
+      ],
+      "outEdges": [
+        "1x8ps76",
+        "50urxi",
+        "tjsbbw"
+      ],
+      "title": "3. Plan",
+      "modelRef": "engine.plan",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Plan & decompose",
+      "kind": "phase",
+      "depth": 1,
+      "isCustomized": true,
+      "navigateTo": "plan",
+      "x": 360,
+      "y": -60,
+      "width": 320,
+      "height": 635,
+      "labelBBox": {
+        "x": 86,
+        "y": -248,
+        "width": 46,
+        "height": 15
+      }
+    },
+    {
+      "id": "engine.plan.researcher",
+      "parent": "engine.plan",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1tjism4"
+      ],
+      "outEdges": [
+        "44bcvi",
+        "1x8ps76"
+      ],
+      "title": "Codebase researcher",
+      "modelRef": "engine.plan.researcher",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "An approved L spec",
+        "does": "Reads the code only, changes nothing",
+        "out": "Research: affected modules, what must stay true"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "Research",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": 400,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 131,
+        "y": -217,
+        "width": 138,
+        "height": 66
+      }
+    },
+    {
+      "id": "engine.plan.planner",
+      "parent": "engine.plan",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1kl98ig",
+        "44bcvi"
+      ],
+      "outEdges": [
+        "mwi4h0",
+        "50urxi"
+      ],
+      "title": "Planner",
+      "modelRef": "engine.plan.planner",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "The spec, past decisions, research (L)",
+        "does": "Splits the work into slices",
+        "out": "Plan: per slice the files, order, risks and a check command"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "Planning agent",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": 400,
+      "y": 200,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 150,
+        "y": -200,
+        "width": 101,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.plan.planGate",
+      "parent": "engine.plan",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1te0nzn",
+        "mwi4h0"
+      ],
+      "outEdges": [
+        "tjsbbw"
+      ],
+      "title": "Approve plan",
+      "modelRef": "engine.plan.planGate",
+      "shape": "rectangle",
+      "color": "red",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "The plan",
+        "does": "The Operator approves or edits it",
+        "out": "The work item goes to Implement"
+      },
+      "notation": "Gate: the Operator decides",
+      "technology": "Gate",
+      "kind": "gate",
+      "isCustomized": true,
+      "x": 400,
+      "y": 400,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 116,
+        "y": -200,
+        "width": 169,
+        "height": 32
+      }
+    },
+    {
+      "id": "docs",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1x8ps76",
+        "50urxi"
+      ],
+      "outEdges": [],
+      "title": "Specs, plans and decisions",
+      "modelRef": "docs",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "notation": "Store",
+      "technology": "files in the repo or the work item body",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 800,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 163,
+        "y": -617,
+        "width": 175,
+        "height": 66
+      }
+    },
+    {
+      "id": "engine.implement",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "tjsbbw"
+      ],
+      "outEdges": [],
+      "title": "4. Implement",
+      "modelRef": "engine.implement",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Implement in sandbox",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "implementDeck",
+      "x": 800,
+      "y": 400,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 517,
+        "y": -428,
+        "width": 166,
+        "height": 32
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "1te0nzn",
+      "source": "operator",
+      "target": "engine.plan.planGate",
+      "label": "approves",
+      "points": [
+        [
+          240,
+          468
+        ],
+        [
+          320,
+          468
+        ],
+        [
+          320,
+          468
+        ],
+        [
+          400,
+          468
+        ]
+      ],
+      "labelBBox": {
+        "x": 285,
+        "y": 437,
+        "width": 70,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "2r7c3i"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1tjism4",
+      "source": "engine.spec",
+      "target": "engine.plan.researcher",
+      "label": "L",
+      "points": [
+        [
+          240,
+          50
+        ],
+        [
+          320,
+          50
+        ],
+        [
+          320,
+          68
+        ],
+        [
+          400,
+          68
+        ]
+      ],
+      "labelBBox": {
+        "x": 310,
+        "y": 28,
+        "width": 20,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1dhn5lu"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1kl98ig",
+      "source": "engine.spec",
+      "target": "engine.plan.planner",
+      "label": "M",
+      "points": [
+        [
+          240,
+          86
+        ],
+        [
+          320,
+          86
+        ],
+        [
+          320,
+          268
+        ],
+        [
+          400,
+          268
+        ]
+      ],
+      "labelBBox": {
+        "x": 308,
+        "y": 146,
+        "width": 24,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "19f5o1z"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "44bcvi",
+      "source": "engine.plan.researcher",
+      "target": "engine.plan.planner",
+      "label": "L: research document",
+      "points": [
+        [
+          520,
+          135
+        ],
+        [
+          520,
+          168
+        ],
+        [
+          520,
+          168
+        ],
+        [
+          520,
+          200
+        ]
+      ],
+      "labelBBox": {
+        "x": 359,
+        "y": 155,
+        "width": 149,
+        "height": 25
+      },
+      "parent": "engine.plan",
+      "relations": [
+        "r3t4ux"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "mwi4h0",
+      "source": "engine.plan.planner",
+      "target": "engine.plan.planGate",
+      "label": "plan",
+      "points": [
+        [
+          520,
+          335
+        ],
+        [
+          520,
+          368
+        ],
+        [
+          520,
+          368
+        ],
+        [
+          520,
+          400
+        ]
+      ],
+      "labelBBox": {
+        "x": 468,
+        "y": 355,
+        "width": 40,
+        "height": 25
+      },
+      "parent": "engine.plan",
+      "relations": [
+        "228p2s"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1x8ps76",
+      "source": "engine.plan.researcher",
+      "target": "docs",
+      "label": "research document",
+      "points": [
+        [
+          640,
+          68
+        ],
+        [
+          720,
+          68
+        ],
+        [
+          720,
+          50
+        ],
+        [
+          800,
+          50
+        ]
+      ],
+      "labelBBox": {
+        "x": 653,
+        "y": 28,
+        "width": 134,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "zv8o96"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "50urxi",
+      "source": "engine.plan.planner",
+      "target": "docs",
+      "label": "reads spec, writes plan and ADR",
+      "points": [
+        [
+          640,
+          268
+        ],
+        [
+          720,
+          268
+        ],
+        [
+          720,
+          86
+        ],
+        [
+          800,
+          86
+        ]
+      ],
+      "labelBBox": {
+        "x": 612,
+        "y": 146,
+        "width": 215,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "uy09vz"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "tjsbbw",
+      "source": "engine.plan.planGate",
+      "target": "engine.implement",
+      "label": "plan",
+      "points": [
+        [
+          640,
+          468
+        ],
+        [
+          720,
+          468
+        ],
+        [
+          720,
+          468
+        ],
+        [
+          800,
+          468
+        ]
+      ],
+      "labelBBox": {
+        "x": 700,
+        "y": 437,
+        "width": 40,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "10n5292"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    }
+  ],
+  "_layout": "manual"
+}

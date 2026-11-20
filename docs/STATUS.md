@@ -29,7 +29,8 @@ Deck (20 slides): 1 title · 2 how to read · 3 whole pipeline · 4 what moves a
 ## Known gaps
 
 1. Stage slides (6–14) use compact deck views (`model/deck-views.c4`, descriptions hidden). Wide stages (3. Plan) still render small.
-2. Only the overview has a manual layout. If its elements or links change, LikeC4 reports layout drift: delete `.likec4/index.likec4.snap`, nudge any block in the editor (Edit), run `node tools/layout_index.mjs`.
+2. Manual layouts: the overview (`tools/layout_index.mjs`) and the Plan deck view (`tools/layout_deck.py`, grid in `LAYOUTS`). For a deck view: export JSON, run `python3 tools/layout_deck.py <export.json>`.
+   Only the overview had a manual layout before. If its elements or links change, LikeC4 reports layout drift: delete `.likec4/index.likec4.snap`, nudge any block in the editor (Edit), run `node tools/layout_index.mjs`.
 3. PDF export of the deck with web components is not verified.
 4. `docs/states.md` is a draft the owner has not reviewed yet (slides 16–17).
 5. No target numbers for the pipeline metrics yet.
