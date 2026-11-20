@@ -8,8 +8,6 @@
 stateDiagram-v2
   direction LR
   [*] --> New: signal
-  New --> NeedsInfo: unclear, questions to the requester
-  NeedsInfo --> New: requester answered
   New --> Triaged: checked, sized, outcome proposed
   Triaged --> Accepted: Operator, for the agent
   Triaged --> ForHuman: Operator, for a human
@@ -54,7 +52,6 @@ stateDiagram-v2
 | State | Meaning | Who moves it on | Waits for the Operator | GitHub Issues | Jira |
 |---|---|---|---|---|---|
 | New | Signal recorded, not triaged | Triage agent | no | `state:new` | To Do |
-| NeedsInfo | Unclear; questions asked of the requester | Requester answers | no (waits for the requester) | `state:needs-info` | Waiting for info |
 | Triaged | Checked, size, risk and outcome proposed | Operator | **yes** | `state:triaged` | To Do + label |
 | ForHuman | A human does it; the pipeline only tracks it | a human | no | `state:for-human` | To Do (human) |
 | Accepted | Accepted for work | Orchestrator | no | `state:accepted` | Selected |

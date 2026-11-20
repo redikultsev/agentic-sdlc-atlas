@@ -80,19 +80,19 @@ model {
       triage = agent 'Triage' {
         #idea
         technology 'Triage agent'
-        description 'Before sizing: merges duplicates, checks the behaviour is not already built and was not rejected before, reproduces a bug. Then proposes size S/M/L, risk R0/R1/R2 and an outcome with a reason. Asks the requester when the item is unclear. Never closes anything itself.'
+        description 'Works out the item on its own from the request, alerts, logs and code; never asks people. Merges duplicates, checks the behaviour is not already built and was not rejected before, reproduces a bug. Where something stays unclear, picks the most likely reading and writes it down as an assumption. Proposes size S/M/L, risk R0/R1/R2 and an outcome with a reason. Never closes anything itself.'
         metadata {
           in 'A request, a bug or an alert'
-          does 'Checks duplicates, already built, rejected before; reproduces a bug'
-          out 'Size, risk and an outcome: for agent, for a human, needs info, won\'t do'
+          does 'Investigates on its own: duplicates, already built, rejected before, reproduces a bug; writes down assumptions'
+          out 'Size, risk, assumptions and an outcome: for agent, for a human, won\'t do'
         }
       }
       admit = gate 'Accept' {
         #idea
         technology 'Gate'
-        description 'The Operator sees size, risk and the proposed outcome, may correct them, and decides: for the agent, for a human, or won\'t do (a rejected request goes to the register of rejected requests).'
+        description 'The Operator sees size, risk, assumptions and the proposed outcome, may correct them, and decides: for the agent, for a human, or won\'t do (a rejected request goes to the register of rejected requests).'
         metadata {
-          in 'Size, risk and the proposed outcome'
+          in 'Size, risk, assumptions and the proposed outcome'
           does 'The Operator accepts, corrects or rejects'
           out 'Agent: S → Implement, M, L → Spec; or for a human; or won\'t do'
         }
@@ -279,13 +279,12 @@ model {
   }
 
   // ================= Main flow =================
-  monitoring -> engine.intake.triage 'alert'
+  monitoring -> engine.intake.triage 'alerts, logs, errors'
   requester -> engine.intake.triage 'request or bug'
   operator -> engine.intake.admit 'accepts'
   engine.intake.triage -> tracker 'work item'
   docs .reads engine.intake.triage 'rejected requests'
   engine.intake.admit -> docs 'rejected request'
-  engine.intake.triage -> requester 'questions'
   engine.intake.admit .handoff engine.spec.interviewer 'M, L'
   engine.intake.admit .handoff engine.implement.implementer 'S: straight to code'
   engine.spec.interviewer -> docs 'spec'
