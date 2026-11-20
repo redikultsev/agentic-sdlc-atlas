@@ -1,0 +1,34 @@
+// Single-element views of the real stores, used as blocks on the deck slide
+// "What moves and where it lives". Descriptions are hidden: the slide gives them.
+views {
+  view storeTracker {
+    title 'Store: Work items'
+    include tracker with { description '' }
+    style * { size small textSize xlarge }
+  }
+  view storeDocs {
+    title 'Store: Specs and plans'
+    include docs with { description '' }
+    style * { size small textSize xlarge }
+  }
+  view storeChanges {
+    title 'Store: Change sets'
+    include changes with { description '' }
+    style * { size small textSize xlarge }
+  }
+  view storeCi {
+    title 'Store: Check results'
+    include ci with { description '' }
+    style * { size small textSize xlarge }
+  }
+  view storeReleases {
+    title 'Store: Deployments'
+    include releases with { description '' }
+    style * { size small textSize xlarge }
+  }
+  view storeProd {
+    title 'Store: Production'
+    include prod with { description '' }
+    style * { size small textSize xlarge }
+  }
+}

@@ -29,7 +29,10 @@ def txt(v):
     return (v or '').strip()
 def title(fqn): return E[fqn]['title'] if fqn in E else fqn
 def cell(s): return s.replace('|', '\\|').replace('\n', ' ')
-def part(name): return (root / 'deck' / 'parts' / f'{name}.md').read_text().strip()
+def part(name):
+    # {{tech:fqn}} in a part is replaced by that element's technology from the model (one source per fact)
+    t = (root / 'deck' / 'parts' / f'{name}.md').read_text().strip()
+    return re.sub(r'\{\{tech:([\w.]+)\}\}', lambda m: E[m.group(1)].get('technology', ''), t)
 
 def stage_slide(key):
     fqn = f'engine.{key}'; st = E[fqn]

@@ -47,17 +47,20 @@ Nine stages that Stripe, Anthropic, Spotify, Google, Cognition, AWS AI-DLC and o
 
 # What moves and where it lives
 
-Signal → **work item** → spec → plan → **change set** → check results → review → merged change → **deployment** → incident → signal again
+<div class="chain">
+  <span>Signal</span><i>→</i><span class="k">Work item</span><i>→</i><span>Spec · plan</span><i>→</i><span class="k">Change set</span><i>→</i><span>Checks</span><i>→</i><span>Review · merge</span><i>→</i><span class="k">Deployment</span><i>→</i><span>Incident</span><i>↺</i>
+</div>
 
-| Store | What it holds | Today |
-|---|---|---|
-| **Work items** | the hub: number, size, risk, state; everything links to the number | GitHub Issues · Jira |
-| **Specs and plans** | what "done" means, how we do it | files in the repo or the work item body |
-| **Change sets** | PR, reviews, verdicts | PR · MR |
-| **Check results** | test output tied to the commit | CI |
-| **Deployments** | which version runs where and how it ended | Dokploy |
+<div class="st">
+  <div class="st-cell"><likec4-view view-id="storeTracker" color-scheme="light" class="sv"></likec4-view><p class="tool">GitHub Issues · Jira</p><p><b>The hub.</b> Number, size, risk, state. Everything links to the number.</p></div>
+  <div class="st-cell"><likec4-view view-id="storeDocs" color-scheme="light" class="sv"></likec4-view><p class="tool">files in the repo or the work item body</p><p>What "done" means and how we get there.</p></div>
+  <div class="st-cell"><likec4-view view-id="storeChanges" color-scheme="light" class="sv"></likec4-view><p class="tool">PR · MR</p><p>The code change, its reviews and verdicts.</p></div>
+  <div class="st-cell"><likec4-view view-id="storeCi" color-scheme="light" class="sv"></likec4-view><p class="tool">CI</p><p>Test, lint and build output tied to the commit.</p></div>
+  <div class="st-cell"><likec4-view view-id="storeReleases" color-scheme="light" class="sv"></likec4-view><p class="tool">Dokploy</p><p>Which version runs where and how the rollout ended.</p></div>
+  <div class="st-cell"><likec4-view view-id="storeProd" color-scheme="light" class="sv"></likec4-view><p class="tool">Running services</p><p>Errors and incidents here start new work items.</p></div>
+</div>
 
-Artifact names follow the CDEvents standard (CD Foundation): ticket, change, build, release, incident.
+<details class="fine"><summary>Names</summary>Artifact names follow the CDEvents standard (CD Foundation): ticket, change, build, release, incident. The tool under each block is today's choice; the pipeline talks to it through an adapter.</details>
 
 ---
 
