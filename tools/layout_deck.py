@@ -65,7 +65,8 @@ def lay(view):
             loops.append(e); continue
         if abs((sx + sw / 2) - (tx + tw / 2)) < 50:
             down = ty > sy
-            a, b, vertical = [sx + sw / 2, sy + sh if down else sy], [tx + tw / 2, ty if down else ty + th], True
+            cx = (max(sx, tx) + min(sx + sw, tx + tw)) / 2  # one shared x, so the edge is straight
+            a, b, vertical = [cx, sy + sh if down else sy], [cx, ty if down else ty + th], True
         elif tx > sx:
             a, b, vertical = [sx + sw, sy + sh / 2], [tx, ty + th / 2], False
         else:

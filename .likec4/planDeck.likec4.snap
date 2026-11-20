@@ -112,8 +112,8 @@
         "50urxi"
       ],
       "outEdges": [
-        "33gp1i",
-        "uo7sgd"
+        "uo7sgd",
+        "33gp1i"
       ],
       "title": "Specs, plans and decisions",
       "modelRef": "docs",
@@ -152,9 +152,9 @@
       "children": [],
       "inEdges": [],
       "outEdges": [
+        "12kv8cz",
         "1tjism4",
-        "1kl98ig",
-        "12kv8cz"
+        "1kl98ig"
       ],
       "title": "2. Spec",
       "modelRef": "engine.spec",
@@ -197,18 +197,18 @@
       ],
       "inEdges": [
         "1te0nzn",
-        "33gp1i",
         "uo7sgd",
+        "33gp1i",
+        "12kv8cz",
         "1tjism4",
-        "1kl98ig",
-        "12kv8cz"
+        "1kl98ig"
       ],
       "outEdges": [
+        "gc0jl7",
         "1x8ps76",
         "3l7a9x",
         "50urxi",
-        "tjsbbw",
-        "gc0jl7"
+        "tjsbbw"
       ],
       "title": "3. Plan",
       "modelRef": "engine.plan",
@@ -588,6 +588,45 @@
       "isLabelCustomized": true
     },
     {
+      "id": "uo7sgd",
+      "source": "docs",
+      "target": "engine.plan.scenarioWriter",
+      "label": "acceptance criteria",
+      "points": [
+        [
+          800,
+          214
+        ],
+        [
+          720,
+          214
+        ],
+        [
+          720,
+          86
+        ],
+        [
+          640,
+          86
+        ]
+      ],
+      "labelBBox": {
+        "x": 654,
+        "y": 119,
+        "width": 132,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "r5iy9t"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
+      "isLabelCustomized": true
+    },
+    {
       "id": "33gp1i",
       "source": "docs",
       "target": "engine.plan.planner",
@@ -627,42 +666,42 @@
       "isLabelCustomized": true
     },
     {
-      "id": "uo7sgd",
-      "source": "docs",
+      "id": "12kv8cz",
+      "source": "engine.spec",
       "target": "engine.plan.scenarioWriter",
-      "label": "acceptance criteria",
+      "label": "M, L",
       "points": [
         [
-          800,
-          214
+          240,
+          232
         ],
         [
-          720,
-          214
+          320,
+          232
         ],
         [
-          720,
-          86
+          320,
+          68
         ],
         [
-          640,
-          86
+          400,
+          68
         ]
       ],
       "labelBBox": {
-        "x": 654,
+        "x": 301,
         "y": 119,
-        "width": 132,
+        "width": 38,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "r5iy9t"
+        "1vavpj6"
       ],
-      "color": "gray",
-      "line": "dotted",
+      "color": "primary",
+      "line": "dashed",
       "head": "normal",
-      "kind": "reads",
+      "kind": "handoff",
       "isLabelCustomized": true
     },
     {
@@ -744,45 +783,6 @@
       "isLabelCustomized": true
     },
     {
-      "id": "12kv8cz",
-      "source": "engine.spec",
-      "target": "engine.plan.scenarioWriter",
-      "label": "M, L",
-      "points": [
-        [
-          240,
-          232
-        ],
-        [
-          320,
-          232
-        ],
-        [
-          320,
-          68
-        ],
-        [
-          400,
-          68
-        ]
-      ],
-      "labelBBox": {
-        "x": 301,
-        "y": 119,
-        "width": 38,
-        "height": 25
-      },
-      "parent": null,
-      "relations": [
-        "1vavpj6"
-      ],
-      "color": "primary",
-      "line": "dashed",
-      "head": "normal",
-      "kind": "handoff",
-      "isLabelCustomized": true
-    },
-    {
       "id": "44bcvi",
       "source": "engine.plan.researcher",
       "target": "engine.plan.planner",
@@ -852,6 +852,44 @@
       "parent": "engine.plan",
       "relations": [
         "1gept4d"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "gc0jl7",
+      "source": "engine.plan.scenarioWriter",
+      "target": "scenarios",
+      "label": "scenarios",
+      "points": [
+        [
+          640,
+          50
+        ],
+        [
+          720,
+          50
+        ],
+        [
+          720,
+          68
+        ],
+        [
+          800,
+          68
+        ]
+      ],
+      "labelBBox": {
+        "x": 684,
+        "y": 28,
+        "width": 73,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1yfrjno"
       ],
       "color": "gray",
       "line": "dashed",
@@ -1009,44 +1047,6 @@
       "line": "dashed",
       "head": "normal",
       "kind": "handoff",
-      "isLabelCustomized": true
-    },
-    {
-      "id": "gc0jl7",
-      "source": "engine.plan.scenarioWriter",
-      "target": "scenarios",
-      "label": "scenarios",
-      "points": [
-        [
-          640,
-          50
-        ],
-        [
-          720,
-          50
-        ],
-        [
-          720,
-          68
-        ],
-        [
-          800,
-          68
-        ]
-      ],
-      "labelBBox": {
-        "x": 684,
-        "y": 28,
-        "width": 73,
-        "height": 25
-      },
-      "parent": null,
-      "relations": [
-        "1yfrjno"
-      ],
-      "color": "gray",
-      "line": "dashed",
-      "head": "normal",
       "isLabelCustomized": true
     }
   ],
