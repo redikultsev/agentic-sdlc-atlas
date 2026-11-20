@@ -4,7 +4,7 @@ Where the project stands and what comes next. Update it at the end of every work
 
 ## Now (2026-11-20)
 
-**Deck walkthrough with the owner, slide by slide.** Slides 1–13 are reviewed. Continue from slide 14 (9. Learn), 15 (life of one work item), 16–17 (states), 18 (cross-cutting), 19 (decisions), 20 (open questions).
+**Deck walkthrough with the owner, slide by slide.** Slides 1–14 are reviewed. Continue from slide 15 (life of one work item), 16–17 (states), 18 (cross-cutting), 19 (decisions), 20 (open questions).
 
 How a slide is reviewed: show it, explain in plain words what each part does, list gaps found in the model, propose before → after. When the owner doubts a design choice, run a research swarm (three or four parallel agents, each with its own angle, web through fetchira), save the synthesis to `research/atlas/research/`, then propose. After a decision: write it into the affected elements (the model is the spec), `docs/decisions.md`, glossary and states; regenerate; check in the browser at 1280×760; commit and push.
 
@@ -17,7 +17,7 @@ Run both views from the repository root:
 
 `npm run deck:gen` regenerates `deck/slides.md` and the web components after any model change. Slidev does not reload `likec4-views.js` by itself: refresh the browser tab.
 
-## What the walkthrough changed (decisions 14–26)
+## What the walkthrough changed (decisions 14–27)
 
 - **Intake:** Triage works alone from request, alerts, logs and code, never asks people; checks duplicates, already built, rejected before, reproduces bugs; writes assumptions; outcomes for agent / for a human / won't do. Requests from people and from Learn enter through Triage. States: no NeedsInfo; ForHuman added.
 - **Ambiguity (19):** agents resolve it themselves and write assumptions; people only at gates. Exception: the Interviewer asks the Operator business questions.
@@ -29,10 +29,11 @@ Run both views from the repository root:
 - **Fix rounds:** one shared limit of 3 per work item (CI, review, acceptance); after that or on block → Blocked and a decision request (15, 22).
 - **7. Merge:** an auto-merge rules file decides R0 by facts, with a kill switch on the revert rate (25); the Operator's gate shows scope first, "changes" goes back without spending the 3 rounds; merge queue on the latest main (24).
 - **8. Deploy & watch:** every merge deploys main to everyone at once, one merge at a time; no gate after merge, R2 is approved at the Merge gate (8 revised). The Watcher agent watches what the PR changed for a window, rolls back by itself, reports to the Operator, sends a work item to Triage; asks when unsure; migrations expand–contract, never auto-rolled back (26). DeployReview state removed.
+- **9. Learn:** the Adopt gate is gone; a weekly Retro reads corrections and failures, sends rule and check work items to Triage, proposes removing unused rules, sends a weekly summary of six metrics; instruction files never R0, weakening a check R2 (27).
 - **Arrows:** data flows along the arrow; dashed = writes into a store, dotted = reads from a store.
 - Change sets renamed Pull requests.
 
-Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and sandboxes, criteria vs scenarios, AI code review, review vs validation order, merge, deploy and watch, Pocock's skills).
+Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and sandboxes, criteria vs scenarios, AI code review, review vs validation order, merge, deploy and watch, learn, Pocock's skills).
 
 ## Known gaps
 
@@ -47,7 +48,7 @@ Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and
 
 ## Next
 
-1. Finish the walkthrough (slides 14–20; slide 15 needs a cleaner layout) and apply corrections.
+1. Finish the walkthrough (slides 15–20; slide 15 needs a cleaner layout) and apply corrections.
 2. Audit the model against decisions 1–25; run the five-question check (decision 18) over every stage.
 3. Approve the work item states.
 4. Research and choose the engine to build the pipeline on.

@@ -14,7 +14,7 @@ Terms used in this project. Stage names follow the convergent pipeline of leadin
 | 6 | Acceptance | A separate Validator, blind to the reviewer's verdict, checks the acceptance criteria on the running app and records evidence | agent |
 | 7 | Merge | By risk: R0 merges itself, R1 the Operator on evidence, R2 the Operator reads the code | script + Operator |
 | 8 | Deploy & watch | Every merge deploys to everyone; the Watcher watches what the PR changed and rolls back on a regression | script + agent |
-| 9 | Learn | Mistakes and corrections become new work items, checks and rules | agent, Operator chooses |
+| 9 | Learn | Weekly: what repeated twice becomes a rule or check work item; rules that do not pay off are removed | agent |
 
 ## Size and risk
 

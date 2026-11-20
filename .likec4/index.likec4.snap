@@ -58,7 +58,7 @@
       }
     ]
   },
-  "hash": "DaV_YsZwbkUgyH4NUmNNXx-6CjIVDfvSaTYo19y1rUk",
+  "hash": "JpklTO_j7xygQL6bTVgMsEhTSQ9Lr9SDc8qT72xrwVY",
   "bounds": {
     "x": 20,
     "y": 80,
@@ -76,8 +76,7 @@
         "1yqwquu",
         "1l0mmr3",
         "1l0s5w9",
-        "yi4o42",
-        "yiqrcu"
+        "yi4o42"
       ],
       "title": "Operator",
       "modelRef": "operator",
@@ -124,8 +123,7 @@
         "1yqwquu",
         "1l0mmr3",
         "1l0s5w9",
-        "yi4o42",
-        "yiqrcu"
+        "yi4o42"
       ],
       "outEdges": [
         "1t1hp3i",
@@ -631,7 +629,6 @@
       "level": 1,
       "children": [],
       "inEdges": [
-        "yiqrcu",
         "i51uqd"
       ],
       "outEdges": [],
@@ -644,7 +641,7 @@
         "size": "md"
       },
       "description": {
-        "txt": "Mistakes and corrections become new work items, checks and rules."
+        "txt": "Once a week the Retro agent turns what repeated into rule and check work items, and proposes removing rules that do not pay off. No gate of its own: proposals go through Triage and land as PRs like any change."
       },
       "tags": [],
       "notation": "Pipeline stage",
@@ -656,10 +653,10 @@
       "width": 320,
       "height": 180,
       "labelBBox": {
-        "x": 31,
-        "y": 46,
-        "width": 259,
-        "height": 85
+        "x": 24,
+        "y": 19,
+        "width": 273,
+        "height": 139
       }
     },
     {
@@ -1161,44 +1158,6 @@
       "line": "dashed",
       "head": "normal",
       "kind": "handoff",
-      "isLabelCustomized": true
-    },
-    {
-      "id": "yiqrcu",
-      "source": "operator",
-      "target": "engine.learn",
-      "label": "chooses",
-      "points": [
-        [
-          2020,
-          300
-        ],
-        [
-          2020,
-          476
-        ],
-        [
-          3780,
-          444
-        ],
-        [
-          3780,
-          620
-        ]
-      ],
-      "labelBBox": {
-        "x": 3179,
-        "y": 474,
-        "width": 64,
-        "height": 25
-      },
-      "parent": null,
-      "relations": [
-        "fnjbdf"
-      ],
-      "color": "gray",
-      "line": "dashed",
-      "head": "normal",
       "isLabelCustomized": true
     },
     {

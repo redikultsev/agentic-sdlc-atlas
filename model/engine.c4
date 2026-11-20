@@ -231,7 +231,7 @@ model {
       r0check = script 'Auto-merge rules' {
         #idea
         technology 'Rules file in the repo'
-        description 'Checks facts, not the agent\'s opinion: only allowed paths and change types (docs, tests, dev tools, patch updates), at most N changed lines, no new dependencies, never-zones untouched (migrations, auth, payments, CI config), all checks green, inside working hours. All true: R0, straight to the queue. Any false: the Operator\'s gate. Kill switch: when merged changes of one type are reverted more than 5% over 30 days, auto-merge for that type turns off until the Operator changes the rules.'
+        description 'Checks facts, not the agent\'s opinion: only allowed paths and change types (docs, tests, dev tools, patch updates), at most N changed lines, no new dependencies, never-zones untouched (migrations, auth, payments, CI config, agent instructions and rules files), all checks green, inside working hours. All true: R0, straight to the queue. Any false: the Operator\'s gate. Kill switch: when merged changes of one type are reverted more than 5% over 30 days, auto-merge for that type turns off until the Operator changes the rules.'
         metadata {
           in 'The PR that passed acceptance, the rules file'
           does 'Checks paths, size, dependencies, never-zones, time'
@@ -293,18 +293,17 @@ model {
     // ================= 9. Learn =================
     learn = phase '9. Learn' {
       technology 'Learn & close the loop'
-      description 'Mistakes and corrections become new work items, checks and rules.'
+      description 'Once a week the Retro agent turns what repeated into rule and check work items, and proposes removing rules that do not pay off. No gate of its own: proposals go through Triage and land as PRs like any change.'
       retro = agent 'Retro' {
         #idea
-        technology 'Retro'
-        description 'Weekly: what repeated twice becomes a proposed rule, check or work item.'
+        technology 'Retro agent, weekly'
+        description 'Reads where people had to step in and where the pipeline stumbled: the Operator\'s "changes" comments and edits at the spec and plan gates, Blocked work items, fix rounds, AI reviewer findings, Validator failures, the Watcher\'s rollbacks and session traces. A lesson is what repeated at least twice. Each proposal is a work item for Triage with the cases linked, the file to change and the kind of change: a rule that must always hold becomes a check (lint rule or test) whose message says how to fix it; guidance becomes a line in the agent instructions; guidance broken again becomes a check. Also proposes removing a rule that has not fired or helped in 8 weeks; the root agent instructions stay within 150 lines. Never changes files itself. Instruction and rules files never merge as R0; a change that weakens or removes a check is R2. Sends the Operator a weekly summary: Operator time per work item, share done without manual help, fix rounds to green, share of PRs merged, rollbacks, cost per merged change.'
+        metadata {
+          in 'Corrections, Blocked items, rounds, findings, rollbacks, traces'
+          does 'Finds what repeated twice; proposes adding or removing rules'
+          out 'Rule and check work items to Triage; weekly summary'
+        }
       }
-      adopt = gate 'Adopt rule?' {
-        #idea
-        technology 'Gate'
-        description 'The Operator picks which proposals to adopt.'
-      }
-      retro -> adopt 'proposals'
     }
   }
 
@@ -352,7 +351,10 @@ model {
   monitoring -> engine.deploy.watcher 'errors, logs, metrics'
   changes .reads engine.deploy.watcher 'what changed'
   engine.deploy.watcher .handoff engine.learn.retro 'rollout outcome'
-  operator -> engine.learn.adopt 'chooses'
+  tracker .reads engine.learn.retro 'Blocked, fix rounds'
+  changes .reads engine.learn.retro 'Operator changes, findings, failures'
+  releases .reads engine.learn.retro 'rollbacks'
+  engine.learn.retro -> operator 'weekly summary'
 
   // ================= Loops back =================
   engine.verify.checks .verdict engine.implement.implementer 'red: fix, at most 3 rounds'
@@ -360,8 +362,7 @@ model {
   engine.spec.interviewer -> operator 'questions'
   engine.deploy.watcher -> operator 'rolled back: report'
   engine.deploy.watcher .handoff engine.intake.triage 'regression: work item with evidence'
-  engine.learn.retro -> engine.intake.triage 'proposed work items'
-  engine.learn.adopt -> engine.orchestrator 'new rule or check'
+  engine.learn.retro .handoff engine.intake.triage 'rule and check work items'
 
   // ================= Cross-cutting =================
   engine.orchestrator -> engine.implement.implementer 'a session per slice'

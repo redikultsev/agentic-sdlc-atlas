@@ -1,0 +1,711 @@
+{
+  "_type": "element",
+  "tags": null,
+  "links": null,
+  "viewOf": "engine.learn",
+  "_stage": "layouted",
+  "sourcePath": "model/deck-views.c4",
+  "description": null,
+  "title": "9. Learn",
+  "id": "learnDeck",
+  "autoLayout": {
+    "direction": "LR",
+    "nodeSep": 50,
+    "rankSep": 40
+  },
+  "notation": {
+    "nodes": [
+      {
+        "title": "Human",
+        "shape": "person",
+        "color": "amber",
+        "kinds": [
+          "human"
+        ]
+      },
+      {
+        "title": "Agent (LLM)",
+        "shape": "rectangle",
+        "color": "indigo",
+        "kinds": [
+          "agent"
+        ]
+      },
+      {
+        "title": "Cross-cutting part",
+        "shape": "rectangle",
+        "color": "sky",
+        "kinds": [
+          "platform"
+        ]
+      },
+      {
+        "title": "Pipeline stage",
+        "shape": "rectangle",
+        "color": "slate",
+        "kinds": [
+          "phase"
+        ]
+      },
+      {
+        "title": "Store",
+        "shape": "storage",
+        "color": "storecolor",
+        "kinds": [
+          "store"
+        ]
+      }
+    ]
+  },
+  "hash": "bRg4OYpJzX90hED-Eky5-aza8ki-3IZux_68mxeuoYY",
+  "bounds": {
+    "x": -200.0,
+    "y": -40,
+    "width": 1440.0,
+    "height": 1015
+  },
+  "nodes": [
+    {
+      "id": "tracker",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1943u0m"
+      ],
+      "title": "Work items",
+      "modelRef": "tracker",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "GitHub Issues \u00b7 Jira",
+      "kind": "store",
+      "isCustomized": true,
+      "x": -160.0,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -112.0,
+        "y": 49,
+        "width": 144,
+        "height": 32
+      }
+    },
+    {
+      "id": "changes",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1ckbw57"
+      ],
+      "title": "Pull requests",
+      "modelRef": "changes",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "PR \u00b7 MR",
+      "kind": "store",
+      "isCustomized": true,
+      "x": -160.0,
+      "y": 200,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -123.0,
+        "y": 64,
+        "width": 166,
+        "height": 32
+      }
+    },
+    {
+      "id": "releases",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "wua6ac"
+      ],
+      "title": "Deployments",
+      "modelRef": "releases",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "Dokploy \u00b7 TeamCity",
+      "kind": "store",
+      "isCustomized": true,
+      "x": -160.0,
+      "y": 400,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -124.0,
+        "y": 79,
+        "width": 167,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.traces",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "zos398"
+      ],
+      "title": "Session traces",
+      "modelRef": "engine.traces",
+      "shape": "rectangle",
+      "color": "sky",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "notation": "Cross-cutting part",
+      "technology": "Traces",
+      "kind": "platform",
+      "isCustomized": true,
+      "x": -160.0,
+      "y": 600,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -134.0,
+        "y": 94,
+        "width": 188,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.deploy",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1qpj1gl"
+      ],
+      "title": "8. Deploy & watch",
+      "modelRef": "engine.deploy",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Release, deploy & watch",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "deployDeck",
+      "x": -160.0,
+      "y": 800,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -101.0,
+        "y": 92,
+        "width": 122,
+        "height": 66
+      }
+    },
+    {
+      "id": "engine.learn",
+      "parent": null,
+      "level": 0,
+      "children": [
+        "engine.learn.retro"
+      ],
+      "inEdges": [
+        "1943u0m",
+        "1ckbw57",
+        "wua6ac",
+        "zos398",
+        "1qpj1gl"
+      ],
+      "outEdges": [
+        "wqayz2",
+        "1axn22a"
+      ],
+      "title": "9. Learn",
+      "modelRef": "engine.learn",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Learn & close the loop",
+      "kind": "phase",
+      "depth": 1,
+      "isCustomized": true,
+      "navigateTo": "learn",
+      "x": 360,
+      "y": 340,
+      "width": 320,
+      "height": 235,
+      "labelBBox": {
+        "x": -34,
+        "y": -163,
+        "width": 54,
+        "height": 15
+      }
+    },
+    {
+      "id": "engine.learn.retro",
+      "parent": "engine.learn",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1943u0m",
+        "1ckbw57",
+        "wua6ac",
+        "zos398",
+        "1qpj1gl"
+      ],
+      "outEdges": [
+        "wqayz2",
+        "1axn22a"
+      ],
+      "title": "Retro",
+      "modelRef": "engine.learn.retro",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "Corrections, Blocked items, rounds, findings, rollbacks, traces",
+        "does": "Finds what repeated twice; proposes adding or removing rules",
+        "out": "Rule and check work items to Triage; weekly summary"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "Retro agent, weekly",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": 400,
+      "y": 400,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 52.0,
+        "y": -106,
+        "width": 72,
+        "height": 32
+      }
+    },
+    {
+      "id": "operator",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "wqayz2"
+      ],
+      "outEdges": [],
+      "title": "Operator",
+      "modelRef": "operator",
+      "shape": "person",
+      "color": "amber",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Human",
+      "technology": "Human",
+      "kind": "human",
+      "isCustomized": true,
+      "x": 960.0,
+      "y": 280.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 114.0,
+        "y": -41.0,
+        "width": 115,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.intake",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1axn22a"
+      ],
+      "outEdges": [],
+      "title": "1. Intake",
+      "modelRef": "engine.intake",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Intake & triage",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "intakeDeck",
+      "x": 960.0,
+      "y": 520.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 115.0,
+        "y": 14.0,
+        "width": 111,
+        "height": 32
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "1943u0m",
+      "source": "tracker",
+      "target": "engine.learn.retro",
+      "label": "Blocked, fix rounds",
+      "points": [
+        [
+          80,
+          68
+        ],
+        [
+          240,
+          68
+        ],
+        [
+          240,
+          414
+        ],
+        [
+          400,
+          414
+        ]
+      ],
+      "labelBBox": {
+        "x": 174,
+        "y": 210,
+        "width": 132,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1b7insr"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1ckbw57",
+      "source": "changes",
+      "target": "engine.learn.retro",
+      "label": "Operator changes,\nfindings, failures",
+      "points": [
+        [
+          80,
+          268
+        ],
+        [
+          240,
+          268
+        ],
+        [
+          240,
+          440
+        ],
+        [
+          400,
+          440
+        ]
+      ],
+      "labelBBox": {
+        "x": 176,
+        "y": 315,
+        "width": 128,
+        "height": 42
+      },
+      "parent": null,
+      "relations": [
+        "1by9ggh"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "wua6ac",
+      "source": "releases",
+      "target": "engine.learn.retro",
+      "label": "rollbacks",
+      "points": [
+        [
+          80,
+          468
+        ],
+        [
+          240,
+          468
+        ],
+        [
+          240,
+          468
+        ],
+        [
+          400,
+          468
+        ]
+      ],
+      "labelBBox": {
+        "x": 205,
+        "y": 437,
+        "width": 70,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "snbjlr"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "zos398",
+      "source": "engine.traces",
+      "target": "engine.learn.retro",
+      "label": "session traces",
+      "points": [
+        [
+          80,
+          668
+        ],
+        [
+          240,
+          668
+        ],
+        [
+          240,
+          494
+        ],
+        [
+          400,
+          494
+        ]
+      ],
+      "labelBBox": {
+        "x": 189,
+        "y": 550,
+        "width": 102,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "vit5c"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1qpj1gl",
+      "source": "engine.deploy",
+      "target": "engine.learn.retro",
+      "label": "rollout outcome",
+      "points": [
+        [
+          80,
+          868
+        ],
+        [
+          240,
+          868
+        ],
+        [
+          240,
+          522
+        ],
+        [
+          400,
+          522
+        ]
+      ],
+      "labelBBox": {
+        "x": 184,
+        "y": 664,
+        "width": 112,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1u425q1"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "wqayz2",
+      "source": "engine.learn.retro",
+      "target": "operator",
+      "label": "weekly summary",
+      "points": [
+        [
+          640,
+          438
+        ],
+        [
+          800,
+          438
+        ],
+        [
+          800,
+          348
+        ],
+        [
+          960,
+          348
+        ]
+      ],
+      "labelBBox": {
+        "x": 740,
+        "y": 362,
+        "width": 119,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "17u3lie"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1axn22a",
+      "source": "engine.learn.retro",
+      "target": "engine.intake",
+      "label": "rule and check work items",
+      "points": [
+        [
+          640,
+          498
+        ],
+        [
+          800,
+          498
+        ],
+        [
+          800,
+          588
+        ],
+        [
+          960,
+          588
+        ]
+      ],
+      "labelBBox": {
+        "x": 712,
+        "y": 512,
+        "width": 177,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "slrwgv"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    }
+  ],
+  "_layout": "manual"
+}

@@ -240,17 +240,16 @@ layout: default
 
 # 9. Learn
 
-<div class="lead">Mistakes and corrections become new work items, checks and rules.</div>
+<div class="lead">Once a week the Retro agent turns what repeated into rule and check work items, and proposes removing rules that do not pay off. No gate of its own: proposals go through Triage and land as PRs like any change.</div>
 
 <div class="stg">
 <div class="dg"><likec4-view view-id="learnDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-<div class="pcs n2">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Retro</p><p class="pd">Weekly: what repeated twice becomes a proposed rule, check or work item.</p></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Adopt rule?</p><p class="pd">The Operator picks which proposals to adopt.</p></div>
+<div class="pcs n1">
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Retro</p><dl class="eg3"><dt>In</dt><dd>Corrections, Blocked items, rounds, findings, rollbacks, traces</dd><dt>Does</dt><dd>Finds what repeated twice; proposes adding or removing rules</dd><dt>Out</dt><dd>Rule and check work items to Triage; weekly summary</dd></dl></div>
 </div>
 </div>
 
-<p class="sf"><b>Work item states:</b> new work items in New &nbsp;·&nbsp; <b>The Operator decides:</b> Adopt rule?</p>
+<p class="sf"><b>Work item states:</b> new work items in New &nbsp;·&nbsp; <b>The Operator decides:</b> nothing, this stage runs without a human</p>
 
 
 ---
@@ -359,6 +358,7 @@ layout: default
 | 24 | How a PR lands | Through a merge queue: the PR is rebuilt on the latest main with the PRs ahead and the full CI runs again; approvals stay valid while the PR's own diff is unchanged; a red build or a conflict ejects it to the Implementer, and after a conflict fix the changed part goes through checks, review and acceptance again. At the gate the Operator sees the scope first (files outside the plan, new dependencies, size), then the explanation and evidence, for R2 the code; "changes" with a comment goes back to the Implementer and does not count toward the 3 automatic rounds |
 | 25 | When a change merges without the Operator (R0) | Only when a rules file in the repo matches all facts: allowed paths and change types (docs, tests, dev tools, patch updates), size limit, no new dependencies, never-zones untouched (migrations, auth, payments, CI config), all checks green, working hours. Kill switch: a change type whose merged changes are reverted more than 5% over 30 days loses auto-merge until the rules change. The agent's R0 is only a forecast |
 | 26 | How a deploy is watched and rolled back | Deploy goes to all users at once, one merge at a time. The Watcher agent watches each deploy for a window (30 min by default): first what the PR changed (errors from the changed code, the business numbers it touches), then the whole service. On a clear regression it rolls back by itself, then reports to the Operator and sends a work item with evidence to Triage; when unsure it asks. More than 2 unneeded rollbacks in 30 days: it asks before rolling back. Migrations ship expand–contract and are never rolled back automatically |
+| 27 | How the pipeline learns | A weekly Retro agent reads corrections and failures (Operator changes and edits, Blocked items, fix rounds, reviewer findings, Validator failures, rollbacks, traces); what repeated twice becomes a work item for Triage with the cases and the file to change. A rule that must hold becomes a check with a fix hint; guidance becomes an instruction line; guidance broken again becomes a check. Rules unused for 8 weeks are proposed for removal; root instructions ≤150 lines. Instruction and rules files never R0; weakening a check is R2. Weekly summary of six metrics to the Operator |
 | 18 | How to check the model for gaps | After the deck walkthrough, every stage answers five questions: what triggers it, what it reads and writes, what it triggers next, where a human re-enters, what stops two runs doing the same work |
 
 </div>

@@ -49,6 +49,11 @@ LAYOUTS = {
         'prod': (2.4, -0.6), 'releases': (2.4, 0.6),
         'operator': (2.4, 1.8), 'engine.intake': (2.4, 3), 'engine.learn': (2.4, 4.2),
     },
+    'learnDeck': {
+        'tracker': (-0.4, 0), 'changes': (-0.4, 1), 'releases': (-0.4, 2), 'engine.traces': (-0.4, 3), 'engine.deploy': (-0.4, 4),
+        'engine.learn.retro': (1, 2),
+        'operator': (2.4, 1.4), 'engine.intake': (2.4, 2.6),
+    },
 }
 
 # edges that skip a block in the same column: drawn as an arc around its right side
