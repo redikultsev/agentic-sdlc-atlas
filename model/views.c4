@@ -35,6 +35,8 @@ views {
       engine.spec -> operator,
       engine.deploy -> operator,
       engine.learn -> tracker,
+      engine.aiReview -> changes,
+      engine.merge -> changes,
       prod -> *,
       monitoring -> *
     autoLayout LeftRight 60 80

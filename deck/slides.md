@@ -41,7 +41,7 @@ How a work item travels from a signal to production, who does what, and where th
 
 <div class="dg"><likec4-view view-id="index" color-scheme="light" browser="true" class="view-wide"></likec4-view><span class="hint">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>
 
-Nine stages that Stripe, Anthropic, Spotify, Google, Cognition, AWS AI-DLC and others converge on. Stores sit above the stages that use them; the Operator is on the left.
+Nine stages that Stripe, Anthropic, Spotify, Google, Cognition, AWS AI-DLC and others converge on. The Operator on top, stores below the stages that use them.
 
 ---
 

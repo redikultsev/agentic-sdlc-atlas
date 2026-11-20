@@ -1,0 +1,1746 @@
+{
+  "_type": "element",
+  "tags": null,
+  "links": null,
+  "_stage": "layouted",
+  "sourcePath": "model/views.c4",
+  "description": {
+    "md": "**How to read:** stages left to right; grey cylinders show where work items, specs, PRs, checks and deployments live; the Operator's arrows go into stage gates.\nClick a stage to open it. Loops back are shown on the stage views.\n\n**Colour:** purple = agent, green = script, red = the Operator decides, grey = store.\n\n**Size:** S = straight to code; M = spec and plan; L = plus codebase research.\n**Risk:** R0 merges and deploys itself; R1 = the Operator checks the evidence; R2 = the Operator reads the code and deploys."
+  },
+  "title": "0. Whole pipeline",
+  "id": "index",
+  "autoLayout": {
+    "direction": "LR",
+    "nodeSep": 80,
+    "rankSep": 60
+  },
+  "notation": {
+    "nodes": [
+      {
+        "title": "Human",
+        "shape": "person",
+        "color": "amber",
+        "kinds": [
+          "human"
+        ]
+      },
+      {
+        "title": "External system",
+        "shape": "rectangle",
+        "color": "slate",
+        "kinds": [
+          "external"
+        ]
+      },
+      {
+        "title": "Pipeline stage",
+        "shape": "rectangle",
+        "color": "slate",
+        "kinds": [
+          "phase"
+        ]
+      },
+      {
+        "title": "System",
+        "shape": "rectangle",
+        "color": "primary",
+        "kinds": [
+          "system"
+        ]
+      },
+      {
+        "title": "Store",
+        "shape": "storage",
+        "color": "gray",
+        "kinds": [
+          "store"
+        ]
+      }
+    ]
+  },
+  "hash": "wI_FIaDyrlJHkRDplr0Y3SbZ3ThdElezA3jqVaoBYXI",
+  "bounds": {
+    "x": 20,
+    "y": 80,
+    "width": 4000,
+    "height": 1234
+  },
+  "nodes": [
+    {
+      "id": "operator",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1yqwquu",
+        "1l0mmr3",
+        "1l0s5w9",
+        "yi4o42",
+        "7vlpoh",
+        "yiqrcu"
+      ],
+      "title": "Operator",
+      "modelRef": "operator",
+      "shape": "person",
+      "color": "amber",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "The person over the agents. Decides at the gates; everything is shown by the presentation rules (decision type sets the depth, a real before/after case, what was not verified on top)."
+      },
+      "tags": [],
+      "notation": "Human",
+      "technology": "Human",
+      "kind": "human",
+      "x": 1860,
+      "y": 120,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 14,
+        "y": 19,
+        "width": 292,
+        "height": 139
+      },
+      "navigateTo": null,
+      "links": null
+    },
+    {
+      "id": "engine",
+      "parent": null,
+      "level": 0,
+      "children": [
+        "engine.intake",
+        "engine.spec",
+        "engine.plan",
+        "engine.implement",
+        "engine.verify",
+        "engine.aiReview",
+        "engine.merge",
+        "engine.deploy",
+        "engine.learn"
+      ],
+      "inEdges": [
+        "1yqwquu",
+        "1l0mmr3",
+        "1l0s5w9",
+        "yi4o42",
+        "7vlpoh",
+        "yiqrcu"
+      ],
+      "outEdges": [
+        "1t1hp3i",
+        "xbu038",
+        "jgyy2q",
+        "wyfqmo",
+        "qfp46v",
+        "1bm3z3v",
+        "en4abs"
+      ],
+      "title": "Pipeline",
+      "modelRef": "engine",
+      "shape": "rectangle",
+      "color": "primary",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "md": "**Draft v1.** Nine stages that leading teams converge on (Stripe, Anthropic, Spotify, Google, Cognition and others)\nand the decisions in docs/decisions.md. Part status: `built` exists, `planned` decided to build, `idea` an idea."
+      },
+      "tags": [],
+      "notation": "System",
+      "kind": "system",
+      "depth": 1,
+      "x": 60,
+      "y": 560,
+      "width": 3920,
+      "height": 280,
+      "labelBBox": {
+        "x": 6,
+        "y": 0,
+        "width": 54,
+        "height": 15
+      },
+      "navigateTo": null,
+      "links": null
+    },
+    {
+      "id": "engine.intake",
+      "parent": "engine",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1yqwquu"
+      ],
+      "outEdges": [
+        "iu2rtf",
+        "1t1hp3i"
+      ],
+      "title": "1. Intake",
+      "modelRef": "engine.intake",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "A signal becomes a work item. An agent proposes size and risk; the Operator accepts it."
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Intake & triage",
+      "kind": "phase",
+      "navigateTo": "intake",
+      "x": 100,
+      "y": 620,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 24,
+        "y": 37,
+        "width": 272,
+        "height": 103
+      },
+      "links": null
+    },
+    {
+      "id": "engine.spec",
+      "parent": "engine",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1l0mmr3",
+        "iu2rtf"
+      ],
+      "outEdges": [
+        "115wmf0",
+        "xbu038"
+      ],
+      "title": "2. Spec",
+      "modelRef": "engine.spec",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "M and L only. The agent clarifies and writes what \"done\" means."
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Specification",
+      "kind": "phase",
+      "navigateTo": "spec",
+      "x": 540,
+      "y": 620,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 35,
+        "y": 46,
+        "width": 250,
+        "height": 85
+      },
+      "links": null
+    },
+    {
+      "id": "tracker",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1t1hp3i"
+      ],
+      "outEdges": [],
+      "title": "Work items",
+      "modelRef": "tracker",
+      "shape": "storage",
+      "color": "gray",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "The hub of the pipeline. Every piece of work is a work item with a number, size (S/M/L), risk (R0/R1/R2) and state. Everything else links to its number. Each tracker plugs in through an adapter."
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "GitHub Issues · Jira",
+      "kind": "store",
+      "x": 100,
+      "y": 1090,
+      "width": 320,
+      "height": 184,
+      "labelBBox": {
+        "x": 23,
+        "y": 21,
+        "width": 274,
+        "height": 139
+      },
+      "navigateTo": null,
+      "links": null
+    },
+    {
+      "id": "engine.plan",
+      "parent": "engine",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1l0s5w9",
+        "115wmf0"
+      ],
+      "outEdges": [
+        "tx5iwm",
+        "jgyy2q"
+      ],
+      "title": "3. Plan",
+      "modelRef": "engine.plan",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "M and L only. How we do it, in slices, and how we prove it is done."
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Plan & decompose",
+      "kind": "phase",
+      "navigateTo": "plan",
+      "x": 980,
+      "y": 620,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 21,
+        "y": 46,
+        "width": 279,
+        "height": 85
+      },
+      "links": null
+    },
+    {
+      "id": "engine.implement",
+      "parent": "engine",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "tx5iwm"
+      ],
+      "outEdges": [
+        "i360xe",
+        "wyfqmo"
+      ],
+      "title": "4. Implement",
+      "modelRef": "engine.implement",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "The agent writes the change in the sandbox. S comes here straight from intake."
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Implement in sandbox",
+      "kind": "phase",
+      "navigateTo": "implement",
+      "x": 1420,
+      "y": 620,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 36,
+        "y": 37,
+        "width": 249,
+        "height": 103
+      },
+      "links": null
+    },
+    {
+      "id": "docs",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "xbu038",
+        "jgyy2q"
+      ],
+      "outEdges": [],
+      "title": "Specs and plans",
+      "modelRef": "docs",
+      "shape": "storage",
+      "color": "gray",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "Spec: what \"done\" means. Plan: how we do it and how we prove it. For L, also a codebase research document."
+      },
+      "tags": [
+        "idea"
+      ],
+      "notation": "Store",
+      "technology": "files in the repo or the work item body",
+      "kind": "store",
+      "x": 760,
+      "y": 1090,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 24,
+        "y": 37,
+        "width": 273,
+        "height": 103
+      },
+      "navigateTo": null,
+      "links": null
+    },
+    {
+      "id": "engine.verify",
+      "parent": "engine",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "i360xe"
+      ],
+      "outEdges": [
+        "11vdxv3",
+        "qfp46v"
+      ],
+      "title": "5. Self-verify",
+      "modelRef": "engine.verify",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "The agent never says \"done\" until checks are green. Rounds are capped."
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Self-verification",
+      "kind": "phase",
+      "navigateTo": "verify",
+      "x": 1860,
+      "y": 620,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 21,
+        "y": 46,
+        "width": 279,
+        "height": 85
+      },
+      "links": null
+    },
+    {
+      "id": "changes",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "wyfqmo"
+      ],
+      "outEdges": [],
+      "title": "Change sets",
+      "modelRef": "changes",
+      "shape": "storage",
+      "color": "gray",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "A proposed code change on a branch, linked to its work item. Reviews and verdicts live here too."
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "PR · MR",
+      "kind": "store",
+      "x": 1420,
+      "y": 1090,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 31,
+        "y": 37,
+        "width": 258,
+        "height": 103
+      },
+      "navigateTo": null,
+      "links": null
+    },
+    {
+      "id": "engine.aiReview",
+      "parent": "engine",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "11vdxv3"
+      ],
+      "outEdges": [
+        "l0sio0"
+      ],
+      "title": "6. AI review",
+      "modelRef": "engine.aiReview",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "Reviewer agents with a fresh context check against the spec and standards. An agent approval is not a human approval."
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "AI review & autofix",
+      "kind": "phase",
+      "navigateTo": "aiReview",
+      "x": 2300,
+      "y": 620,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 19,
+        "y": 37,
+        "width": 283,
+        "height": 103
+      },
+      "links": null
+    },
+    {
+      "id": "ci",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "qfp46v"
+      ],
+      "outEdges": [],
+      "title": "Check results",
+      "modelRef": "ci",
+      "shape": "storage",
+      "color": "gray",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "Tests, lint, types, build, holdout tests, with output tied to the commit."
+      },
+      "tags": [
+        "planned"
+      ],
+      "notation": "Store",
+      "technology": "CI",
+      "kind": "store",
+      "x": 1860,
+      "y": 1090,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 20,
+        "y": 46,
+        "width": 281,
+        "height": 85
+      },
+      "navigateTo": null,
+      "links": null
+    },
+    {
+      "id": "engine.merge",
+      "parent": "engine",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "yi4o42",
+        "l0sio0"
+      ],
+      "outEdges": [
+        "1ki0gt5"
+      ],
+      "title": "7. Merge",
+      "modelRef": "engine.merge",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "By risk: R0 merges itself, R1 the Operator merges on evidence, R2 the Operator reads the code."
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Merge",
+      "kind": "phase",
+      "navigateTo": "merge",
+      "x": 2740,
+      "y": 620,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 20,
+        "y": 37,
+        "width": 282,
+        "height": 103
+      },
+      "links": null
+    },
+    {
+      "id": "engine.deploy",
+      "parent": "engine",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "7vlpoh",
+        "1ki0gt5"
+      ],
+      "outEdges": [
+        "i51uqd",
+        "1bm3z3v",
+        "en4abs"
+      ],
+      "title": "8. Deploy & watch",
+      "modelRef": "engine.deploy",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "R0 and R1 go to production right after merge, R2 on the Operator yes. A watcher compares metrics before and after."
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Release, deploy & watch",
+      "kind": "phase",
+      "navigateTo": "deploy",
+      "x": 3180,
+      "y": 620,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 17,
+        "y": 37,
+        "width": 286,
+        "height": 103
+      },
+      "links": null
+    },
+    {
+      "id": "engine.learn",
+      "parent": "engine",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "yiqrcu",
+        "i51uqd"
+      ],
+      "outEdges": [],
+      "title": "9. Learn",
+      "modelRef": "engine.learn",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "Mistakes and corrections become new work items, checks and rules."
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Learn & close the loop",
+      "kind": "phase",
+      "navigateTo": "learn",
+      "x": 3620,
+      "y": 620,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 31,
+        "y": 46,
+        "width": 259,
+        "height": 85
+      },
+      "links": null
+    },
+    {
+      "id": "releases",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1bm3z3v"
+      ],
+      "outEdges": [],
+      "title": "Deployments",
+      "modelRef": "releases",
+      "shape": "storage",
+      "color": "gray",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "Which version runs where and how the rollout ended."
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "Dokploy",
+      "kind": "store",
+      "x": 3180,
+      "y": 1090,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 29,
+        "y": 46,
+        "width": 262,
+        "height": 85
+      },
+      "navigateTo": null,
+      "links": null
+    },
+    {
+      "id": "prod",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "en4abs"
+      ],
+      "outEdges": [],
+      "title": "Production",
+      "modelRef": "prod",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "md"
+      },
+      "description": {
+        "txt": "Running services and their data."
+      },
+      "tags": [],
+      "notation": "External system",
+      "technology": "Running services",
+      "kind": "external",
+      "x": 3620,
+      "y": 1090,
+      "width": 320,
+      "height": 180,
+      "labelBBox": {
+        "x": 51,
+        "y": 55,
+        "width": 219,
+        "height": 67
+      },
+      "navigateTo": null,
+      "links": null
+    }
+  ],
+  "edges": [
+    {
+      "id": "1yqwquu",
+      "source": "operator",
+      "target": "engine.intake",
+      "label": "accepts",
+      "points": [
+        [
+          2020,
+          300
+        ],
+        [
+          1433,
+          407
+        ],
+        [
+          847,
+          513
+        ],
+        [
+          260,
+          620
+        ]
+      ],
+      "labelBBox": {
+        "x": 722,
+        "y": 502,
+        "width": 61,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1cepoiv"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 1140,
+          "y": 460
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "1l0mmr3",
+      "source": "operator",
+      "target": "engine.spec",
+      "label": "approves",
+      "points": [
+        [
+          2020,
+          300
+        ],
+        [
+          1580,
+          407
+        ],
+        [
+          1140,
+          513
+        ],
+        [
+          700,
+          620
+        ]
+      ],
+      "labelBBox": {
+        "x": 1035,
+        "y": 502,
+        "width": 70,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "istt3w"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 1360,
+          "y": 460
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "iu2rtf",
+      "source": "engine.intake",
+      "target": "engine.spec",
+      "label": "M, L",
+      "points": [
+        [
+          420,
+          710
+        ],
+        [
+          460,
+          710
+        ],
+        [
+          500,
+          710
+        ],
+        [
+          540,
+          710
+        ]
+      ],
+      "labelBBox": {
+        "x": 461,
+        "y": 676,
+        "width": 38,
+        "height": 25
+      },
+      "parent": "engine",
+      "relations": [
+        "1f21nw0"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 480,
+          "y": 710
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "1l0s5w9",
+      "source": "operator",
+      "target": "engine.plan",
+      "label": "approves",
+      "points": [
+        [
+          2020,
+          300
+        ],
+        [
+          1727,
+          407
+        ],
+        [
+          1433,
+          513
+        ],
+        [
+          1140,
+          620
+        ]
+      ],
+      "labelBBox": {
+        "x": 1351,
+        "y": 502,
+        "width": 70,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1bbutu8"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 1580,
+          "y": 460
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "115wmf0",
+      "source": "engine.spec",
+      "target": "engine.plan",
+      "label": "[...]",
+      "points": [
+        [
+          860,
+          710
+        ],
+        [
+          900,
+          710
+        ],
+        [
+          940,
+          710
+        ],
+        [
+          980,
+          710
+        ]
+      ],
+      "labelBBox": {
+        "x": 904,
+        "y": 676,
+        "width": 33,
+        "height": 25
+      },
+      "parent": "engine",
+      "relations": [
+        "14xlw30",
+        "1xn8yix"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 920,
+          "y": 710
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "tx5iwm",
+      "source": "engine.plan",
+      "target": "engine.implement",
+      "label": "plan",
+      "points": [
+        [
+          1300,
+          710
+        ],
+        [
+          1340,
+          710
+        ],
+        [
+          1380,
+          710
+        ],
+        [
+          1420,
+          710
+        ]
+      ],
+      "labelBBox": {
+        "x": 1340,
+        "y": 676,
+        "width": 40,
+        "height": 25
+      },
+      "parent": "engine",
+      "relations": [
+        "zo1vdv"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 1360,
+          "y": 710
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "i360xe",
+      "source": "engine.implement",
+      "target": "engine.verify",
+      "label": "run",
+      "points": [
+        [
+          1740,
+          710
+        ],
+        [
+          1780,
+          710
+        ],
+        [
+          1820,
+          710
+        ],
+        [
+          1860,
+          710
+        ]
+      ],
+      "labelBBox": {
+        "x": 1783,
+        "y": 676,
+        "width": 34,
+        "height": 25
+      },
+      "parent": "engine",
+      "relations": [
+        "1kzhz10"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 1800,
+          "y": 710
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "11vdxv3",
+      "source": "engine.verify",
+      "target": "engine.aiReview",
+      "label": "PR + evidence",
+      "points": [
+        [
+          2180,
+          710
+        ],
+        [
+          2220,
+          710
+        ],
+        [
+          2260,
+          710
+        ],
+        [
+          2300,
+          710
+        ]
+      ],
+      "labelBBox": {
+        "x": 2190,
+        "y": 676,
+        "width": 101,
+        "height": 25
+      },
+      "parent": "engine",
+      "relations": [
+        "19q890v"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 2240,
+          "y": 710
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "yi4o42",
+      "source": "operator",
+      "target": "engine.merge",
+      "label": "reviews evidence",
+      "points": [
+        [
+          2020,
+          300
+        ],
+        [
+          2313,
+          407
+        ],
+        [
+          2607,
+          513
+        ],
+        [
+          2900,
+          620
+        ]
+      ],
+      "labelBBox": {
+        "x": 2594,
+        "y": 502,
+        "width": 120,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "ea74k2"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 2460,
+          "y": 460
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "l0sio0",
+      "source": "engine.aiReview",
+      "target": "engine.merge",
+      "label": "[...]",
+      "points": [
+        [
+          2620,
+          710
+        ],
+        [
+          2660,
+          710
+        ],
+        [
+          2700,
+          710
+        ],
+        [
+          2740,
+          710
+        ]
+      ],
+      "labelBBox": {
+        "x": 2664,
+        "y": 676,
+        "width": 33,
+        "height": 25
+      },
+      "parent": "engine",
+      "relations": [
+        "1g50je9",
+        "1lk84e0"
+      ],
+      "color": "red",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "verdict",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 2680,
+          "y": 710
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "7vlpoh",
+      "source": "operator",
+      "target": "engine.deploy",
+      "label": "deploys",
+      "points": [
+        [
+          2020,
+          300
+        ],
+        [
+          2460,
+          407
+        ],
+        [
+          2900,
+          513
+        ],
+        [
+          3340,
+          620
+        ]
+      ],
+      "labelBBox": {
+        "x": 2939,
+        "y": 502,
+        "width": 62,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "dldi6z"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 2680,
+          "y": 460
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "1ki0gt5",
+      "source": "engine.merge",
+      "target": "engine.deploy",
+      "label": "[...]",
+      "points": [
+        [
+          3060,
+          710
+        ],
+        [
+          3100,
+          710
+        ],
+        [
+          3140,
+          710
+        ],
+        [
+          3180,
+          710
+        ]
+      ],
+      "labelBBox": {
+        "x": 3104,
+        "y": 676,
+        "width": 33,
+        "height": 25
+      },
+      "parent": "engine",
+      "relations": [
+        "11l7v56",
+        "vkryeh"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 3120,
+          "y": 710
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "yiqrcu",
+      "source": "operator",
+      "target": "engine.learn",
+      "label": "chooses",
+      "points": [
+        [
+          2020,
+          300
+        ],
+        [
+          2607,
+          407
+        ],
+        [
+          3193,
+          513
+        ],
+        [
+          3780,
+          620
+        ]
+      ],
+      "labelBBox": {
+        "x": 3255,
+        "y": 502,
+        "width": 64,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "os6lxt"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 2900,
+          "y": 460
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "i51uqd",
+      "source": "engine.deploy",
+      "target": "engine.learn",
+      "label": "rollout outcome",
+      "points": [
+        [
+          3500,
+          710
+        ],
+        [
+          3540,
+          710
+        ],
+        [
+          3580,
+          710
+        ],
+        [
+          3620,
+          710
+        ]
+      ],
+      "labelBBox": {
+        "x": 3504,
+        "y": 676,
+        "width": 112,
+        "height": 25
+      },
+      "parent": "engine",
+      "relations": [
+        "1d2d7uj"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 3560,
+          "y": 710
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "1t1hp3i",
+      "source": "engine.intake",
+      "target": "tracker",
+      "label": "work item",
+      "points": [
+        [
+          260,
+          800
+        ],
+        [
+          260,
+          897
+        ],
+        [
+          260,
+          993
+        ],
+        [
+          260,
+          1090
+        ]
+      ],
+      "labelBBox": {
+        "x": 278,
+        "y": 933,
+        "width": 75,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "vojwtj"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 260,
+          "y": 945
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "xbu038",
+      "source": "engine.spec",
+      "target": "docs",
+      "label": "spec",
+      "points": [
+        [
+          700,
+          800
+        ],
+        [
+          773,
+          897
+        ],
+        [
+          847,
+          993
+        ],
+        [
+          920,
+          1090
+        ]
+      ],
+      "labelBBox": {
+        "x": 828,
+        "y": 933,
+        "width": 42,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "p0tg4q"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 810,
+          "y": 945
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "jgyy2q",
+      "source": "engine.plan",
+      "target": "docs",
+      "label": "plan",
+      "points": [
+        [
+          1140,
+          800
+        ],
+        [
+          1067,
+          897
+        ],
+        [
+          993,
+          993
+        ],
+        [
+          920,
+          1090
+        ]
+      ],
+      "labelBBox": {
+        "x": 1048,
+        "y": 933,
+        "width": 40,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "sfstc4"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 1030,
+          "y": 945
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "wyfqmo",
+      "source": "engine.implement",
+      "target": "changes",
+      "label": "PR",
+      "points": [
+        [
+          1580,
+          800
+        ],
+        [
+          1580,
+          897
+        ],
+        [
+          1580,
+          993
+        ],
+        [
+          1580,
+          1090
+        ]
+      ],
+      "labelBBox": {
+        "x": 1598,
+        "y": 933,
+        "width": 30,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "pkfqm"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 1580,
+          "y": 945
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "qfp46v",
+      "source": "engine.verify",
+      "target": "ci",
+      "label": "results",
+      "points": [
+        [
+          2020,
+          800
+        ],
+        [
+          2020,
+          897
+        ],
+        [
+          2020,
+          993
+        ],
+        [
+          2020,
+          1090
+        ]
+      ],
+      "labelBBox": {
+        "x": 2038,
+        "y": 933,
+        "width": 55,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "uh4y3q"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 2020,
+          "y": 945
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "1bm3z3v",
+      "source": "engine.deploy",
+      "target": "releases",
+      "label": "version",
+      "points": [
+        [
+          3340,
+          800
+        ],
+        [
+          3340,
+          897
+        ],
+        [
+          3340,
+          993
+        ],
+        [
+          3340,
+          1090
+        ]
+      ],
+      "labelBBox": {
+        "x": 3358,
+        "y": 933,
+        "width": 58,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1j367r6"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 3340,
+          "y": 945
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    },
+    {
+      "id": "en4abs",
+      "source": "engine.deploy",
+      "target": "prod",
+      "label": "rollout",
+      "points": [
+        [
+          3340,
+          800
+        ],
+        [
+          3487,
+          897
+        ],
+        [
+          3633,
+          993
+        ],
+        [
+          3780,
+          1090
+        ]
+      ],
+      "labelBBox": {
+        "x": 3578,
+        "y": 933,
+        "width": 54,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1gkcr1y"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true,
+      "controlPoints": [
+        {
+          "x": 3560,
+          "y": 945
+        }
+      ],
+      "navigateTo": null,
+      "tags": null
+    }
+  ],
+  "_layout": "manual"
+}
