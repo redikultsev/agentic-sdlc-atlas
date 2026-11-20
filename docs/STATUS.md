@@ -39,6 +39,7 @@ Deck (20 slides): 1 title · 2 how to read · 3 whole pipeline · 4 what moves a
 ## Next
 
 1. Finish the walkthrough (slides 4–20) and apply corrections.
+   Then run the five-question check (decision 18) over every stage.
 2. Approve the work item states.
 3. Research and choose the engine to build the pipeline on.
 4. Deep dives: verification the agent cannot reach, catching false "done", agent rights in the sandbox, cost of human review, admitting and retiring rules by measurement.

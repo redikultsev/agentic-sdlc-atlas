@@ -37,6 +37,8 @@ views {
       engine.learn -> engine.intake,
       engine.aiReview -> changes,
       engine.implement -> docs,
+      engine.intake -> docs,
+      engine.plan -> tracker,
       engine.aiReview -> docs,
       engine.merge -> changes,
       prod -> *,

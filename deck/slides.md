@@ -92,12 +92,12 @@ layout: default
 <div class="stg">
 <div class="dg"><likec4-view view-id="intakeDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Triage</p><dl class="eg3"><dt>In</dt><dd>A request, a bug or an alert</dd><dt>Does</dt><dd>Finds duplicates, reads the related code</dd><dt>Out</dt><dd>A work item with size, risk and the reason</dd></dl></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Accept</p><dl class="eg3"><dt>In</dt><dd>The work item with size, risk and the reason</dd><dt>Does</dt><dd>The Operator accepts, corrects or cancels</dd><dt>Out</dt><dd>S → Implement; M, L → Spec</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Triage</p><dl class="eg3"><dt>In</dt><dd>A request, a bug or an alert</dd><dt>Does</dt><dd>Checks duplicates, already built, rejected before; reproduces a bug</dd><dt>Out</dt><dd>Size, risk and an outcome: for agent, for a human, needs info, won't do</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Accept</p><dl class="eg3"><dt>In</dt><dd>Size, risk and the proposed outcome</dd><dt>Does</dt><dd>The Operator accepts, corrects or rejects</dd><dt>Out</dt><dd>Agent: S → Implement, M, L → Spec; or for a human; or won't do</dd></dl></div>
 </div>
 </div>
 
-<p class="sf"><b>Work item states:</b> New → Triaged → Accepted / Cancelled &nbsp;·&nbsp; <b>The Operator decides:</b> Accept</p>
+<p class="sf"><b>Work item states:</b> New (→ NeedsInfo) → Triaged → Accepted / ForHuman / Cancelled &nbsp;·&nbsp; <b>The Operator decides:</b> Accept</p>
 
 
 ---
@@ -131,7 +131,7 @@ layout: default
 <div class="dg"><likec4-view view-id="planDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs">
   <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Codebase researcher</p><dl class="eg3"><dt>In</dt><dd>An approved L spec</dd><dt>Does</dt><dd>Reads the code only, changes nothing</dd><dt>Out</dt><dd>Research: affected modules, what must stay true</dd></dl></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Planner</p><dl class="eg3"><dt>In</dt><dd>The spec, past decisions, research (L)</dd><dt>Does</dt><dd>Splits the work into slices</dd><dt>Out</dt><dd>Plan: slices with files, dependencies, risks and a check command</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Planner</p><dl class="eg3"><dt>In</dt><dd>The spec, past decisions, research (L)</dd><dt>Does</dt><dd>Splits the work into slices</dd><dt>Out</dt><dd>Plan; one sub-issue per slice with "blocked by" links</dd></dl></div>
   <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Approve plan</p><dl class="eg3"><dt>In</dt><dd>The plan</dd><dt>Does</dt><dd>The Operator approves or edits it</dd><dt>Out</dt><dd>The work item goes to Implement</dd></dl></div>
 </div>
 </div>
@@ -272,8 +272,11 @@ Branches by size (S / M / L) and risk (R0 / R1 / R2). The "checks → review →
 stateDiagram-v2
   direction LR
   [*] --> New: signal
-  New --> Triaged: agent proposed S/M/L and R
-  Triaged --> Accepted: Operator accepts
+  New --> NeedsInfo: unclear, questions to the requester
+  NeedsInfo --> New: requester answered
+  New --> Triaged: checked, sized, outcome proposed
+  Triaged --> Accepted: Operator, for the agent
+  Triaged --> ForHuman: Operator, for a human
   Triaged --> Cancelled: "won't do"
   Accepted --> Implementing: S
   Accepted --> Clarifying: M or L
@@ -284,7 +287,7 @@ stateDiagram-v2
   Researching --> Planning
   Planning --> PlanReview
   PlanReview --> Planning: "redo"
-  PlanReview --> Implementing: approved
+  PlanReview --> Implementing: approved, slice sub-issues created
 ```
 
 <div class="small">The state lives in the tracker: a <code>state:…</code> label in GitHub, a status in Jira. At most 3 work items wait for the Operator at once. <b>Draft, awaiting approval.</b></div>
@@ -350,7 +353,9 @@ layout: default
 | 13 | Language | Everything in the project in English: model, docs, deck, research |
 | 14 | Specs and decisions store | Holds per work item spec, plan and research, and per project decision records (ADR). Interviewer and Planner read past decisions; Implementer reads the plan; AI review reads the spec |
 | 15 | Fix rounds before Blocked | At most 3 rounds of fix after red checks, then the work item is Blocked and waits for the Operator |
-| 16 | Several agents on one work item | One fresh Implementer session per slice. Slices with no dependency and no shared files run in parallel, each in its own worktree; the rest in plan order. The Orchestrator merges slice branches; a conflict goes back to the Implementer |
+| 16 | Several agents on one work item | One fresh Implementer session per slice. Each slice is a sub-issue of the work item with "blocked by" links; the Orchestrator works the frontier (slices whose blockers are done) and runs frontier slices with no shared files in parallel, each in its own worktree. It merges slice branches; a conflict goes back to the Implementer. Revised 2026-11-20: slices moved from the plan document to tracker sub-issues |
+| 17 | What Triage does before sizing | Checks duplicates, that the behaviour is not already built, and the register of rejected requests; reproduces a bug. Proposes an outcome: for the agent, for a human, needs info (questions to the requester), won't do. The Operator decides at Accept |
+| 18 | How to check the model for gaps | After the deck walkthrough, every stage answers five questions: what triggers it, what it reads and writes, what it triggers next, where a human re-enters, what stops two runs doing the same work |
 
 </div>
 

@@ -19,7 +19,7 @@ LAYOUTS = {
     'planDeck': {
         'engine.spec': (0, 0), 'operator': (0, 2),
         'engine.plan.researcher': (1, 0), 'engine.plan.planner': (1, 1), 'engine.plan.planGate': (1, 2),
-        'docs': (2, 0), 'engine.implement': (2, 2),
+        'docs': (2, 0), 'tracker': (2, 1), 'engine.implement': (2, 2),
     },
     'implementDeck': {
         'engine.orchestrator': (1, 0), 'engine.sandbox': (2, 0),

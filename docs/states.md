@@ -8,8 +8,11 @@
 stateDiagram-v2
   direction LR
   [*] --> New: signal
-  New --> Triaged: agent proposed S/M/L and R
-  Triaged --> Accepted: Operator accepts
+  New --> NeedsInfo: unclear, questions to the requester
+  NeedsInfo --> New: requester answered
+  New --> Triaged: checked, sized, outcome proposed
+  Triaged --> Accepted: Operator, for the agent
+  Triaged --> ForHuman: Operator, for a human
   Triaged --> Cancelled: "won't do"
   Accepted --> Implementing: S
   Accepted --> Clarifying: M or L
@@ -20,8 +23,10 @@ stateDiagram-v2
   Researching --> Planning
   Planning --> PlanReview
   PlanReview --> Planning: "redo"
-  PlanReview --> Implementing: approved
+  PlanReview --> Implementing: approved, slice sub-issues created
 ```
+
+Each slice is a sub-issue of the work item, linked by "blocked by". The Orchestrator works the frontier (slices whose blockers are done); the work item stays Implementing until all its slices are merged into its branch.
 
 ### Part 2. Execution: from code to production
 
@@ -49,7 +54,9 @@ stateDiagram-v2
 | State | Meaning | Who moves it on | Waits for the Operator | GitHub Issues | Jira |
 |---|---|---|---|---|---|
 | New | Signal recorded, not triaged | Triage agent | no | `state:new` | To Do |
-| Triaged | Size and risk proposed | Operator | **yes** | `state:triaged` | To Do + label |
+| NeedsInfo | Unclear; questions asked of the requester | Requester answers | no (waits for the requester) | `state:needs-info` | Waiting for info |
+| Triaged | Checked, size, risk and outcome proposed | Operator | **yes** | `state:triaged` | To Do + label |
+| ForHuman | A human does it; the pipeline only tracks it | a human | no | `state:for-human` | To Do (human) |
 | Accepted | Accepted for work | Orchestrator | no | `state:accepted` | Selected |
 | Clarifying | Questions on an underspecified item | Interviewer; Operator answers | **yes**, if there are questions | `state:clarifying` | In Progress |
 | SpecReview | Spec awaiting approval | Operator | **yes** | `state:spec-review` | In Review |

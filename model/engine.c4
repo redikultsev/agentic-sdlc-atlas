@@ -27,7 +27,7 @@ model {
   docs = store 'Specs, plans and decisions' {
     #idea
     technology 'files in the repo or the work item body'
-    description 'Per work item: the spec (what "done" means), the plan (how we do it and prove it), for L a codebase research document. Per project: decision records (ADR), so new work does not contradict old choices.'
+    description 'Per work item: the spec (what "done" means), the plan (how we do it and prove it), for L a codebase research document. Per project: decision records (ADR) and the register of rejected requests, so new work does not contradict old choices and rejected ideas are not argued twice.'
   }
   changes = store 'Change sets' {
     #built
@@ -60,7 +60,7 @@ model {
     orchestrator = platform 'Orchestrator' {
       #idea
       technology 'Orchestrator'
-      description 'Moves a work item through the stages. Code decides the next step from a JSON verdict, never from agent prose. Starts one fresh Implementer session per slice: slices with no dependency and no shared files run in parallel, each in its own worktree; the rest in plan order. Merges slice branches into the work item branch; a conflict goes back to the Implementer. Enforces the limit: at most 3 work items wait for the Operator at once. Engine not chosen yet.'
+      description 'Moves a work item through the stages. Code decides the next step from a JSON verdict, never from agent prose. Works the frontier: every slice sub-issue whose blockers are done gets a fresh Implementer session; slices on the frontier with no shared files run in parallel, each in its own worktree. Merges slice branches into the work item branch; a conflict goes back to the Implementer. Enforces the limit: at most 3 work items wait for the Operator at once. Engine not chosen yet.'
     }
     sandbox = platform 'Sandbox' {
       #idea
@@ -80,21 +80,21 @@ model {
       triage = agent 'Triage' {
         #idea
         technology 'Triage agent'
-        description 'Merges duplicates, proposes size S/M/L and risk R0/R1/R2 with a reason. Never closes anything itself.'
+        description 'Before sizing: merges duplicates, checks the behaviour is not already built and was not rejected before, reproduces a bug. Then proposes size S/M/L, risk R0/R1/R2 and an outcome with a reason. Asks the requester when the item is unclear. Never closes anything itself.'
         metadata {
           in 'A request, a bug or an alert'
-          does 'Finds duplicates, reads the related code'
-          out 'A work item with size, risk and the reason'
+          does 'Checks duplicates, already built, rejected before; reproduces a bug'
+          out 'Size, risk and an outcome: for agent, for a human, needs info, won\'t do'
         }
       }
       admit = gate 'Accept' {
         #idea
         technology 'Gate'
-        description 'The Operator sees size and risk, may correct them, and accepts the work item.'
+        description 'The Operator sees size, risk and the proposed outcome, may correct them, and decides: for the agent, for a human, or won\'t do (a rejected request goes to the register of rejected requests).'
         metadata {
-          in 'The work item with size, risk and the reason'
-          does 'The Operator accepts, corrects or cancels'
-          out 'S → Implement; M, L → Spec'
+          in 'Size, risk and the proposed outcome'
+          does 'The Operator accepts, corrects or rejects'
+          out 'Agent: S → Implement, M, L → Spec; or for a human; or won\'t do'
         }
       }
       triage -> admit 'size and risk'
@@ -144,11 +144,11 @@ model {
       planner = agent 'Planner' {
         #idea
         technology 'Planning agent'
-        description 'A plan in slices: for each slice the files, what it depends on, risks and a check command.'
+        description 'A plan in vertical slices, each fits one fresh context: files, risks, a check command. Each slice becomes a sub-issue of the work item with "blocked by" links. A wide refactor goes expand, migrate in batches, contract.'
         metadata {
           in 'The spec, past decisions, research (L)'
           does 'Splits the work into slices'
-          out 'Plan: slices with files, dependencies, risks and a check command'
+          out 'Plan; one sub-issue per slice with "blocked by" links'
         }
       }
       planGate = gate 'Approve plan' {
@@ -283,6 +283,8 @@ model {
   requester -> engine.intake.triage 'request or bug'
   operator -> engine.intake.admit 'accepts'
   engine.intake.triage -> tracker 'work item'
+  engine.intake.triage -> docs 'reads rejected requests'
+  engine.intake.triage -> requester 'questions'
   engine.intake.admit .handoff engine.spec.interviewer 'M, L'
   engine.intake.admit .handoff engine.implement.implementer 'S: straight to code'
   engine.spec.interviewer -> docs 'writes spec, reads decisions'
@@ -290,6 +292,7 @@ model {
   engine.spec.specGate .handoff engine.plan.researcher 'L'
   engine.spec.specGate .handoff engine.plan.planner 'M'
   engine.plan.planner -> docs 'reads spec, writes plan and ADR'
+  engine.plan.planner -> tracker 'slice sub-issues, blocked by'
   engine.plan.researcher -> docs 'research document'
   engine.implement.implementer .reads docs 'reads the plan'
   engine.aiReview.reviewers .reads docs 'reads the spec'
@@ -323,6 +326,7 @@ model {
 
   // ================= Cross-cutting =================
   engine.orchestrator -> engine.implement.implementer 'a session per slice'
+  engine.orchestrator -> tracker 'reads the frontier'
   engine.orchestrator -> engine.sandbox 'creates per work item'
   engine.implement.implementer -> engine.sandbox 'works inside'
   engine.orchestrator -> engine.cards 'asks the Operator'

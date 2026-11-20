@@ -57,7 +57,7 @@
       }
     ]
   },
-  "hash": "zkctCTnwz4DLVxVmplPJB7imcxs_5dGhrrff8vfoTZo",
+  "hash": "7rGk7SgIS3AN-GiYsQJ03YAd-Qtc-av39BkO-1KyoMk",
   "bounds": {
     "x": -40,
     "y": -100,
@@ -157,6 +157,7 @@
       ],
       "outEdges": [
         "1x8ps76",
+        "3l7a9x",
         "50urxi",
         "tjsbbw"
       ],
@@ -248,6 +249,7 @@
       ],
       "outEdges": [
         "mwi4h0",
+        "3l7a9x",
         "50urxi"
       ],
       "title": "Planner",
@@ -268,7 +270,7 @@
       "metadata": {
         "in": "The spec, past decisions, research (L)",
         "does": "Splits the work into slices",
-        "out": "Plan: slices with files, dependencies, risks and a check command"
+        "out": "Plan; one sub-issue per slice with \"blocked by\" links"
       },
       "notation": "Agent (LLM)",
       "technology": "Planning agent",
@@ -333,6 +335,45 @@
       }
     },
     {
+      "id": "tracker",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "3l7a9x"
+      ],
+      "outEdges": [],
+      "title": "Work items",
+      "modelRef": "tracker",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "GitHub Issues \u00b7 Jira",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 800,
+      "y": 200,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 179,
+        "y": -400,
+        "width": 144,
+        "height": 32
+      }
+    },
+    {
       "id": "docs",
       "parent": null,
       "level": 0,
@@ -366,7 +407,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 163,
+        "x": -127,
         "y": -617,
         "width": 175,
         "height": 66
@@ -443,7 +484,7 @@
       },
       "parent": null,
       "relations": [
-        "2r7c3i"
+        "1ckaq4d"
       ],
       "color": "gray",
       "line": "dashed",
@@ -481,7 +522,7 @@
       },
       "parent": null,
       "relations": [
-        "1dhn5lu"
+        "1jsphs9"
       ],
       "color": "primary",
       "line": "dashed",
@@ -520,7 +561,7 @@
       },
       "parent": null,
       "relations": [
-        "19f5o1z"
+        "y90ioc"
       ],
       "color": "primary",
       "line": "dashed",
@@ -635,7 +676,45 @@
       },
       "parent": null,
       "relations": [
-        "zv8o96"
+        "wbmxn3"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "3l7a9x",
+      "source": "engine.plan.planner",
+      "target": "tracker",
+      "label": "slice sub-issues, blocked by",
+      "points": [
+        [
+          640,
+          286
+        ],
+        [
+          720,
+          286
+        ],
+        [
+          720,
+          268
+        ],
+        [
+          800,
+          268
+        ]
+      ],
+      "labelBBox": {
+        "x": 626,
+        "y": 246,
+        "width": 188,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1r73pr"
       ],
       "color": "gray",
       "line": "dashed",
@@ -650,11 +729,11 @@
       "points": [
         [
           640,
-          268
+          250
         ],
         [
           720,
-          268
+          250
         ],
         [
           720,
@@ -667,13 +746,13 @@
       ],
       "labelBBox": {
         "x": 612,
-        "y": 146,
+        "y": 137,
         "width": 215,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "uy09vz"
+        "2gqd71"
       ],
       "color": "gray",
       "line": "dashed",
@@ -711,7 +790,7 @@
       },
       "parent": null,
       "relations": [
-        "10n5292"
+        "1nf3wa3"
       ],
       "color": "primary",
       "line": "dashed",

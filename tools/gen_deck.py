@@ -13,7 +13,7 @@ KIND = {'agent': 'agent', 'script': 'script', 'gate': 'Operator decides', 'store
 STATUS = {'built': 'built', 'planned': 'planned', 'idea': 'idea'}
 STAGES = ['intake', 'spec', 'plan', 'implement', 'verify', 'aiReview', 'merge', 'deploy', 'learn']
 STATES = {  # which task states (docs/states.md) live in each stage
-    'intake': 'New → Triaged → Accepted / Cancelled',
+    'intake': 'New (→ NeedsInfo) → Triaged → Accepted / ForHuman / Cancelled',
     'spec': 'Clarifying → SpecReview',
     'plan': 'Researching (L) → Planning → PlanReview',
     'implement': 'Implementing',

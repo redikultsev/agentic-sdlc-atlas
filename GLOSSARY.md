@@ -68,6 +68,10 @@ The agent proposes size and risk at intake; the Operator may correct them.
 | **Verdict** | The judge's decision as schema JSON: `pass`, `fix` or `block`. Code picks the next step from it |
 | **Holdout tests** | Tests the agent cannot see or edit |
 | **Slice** | A piece of the plan that can be built and checked on its own ("vertical slice"). The Planner cuts the work into slices; each one runs in a fresh Implementer session; independent slices run in parallel |
+| **Blocked by** | A link between slice sub-issues: this slice starts only after that one is done |
+| **Frontier** | The slices whose blockers are all done; they can start now, in parallel |
+| **Expand–contract** | How to do a wide refactor: add the new form beside the old, migrate callers in batches, delete the old |
+| **ADR** | Architecture decision record: what was chosen, why, what was rejected |
 | **Sandbox** | An isolated environment per work item: the agent cannot reach other files, networks or credentials |
 | **Orchestrator** | The program that moves a work item through the stages |
 | **Traces** | A record of what the agent did: calls, decisions, cost |
