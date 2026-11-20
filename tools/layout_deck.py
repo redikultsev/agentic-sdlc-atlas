@@ -26,6 +26,11 @@ LAYOUTS = {
         'engine.verify.checks': (1, 0), 'engine.verify.validator': (1, 1.5), 'engine.aiReview': (1, 3),
         'ci': (2, 0), 'docs': (2, 1), 'engine.sandbox': (2, 2), 'changes': (2, 3),
     },
+    'aiReviewDeck': {
+        'engine.verify': (0, 0), 'docs': (0, 1),
+        'engine.aiReview.reviewers': (1, 0), 'engine.aiReview.judge': (1, 1), 'engine.aiReview.explainer': (1, 2),
+        'engine.implement': (2, 0), 'changes': (2, 1), 'engine.merge': (2, 2),
+    },
     'implementDeck': {
         'engine.orchestrator': (1, 0), 'engine.sandbox': (2, 0),
         'engine.intake': (0, 1), 'engine.plan': (0, 2), 'engine.aiReview': (0, 3),

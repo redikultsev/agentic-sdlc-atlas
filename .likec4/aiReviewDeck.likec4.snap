@@ -1,0 +1,790 @@
+{
+  "_type": "element",
+  "tags": null,
+  "links": null,
+  "viewOf": "engine.aiReview",
+  "_stage": "layouted",
+  "sourcePath": "model/deck-views.c4",
+  "description": null,
+  "title": "6. AI review",
+  "id": "aiReviewDeck",
+  "autoLayout": {
+    "direction": "LR",
+    "nodeSep": 50,
+    "rankSep": 40
+  },
+  "notation": {
+    "nodes": [
+      {
+        "title": "Agent (LLM)",
+        "shape": "rectangle",
+        "color": "indigo",
+        "kinds": [
+          "agent"
+        ]
+      },
+      {
+        "title": "Pipeline stage",
+        "shape": "rectangle",
+        "color": "slate",
+        "kinds": [
+          "phase"
+        ]
+      },
+      {
+        "title": "Store",
+        "shape": "storage",
+        "color": "storecolor",
+        "kinds": [
+          "store"
+        ]
+      }
+    ]
+  },
+  "hash": "44_UezoFIGB7kPZ7AUdbmbqLSdJ0pJAGuSd5sB-7vso",
+  "bounds": {
+    "x": -40,
+    "y": -100,
+    "width": 1120,
+    "height": 715
+  },
+  "nodes": [
+    {
+      "id": "docs",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1qmkdxv"
+      ],
+      "title": "Specs, plans and decisions",
+      "modelRef": "docs",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "notation": "Store",
+      "technology": "files in the repo or the work item body",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 0,
+      "y": 200,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 32,
+        "y": 97,
+        "width": 175,
+        "height": 66
+      }
+    },
+    {
+      "id": "engine.verify",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "eeasv3"
+      ],
+      "title": "5. Self-verify",
+      "modelRef": "engine.verify",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Self-verification",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "verifyDeck",
+      "x": 0,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 40,
+        "y": -271,
+        "width": 160,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.aiReview",
+      "parent": null,
+      "level": 0,
+      "children": [
+        "engine.aiReview.reviewers",
+        "engine.aiReview.judge",
+        "engine.aiReview.explainer"
+      ],
+      "inEdges": [
+        "1qmkdxv",
+        "eeasv3"
+      ],
+      "outEdges": [
+        "hxdd7e",
+        "1fyaaw0",
+        "80ab1z",
+        "18ssn4j",
+        "uevae6"
+      ],
+      "title": "6. AI review",
+      "modelRef": "engine.aiReview",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "AI review & autofix",
+      "kind": "phase",
+      "depth": 1,
+      "isCustomized": true,
+      "navigateTo": "aiReview",
+      "x": 360,
+      "y": -60,
+      "width": 320,
+      "height": 635,
+      "labelBBox": {
+        "x": -3,
+        "y": -319,
+        "width": 74,
+        "height": 15
+      }
+    },
+    {
+      "id": "engine.aiReview.reviewers",
+      "parent": "engine.aiReview",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1qmkdxv",
+        "eeasv3"
+      ],
+      "outEdges": [
+        "n2rk4t"
+      ],
+      "title": "Reviewers",
+      "modelRef": "engine.aiReview.reviewers",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "metadata": {
+        "in": "The PR, the spec, the evidence",
+        "does": "Check correctness, security, match with the spec",
+        "out": "Findings ranked by severity"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "Review",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": 400,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 44,
+        "y": -271,
+        "width": 135,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.aiReview.judge",
+      "parent": "engine.aiReview",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "n2rk4t"
+      ],
+      "outEdges": [
+        "1d3lzsz",
+        "hxdd7e",
+        "1fyaaw0",
+        "80ab1z"
+      ],
+      "title": "Judge",
+      "modelRef": "engine.aiReview.judge",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "metadata": {
+        "in": "Findings",
+        "does": "Weighs them, drops noise",
+        "out": "Verdict: pass, fix or block"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "Verdict",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": 400,
+      "y": 200,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -271,
+        "y": -71,
+        "width": 80,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.aiReview.explainer",
+      "parent": "engine.aiReview",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1d3lzsz"
+      ],
+      "outEdges": [
+        "18ssn4j",
+        "uevae6"
+      ],
+      "title": "Change explainer",
+      "modelRef": "engine.aiReview.explainer",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "The passed PR, the spec, the evidence",
+        "does": "Explains the change by the presentation rules",
+        "out": "Explanation in the PR: before \u2192 after, why, what is not verified"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "Explanation for the Operator",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": 400,
+      "y": 400,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -659,
+        "y": 112,
+        "width": 118,
+        "height": 66
+      }
+    },
+    {
+      "id": "engine.implement",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1fyaaw0"
+      ],
+      "outEdges": [],
+      "title": "4. Implement",
+      "modelRef": "engine.implement",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Implement in sandbox",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "implementDeck",
+      "x": 800,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -283,
+        "y": -34,
+        "width": 166,
+        "height": 32
+      }
+    },
+    {
+      "id": "changes",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "hxdd7e",
+        "18ssn4j"
+      ],
+      "outEdges": [],
+      "title": "Pull requests",
+      "modelRef": "changes",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "PR \u00b7 MR",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 800,
+      "y": 200,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -710,
+        "y": 167,
+        "width": 166,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.merge",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "80ab1z",
+        "uevae6"
+      ],
+      "outEdges": [],
+      "title": "7. Merge",
+      "modelRef": "engine.merge",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Merge",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "mergeDeck",
+      "x": 800,
+      "y": 400,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -684,
+        "y": 42,
+        "width": 115,
+        "height": 32
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "1qmkdxv",
+      "source": "docs",
+      "target": "engine.aiReview.reviewers",
+      "label": "spec",
+      "points": [
+        [
+          240,
+          268
+        ],
+        [
+          320,
+          268
+        ],
+        [
+          320,
+          98
+        ],
+        [
+          400,
+          98
+        ]
+      ],
+      "labelBBox": {
+        "x": 299,
+        "y": 152,
+        "width": 42,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "15pqto2"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "eeasv3",
+      "source": "engine.verify",
+      "target": "engine.aiReview.reviewers",
+      "label": "PR + evidence",
+      "points": [
+        [
+          240,
+          68
+        ],
+        [
+          320,
+          68
+        ],
+        [
+          320,
+          38
+        ],
+        [
+          400,
+          38
+        ]
+      ],
+      "labelBBox": {
+        "x": 270,
+        "y": 22,
+        "width": 101,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1kijp0v"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "n2rk4t",
+      "source": "engine.aiReview.reviewers",
+      "target": "engine.aiReview.judge",
+      "label": "findings",
+      "points": [
+        [
+          520,
+          135
+        ],
+        [
+          520,
+          168
+        ],
+        [
+          520,
+          168
+        ],
+        [
+          520,
+          200
+        ]
+      ],
+      "labelBBox": {
+        "x": 446,
+        "y": 155,
+        "width": 62,
+        "height": 25
+      },
+      "parent": "engine.aiReview",
+      "relations": [
+        "1r54lkl"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1d3lzsz",
+      "source": "engine.aiReview.judge",
+      "target": "engine.aiReview.explainer",
+      "label": "pass, R1/R2",
+      "points": [
+        [
+          520,
+          335
+        ],
+        [
+          520,
+          368
+        ],
+        [
+          520,
+          368
+        ],
+        [
+          520,
+          400
+        ]
+      ],
+      "labelBBox": {
+        "x": 419,
+        "y": 355,
+        "width": 89,
+        "height": 25
+      },
+      "parent": "engine.aiReview",
+      "relations": [
+        "1t86tuk"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "hxdd7e",
+      "source": "engine.aiReview.judge",
+      "target": "changes",
+      "label": "verdict",
+      "points": [
+        [
+          640,
+          268
+        ],
+        [
+          720,
+          268
+        ],
+        [
+          720,
+          238
+        ],
+        [
+          800,
+          238
+        ]
+      ],
+      "labelBBox": {
+        "x": 692,
+        "y": 222,
+        "width": 56,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "bsf6m3"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1fyaaw0",
+      "source": "engine.aiReview.judge",
+      "target": "engine.implement",
+      "label": "fix",
+      "points": [
+        [
+          640,
+          214
+        ],
+        [
+          720,
+          214
+        ],
+        [
+          720,
+          68
+        ],
+        [
+          800,
+          68
+        ]
+      ],
+      "labelBBox": {
+        "x": 706,
+        "y": 110,
+        "width": 28,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1ishpvg"
+      ],
+      "color": "red",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "verdict",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "80ab1z",
+      "source": "engine.aiReview.judge",
+      "target": "engine.merge",
+      "label": "pass, R0",
+      "points": [
+        [
+          640,
+          322
+        ],
+        [
+          720,
+          322
+        ],
+        [
+          720,
+          438
+        ],
+        [
+          800,
+          438
+        ]
+      ],
+      "labelBBox": {
+        "x": 687,
+        "y": 349,
+        "width": 66,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1k3b981"
+      ],
+      "color": "red",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "verdict",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "18ssn4j",
+      "source": "engine.aiReview.explainer",
+      "target": "changes",
+      "label": "explanation",
+      "points": [
+        [
+          640,
+          438
+        ],
+        [
+          720,
+          438
+        ],
+        [
+          720,
+          298
+        ],
+        [
+          800,
+          298
+        ]
+      ],
+      "labelBBox": {
+        "x": 677,
+        "y": 337,
+        "width": 86,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "11i9ula"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "uevae6",
+      "source": "engine.aiReview.explainer",
+      "target": "engine.merge",
+      "label": "PR + explanation",
+      "points": [
+        [
+          640,
+          498
+        ],
+        [
+          720,
+          498
+        ],
+        [
+          720,
+          498
+        ],
+        [
+          800,
+          498
+        ]
+      ],
+      "labelBBox": {
+        "x": 660,
+        "y": 467,
+        "width": 119,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1r5sqvl"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    }
+  ],
+  "_layout": "manual"
+}
