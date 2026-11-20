@@ -35,7 +35,7 @@ Deck (20 slides): 1 title · 2 how to read · 3 whole pipeline · 4 what moves a
 4. `docs/states.md` is a draft the owner has not reviewed yet (slides 16–17).
 5. No target numbers for the pipeline metrics yet.
 7. How the Interviewer asks the Operator business questions (few, short, no walls of text) is not designed yet.
-6. The repository is local only; publishing needs the owner's decision and a scan for personal data.
+6. The repository is private on GitHub; making it public needs the owner's decision and a scan for personal data.
 
 ## Next
 
