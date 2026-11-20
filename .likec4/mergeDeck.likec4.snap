@@ -57,7 +57,7 @@
       }
     ]
   },
-  "hash": "tzOZhIbcFzyMEcH4fF-S1WC_TKxIacHH0b3t9pdkmzQ",
+  "hash": "zTMrCJqLR8kglrLqvrsrFCfPtfl75P0TwF9IF9xHT9U",
   "bounds": {
     "x": -40,
     "y": -100,
@@ -220,7 +220,7 @@
       "navigateTo": "merge",
       "x": 360,
       "y": -60,
-      "width": 330,
+      "width": 412,
       "height": 835,
       "labelBBox": {
         "x": -23,
@@ -441,13 +441,13 @@
       "kind": "phase",
       "isCustomized": true,
       "navigateTo": "implementDeck",
-      "x": 800,
-      "y": 300.0,
+      "x": 0,
+      "y": 600,
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -703,
-        "y": 271.0,
+        "x": -1503,
+        "y": 571,
         "width": 166,
         "height": 32
       }
@@ -508,16 +508,16 @@
         ],
         [
           320,
-          368
+          338
         ],
         [
           400,
-          368
+          338
         ]
       ],
       "labelBBox": {
         "x": 290,
-        "y": 337,
+        "y": 322,
         "width": 61,
         "height": 25
       },
@@ -653,24 +653,24 @@
       "label": "R0: rules match",
       "points": [
         [
-          525,
-          135
+          650,
+          108
         ],
         [
-          525,
-          368
+          760,
+          108
         ],
         [
-          525,
-          368
+          760,
+          627
         ],
         [
-          525,
-          600
+          650,
+          627
         ]
       ],
       "labelBBox": {
-        "x": 401,
+        "x": 744,
         "y": 355,
         "width": 112,
         "height": 25
@@ -729,25 +729,25 @@
       "label": "changes + comment",
       "points": [
         [
-          640,
-          368
+          400,
+          398
         ],
         [
-          720,
-          368
+          320,
+          398
         ],
         [
-          720,
-          338
+          320,
+          638
         ],
         [
-          800,
-          338
+          240,
+          638
         ]
       ],
       "labelBBox": {
-        "x": 650,
-        "y": 322,
+        "x": 250,
+        "y": 487,
         "width": 140,
         "height": 25
       },
@@ -769,11 +769,11 @@
       "points": [
         [
           650,
-          698
+          668
         ],
         [
           725,
-          698
+          668
         ],
         [
           725,
@@ -786,7 +786,7 @@
       ],
       "labelBBox": {
         "x": 699,
-        "y": 652,
+        "y": 637,
         "width": 52,
         "height": 25
       },
@@ -806,25 +806,25 @@
       "label": "red or conflict",
       "points": [
         [
-          650,
-          638
+          400,
+          668
         ],
         [
-          725,
-          638
+          320,
+          668
         ],
         [
-          725,
-          398
+          320,
+          698
         ],
         [
-          800,
-          398
+          240,
+          698
         ]
       ],
       "labelBBox": {
-        "x": 675,
-        "y": 487,
+        "x": 270,
+        "y": 652,
         "width": 100,
         "height": 25
       },
@@ -842,7 +842,7 @@
       "id": "ooqfow",
       "source": "engine.merge.land",
       "target": "engine.deploy",
-      "label": "[...]",
+      "label": "merged",
       "points": [
         [
           520,
@@ -862,9 +862,9 @@
         ]
       ],
       "labelBBox": {
-        "x": 475,
+        "x": 448,
         "y": 785,
-        "width": 33,
+        "width": 60,
         "height": 25
       },
       "parent": null,
@@ -876,6 +876,7 @@
       "line": "dashed",
       "head": "normal",
       "kind": "handoff",
+      "isCustomized": true,
       "isLabelCustomized": true
     }
   ],

@@ -84,6 +84,7 @@ views {
     title '7. Merge'
     include * with { description '' }
     include -> engine.merge.* ->
+    include engine.merge.land -> engine.deploy with { title 'merged' }
     style * { size small textSize xlarge }
     autoLayout LeftRight 40 50
   }

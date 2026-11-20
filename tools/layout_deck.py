@@ -38,11 +38,16 @@ LAYOUTS = {
         'engine.verify': (2, 1), 'docs': (2, 2), 'changes': (2, 3),
     },
     'mergeDeck': {
-        'engine.aiReview': (0, 0), 'operator': (0, 1.5),
+        'engine.aiReview': (0, 0), 'operator': (0, 1.5), 'engine.implement': (0, 3),
         'engine.merge.r0check': (1, 0), 'engine.merge.mergeGate': (1, 1.5), 'engine.merge.land': (1, 3),
         'engine.deploy': (1, 4.3),
-        'docs': (2, 0), 'engine.implement': (2, 1.5), 'changes': (2, 3),
+        'docs': (2, 0), 'changes': (2, 3),
     },
+}
+
+# edges that skip a block in the same column: drawn as an arc around its right side
+BYPASS = {
+    'mergeDeck': {('engine.merge.r0check', 'engine.merge.land')},
 }
 
 
@@ -72,11 +77,13 @@ def lay(view):
 
     box = lambda n: (n['x'], n['y'], n['width'], n['height'])
     # anchors: same column -> bottom to top; otherwise right side to left side
-    ends, loops = [], []
+    ends, loops, arcs = [], [], []
     for e in view['edges']:
         sx, sy, sw, sh = box(nodes[e['source']]); tx, ty, tw, th = box(nodes[e['target']])
         if e['source'] == e['target']:
             loops.append(e); continue
+        if (e['source'], e['target']) in BYPASS.get(view['id'], set()):
+            arcs.append(e); continue
         if abs((sx + sw / 2) - (tx + tw / 2)) < 50:
             down = ty > sy
             cx = (max(sx, tx) + min(sx + sw, tx + tw)) / 2  # one shared x, so the edge is straight
@@ -106,6 +113,14 @@ def lay(view):
         else:
             k = (b[0] - a[0]) * 0.5; c1, c2 = [a[0] + k, a[1]], [b[0] - k, b[1]]
         place_edge(e, a, c1, c2, b, vertical)
+    for e in arcs:  # from the lower right of the source to the upper right of the target
+        sx, sy, sw, sh = box(nodes[e['source']]); tx, ty, tw, th = box(nodes[e['target']])
+        a, b = [sx + sw, sy + sh * 0.8], [tx + tw, ty + th * 0.2]
+        place_edge(e, a, [a[0] + 110, a[1]], [b[0] + 110, b[1]], b, False, right=True)
+        for n in view['nodes']:  # keep the arc inside the container of both ends
+            kids = n.get('children') or []
+            if e['source'] in kids and e['target'] in kids:
+                n['width'] = max(n['width'], a[0] + 82 + PAD_X - n['x'])
     for e in loops:  # a loop over the top-left corner of its block
         x, y, w, h = box(nodes[e['source']])
         a, b = [x, y + h * 0.3], [x + w * 0.3, y]
@@ -120,12 +135,18 @@ def lay(view):
     print('laid out', view['id'], view['bounds'])
 
 
-def place_edge(e, a, c1, c2, b, vertical):
+def place_edge(e, a, c1, c2, b, vertical, right=False):
     e['points'] = [[round(p[0]), round(p[1])] for p in (a, c1, c2, b)]
     e.pop('controlPoints', None)
     lw = (e.get('labelBBox') or {}).get('width', 60); lh = (e.get('labelBBox') or {}).get('height', 24)
     mx, my = (a[0] + 3 * c1[0] + 3 * c2[0] + b[0]) / 8, (a[1] + 3 * c1[1] + 3 * c2[1] + b[1]) / 8
-    e['labelBBox'] = {'x': round(mx - lw - 12 if vertical else mx - lw / 2), 'y': round(my - lh / 2 - (0 if vertical else 18)), 'width': lw, 'height': lh}
+    if right:  # label to the right of an arc
+        lx, ly = mx + 12, my - lh / 2
+    elif vertical:  # label to the left of a vertical edge
+        lx, ly = mx - lw - 12, my - lh / 2
+    else:  # label above a horizontal edge
+        lx, ly = mx - lw / 2, my - lh / 2 - 18
+    e['labelBBox'] = {'x': round(lx), 'y': round(ly), 'width': lw, 'height': lh}
     e['isLabelCustomized'] = True
 
 
