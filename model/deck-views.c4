@@ -7,7 +7,7 @@ views {
     style * { size small textSize xlarge }
   }
   view storeDocs {
-    title 'Store: Specs and plans'
+    title 'Store: Specs, plans and decisions'
     include docs with { description '' }
     style * { size small textSize xlarge }
   }

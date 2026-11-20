@@ -34,7 +34,7 @@ The agent proposes size and risk at intake; the Operator may correct them.
 | Store | What it holds | Today |
 |---|---|---|
 | Work items | Number, size, risk, state. The pipeline hub | GitHub Issues · Jira |
-| Specs and plans | Spec, plan, research document | files in the repo or the work item body |
+| Specs, plans and decisions | Spec, plan, research document; decision records (ADR) | files in the repo or the work item body |
 | Change sets | PR, reviews, verdicts | PR (GitHub) · MR |
 | Check results | Test and check output tied to the commit | CI |
 | Deployments | Which version runs where and how it ended | Dokploy |

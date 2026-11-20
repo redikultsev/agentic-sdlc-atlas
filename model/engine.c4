@@ -24,10 +24,10 @@ model {
     technology 'GitHub Issues · Jira'
     description 'The hub of the pipeline. Every piece of work is a work item with a number, size (S/M/L), risk (R0/R1/R2) and state. Everything else links to its number. Each tracker plugs in through an adapter.'
   }
-  docs = store 'Specs and plans' {
+  docs = store 'Specs, plans and decisions' {
     #idea
     technology 'files in the repo or the work item body'
-    description 'Spec: what "done" means. Plan: how we do it and how we prove it. For L, also a codebase research document.'
+    description 'Per work item: the spec (what "done" means), the plan (how we do it and prove it), for L a codebase research document. Per project: decision records (ADR), so new work does not contradict old choices.'
   }
   changes = store 'Change sets' {
     #built
@@ -265,11 +265,13 @@ model {
   engine.intake.triage -> tracker 'work item'
   engine.intake.admit .handoff engine.spec.interviewer 'M, L'
   engine.intake.admit .handoff engine.implement.implementer 'S: straight to code'
-  engine.spec.interviewer -> docs 'spec'
+  engine.spec.interviewer -> docs 'writes spec, reads decisions'
   operator -> engine.spec.specGate 'approves'
   engine.spec.specGate .handoff engine.plan.researcher 'L'
   engine.spec.specGate .handoff engine.plan.planner 'M'
-  engine.plan.planner -> docs 'plan'
+  engine.plan.planner -> docs 'reads spec, writes plan and ADR'
+  engine.implement.implementer .reads docs 'reads the plan'
+  engine.aiReview.reviewers .reads docs 'reads the spec'
   operator -> engine.plan.planGate 'approves'
   engine.plan.planGate .handoff engine.implement.implementer 'plan'
   engine.implement.implementer -> changes 'PR'
