@@ -6,7 +6,7 @@
   "_stage": "layouted",
   "sourcePath": "model/deck-views.c4",
   "description": null,
-  "title": "5. Self-verify",
+  "title": "5. Checks & review",
   "id": "verifyDeck",
   "autoLayout": {
     "direction": "LR",
@@ -635,7 +635,7 @@
       },
       "parent": null,
       "relations": [
-        "17el8cy"
+        "1x9b1xw"
       ],
       "color": "red",
       "line": "dashed",
@@ -712,7 +712,7 @@
       },
       "parent": null,
       "relations": [
-        "1hjgyri"
+        "1fxtz08"
       ],
       "color": "gray",
       "line": "dashed",
@@ -750,7 +750,7 @@
       },
       "parent": null,
       "relations": [
-        "195hbsd"
+        "1fftzhr"
       ],
       "color": "red",
       "line": "dashed",

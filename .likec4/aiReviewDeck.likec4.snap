@@ -6,7 +6,7 @@
   "_stage": "layouted",
   "sourcePath": "model/deck-views.c4",
   "description": null,
-  "title": "6. AI review",
+  "title": "6. Acceptance",
   "id": "aiReviewDeck",
   "autoLayout": {
     "direction": "LR",
@@ -49,7 +49,7 @@
       }
     ]
   },
-  "hash": "pgVu_pS1bIxVU4MvvfHuy_0nv7YwvSuaXGr3yzVZUIY",
+  "hash": "L5vzuFzB2WJK7VOTkkOzPD5cTU26zyfmYcOFOkmfM0g",
   "bounds": {
     "x": -40,
     "y": -140.0,
@@ -584,7 +584,7 @@
       "id": "zdwt3k",
       "source": "engine.aiReview.validator",
       "target": "engine.merge",
-      "label": "[...]",
+      "label": "pass",
       "points": [
         [
           640,
@@ -604,19 +604,19 @@
         ]
       ],
       "labelBBox": {
-        "x": 704,
+        "x": 699,
         "y": 264,
-        "width": 33,
+        "width": 42,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "deplkm",
-        "eer6lb"
+        "1nb51hx"
       ],
-      "color": "gray",
+      "color": "primary",
       "line": "dashed",
       "head": "normal",
+      "kind": "handoff",
       "isLabelCustomized": true
     }
   ],

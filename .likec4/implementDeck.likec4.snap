@@ -49,12 +49,12 @@
       }
     ]
   },
-  "hash": "KnGNzJZSszdWitDHOPma3dnQAGbiheLSlgAdEPiCyYw",
+  "hash": "nvykcPzJIN8ZntkP7csPRsgCZ_FC473VA_iorPshv2U",
   "bounds": {
     "x": -40,
     "y": -40,
     "width": 1120,
-    "height": 815
+    "height": 1015
   },
   "nodes": [
     {
@@ -91,7 +91,7 @@
       "height": 135,
       "labelBBox": {
         "x": 832,
-        "y": 62,
+        "y": -308,
         "width": 175,
         "height": 66
       }
@@ -169,7 +169,7 @@
       "height": 135,
       "labelBBox": {
         "x": 64,
-        "y": -306,
+        "y": -676,
         "width": 111,
         "height": 32
       }
@@ -207,7 +207,7 @@
       "height": 135,
       "labelBBox": {
         "x": 74,
-        "y": -291,
+        "y": 79,
         "width": 91,
         "height": 32
       }
@@ -293,6 +293,44 @@
       }
     },
     {
+      "id": "engine.merge",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1rzi3fv"
+      ],
+      "title": "7. Merge",
+      "modelRef": "engine.merge",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Merge",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "mergeDeck",
+      "x": 0,
+      "y": 800,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 63,
+        "y": 294,
+        "width": 115,
+        "height": 32
+      }
+    },
+    {
       "id": "engine.implement",
       "parent": null,
       "level": 0,
@@ -305,7 +343,8 @@
         "1ce8fm7",
         "1mzxvnk",
         "ct709w",
-        "7syj35"
+        "7syj35",
+        "1rzi3fv"
       ],
       "outEdges": [
         "u2b9pi",
@@ -332,12 +371,12 @@
       "isCustomized": true,
       "navigateTo": "implement",
       "x": 360,
-      "y": 340,
+      "y": 440.0,
       "width": 320,
-      "height": 235,
+      "height": 235.0,
       "labelBBox": {
         "x": -56,
-        "y": -148,
+        "y": -48.0,
         "width": 81,
         "height": 15
       }
@@ -353,7 +392,8 @@
         "1ce8fm7",
         "1mzxvnk",
         "ct709w",
-        "7syj35"
+        "7syj35",
+        "1rzi3fv"
       ],
       "outEdges": [
         "u2b9pi",
@@ -385,12 +425,12 @@
       "kind": "agent",
       "isCustomized": true,
       "x": 400,
-      "y": 400,
+      "y": 500.0,
       "width": 240,
       "height": 135,
       "labelBBox": {
         "x": -14,
-        "y": -91,
+        "y": 9.0,
         "width": 160,
         "height": 32
       }
@@ -494,16 +534,16 @@
         ],
         [
           720,
-          494
+          594
         ],
         [
           640,
-          494
+          594
         ]
       ],
       "labelBBox": {
         "x": 674,
-        "y": 450,
+        "y": 500,
         "width": 91,
         "height": 25
       },
@@ -529,26 +569,26 @@
         ],
         [
           520,
-          268
+          318
         ],
         [
           520,
-          268
+          318
         ],
         [
           520,
-          400
+          500
         ]
       ],
       "labelBBox": {
         "x": 381,
-        "y": 255,
+        "y": 305,
         "width": 127,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "i0xb22"
+        "otgjxt"
       ],
       "color": "gray",
       "line": "dashed",
@@ -571,16 +611,16 @@
         ],
         [
           320,
-          414
+          514
         ],
         [
           400,
-          414
+          514
         ]
       ],
       "labelBBox": {
         "x": 257,
-        "y": 310,
+        "y": 360,
         "width": 126,
         "height": 25
       },
@@ -610,16 +650,16 @@
         ],
         [
           320,
-          468
+          550
         ],
         [
           400,
-          468
+          550
         ]
       ],
       "labelBBox": {
         "x": 300,
-        "y": 437,
+        "y": 478,
         "width": 40,
         "height": 25
       },
@@ -649,23 +689,23 @@
         ],
         [
           720,
-          440
+          540
         ],
         [
           640,
-          440
+          540
         ]
       ],
       "labelBBox": {
         "x": 704,
-        "y": 308,
+        "y": 358,
         "width": 33,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "17el8cy",
-        "195hbsd"
+        "1x9b1xw",
+        "1fftzhr"
       ],
       "color": "red",
       "line": "dashed",
@@ -689,22 +729,62 @@
         ],
         [
           320,
-          522
+          586
         ],
         [
           400,
-          522
+          586
         ]
       ],
       "labelBBox": {
         "x": 243,
-        "y": 579,
+        "y": 611,
         "width": 154,
         "height": 25
       },
       "parent": null,
       "relations": [
         "rih398"
+      ],
+      "color": "red",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "verdict",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1rzi3fv",
+      "source": "engine.merge",
+      "target": "engine.implement.implementer",
+      "label": "[...]",
+      "points": [
+        [
+          240,
+          868
+        ],
+        [
+          320,
+          868
+        ],
+        [
+          320,
+          622
+        ],
+        [
+          400,
+          622
+        ]
+      ],
+      "labelBBox": {
+        "x": 304,
+        "y": 714,
+        "width": 33,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1p3va87",
+        "sidwby"
       ],
       "color": "red",
       "line": "dashed",
@@ -720,11 +800,11 @@
       "points": [
         [
           640,
-          522
+          622
         ],
         [
           720,
-          522
+          622
         ],
         [
           720,
@@ -737,7 +817,7 @@
       ],
       "labelBBox": {
         "x": 705,
-        "y": 564,
+        "y": 614,
         "width": 30,
         "height": 25
       },
@@ -758,11 +838,11 @@
       "points": [
         [
           640,
-          414
+          514
         ],
         [
           720,
-          414
+          514
         ],
         [
           720,
@@ -775,13 +855,13 @@
       ],
       "labelBBox": {
         "x": 674,
-        "y": 210,
+        "y": 260,
         "width": 91,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1xjxe8h"
+        "12hczx3"
       ],
       "color": "gray",
       "line": "dashed",
@@ -796,11 +876,11 @@
       "points": [
         [
           640,
-          468
+          568
         ],
         [
           720,
-          468
+          568
         ],
         [
           720,
@@ -813,7 +893,7 @@
       ],
       "labelBBox": {
         "x": 667,
-        "y": 352,
+        "y": 402,
         "width": 106,
         "height": 25
       },
@@ -858,7 +938,7 @@
       },
       "parent": null,
       "relations": [
-        "1lwnydh"
+        "1bgrn2f"
       ],
       "color": "gray",
       "line": "dashed",
@@ -896,7 +976,7 @@
       },
       "parent": null,
       "relations": [
-        "1hjgyri"
+        "1fxtz08"
       ],
       "color": "gray",
       "line": "dashed",

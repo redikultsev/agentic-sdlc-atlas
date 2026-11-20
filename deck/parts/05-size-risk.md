@@ -11,7 +11,7 @@
 </div>
 <div class="sr-col">
   <h3><b>Risk</b> decides who merges and deploys</h3>
-  <div class="card"><span class="tag">R0</span><div><p class="what">Reversible, stays inside <em class="ag">agent merges and deploys</em></p><p class="eg">e.g. docs, an internal script</p></div></div>
+  <div class="card"><span class="tag">R0</span><div><p class="what">Matches the auto-merge rules <em class="ag">merges and deploys without the Operator</em></p><p class="eg">e.g. docs, tests, patch updates; never auth or payments</p></div></div>
   <div class="card"><span class="tag">R1</span><div><p class="what">Regular code behind checks <em class="op">Operator merges on evidence</em></p><p class="eg">e.g. a regular feature; deploys right away</p></div></div>
   <div class="card"><span class="tag">R2</span><div><p class="what">Irreversible or leaves the system <em class="op">Operator reads the code, deploys</em></p><p class="eg">e.g. a database migration, payments, sending email</p></div></div>
 </div>

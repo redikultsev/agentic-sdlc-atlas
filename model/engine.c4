@@ -27,7 +27,7 @@ model {
   docs = store 'Specs, plans and decisions' {
     #idea
     technology 'files in the repo or the work item body'
-    description 'Per work item: the spec (what "done" means: acceptance criteria with key examples), the plan (how we do it and prove it), for L a codebase research document. Per project: decision records (ADR) and the register of rejected requests, so new work does not contradict old choices and rejected ideas are not argued twice.'
+    description 'Per work item: the spec (what "done" means: acceptance criteria with key examples), the plan (how we do it and prove it), for L a codebase research document. Per project: decision records (ADR), the register of rejected requests and the auto-merge rules, so new work does not contradict old choices and rejected ideas are not argued twice.'
   }
   changes = store 'Pull requests' {
     #built
@@ -80,7 +80,7 @@ model {
       triage = agent 'Triage' {
         #idea
         technology 'Triage agent'
-        description 'Works out the item on its own from the request, alerts, logs and code; never asks people. Merges duplicates, checks the behaviour is not already built and was not rejected before, reproduces a bug. Where something stays unclear, picks the most likely reading and writes it down as an assumption. Proposes size S/M/L, risk R0/R1/R2 and an outcome with a reason. Never closes anything itself.'
+        description 'Works out the item on its own from the request, alerts, logs and code; never asks people. Merges duplicates, checks the behaviour is not already built and was not rejected before, reproduces a bug. Where something stays unclear, picks the most likely reading and writes it down as an assumption. Proposes size S/M/L, risk R0/R1/R2 and an outcome with a reason. R0 is only a forecast: whether a change merges without the Operator is decided at merge by the auto-merge rules. Never closes anything itself.'
         metadata {
           in 'A request, a bug or an alert'
           does 'Investigates on its own: duplicates, already built, rejected before, reproduces a bug; writes down assumptions'
@@ -227,18 +227,40 @@ model {
     // ================= 7. Merge =================
     merge = phase '7. Merge' {
       technology 'Merge'
-      description 'By risk: R0 merges itself, R1 the Operator merges on evidence, R2 the Operator reads the code.'
+      description 'A script checks the auto-merge rules: a match merges without the Operator (R0), anything else goes to the Operator\'s gate. Everything lands through a merge queue on the latest main.'
+      r0check = script 'Auto-merge rules' {
+        #idea
+        technology 'Rules file in the repo'
+        description 'Checks facts, not the agent\'s opinion: only allowed paths and change types (docs, tests, dev tools, patch updates), at most N changed lines, no new dependencies, never-zones untouched (migrations, auth, payments, CI config), all checks green, inside working hours. All true: R0, straight to the queue. Any false: the Operator\'s gate. Kill switch: when merged changes of one type are reverted more than 5% over 30 days, auto-merge for that type turns off until the Operator changes the rules.'
+        metadata {
+          in 'The PR that passed acceptance, the rules file'
+          does 'Checks paths, size, dependencies, never-zones, time'
+          out 'Match: queue (R0). No match: the Operator\'s gate'
+        }
+      }
       mergeGate = gate 'Merge?' {
         #idea
         technology 'Gate'
-        description 'R1: report with evidence. R2: plus the code.'
+        description 'The Operator sees first the scope (files outside the plan, new dependencies, size), then the explanation and the evidence; for R2 also the code. "Merge" sends the PR to the queue; "changes" with a comment sends it back to the Implementer. Changes asked by the Operator do not count toward the 3 automatic fix rounds.'
+        metadata {
+          in 'The PR: scope, explanation, evidence; for R2 the code'
+          does 'The Operator: merge or changes with a comment'
+          out 'Merge: to the queue. Changes: back to the Implementer'
+        }
       }
-      land = script 'Merge script' {
+      land = script 'Merge queue' {
         #planned
-        technology 'Merge script'
-        description 'Merges only if the PR head is unchanged, the review was on that head and CI is green. The agent never merges.'
+        technology 'Merge queue'
+        description 'Tests the PR on top of the latest main and the PRs ahead of it with the full CI, then lands it. Approvals stay valid while the PR\'s own diff is unchanged. A red build or a conflict ejects the PR back to the Implementer; after a conflict is resolved the diff changed, so checks, review and acceptance run again for what changed. The agent never merges.'
+        metadata {
+          in 'An approved PR'
+          does 'Rebuilds on the latest main, runs the full CI'
+          out 'Merged commit; or ejected with the reason'
+        }
       }
-      mergeGate -> land 'yes'
+      r0check -> land 'R0: rules match'
+      r0check -> mergeGate 'no match'
+      mergeGate -> land 'merge'
     }
 
     // ================= 8. Deploy & watch =================
@@ -312,10 +334,12 @@ model {
   engine.aiReview.validator -> changes 'evidence on the PR'
   engine.verify.reviewer .handoff engine.aiReview.validator 'pass: PR'
   engine.verify.reviewer -> changes 'findings, verdict, explanation'
-  engine.aiReview.validator .verdict engine.merge.land 'pass, R0'
-  engine.aiReview.validator .handoff engine.merge.mergeGate 'pass, R1/R2: PR + evidence + explanation'
+  engine.aiReview.validator .handoff engine.merge.r0check 'pass'
+  docs .reads engine.merge.r0check 'auto-merge rules'
+  engine.merge.mergeGate .verdict engine.implement.implementer 'changes + comment'
+  engine.merge.land .verdict engine.implement.implementer 'red or conflict'
   engine.verify.reviewer -> engine.sandbox 're-checks findings in its own'
-  operator -> engine.merge.mergeGate 'reviews evidence'
+  operator -> engine.merge.mergeGate 'decides'
   engine.merge.land -> changes 'merge'
   engine.merge.land .handoff engine.deploy.deployer 'R0, R1'
   engine.merge.land .handoff engine.deploy.prodGate 'R2'

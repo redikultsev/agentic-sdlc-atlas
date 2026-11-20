@@ -33,9 +33,15 @@ LAYOUTS = {
     },
     'implementDeck': {
         'engine.orchestrator': (1, 0), 'engine.sandbox': (2, 0),
-        'engine.intake': (0, 1), 'engine.plan': (0, 2), 'engine.aiReview': (0, 3),
-        'engine.implement.implementer': (1, 2),
+        'engine.intake': (0, 1), 'engine.plan': (0, 2), 'engine.aiReview': (0, 3), 'engine.merge': (0, 4),
+        'engine.implement.implementer': (1, 2.5),
         'engine.verify': (2, 1), 'docs': (2, 2), 'changes': (2, 3),
+    },
+    'mergeDeck': {
+        'engine.aiReview': (0, 0), 'operator': (0, 1.5),
+        'engine.merge.r0check': (1, 0), 'engine.merge.mergeGate': (1, 1.5), 'engine.merge.land': (1, 3),
+        'engine.deploy': (1, 4.3),
+        'docs': (2, 0), 'engine.implement': (2, 1.5), 'changes': (2, 3),
     },
 }
 

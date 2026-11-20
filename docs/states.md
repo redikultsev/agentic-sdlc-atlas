@@ -34,10 +34,11 @@ stateDiagram-v2
   Implementing --> Verifying: change ready
   Verifying --> Implementing: red or fix, round ≤ 3
   Verifying --> Blocked: out of rounds or block verdict
-  Verifying --> Merged: pass, R0
+  Verifying --> Merged: pass, auto-merge rules match (R0)
   Verifying --> MergeReview: pass, R1/R2
-  MergeReview --> Implementing: "changes"
+  MergeReview --> Implementing: "changes" + comment
   MergeReview --> Merged: "merge"
+  MergeReview --> Implementing: queue red or conflict
   Merged --> Live: R0/R1 right away
   Merged --> DeployReview: R2
   DeployReview --> Live: "deploy"

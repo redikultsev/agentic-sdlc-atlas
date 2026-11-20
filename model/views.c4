@@ -31,6 +31,7 @@ views {
     exclude
       engine.intake -> engine.implement,
       engine.verify -> engine.implement,
+      engine.merge -> engine.implement,
       engine.aiReview -> engine.implement,
       engine.spec -> operator,
       engine.deploy -> operator,
@@ -155,19 +156,22 @@ views {
       engine.aiReview.validator -> engine.implement.implementer 'fail: fix'
     }
     alt 'risk' {
-      when 'R0' {
-        engine.aiReview.validator -> engine.merge.land 'pass'
+      when 'R0: rules match' {
+        engine.aiReview.validator -> engine.merge.r0check 'pass'
+        engine.merge.r0check -> engine.merge.land 'match'
         engine.merge.land -> engine.deploy.deployer 'right away'
       }
       if 'R1' {
-        engine.aiReview.validator -> engine.merge.mergeGate 'pass + evidence + explanation'
-        operator -> engine.merge.mergeGate 'evidence → yes'
+        engine.aiReview.validator -> engine.merge.r0check 'pass'
+        engine.merge.r0check -> engine.merge.mergeGate 'no match'
+        operator -> engine.merge.mergeGate 'scope, evidence → merge'
         engine.merge.mergeGate -> engine.merge.land 'merge'
         engine.merge.land -> engine.deploy.deployer 'right away'
       }
       else 'R2' {
-        engine.aiReview.validator -> engine.merge.mergeGate 'pass + evidence + explanation'
-        operator -> engine.merge.mergeGate 'code → yes'
+        engine.aiReview.validator -> engine.merge.r0check 'pass'
+        engine.merge.r0check -> engine.merge.mergeGate 'no match'
+        operator -> engine.merge.mergeGate 'scope, code → merge'
         engine.merge.mergeGate -> engine.merge.land 'merge'
         engine.merge.land -> engine.deploy.prodGate 'waits'
         operator -> engine.deploy.prodGate 'deploy'

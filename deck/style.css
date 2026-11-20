@@ -67,3 +67,8 @@ details summary { cursor: pointer; color: #6b7280; font-size: 0.85rem; }
 .pcs.n4 .pc .pn { margin: 2px 0 0; font-size: 18px; }
 .pcs.n4 .eg3 { row-gap: 0; line-height: 1.25; margin-top: 2px; }
 .stg:has(.pcs.n4) { grid-template-columns: 1.2fr 1fr; }
+.stg:has(.pcs.n3) { grid-template-columns: 1.2fr 1fr; }
+.pcs.n3 { gap: 10px; }
+.pcs.n3 .pc { padding: 8px 14px; }
+.pcs.n3 .pc .pn { margin: 2px 0 0; font-size: 18px; }
+.pcs.n3 .eg3 { row-gap: 0; line-height: 1.25; margin-top: 2px; }

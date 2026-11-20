@@ -1,0 +1,883 @@
+{
+  "_type": "element",
+  "tags": null,
+  "links": null,
+  "viewOf": "engine.merge",
+  "_stage": "layouted",
+  "sourcePath": "model/deck-views.c4",
+  "description": null,
+  "title": "7. Merge",
+  "id": "mergeDeck",
+  "autoLayout": {
+    "direction": "LR",
+    "nodeSep": 50,
+    "rankSep": 40
+  },
+  "notation": {
+    "nodes": [
+      {
+        "title": "Script or check (no LLM)",
+        "shape": "component",
+        "color": "green",
+        "kinds": [
+          "script"
+        ]
+      },
+      {
+        "title": "Human",
+        "shape": "person",
+        "color": "amber",
+        "kinds": [
+          "human"
+        ]
+      },
+      {
+        "title": "Gate: the Operator decides",
+        "shape": "rectangle",
+        "color": "red",
+        "kinds": [
+          "gate"
+        ]
+      },
+      {
+        "title": "Pipeline stage",
+        "shape": "rectangle",
+        "color": "slate",
+        "kinds": [
+          "phase"
+        ]
+      },
+      {
+        "title": "Store",
+        "shape": "storage",
+        "color": "storecolor",
+        "kinds": [
+          "store"
+        ]
+      }
+    ]
+  },
+  "hash": "tzOZhIbcFzyMEcH4fF-S1WC_TKxIacHH0b3t9pdkmzQ",
+  "bounds": {
+    "x": -40,
+    "y": -100,
+    "width": 1120,
+    "height": 1135.0
+  },
+  "nodes": [
+    {
+      "id": "operator",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "15wm9oz"
+      ],
+      "title": "Operator",
+      "modelRef": "operator",
+      "shape": "person",
+      "color": "amber",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Human",
+      "technology": "Human",
+      "kind": "human",
+      "isCustomized": true,
+      "x": 0,
+      "y": 300.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -371,
+        "y": -145.0,
+        "width": 115,
+        "height": 32
+      }
+    },
+    {
+      "id": "docs",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1xcli77"
+      ],
+      "title": "Specs, plans and decisions",
+      "modelRef": "docs",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "notation": "Store",
+      "technology": "files in the repo or the work item body",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 800,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 832,
+        "y": 32,
+        "width": 175,
+        "height": 66
+      }
+    },
+    {
+      "id": "engine.aiReview",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "r3wvvu"
+      ],
+      "title": "6. Acceptance",
+      "modelRef": "engine.aiReview",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Black-box validation",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "aiReviewDeck",
+      "x": 0,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 29,
+        "y": -136,
+        "width": 181,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.merge",
+      "parent": null,
+      "level": 0,
+      "children": [
+        "engine.merge.r0check",
+        "engine.merge.mergeGate",
+        "engine.merge.land"
+      ],
+      "inEdges": [
+        "15wm9oz",
+        "1xcli77",
+        "r3wvvu"
+      ],
+      "outEdges": [
+        "1xfqtoc",
+        "1hqymem",
+        "1jyputw",
+        "ooqfow"
+      ],
+      "title": "7. Merge",
+      "modelRef": "engine.merge",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Merge",
+      "kind": "phase",
+      "depth": 1,
+      "isCustomized": true,
+      "navigateTo": "merge",
+      "x": 360,
+      "y": -60,
+      "width": 330,
+      "height": 835,
+      "labelBBox": {
+        "x": -23,
+        "y": -153,
+        "width": 57,
+        "height": 15
+      }
+    },
+    {
+      "id": "engine.merge.r0check",
+      "parent": "engine.merge",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1xcli77",
+        "r3wvvu"
+      ],
+      "outEdges": [
+        "nlkhcx",
+        "i8hz9l"
+      ],
+      "title": "Auto-merge rules",
+      "modelRef": "engine.merge.r0check",
+      "shape": "component",
+      "color": "green",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "The PR that passed acceptance, the rules file",
+        "does": "Checks paths, size, dependencies, never-zones, time",
+        "out": "Match: queue (R0). No match: the Operator's gate"
+      },
+      "notation": "Script or check (no LLM)",
+      "technology": "Rules file in the repo",
+      "kind": "script",
+      "isCustomized": true,
+      "x": 400,
+      "y": 0,
+      "width": 250,
+      "height": 135,
+      "labelBBox": {
+        "x": 21,
+        "y": -153,
+        "width": 150,
+        "height": 66
+      }
+    },
+    {
+      "id": "engine.merge.mergeGate",
+      "parent": "engine.merge",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "15wm9oz",
+        "nlkhcx"
+      ],
+      "outEdges": [
+        "1xmxqqq",
+        "1xfqtoc"
+      ],
+      "title": "Merge?",
+      "modelRef": "engine.merge.mergeGate",
+      "shape": "rectangle",
+      "color": "red",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "The PR: scope, explanation, evidence; for R2 the code",
+        "does": "The Operator: merge or changes with a comment",
+        "out": "Merge: to the queue. Changes: back to the Implementer"
+      },
+      "notation": "Gate: the Operator decides",
+      "technology": "Gate",
+      "kind": "gate",
+      "isCustomized": true,
+      "x": 400,
+      "y": 300.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -319,
+        "y": 71.0,
+        "width": 99,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.merge.land",
+      "parent": "engine.merge",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "i8hz9l",
+        "1xmxqqq"
+      ],
+      "outEdges": [
+        "1hqymem",
+        "1jyputw",
+        "ooqfow"
+      ],
+      "title": "Merge queue",
+      "modelRef": "engine.merge.land",
+      "shape": "component",
+      "color": "green",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "planned"
+      ],
+      "metadata": {
+        "in": "An approved PR",
+        "does": "Rebuilds on the latest main, runs the full CI",
+        "out": "Merged commit; or ejected with the reason"
+      },
+      "notation": "Script or check (no LLM)",
+      "technology": "Merge queue",
+      "kind": "script",
+      "isCustomized": true,
+      "x": 400,
+      "y": 600,
+      "width": 250,
+      "height": 135,
+      "labelBBox": {
+        "x": -681,
+        "y": 386,
+        "width": 169,
+        "height": 32
+      }
+    },
+    {
+      "id": "changes",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1hqymem"
+      ],
+      "outEdges": [],
+      "title": "Pull requests",
+      "modelRef": "changes",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "PR \u00b7 MR",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 800,
+      "y": 600,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -703,
+        "y": 386,
+        "width": 166,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.implement",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1xfqtoc",
+        "1jyputw"
+      ],
+      "outEdges": [],
+      "title": "4. Implement",
+      "modelRef": "engine.implement",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Implement in sandbox",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "implementDeck",
+      "x": 800,
+      "y": 300.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -703,
+        "y": 271.0,
+        "width": 166,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.deploy",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "ooqfow"
+      ],
+      "outEdges": [],
+      "title": "8. Deploy & watch",
+      "modelRef": "engine.deploy",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Release, deploy & watch",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "deployDeck",
+      "x": 400,
+      "y": 860.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -1081,
+        "y": 444.0,
+        "width": 122,
+        "height": 66
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "15wm9oz",
+      "source": "operator",
+      "target": "engine.merge.mergeGate",
+      "label": "decides",
+      "points": [
+        [
+          240,
+          368
+        ],
+        [
+          320,
+          368
+        ],
+        [
+          320,
+          368
+        ],
+        [
+          400,
+          368
+        ]
+      ],
+      "labelBBox": {
+        "x": 290,
+        "y": 337,
+        "width": 61,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "gkbmhl"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1xcli77",
+      "source": "docs",
+      "target": "engine.merge.r0check",
+      "label": "auto-merge rules",
+      "points": [
+        [
+          800,
+          68
+        ],
+        [
+          725,
+          68
+        ],
+        [
+          725,
+          68
+        ],
+        [
+          650,
+          68
+        ]
+      ],
+      "labelBBox": {
+        "x": 664,
+        "y": 37,
+        "width": 121,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "qadbvx"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "r3wvvu",
+      "source": "engine.aiReview",
+      "target": "engine.merge.r0check",
+      "label": "pass",
+      "points": [
+        [
+          240,
+          68
+        ],
+        [
+          320,
+          68
+        ],
+        [
+          320,
+          68
+        ],
+        [
+          400,
+          68
+        ]
+      ],
+      "labelBBox": {
+        "x": 299,
+        "y": 37,
+        "width": 42,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1nb51hx"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "nlkhcx",
+      "source": "engine.merge.r0check",
+      "target": "engine.merge.mergeGate",
+      "label": "no match",
+      "points": [
+        [
+          520,
+          135
+        ],
+        [
+          520,
+          218
+        ],
+        [
+          520,
+          218
+        ],
+        [
+          520,
+          300
+        ]
+      ],
+      "labelBBox": {
+        "x": 437,
+        "y": 205,
+        "width": 71,
+        "height": 25
+      },
+      "parent": "engine.merge",
+      "relations": [
+        "8pf37q"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "i8hz9l",
+      "source": "engine.merge.r0check",
+      "target": "engine.merge.land",
+      "label": "R0: rules match",
+      "points": [
+        [
+          525,
+          135
+        ],
+        [
+          525,
+          368
+        ],
+        [
+          525,
+          368
+        ],
+        [
+          525,
+          600
+        ]
+      ],
+      "labelBBox": {
+        "x": 401,
+        "y": 355,
+        "width": 112,
+        "height": 25
+      },
+      "parent": "engine.merge",
+      "relations": [
+        "18ri59l"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1xmxqqq",
+      "source": "engine.merge.mergeGate",
+      "target": "engine.merge.land",
+      "label": "merge",
+      "points": [
+        [
+          520,
+          435
+        ],
+        [
+          520,
+          518
+        ],
+        [
+          520,
+          518
+        ],
+        [
+          520,
+          600
+        ]
+      ],
+      "labelBBox": {
+        "x": 456,
+        "y": 505,
+        "width": 52,
+        "height": 25
+      },
+      "parent": "engine.merge",
+      "relations": [
+        "4xu1ok"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1xfqtoc",
+      "source": "engine.merge.mergeGate",
+      "target": "engine.implement",
+      "label": "changes + comment",
+      "points": [
+        [
+          640,
+          368
+        ],
+        [
+          720,
+          368
+        ],
+        [
+          720,
+          338
+        ],
+        [
+          800,
+          338
+        ]
+      ],
+      "labelBBox": {
+        "x": 650,
+        "y": 322,
+        "width": 140,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1p3va87"
+      ],
+      "color": "red",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "verdict",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1hqymem",
+      "source": "engine.merge.land",
+      "target": "changes",
+      "label": "merge",
+      "points": [
+        [
+          650,
+          698
+        ],
+        [
+          725,
+          698
+        ],
+        [
+          725,
+          668
+        ],
+        [
+          800,
+          668
+        ]
+      ],
+      "labelBBox": {
+        "x": 699,
+        "y": 652,
+        "width": 52,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1cykftz"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1jyputw",
+      "source": "engine.merge.land",
+      "target": "engine.implement",
+      "label": "red or conflict",
+      "points": [
+        [
+          650,
+          638
+        ],
+        [
+          725,
+          638
+        ],
+        [
+          725,
+          398
+        ],
+        [
+          800,
+          398
+        ]
+      ],
+      "labelBBox": {
+        "x": 675,
+        "y": 487,
+        "width": 100,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "sidwby"
+      ],
+      "color": "red",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "verdict",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "ooqfow",
+      "source": "engine.merge.land",
+      "target": "engine.deploy",
+      "label": "[...]",
+      "points": [
+        [
+          520,
+          735
+        ],
+        [
+          520,
+          798
+        ],
+        [
+          520,
+          798
+        ],
+        [
+          520,
+          860
+        ]
+      ],
+      "labelBBox": {
+        "x": 475,
+        "y": 785,
+        "width": 33,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "i31tqi",
+        "sajx3b"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    }
+  ],
+  "_layout": "manual"
+}
