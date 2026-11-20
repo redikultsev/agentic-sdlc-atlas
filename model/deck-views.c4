@@ -56,7 +56,7 @@ views {
     include * with { description '' }
     include -> engine.plan.* ->
     style * { size small textSize xlarge }
-    autoLayout LeftRight 40 50
+    autoLayout TopBottom 40 50
   }
   view implementDeck of engine.implement {
     title '4. Implement'

@@ -135,16 +135,31 @@ model {
         #idea
         technology 'Research'
         description 'L only: a separate read-only pass; the result is a short document on affected modules and invariants.'
+        metadata {
+          in 'An approved L spec'
+          does 'Reads the code only, changes nothing'
+          out 'Research: affected modules, what must stay true'
+        }
       }
       planner = agent 'Planner' {
         #idea
         technology 'Planning agent'
         description 'A plan in slices: files, order, risks, a check command for each slice.'
+        metadata {
+          in 'The spec, past decisions, research (L)'
+          does 'Splits the work into slices'
+          out 'Plan: per slice the files, order, risks and a check command'
+        }
       }
       planGate = gate 'Approve plan' {
         #idea
         technology 'Gate'
         description 'M and L: the main Operator gate. A wrong idea is cheaper to catch before code.'
+        metadata {
+          in 'The plan'
+          does 'The Operator approves or edits it'
+          out 'The work item goes to Implement'
+        }
       }
       researcher -> planner 'L: research document'
       planner -> planGate 'plan'
@@ -270,6 +285,7 @@ model {
   engine.spec.specGate .handoff engine.plan.researcher 'L'
   engine.spec.specGate .handoff engine.plan.planner 'M'
   engine.plan.planner -> docs 'reads spec, writes plan and ADR'
+  engine.plan.researcher -> docs 'research document'
   engine.implement.implementer .reads docs 'reads the plan'
   engine.aiReview.reviewers .reads docs 'reads the spec'
   operator -> engine.plan.planGate 'approves'
