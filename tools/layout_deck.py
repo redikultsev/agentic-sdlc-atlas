@@ -21,6 +21,12 @@ LAYOUTS = {
         'engine.plan.researcher': (1, 0), 'engine.plan.planner': (1, 1), 'engine.plan.planGate': (1, 2),
         'docs': (2, 0), 'engine.implement': (2, 2),
     },
+    'implementDeck': {
+        'engine.orchestrator': (1, 0), 'engine.sandbox': (2, 0),
+        'engine.intake': (0, 1), 'engine.plan': (0, 2), 'engine.aiReview': (0, 3),
+        'engine.implement.implementer': (1, 2),
+        'engine.verify': (2, 1), 'docs': (2, 2), 'changes': (2, 3),
+    },
 }
 
 
@@ -45,37 +51,40 @@ def lay(view):
 
     box = lambda n: (n['x'], n['y'], n['width'], n['height'])
     # anchors: same column -> bottom to top; otherwise right side to left side
-    ends = []
+    ends, loops = [], []
     for e in view['edges']:
         sx, sy, sw, sh = box(nodes[e['source']]); tx, ty, tw, th = box(nodes[e['target']])
+        if e['source'] == e['target']:
+            loops.append(e); continue
         if abs((sx + sw / 2) - (tx + tw / 2)) < 50:
-            a, b, vertical = [sx + sw / 2, sy + sh], [tx + tw / 2, ty], True
+            down = ty > sy
+            a, b, vertical = [sx + sw / 2, sy + sh if down else sy], [tx + tw / 2, ty if down else ty + th], True
         elif tx > sx:
             a, b, vertical = [sx + sw, sy + sh / 2], [tx, ty + th / 2], False
         else:
             a, b, vertical = [sx, sy + sh / 2], [tx + tw, ty + th / 2], False
         ends.append((e, a, b, vertical))
-    # spread edges that share an anchor point
-    for i in (1, 2):
-        groups = {}
-        for item in ends:
-            groups.setdefault(tuple(item[i]), []).append(item)
-        for items in groups.values():
-            if len(items) > 1:
-                for k, item in enumerate(sorted(items, key=lambda it: it[2 if i == 1 else 1][1])):
-                    off = (k - (len(items) - 1) / 2) * 36
-                    item[i][0 if item[3] else 1] += off
+    # spread edge ends that share an anchor point (incoming and outgoing alike), ordered by where the other end is
+    groups = {}
+    for e, a, b, vertical in ends:
+        groups.setdefault(tuple(a), []).append((a, b, vertical))
+        groups.setdefault(tuple(b), []).append((b, a, vertical))
+    for items in groups.values():
+        if len(items) > 1:
+            axis = lambda it: 0 if it[2] else 1
+            items.sort(key=lambda it: it[1][axis(it)])
+            for k, (pt, other, vertical) in enumerate(items):
+                pt[axis((pt, other, vertical))] += (k - (len(items) - 1) / 2) * 36
     for e, a, b, vertical in ends:
         if vertical:
             k = (b[1] - a[1]) * 0.5; c1, c2 = [a[0], a[1] + k], [b[0], b[1] - k]
         else:
             k = (b[0] - a[0]) * 0.5; c1, c2 = [a[0] + k, a[1]], [b[0] - k, b[1]]
-        e['points'] = [[round(p[0]), round(p[1])] for p in (a, c1, c2, b)]
-        e.pop('controlPoints', None)
-        lw = (e.get('labelBBox') or {}).get('width', 60); lh = (e.get('labelBBox') or {}).get('height', 24)
-        mx, my = (a[0] + 3 * c1[0] + 3 * c2[0] + b[0]) / 8, (a[1] + 3 * c1[1] + 3 * c2[1] + b[1]) / 8
-        e['labelBBox'] = {'x': round(mx - lw - 12 if vertical else mx - lw / 2), 'y': round(my - lh / 2 - (0 if vertical else 18)), 'width': lw, 'height': lh}
-        e['isLabelCustomized'] = True
+        place_edge(e, a, c1, c2, b, vertical)
+    for e in loops:  # a loop over the top-left corner of its block
+        x, y, w, h = box(nodes[e['source']])
+        a, b = [x, y + h * 0.3], [x + w * 0.3, y]
+        place_edge(e, a, [a[0] - 70, a[1]], [b[0], b[1] - 70], b, False)
 
     xs = [v for n in view['nodes'] for v in (n['x'], n['x'] + n['width'])]
     ys = [v for n in view['nodes'] for v in (n['y'], n['y'] + n['height'])]
@@ -84,6 +93,15 @@ def lay(view):
     out = root / '.likec4' / f"{view['id']}.likec4.snap"
     out.write_text(json.dumps(view, indent=2) + '\n')
     print('laid out', view['id'], view['bounds'])
+
+
+def place_edge(e, a, c1, c2, b, vertical):
+    e['points'] = [[round(p[0]), round(p[1])] for p in (a, c1, c2, b)]
+    e.pop('controlPoints', None)
+    lw = (e.get('labelBBox') or {}).get('width', 60); lh = (e.get('labelBBox') or {}).get('height', 24)
+    mx, my = (a[0] + 3 * c1[0] + 3 * c2[0] + b[0]) / 8, (a[1] + 3 * c1[1] + 3 * c2[1] + b[1]) / 8
+    e['labelBBox'] = {'x': round(mx - lw - 12 if vertical else mx - lw / 2), 'y': round(my - lh / 2 - (0 if vertical else 18)), 'width': lw, 'height': lh}
+    e['isLabelCustomized'] = True
 
 
 for vid in LAYOUTS:

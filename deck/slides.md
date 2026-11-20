@@ -150,7 +150,7 @@ layout: default
 <div class="stg">
 <div class="dg"><likec4-view view-id="implementDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Implementer</p><p class="pd">Reads the code it needs and writes one slice in a fresh context.</p></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Implementer</p><dl class="eg3"><dt>In</dt><dd>The plan (for S, the work item) and the code</dd><dt>Does</dt><dd>Slice by slice: a fresh context, writes the slice, runs its check</dd><dt>Out</dt><dd>Commits on a branch, a PR</dd></dl></div>
 </div>
 </div>
 

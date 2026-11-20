@@ -1,0 +1,865 @@
+{
+  "_type": "element",
+  "tags": null,
+  "links": null,
+  "viewOf": "engine.implement",
+  "_stage": "layouted",
+  "sourcePath": "model/deck-views.c4",
+  "description": null,
+  "title": "4. Implement",
+  "id": "implementDeck",
+  "autoLayout": {
+    "direction": "LR",
+    "nodeSep": 50,
+    "rankSep": 40
+  },
+  "notation": {
+    "nodes": [
+      {
+        "title": "Agent (LLM)",
+        "shape": "rectangle",
+        "color": "indigo",
+        "kinds": [
+          "agent"
+        ]
+      },
+      {
+        "title": "Cross-cutting part",
+        "shape": "rectangle",
+        "color": "sky",
+        "kinds": [
+          "platform"
+        ]
+      },
+      {
+        "title": "Pipeline stage",
+        "shape": "rectangle",
+        "color": "slate",
+        "kinds": [
+          "phase"
+        ]
+      },
+      {
+        "title": "Store",
+        "shape": "storage",
+        "color": "storecolor",
+        "kinds": [
+          "store"
+        ]
+      }
+    ]
+  },
+  "hash": "nY3SMioI6CYIdX2ryuZ4u-VTjoknEBgx35o0MlhvoaI",
+  "bounds": {
+    "x": -40,
+    "y": -40,
+    "width": 1120,
+    "height": 815
+  },
+  "nodes": [
+    {
+      "id": "engine.orchestrator",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1e4ekzh",
+        "f9p7ux"
+      ],
+      "title": "Orchestrator",
+      "modelRef": "engine.orchestrator",
+      "shape": "rectangle",
+      "color": "sky",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "notation": "Cross-cutting part",
+      "technology": "Orchestrator",
+      "kind": "platform",
+      "isCustomized": true,
+      "x": 400,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 440,
+        "y": 49,
+        "width": 160,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.intake",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1ce8fm7"
+      ],
+      "title": "1. Intake",
+      "modelRef": "engine.intake",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Intake & triage",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "intakeDeck",
+      "x": 0,
+      "y": 200,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 64,
+        "y": 64,
+        "width": 111,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.plan",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1mzxvnk"
+      ],
+      "title": "3. Plan",
+      "modelRef": "engine.plan",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Plan & decompose",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "planDeck",
+      "x": 0,
+      "y": 400,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 74,
+        "y": 79,
+        "width": 91,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.verify",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1shsetg"
+      ],
+      "outEdges": [
+        "ct709w"
+      ],
+      "title": "5. Self-verify",
+      "modelRef": "engine.verify",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Self-verification",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "verifyDeck",
+      "x": 800,
+      "y": 200,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -55,
+        "y": 64,
+        "width": 160,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.aiReview",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "7syj35"
+      ],
+      "title": "6. AI review",
+      "modelRef": "engine.aiReview",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "AI review & autofix",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "aiReviewDeck",
+      "x": 0,
+      "y": 600,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 45,
+        "y": 94,
+        "width": 150,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.implement",
+      "parent": null,
+      "level": 0,
+      "children": [
+        "engine.implement.implementer"
+      ],
+      "inEdges": [
+        "1e4ekzh",
+        "1ce8fm7",
+        "1mzxvnk",
+        "ct709w",
+        "7syj35"
+      ],
+      "outEdges": [
+        "1jdzo4o",
+        "u2b9pi",
+        "4d3tpa",
+        "1shsetg"
+      ],
+      "title": "4. Implement",
+      "modelRef": "engine.implement",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Implement in sandbox",
+      "kind": "phase",
+      "depth": 1,
+      "isCustomized": true,
+      "navigateTo": "implement",
+      "x": 360,
+      "y": 340,
+      "width": 320,
+      "height": 235,
+      "labelBBox": {
+        "x": -28,
+        "y": 170,
+        "width": 81,
+        "height": 15
+      }
+    },
+    {
+      "id": "engine.implement.implementer",
+      "parent": "engine.implement",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1e4ekzh",
+        "1ce8fm7",
+        "1mzxvnk",
+        "ct709w",
+        "7syj35"
+      ],
+      "outEdges": [
+        "1jdzo4o",
+        "u2b9pi",
+        "4d3tpa",
+        "1shsetg"
+      ],
+      "title": "Implementer",
+      "modelRef": "engine.implement.implementer",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "metadata": {
+        "in": "The plan (for S, the work item) and the code",
+        "does": "Slice by slice: a fresh context, writes the slice, runs its check",
+        "out": "Commits on a branch, a PR"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "Coding agent",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": 400,
+      "y": 400,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 14,
+        "y": 227,
+        "width": 160,
+        "height": 32
+      }
+    },
+    {
+      "id": "docs",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1jdzo4o"
+      ],
+      "outEdges": [],
+      "title": "Specs, plans and decisions",
+      "modelRef": "docs",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "notation": "Store",
+      "technology": "files in the repo or the work item body",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 800,
+      "y": 400,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -62,
+        "y": 62,
+        "width": 175,
+        "height": 66
+      }
+    },
+    {
+      "id": "changes",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "u2b9pi"
+      ],
+      "outEdges": [],
+      "title": "Change sets",
+      "modelRef": "changes",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "PR \u00b7 MR",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 800,
+      "y": 600,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -55,
+        "y": 94,
+        "width": 161,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.sandbox",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "4d3tpa",
+        "f9p7ux"
+      ],
+      "outEdges": [],
+      "title": "Sandbox",
+      "modelRef": "engine.sandbox",
+      "shape": "rectangle",
+      "color": "sky",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "notation": "Cross-cutting part",
+      "technology": "Sandbox",
+      "kind": "platform",
+      "isCustomized": true,
+      "x": 800,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -32,
+        "y": 49,
+        "width": 115,
+        "height": 32
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "1e4ekzh",
+      "source": "engine.orchestrator",
+      "target": "engine.implement.implementer",
+      "label": "runs in sandbox",
+      "points": [
+        [
+          520,
+          135
+        ],
+        [
+          520,
+          268
+        ],
+        [
+          520,
+          268
+        ],
+        [
+          520,
+          400
+        ]
+      ],
+      "labelBBox": {
+        "x": 396,
+        "y": 255,
+        "width": 112,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "94vr0b"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1ce8fm7",
+      "source": "engine.intake",
+      "target": "engine.implement.implementer",
+      "label": "S: straight to code",
+      "points": [
+        [
+          240,
+          268
+        ],
+        [
+          320,
+          268
+        ],
+        [
+          320,
+          432
+        ],
+        [
+          400,
+          432
+        ]
+      ],
+      "labelBBox": {
+        "x": 257,
+        "y": 319,
+        "width": 126,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "rwutej"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1mzxvnk",
+      "source": "engine.plan",
+      "target": "engine.implement.implementer",
+      "label": "plan",
+      "points": [
+        [
+          240,
+          468
+        ],
+        [
+          320,
+          468
+        ],
+        [
+          320,
+          468
+        ],
+        [
+          400,
+          468
+        ]
+      ],
+      "labelBBox": {
+        "x": 300,
+        "y": 437,
+        "width": 40,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "10n5292"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "ct709w",
+      "source": "engine.verify",
+      "target": "engine.implement.implementer",
+      "label": "red: fix, at most 2 rounds",
+      "points": [
+        [
+          800,
+          250
+        ],
+        [
+          720,
+          250
+        ],
+        [
+          720,
+          432
+        ],
+        [
+          640,
+          432
+        ]
+      ],
+      "labelBBox": {
+        "x": 636,
+        "y": 310,
+        "width": 169,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "3d471v"
+      ],
+      "color": "red",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "verdict",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "7syj35",
+      "source": "engine.aiReview",
+      "target": "engine.implement.implementer",
+      "label": "fix",
+      "points": [
+        [
+          240,
+          668
+        ],
+        [
+          320,
+          668
+        ],
+        [
+          320,
+          504
+        ],
+        [
+          400,
+          504
+        ]
+      ],
+      "labelBBox": {
+        "x": 306,
+        "y": 555,
+        "width": 28,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "r121x9"
+      ],
+      "color": "red",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "verdict",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1jdzo4o",
+      "source": "engine.implement.implementer",
+      "target": "docs",
+      "label": "reads the plan",
+      "points": [
+        [
+          640,
+          504
+        ],
+        [
+          720,
+          504
+        ],
+        [
+          720,
+          468
+        ],
+        [
+          800,
+          468
+        ]
+      ],
+      "labelBBox": {
+        "x": 669,
+        "y": 455,
+        "width": 102,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1s5vrz7"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "u2b9pi",
+      "source": "engine.implement.implementer",
+      "target": "changes",
+      "label": "PR",
+      "points": [
+        [
+          640,
+          540
+        ],
+        [
+          720,
+          540
+        ],
+        [
+          720,
+          668
+        ],
+        [
+          800,
+          668
+        ]
+      ],
+      "labelBBox": {
+        "x": 705,
+        "y": 573,
+        "width": 30,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "192rlqh"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "4d3tpa",
+      "source": "engine.implement.implementer",
+      "target": "engine.sandbox",
+      "label": "works inside",
+      "points": [
+        [
+          640,
+          396
+        ],
+        [
+          720,
+          396
+        ],
+        [
+          720,
+          86
+        ],
+        [
+          800,
+          86
+        ]
+      ],
+      "labelBBox": {
+        "x": 674,
+        "y": 210,
+        "width": 91,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "ja290x"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1shsetg",
+      "source": "engine.implement.implementer",
+      "target": "engine.verify",
+      "label": "run",
+      "points": [
+        [
+          640,
+          468
+        ],
+        [
+          720,
+          468
+        ],
+        [
+          720,
+          286
+        ],
+        [
+          800,
+          286
+        ]
+      ],
+      "labelBBox": {
+        "x": 703,
+        "y": 346,
+        "width": 34,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1uukftd"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "f9p7ux",
+      "source": "engine.orchestrator",
+      "target": "engine.sandbox",
+      "label": "creates per work item",
+      "points": [
+        [
+          640,
+          68
+        ],
+        [
+          720,
+          68
+        ],
+        [
+          720,
+          50
+        ],
+        [
+          800,
+          50
+        ]
+      ],
+      "labelBBox": {
+        "x": 646,
+        "y": 28,
+        "width": 149,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "5djfdz"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    }
+  ],
+  "_layout": "manual"
+}

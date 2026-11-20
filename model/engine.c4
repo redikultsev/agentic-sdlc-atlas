@@ -173,6 +173,11 @@ model {
         #built
         technology 'Coding agent'
         description 'Reads the code it needs and writes one slice in a fresh context.'
+        metadata {
+          in 'The plan (for S, the work item) and the code'
+          does 'Slice by slice: a fresh context, writes the slice, runs its check'
+          out 'Commits on a branch, a PR'
+        }
       }
     }
 
@@ -318,6 +323,8 @@ model {
 
   // ================= Cross-cutting =================
   engine.orchestrator -> engine.implement.implementer 'runs in sandbox'
+  engine.orchestrator -> engine.sandbox 'creates per work item'
+  engine.implement.implementer -> engine.sandbox 'works inside'
   engine.orchestrator -> engine.cards 'asks the Operator'
   engine.cards -> operator 'decision request'
   engine.orchestrator -> engine.traces 'writes'
