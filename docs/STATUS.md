@@ -4,7 +4,7 @@ Where the project stands and what comes next. Update it at the end of every work
 
 ## Now (2026-11-20)
 
-**Deck walkthrough with the owner, slide by slide.** Slides 1–14 are reviewed. Continue from slide 15 (life of one work item), 16–17 (states), 18 (cross-cutting), 19 (decisions), 20 (open questions).
+**Deck walkthrough with the owner, slide by slide.** Slides 1–14 are reviewed. The "life of one work item" slide was removed (it repeated the overview, slide 5 and the states). Continue from slides 15–16 (states), then 17 (cross-cutting), 18 (decisions), 19 (open questions).
 
 How a slide is reviewed: show it, explain in plain words what each part does, list gaps found in the model, propose before → after. When the owner doubts a design choice, run a research swarm (three or four parallel agents, each with its own angle, web through fetchira), save the synthesis to `research/atlas/research/`, then propose. After a decision: write it into the affected elements (the model is the spec), `docs/decisions.md`, glossary and states; regenerate; check in the browser at 1280×760; commit and push.
 
@@ -40,7 +40,7 @@ Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and
 1. Manual layouts: the overview (`tools/layout_index.mjs`) and the deck views in `tools/layout_deck.py` (`LAYOUTS`: plan, verify, aiReview, implement, merge, deploy; `BYPASS` draws an edge that skips a block as an arc). After a model change: `likec4 export json -o <file> .`, then `python3 tools/layout_deck.py <file>`; if a snap drifts, delete `.likec4/<view>.likec4.snap` first. The overview: if its links change, add an exclude in `views.c4` or rebuild with `node tools/layout_index.mjs`.
 2. Element ids lag behind renamed stages: `engine.verify` is "5. Checks & review", `engine.aiReview` is "6. Acceptance".
 3. PDF export of the deck with web components is not verified.
-4. `docs/states.md` is a draft the owner has not reviewed yet (slides 16–17).
+4. `docs/states.md` is a draft the owner has not reviewed yet (slides 15–16).
 5. No target numbers for the pipeline metrics yet.
 6. The repository is private on GitHub; making it public needs the owner's decision and a scan for personal data.
 7. How the Interviewer asks the Operator business questions (few, short, no walls of text) is not designed yet.
@@ -48,7 +48,7 @@ Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and
 
 ## Next
 
-1. Finish the walkthrough (slides 15–20; slide 15 needs a cleaner layout) and apply corrections.
+1. Finish the walkthrough (slides 15–19) and apply corrections.
 2. Audit the model against decisions 1–25; run the five-question check (decision 18) over every stage.
 3. Approve the work item states.
 4. Research and choose the engine to build the pipeline on.

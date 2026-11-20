@@ -81,8 +81,7 @@ out = [part('00-title'), part('02-how-to-read'),
        "---\n\n# Whole pipeline\n\n<div class=\"dg\"><likec4-view view-id=\"index\" color-scheme=\"light\" browser=\"true\" class=\"view-wide\"></likec4-view><span class=\"hint\">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>\n\n" + part('03-overview-note'),
        part('04-artifacts'), part('05-size-risk')]
 out += [stage_slide(k) for k in STAGES]
-out += ["---\n\n# Life of one work item\n\n<div class=\"dg\"><likec4-view view-id=\"task\" color-scheme=\"light\" browser=\"true\" class=\"view-wide\"></likec4-view><span class=\"hint\">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>\n\n" + part('06-task-note'),
-        *["---\n\n# Work item states\n\n**" + t + "**\n\n```mermaid {scale: 0.42}\n" + m + "```\n\n" + part('07-states-note') for t, m in blocks],
+out += [*["---\n\n# Work item states\n\n**" + t + "**\n\n```mermaid {scale: 0.42}\n" + m + "```\n\n" + part('07-states-note') for t, m in blocks],
         "---\n\n# Cross-cutting parts\n\n<div class=\"dg\"><likec4-view view-id=\"platform\" color-scheme=\"light\" browser=\"true\" class=\"view-wide\"></likec4-view><span class=\"hint\">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>\n",
         "---\nlayout: default\n---\n\n# Decisions\n\n<div class=\"small\">\n\n" + dec_tbl + "\n\n</div>\n",
         part('08-open')]

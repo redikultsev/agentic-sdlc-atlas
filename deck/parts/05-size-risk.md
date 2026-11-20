@@ -7,7 +7,7 @@
   <h3><b>Size</b> decides what is written and approved</h3>
   <div class="card"><span class="tag">S</span><div><p class="what">Small change <em class="ag">agent goes straight to code</em></p><p class="eg">e.g. fix the text of an error message</p></div></div>
   <div class="card"><span class="tag">M</span><div><p class="what">A feature in one module <em class="op">Operator approves spec and plan</em></p><p class="eg">e.g. add CSV export to a report</p></div></div>
-  <div class="card"><span class="tag">L</span><div><p class="what">Many modules <em class="op">Operator approves research, spec, plan</em></p><p class="eg">e.g. move sign-in to a new provider</p></div></div>
+  <div class="card"><span class="tag">L</span><div><p class="what">Many modules <em class="op">Operator approves spec and plan; plan built on codebase research</em></p><p class="eg">e.g. move sign-in to a new provider</p></div></div>
 </div>
 <div class="sr-col">
   <h3><b>Risk</b> decides who merges and deploys</h3>
@@ -17,4 +17,4 @@
 </div>
 </div>
 
-<p class="sr-foot">The agent proposes size and risk with a reason; the Operator corrects them on accepting the work item.</p>
+<p class="sr-foot">The Operator decides 1–2 times for S (accept; merge if R1/R2), 3–4 times for M and L (accept, spec, plan; merge if R1/R2). The agent proposes size and risk with a reason; the Operator corrects them on accepting.</p>
