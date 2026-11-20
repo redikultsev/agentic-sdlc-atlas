@@ -62,3 +62,8 @@ details summary { cursor: pointer; color: #6b7280; font-size: 0.85rem; }
 .eg3 { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; row-gap: 3px; margin: 4px 0 0; font-size: 16px; line-height: 1.35; }
 .eg3 dt { color: #64748b; font-weight: 600; }
 .eg3 dd { margin: 0; color: #1f2937; }
+.pcs.n4 { gap: 8px; }
+.pcs.n4 .pc { padding: 6px 14px; }
+.pcs.n4 .pc .pn { margin: 2px 0 0; font-size: 18px; }
+.pcs.n4 .eg3 { row-gap: 0; line-height: 1.25; margin-top: 2px; }
+.stg:has(.pcs.n4) { grid-template-columns: 1.2fr 1fr; }

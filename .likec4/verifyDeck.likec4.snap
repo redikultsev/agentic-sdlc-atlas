@@ -1,0 +1,967 @@
+{
+  "_type": "element",
+  "tags": null,
+  "links": null,
+  "viewOf": "engine.verify",
+  "_stage": "layouted",
+  "sourcePath": "model/deck-views.c4",
+  "description": null,
+  "title": "5. Self-verify",
+  "id": "verifyDeck",
+  "autoLayout": {
+    "direction": "LR",
+    "nodeSep": 50,
+    "rankSep": 40
+  },
+  "notation": {
+    "nodes": [
+      {
+        "title": "Script or check (no LLM)",
+        "shape": "component",
+        "color": "green",
+        "kinds": [
+          "script"
+        ]
+      },
+      {
+        "title": "Agent (LLM)",
+        "shape": "rectangle",
+        "color": "indigo",
+        "kinds": [
+          "agent"
+        ]
+      },
+      {
+        "title": "Cross-cutting part",
+        "shape": "rectangle",
+        "color": "sky",
+        "kinds": [
+          "platform"
+        ]
+      },
+      {
+        "title": "Pipeline stage",
+        "shape": "rectangle",
+        "color": "slate",
+        "kinds": [
+          "phase"
+        ]
+      },
+      {
+        "title": "Store",
+        "shape": "storage",
+        "color": "storecolor",
+        "kinds": [
+          "store"
+        ]
+      }
+    ]
+  },
+  "hash": "zvVPOH1yw_Dv0rfoNdI2QrehjJda1fp8mYyHZobUHlo",
+  "bounds": {
+    "x": -40,
+    "y": -100,
+    "width": 1120,
+    "height": 1135.0
+  },
+  "nodes": [
+    {
+      "id": "scenarios",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1u49t5c"
+      ],
+      "title": "Acceptance scenarios",
+      "modelRef": "scenarios",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "notation": "Store",
+      "technology": "outside the repository",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 800,
+      "y": 200,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 792,
+        "y": -605,
+        "width": 150,
+        "height": 66
+      }
+    },
+    {
+      "id": "engine.implement",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "gz7qvd",
+        "utj7lu"
+      ],
+      "outEdges": [
+        "1qavfc9"
+      ],
+      "title": "4. Implement",
+      "modelRef": "engine.implement",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Implement in sandbox",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "implementDeck",
+      "x": 0,
+      "y": 200,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -860,
+        "y": -135,
+        "width": 166,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.verify",
+      "parent": null,
+      "level": 0,
+      "children": [
+        "engine.verify.checks",
+        "engine.verify.validator",
+        "engine.verify.evidence"
+      ],
+      "inEdges": [
+        "1u49t5c",
+        "1qavfc9"
+      ],
+      "outEdges": [
+        "vuzkks",
+        "f2t5e0",
+        "gz7qvd",
+        "at7sow",
+        "utj7lu",
+        "h606r9",
+        "13ogeia"
+      ],
+      "title": "5. Self-verify",
+      "modelRef": "engine.verify",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Self-verification",
+      "kind": "phase",
+      "depth": 1,
+      "isCustomized": true,
+      "navigateTo": "verify",
+      "x": 360,
+      "y": -60,
+      "width": 330,
+      "height": 835,
+      "labelBBox": {
+        "x": 358,
+        "y": -621,
+        "width": 88,
+        "height": 15
+      }
+    },
+    {
+      "id": "engine.verify.checks",
+      "parent": "engine.verify",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1qavfc9"
+      ],
+      "outEdges": [
+        "qt1ejl",
+        "vuzkks",
+        "f2t5e0",
+        "gz7qvd"
+      ],
+      "title": "CI checks",
+      "modelRef": "engine.verify.checks",
+      "shape": "component",
+      "color": "green",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "planned"
+      ],
+      "metadata": {
+        "in": "The pushed branch",
+        "does": "Runs the full test suite, lint, types, build",
+        "out": "Green: on to the Validator. Red: fix, at most 3 rounds"
+      },
+      "notation": "Script or check (no LLM)",
+      "technology": "CI outside the sandbox",
+      "kind": "script",
+      "isCustomized": true,
+      "x": 400,
+      "y": 0,
+      "width": 250,
+      "height": 135,
+      "labelBBox": {
+        "x": 414,
+        "y": -572,
+        "width": 127,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.verify.validator",
+      "parent": "engine.verify",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1u49t5c",
+        "qt1ejl"
+      ],
+      "outEdges": [
+        "tx559j",
+        "at7sow",
+        "utj7lu"
+      ],
+      "title": "Validator",
+      "modelRef": "engine.verify.validator",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "The change after green CI, the hidden scenarios",
+        "does": "Starts the app, plays each scenario as a user",
+        "out": "Pass, or fail with the scenario that broke"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "Fresh context, own sandbox",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": 400,
+      "y": 300.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 0,
+        "y": -272.0,
+        "width": 115,
+        "height": 32
+      }
+    },
+    {
+      "id": "ci",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "vuzkks"
+      ],
+      "outEdges": [],
+      "title": "Check results",
+      "modelRef": "ci",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "planned"
+      ],
+      "notation": "Store",
+      "technology": "CI",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 800,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 370,
+        "y": 49,
+        "width": 174,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.orchestrator",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "f2t5e0"
+      ],
+      "outEdges": [],
+      "title": "Orchestrator",
+      "modelRef": "engine.orchestrator",
+      "shape": "rectangle",
+      "color": "sky",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "notation": "Cross-cutting part",
+      "technology": "Orchestrator",
+      "kind": "platform",
+      "isCustomized": true,
+      "x": 0,
+      "y": 600,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -423,
+        "y": 464,
+        "width": 160,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.verify.evidence",
+      "parent": "engine.verify",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "tx559j"
+      ],
+      "outEdges": [
+        "h606r9",
+        "13ogeia"
+      ],
+      "title": "Evidence",
+      "modelRef": "engine.verify.evidence",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "The change that passed CI and the Validator",
+        "does": "Records screenshots, video, command output",
+        "out": "Evidence attached to the PR"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "Evidence",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": 400,
+      "y": 600,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -436,
+        "y": 28,
+        "width": 119,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.sandbox",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "at7sow"
+      ],
+      "outEdges": [],
+      "title": "Sandbox",
+      "modelRef": "engine.sandbox",
+      "shape": "rectangle",
+      "color": "sky",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "notation": "Cross-cutting part",
+      "technology": "Sandbox",
+      "kind": "platform",
+      "isCustomized": true,
+      "x": 800,
+      "y": 400,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -34,
+        "y": -388,
+        "width": 115,
+        "height": 32
+      }
+    },
+    {
+      "id": "changes",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "h606r9"
+      ],
+      "outEdges": [],
+      "title": "Change sets",
+      "modelRef": "changes",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "PR \u00b7 MR",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 800,
+      "y": 600,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -498,
+        "y": 213,
+        "width": 161,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.aiReview",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "13ogeia"
+      ],
+      "outEdges": [],
+      "title": "6. AI review",
+      "modelRef": "engine.aiReview",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "AI review & autofix",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "aiReviewDeck",
+      "x": 400,
+      "y": 860.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -893,
+        "y": 288.0,
+        "width": 150,
+        "height": 32
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "1u49t5c",
+      "source": "scenarios",
+      "target": "engine.verify.validator",
+      "label": "hidden scenarios",
+      "points": [
+        [
+          800,
+          268
+        ],
+        [
+          720,
+          268
+        ],
+        [
+          720,
+          350
+        ],
+        [
+          640,
+          350
+        ]
+      ],
+      "labelBBox": {
+        "x": 660,
+        "y": 278,
+        "width": 119,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1yiwc6o"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1qavfc9",
+      "source": "engine.implement",
+      "target": "engine.verify.checks",
+      "label": "pushed branch",
+      "points": [
+        [
+          240,
+          232
+        ],
+        [
+          320,
+          232
+        ],
+        [
+          320,
+          32
+        ],
+        [
+          400,
+          32
+        ]
+      ],
+      "labelBBox": {
+        "x": 267,
+        "y": 101,
+        "width": 106,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "8la1bl"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "qt1ejl",
+      "source": "engine.verify.checks",
+      "target": "engine.verify.validator",
+      "label": "green",
+      "points": [
+        [
+          525,
+          135
+        ],
+        [
+          525,
+          218
+        ],
+        [
+          520,
+          218
+        ],
+        [
+          520,
+          300
+        ]
+      ],
+      "labelBBox": {
+        "x": 462,
+        "y": 205,
+        "width": 48,
+        "height": 25
+      },
+      "parent": "engine.verify",
+      "relations": [
+        "18pqr4w"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "tx559j",
+      "source": "engine.verify.validator",
+      "target": "engine.verify.evidence",
+      "label": "pass",
+      "points": [
+        [
+          520,
+          435
+        ],
+        [
+          520,
+          518
+        ],
+        [
+          520,
+          518
+        ],
+        [
+          520,
+          600
+        ]
+      ],
+      "labelBBox": {
+        "x": 466,
+        "y": 505,
+        "width": 42,
+        "height": 25
+      },
+      "parent": "engine.verify",
+      "relations": [
+        "1952bwh"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "vuzkks",
+      "source": "engine.verify.checks",
+      "target": "ci",
+      "label": "results",
+      "points": [
+        [
+          650,
+          68
+        ],
+        [
+          725,
+          68
+        ],
+        [
+          725,
+          68
+        ],
+        [
+          800,
+          68
+        ]
+      ],
+      "labelBBox": {
+        "x": 698,
+        "y": 37,
+        "width": 55,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1yp0ef7"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "f2t5e0",
+      "source": "engine.verify.checks",
+      "target": "engine.orchestrator",
+      "label": "red after 3 rounds",
+      "points": [
+        [
+          400,
+          104
+        ],
+        [
+          320,
+          104
+        ],
+        [
+          320,
+          668
+        ],
+        [
+          240,
+          668
+        ]
+      ],
+      "labelBBox": {
+        "x": 258,
+        "y": 355,
+        "width": 125,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "2nwjz9"
+      ],
+      "color": "red",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "verdict",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "gz7qvd",
+      "source": "engine.verify.checks",
+      "target": "engine.implement",
+      "label": "red: fix, at most 3 rounds",
+      "points": [
+        [
+          400,
+          68
+        ],
+        [
+          320,
+          68
+        ],
+        [
+          320,
+          268
+        ],
+        [
+          240,
+          268
+        ]
+      ],
+      "labelBBox": {
+        "x": 236,
+        "y": 137,
+        "width": 169,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1a4cra"
+      ],
+      "color": "red",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "verdict",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "at7sow",
+      "source": "engine.verify.validator",
+      "target": "engine.sandbox",
+      "label": "runs the app in its own",
+      "points": [
+        [
+          640,
+          386
+        ],
+        [
+          720,
+          386
+        ],
+        [
+          720,
+          468
+        ],
+        [
+          800,
+          468
+        ]
+      ],
+      "labelBBox": {
+        "x": 643,
+        "y": 396,
+        "width": 154,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "2wpzhr"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "utj7lu",
+      "source": "engine.verify.validator",
+      "target": "engine.implement",
+      "label": "fail: fix, same 3 rounds",
+      "points": [
+        [
+          400,
+          368
+        ],
+        [
+          320,
+          368
+        ],
+        [
+          320,
+          304
+        ],
+        [
+          240,
+          304
+        ]
+      ],
+      "labelBBox": {
+        "x": 243,
+        "y": 305,
+        "width": 154,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "uz2rxx"
+      ],
+      "color": "red",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "verdict",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "h606r9",
+      "source": "engine.verify.evidence",
+      "target": "changes",
+      "label": "evidence on the PR",
+      "points": [
+        [
+          640,
+          668
+        ],
+        [
+          720,
+          668
+        ],
+        [
+          720,
+          668
+        ],
+        [
+          800,
+          668
+        ]
+      ],
+      "labelBBox": {
+        "x": 654,
+        "y": 637,
+        "width": 133,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1kdy0e3"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "13ogeia",
+      "source": "engine.verify.evidence",
+      "target": "engine.aiReview",
+      "label": "PR + evidence",
+      "points": [
+        [
+          520,
+          735
+        ],
+        [
+          520,
+          798
+        ],
+        [
+          520,
+          798
+        ],
+        [
+          520,
+          860
+        ]
+      ],
+      "labelBBox": {
+        "x": 407,
+        "y": 785,
+        "width": 101,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "i358cu"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    }
+  ],
+  "_layout": "manual"
+}

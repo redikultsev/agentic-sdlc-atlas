@@ -49,7 +49,7 @@
       }
     ]
   },
-  "hash": "X48UC5RbEGtwho5Q-tOTkNaq432wYACPNykKqym33LM",
+  "hash": "Eb5w_woc_8RWE_2gNPc8UPZODgPjtdWCuhaCO4uRyZ4",
   "bounds": {
     "x": -40,
     "y": -40,
@@ -91,7 +91,7 @@
       "height": 135,
       "labelBBox": {
         "x": 832,
-        "y": 247,
+        "y": -142,
         "width": 175,
         "height": 66
       }
@@ -131,7 +131,7 @@
       "height": 135,
       "labelBBox": {
         "x": 440,
-        "y": 49,
+        "y": -155,
         "width": 160,
         "height": 32
       }
@@ -169,7 +169,7 @@
       "height": 135,
       "labelBBox": {
         "x": 64,
-        "y": -121,
+        "y": -510,
         "width": 111,
         "height": 32
       }
@@ -207,7 +207,7 @@
       "height": 135,
       "labelBBox": {
         "x": 74,
-        "y": -106,
+        "y": -495,
         "width": 91,
         "height": 32
       }
@@ -221,7 +221,8 @@
         "1shsetg"
       ],
       "outEdges": [
-        "ct709w"
+        "ct709w",
+        "rn1qz4"
       ],
       "title": "5. Self-verify",
       "modelRef": "engine.verify",
@@ -246,8 +247,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 22,
-        "y": -41,
+        "x": 413,
+        "y": 249,
         "width": 160,
         "height": 32
       }
@@ -285,7 +286,7 @@
       "height": 135,
       "labelBBox": {
         "x": 45,
-        "y": -91,
+        "y": 260,
         "width": 150,
         "height": 32
       }
@@ -335,7 +336,7 @@
       "height": 235,
       "labelBBox": {
         "x": -29,
-        "y": 22,
+        "y": -15,
         "width": 81,
         "height": 15
       }
@@ -374,9 +375,9 @@
         "built"
       ],
       "metadata": {
-        "in": "The plan (for S, the work item) and the code",
-        "does": "One slice per fresh session, writes it, runs its check; independent slices in parallel",
-        "out": "Commits on a branch, a PR"
+        "in": "A slice of the plan (for S, the work item) and the code",
+        "does": "Unit tests first, then code; fast checks in the sandbox",
+        "out": "A pushed branch, a PR"
       },
       "notation": "Agent (LLM)",
       "technology": "Coding agent",
@@ -388,7 +389,7 @@
       "height": 135,
       "labelBBox": {
         "x": 13,
-        "y": 79,
+        "y": 42,
         "width": 160,
         "height": 32
       }
@@ -426,8 +427,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 22,
-        "y": 174,
+        "x": -41,
+        "y": 242,
         "width": 161,
         "height": 32
       }
@@ -439,7 +440,8 @@
       "children": [],
       "inEdges": [
         "4d3tpa",
-        "f9p7ux"
+        "f9p7ux",
+        "rn1qz4"
       ],
       "outEdges": [],
       "title": "Sandbox",
@@ -466,8 +468,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 45,
-        "y": -10,
+        "x": -18,
+        "y": -155,
         "width": 115,
         "height": 32
       }
@@ -505,7 +507,7 @@
       },
       "parent": null,
       "relations": [
-        "1yg9zhk"
+        "qf02pt"
       ],
       "color": "gray",
       "line": "dotted",
@@ -544,7 +546,7 @@
       },
       "parent": null,
       "relations": [
-        "1ichvww"
+        "1b47i5v"
       ],
       "color": "gray",
       "line": "dashed",
@@ -582,7 +584,7 @@
       },
       "parent": null,
       "relations": [
-        "17zkbrt"
+        "1j0aqly"
       ],
       "color": "primary",
       "line": "dashed",
@@ -621,7 +623,7 @@
       },
       "parent": null,
       "relations": [
-        "1urfwcg"
+        "hjtnd2"
       ],
       "color": "primary",
       "line": "dashed",
@@ -660,8 +662,8 @@
       },
       "parent": null,
       "relations": [
-        "1ryef5w",
-        "1br0wyd"
+        "uz2rxx",
+        "1a4cra"
       ],
       "color": "red",
       "line": "dashed",
@@ -700,7 +702,7 @@
       },
       "parent": null,
       "relations": [
-        "5kjl25"
+        "1bra7xs"
       ],
       "color": "red",
       "line": "dashed",
@@ -739,7 +741,7 @@
       },
       "parent": null,
       "relations": [
-        "5ge3l9"
+        "1vsxe97"
       ],
       "color": "gray",
       "line": "dashed",
@@ -777,7 +779,7 @@
       },
       "parent": null,
       "relations": [
-        "km4e6o"
+        "1a9o3md"
       ],
       "color": "gray",
       "line": "dashed",
@@ -788,7 +790,7 @@
       "id": "1shsetg",
       "source": "engine.implement.implementer",
       "target": "engine.verify",
-      "label": "run",
+      "label": "pushed branch",
       "points": [
         [
           640,
@@ -808,14 +810,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 703,
+        "x": 667,
         "y": 346,
-        "width": 34,
+        "width": 106,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "atqkab"
+        "8la1bl"
       ],
       "color": "primary",
       "line": "dashed",
@@ -854,7 +856,45 @@
       },
       "parent": null,
       "relations": [
-        "zel0di"
+        "1rqyo8x"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "rn1qz4",
+      "source": "engine.verify",
+      "target": "engine.sandbox",
+      "label": "runs the app in its own",
+      "points": [
+        [
+          920,
+          200
+        ],
+        [
+          920,
+          168
+        ],
+        [
+          920,
+          168
+        ],
+        [
+          920,
+          135
+        ]
+      ],
+      "labelBBox": {
+        "x": 754,
+        "y": 155,
+        "width": 154,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "2wpzhr"
       ],
       "color": "gray",
       "line": "dashed",

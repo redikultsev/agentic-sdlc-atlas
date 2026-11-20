@@ -14,7 +14,7 @@ STATUS = {'built': 'built', 'planned': 'planned', 'idea': 'idea'}
 STAGES = ['intake', 'spec', 'plan', 'implement', 'verify', 'aiReview', 'merge', 'deploy', 'learn']
 STATES = {  # which task states (docs/states.md) live in each stage
     'intake': 'New → Triaged → Accepted / ForHuman / Cancelled',
-    'spec': 'Clarifying → SpecReview → (holdout tests written)',
+    'spec': 'Clarifying → SpecReview',
     'plan': 'Researching (L) → Planning → PlanReview',
     'implement': 'Implementing',
     'verify': 'Verifying (round ≤ 3, else Blocked)',
@@ -62,7 +62,7 @@ layout: default
 
 <div class="stg">
 <div class="dg"><likec4-view view-id="{key}Deck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-<div class="pcs">
+<div class="pcs n{len(kids)}">
 {cards}
 </div>
 </div>

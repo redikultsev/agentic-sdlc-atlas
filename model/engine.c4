@@ -34,10 +34,15 @@ model {
     technology 'PR · MR'
     description 'A proposed code change on a branch, linked to its work item. Reviews and verdicts live here too.'
   }
+  scenarios = store 'Acceptance scenarios' {
+    #idea
+    technology 'outside the repository'
+    description 'End-to-end scenarios per work item, written from the spec before any code. The Implementer has no access; only the Validator reads them.'
+  }
   ci = store 'Check results' {
     #planned
     technology 'CI'
-    description 'Check output tied to the commit: tests, lint, types, build, holdout tests. Also keeps the holdout tests themselves, where the Implementer cannot read them.'
+    description 'Output of the CI run outside the sandbox: tests, lint, types, build, tied to the commit.'
   }
   releases = store 'Deployments' {
     #built
@@ -60,12 +65,12 @@ model {
     orchestrator = platform 'Orchestrator' {
       #idea
       technology 'Orchestrator'
-      description 'Moves a work item through the stages. Code decides the next step from a JSON verdict, never from agent prose. Works the frontier: every slice sub-issue whose blockers are done gets a fresh Implementer session; slices on the frontier with no shared files run in parallel, each in its own worktree. Merges slice branches into the work item branch; a conflict goes back to the Implementer. Enforces the limit: at most 3 work items wait for the Operator at once. Engine not chosen yet.'
+      description 'Moves a work item through the stages. Code decides the next step from a JSON verdict, never from agent prose. Works the frontier: every slice sub-issue whose blockers are done gets a fresh Implementer session; slices on the frontier with no shared files run in parallel, each in its own sandbox. Merges slice branches into the work item branch; a conflict goes back to the Implementer. Enforces the limit: at most 3 work items wait for the Operator at once. Engine not chosen yet.'
     }
     sandbox = platform 'Sandbox' {
       #idea
       technology 'Sandbox'
-      description 'A disposable isolated environment per work item, a worktree per parallel slice: full toolchain, narrow rights, no credentials that can merge.'
+      description 'A disposable isolated machine per agent session: one per slice (parallel slices get separate sandboxes), one for the Validator. Everything that changes or runs code runs inside. Network closed by default; push only through a proxy to one branch; no credentials that can merge.'
     }
     traces = platform 'Session traces' {
       #idea
@@ -103,7 +108,7 @@ model {
     // ================= 2. Spec =================
     spec = phase '2. Spec' {
       technology 'Specification'
-      description 'M and L only. The agent clarifies and writes what "done" means; a second agent turns it into hidden tests.'
+      description 'M and L only. The agent clarifies and writes what "done" means.'
       interviewer = agent 'Interviewer' {
         #idea
         technology 'Clarify'
@@ -124,24 +129,23 @@ model {
           out 'M → Plan; L → codebase research'
         }
       }
-      testWriter = agent 'Test writer' {
-        #idea
-        technology 'Holdout tests'
-        description 'Turns the acceptance criteria of the spec into holdout tests, right after the spec is approved, in parallel with planning. The tests go to CI only, so the Implementer cannot see or fit the code to them.'
-        metadata {
-          in 'The approved spec'
-          does 'Writes tests from the acceptance criteria'
-          out 'Holdout tests, hidden from the Implementer'
-        }
-      }
       interviewer -> specGate 'spec'
-      specGate -> testWriter 'approved spec'
     }
 
     // ================= 3. Plan =================
     plan = phase '3. Plan' {
       technology 'Plan & decompose'
       description 'M and L only. How we do it, in slices, and how we prove it is done.'
+      scenarioWriter = agent 'Scenario writer' {
+        #idea
+        technology 'Acceptance scenarios'
+        description 'Turns the acceptance criteria of the spec into end-to-end scenarios: what a user does and sees. Works in parallel with the Planner, never sees or changes code. Scenarios are kept outside the repository, so the Implementer cannot fit the code to them (a holdout set).'
+        metadata {
+          in 'The approved spec: acceptance criteria'
+          does 'Writes user-level scenarios, no code'
+          out 'Hidden acceptance scenarios'
+        }
+      }
       researcher = agent 'Codebase researcher' {
         #idea
         technology 'Research'
@@ -183,11 +187,11 @@ model {
       implementer = agent 'Implementer' {
         #built
         technology 'Coding agent'
-        description 'Reads the code it needs and writes one slice in a fresh context.'
+        description 'The only agent that changes code. One slice per fresh session in its own sandbox: writes the unit tests first, then the code, runs the fast checks there. Pushes only through the proxy to its branch.'
         metadata {
-          in 'The plan (for S, the work item) and the code'
-          does 'One slice per fresh session, writes it, runs its check; independent slices in parallel'
-          out 'Commits on a branch, a PR'
+          in 'A slice of the plan (for S, the work item) and the code'
+          does 'Unit tests first, then code; fast checks in the sandbox'
+          out 'A pushed branch, a PR'
         }
       }
     }
@@ -195,25 +199,25 @@ model {
     // ================= 5. Self-verify =================
     verify = phase '5. Self-verify' {
       technology 'Self-verification'
-      description 'The agent never says "done" until checks are green. Rounds are capped.'
-      checks = script 'Checks' {
+      description 'CI runs outside the sandbox, then a separate Validator plays hidden scenarios. Rounds are capped.'
+      checks = script 'CI checks' {
         #planned
-        technology 'Tests, lint, build'
-        description 'Tests, lint, types, build. They run by themselves, not on the agent word.'
+        technology 'CI outside the sandbox'
+        description 'The authoritative run of tests, lint, types and build in CI, outside the Implementer\'s sandbox. It runs by itself, not on the agent\'s word.'
         metadata {
-          in 'A slice or the whole change'
-          does 'Runs tests, lint, types, build'
-          out 'Green: on to holdout. Red: fix, at most 3 rounds'
+          in 'The pushed branch'
+          does 'Runs the full test suite, lint, types, build'
+          out 'Green: on to the Validator. Red: fix, at most 3 rounds'
         }
       }
-      holdout = script 'Holdout tests' {
+      validator = agent 'Validator' {
         #idea
-        technology 'Holdout'
-        description 'Scenarios the agent cannot see or edit, written by the Test writer from the acceptance criteria.'
+        technology 'Fresh context, own sandbox'
+        description 'A separate agent with a fresh context and its own sandbox. Starts the app and plays the hidden acceptance scenarios against it, black-box. Never edits code: it only gives a verdict.'
         metadata {
-          in 'The change after green checks'
-          does 'Runs the hidden tests from the spec'
-          out 'Green: on to evidence. Red: fix, same 3 rounds'
+          in 'The change after green CI, the hidden scenarios'
+          does 'Starts the app, plays each scenario as a user'
+          out 'Pass, or fail with the scenario that broke'
         }
       }
       evidence = agent 'Evidence' {
@@ -221,13 +225,13 @@ model {
         technology 'Evidence'
         description 'Screenshots, video, command output: what the Operator looks at instead of code.'
         metadata {
-          in 'The change with all checks green'
+          in 'The change that passed CI and the Validator'
           does 'Records screenshots, video, command output'
           out 'Evidence attached to the PR'
         }
       }
-      checks -> holdout 'green'
-      holdout -> evidence 'green'
+      checks -> validator 'green'
+      validator -> evidence 'pass'
     }
 
     // ================= 6. AI review =================
@@ -318,8 +322,9 @@ model {
   operator -> engine.spec.specGate 'approves'
   engine.spec.specGate .handoff engine.plan.researcher 'L'
   engine.spec.specGate .handoff engine.plan.planner 'M'
-  docs .reads engine.spec.testWriter 'acceptance criteria'
-  engine.spec.testWriter -> ci 'holdout tests'
+  engine.spec.specGate .handoff engine.plan.scenarioWriter 'M, L'
+  docs .reads engine.plan.scenarioWriter 'acceptance criteria'
+  engine.plan.scenarioWriter -> scenarios 'scenarios'
   engine.plan.planner -> docs 'plan, ADR'
   docs .reads engine.plan.planner 'spec, decisions'
   engine.plan.planner -> tracker 'slice sub-issues, blocked by'
@@ -329,10 +334,11 @@ model {
   operator -> engine.plan.planGate 'approves'
   engine.plan.planGate .handoff engine.implement.implementer 'plan'
   engine.implement.implementer -> changes 'PR'
-  engine.implement.implementer .handoff engine.verify.checks 'run'
+  engine.implement.implementer .handoff engine.verify.checks 'pushed branch'
   engine.verify.checks -> ci 'results'
-  ci .reads engine.verify.holdout 'holdout tests'
-  engine.verify.holdout .verdict engine.implement.implementer 'red: fix, same 3 rounds'
+  scenarios .reads engine.verify.validator 'hidden scenarios'
+  engine.verify.validator .verdict engine.implement.implementer 'fail: fix, same 3 rounds'
+  engine.verify.validator -> engine.sandbox 'runs the app in its own'
   engine.verify.evidence -> changes 'evidence on the PR'
   engine.verify.checks .verdict engine.orchestrator 'red after 3 rounds'
   engine.verify.evidence .handoff engine.aiReview.reviewers 'PR + evidence'
