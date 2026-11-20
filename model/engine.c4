@@ -37,7 +37,7 @@ model {
   }
   releases = store 'Deployments' {
     #built
-    technology 'Dokploy'
+    technology 'Dokploy · TeamCity'
     description 'Which version runs where and how the rollout ended.'
   }
 
