@@ -73,6 +73,6 @@ stateDiagram-v2
 
 The limit "at most 3 work items wait for the Operator" counts items in states where "Waits for the Operator" is yes.
 
-## Change set (PR / MR) states
+## Pull request (PR / MR) states
 
-Draft → checks running → green or red → judge verdict (pass / fix / block) → approved by the Operator (R1/R2) → merged or closed. A change set always links to its work item number.
+Draft → checks running → green or red → judge verdict (pass / fix / block) → approved by the Operator (R1/R2) → merged or closed. A pull request always links to its work item number.

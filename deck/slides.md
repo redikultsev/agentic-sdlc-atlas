@@ -53,7 +53,7 @@ Nine stages that Stripe, Anthropic, Spotify, Google, Cognition, AWS AI-DLC and o
 <div class="st">
   <div class="st-cell"><likec4-view view-id="storeTracker" color-scheme="light" class="sv"></likec4-view><p class="tool">GitHub Issues · Jira</p><p><b>The hub.</b> Number, size, risk, state. Everything links to the number.</p></div>
   <div class="st-cell"><likec4-view view-id="storeDocs" color-scheme="light" class="sv"></likec4-view><p class="tool">files in the repo or the work item body</p><p>Spec and plan of each work item; decision records (ADR).</p></div>
-  <div class="st-cell"><likec4-view view-id="storeChanges" color-scheme="light" class="sv"></likec4-view><p class="tool">PR · MR</p><p>The code change, its reviews and verdicts.</p></div>
+  <div class="st-cell"><likec4-view view-id="storeChanges" color-scheme="light" class="sv"></likec4-view><p class="tool">PR · MR</p><p>The code change, evidence, review, verdict and its explanation.</p></div>
   <div class="st-cell"><likec4-view view-id="storeCi" color-scheme="light" class="sv"></likec4-view><p class="tool">CI</p><p>Test, lint and build output tied to the commit.</p></div>
   <div class="st-cell"><likec4-view view-id="storeReleases" color-scheme="light" class="sv"></likec4-view><p class="tool">Dokploy · TeamCity</p><p>Which version runs where and how the rollout ended.</p></div>
   <div class="st-cell"><likec4-view view-id="storeProd" color-scheme="light" class="sv"></likec4-view><p class="tool">Running services</p><p>Errors and incidents here start new work items.</p></div>
@@ -187,9 +187,10 @@ layout: default
 
 <div class="stg">
 <div class="dg"><likec4-view view-id="aiReviewDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-<div class="pcs n2">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Reviewers</p><p class="pd">Correctness, security, match with the spec. Findings ranked by severity, noise filtered out.</p></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Judge</p><p class="pd">Turns findings into a JSON verdict: pass / fix / block.</p></div>
+<div class="pcs n3">
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Reviewers</p><dl class="eg3"><dt>In</dt><dd>The PR, the spec, the evidence</dd><dt>Does</dt><dd>Check correctness, security, match with the spec</dd><dt>Out</dt><dd>Findings ranked by severity</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Judge</p><dl class="eg3"><dt>In</dt><dd>Findings</dd><dt>Does</dt><dd>Weighs them, drops noise</dd><dt>Out</dt><dd>Verdict: pass, fix or block</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Change explainer</p><dl class="eg3"><dt>In</dt><dd>The passed PR, the spec, the evidence</dd><dt>Does</dt><dd>Explains the change by the presentation rules</dd><dt>Out</dt><dd>Explanation in the PR: before → after, why, what is not verified</dd></dl></div>
 </div>
 </div>
 

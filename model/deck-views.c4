@@ -12,7 +12,7 @@ views {
     style * { size small textSize xlarge }
   }
   view storeChanges {
-    title 'Store: Change sets'
+    title 'Store: Pull requests'
     include changes with { description '' }
     style * { size small textSize xlarge }
   }

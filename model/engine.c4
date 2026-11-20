@@ -29,10 +29,10 @@ model {
     technology 'files in the repo or the work item body'
     description 'Per work item: the spec (what "done" means: acceptance criteria with key examples), the plan (how we do it and prove it), for L a codebase research document. Per project: decision records (ADR) and the register of rejected requests, so new work does not contradict old choices and rejected ideas are not argued twice.'
   }
-  changes = store 'Change sets' {
+  changes = store 'Pull requests' {
     #built
     technology 'PR · MR'
-    description 'A proposed code change on a branch, linked to its work item. Reviews and verdicts live here too.'
+    description 'A proposed code change on a branch, linked to its work item. The Implementer opens it and adds fix commits to it; the Validator attaches evidence; AI review adds findings, the verdict and an explanation of the change for the Operator.'
   }
   ci = store 'Check results' {
     #planned
@@ -216,13 +216,34 @@ model {
         #built
         technology 'Review'
         description 'Correctness, security, match with the spec. Findings ranked by severity, noise filtered out.'
+        metadata {
+          in 'The PR, the spec, the evidence'
+          does 'Check correctness, security, match with the spec'
+          out 'Findings ranked by severity'
+        }
       }
       judge = agent 'Judge' {
         #built
         technology 'Verdict'
         description 'Turns findings into a JSON verdict: pass / fix / block.'
+        metadata {
+          in 'Findings'
+          does 'Weighs them, drops noise'
+          out 'Verdict: pass, fix or block'
+        }
+      }
+      explainer = agent 'Change explainer' {
+        #idea
+        technology 'Explanation for the Operator'
+        description 'Did not write the code, so it does not praise it. Explains the change by the presentation rules: what was and what is now, why this way and what was rejected, a diagram only if the structure changed, what was not verified on top. Puts it into the PR.'
+        metadata {
+          in 'The passed PR, the spec, the evidence'
+          does 'Explains the change by the presentation rules'
+          out 'Explanation in the PR: before → after, why, what is not verified'
+        }
       }
       reviewers -> judge 'findings'
+      judge -> explainer 'pass, R1/R2'
     }
 
     // ================= 7. Merge =================
@@ -314,7 +335,8 @@ model {
   engine.verify.validator .handoff engine.aiReview.reviewers 'PR + evidence'
   engine.aiReview.judge -> changes 'verdict'
   engine.aiReview.judge .verdict engine.merge.land 'pass, R0'
-  engine.aiReview.judge .verdict engine.merge.mergeGate 'pass, R1/R2'
+  engine.aiReview.explainer .handoff engine.merge.mergeGate 'PR + explanation'
+  engine.aiReview.explainer -> changes 'explanation'
   operator -> engine.merge.mergeGate 'reviews evidence'
   engine.merge.land -> changes 'merge'
   engine.merge.land .handoff engine.deploy.deployer 'R0, R1'

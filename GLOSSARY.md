@@ -35,7 +35,7 @@ The agent proposes size and risk at intake; the Operator may correct them.
 |---|---|---|
 | Work items | Number, size, risk, state. The pipeline hub | GitHub Issues · Jira |
 | Specs, plans and decisions | Spec, plan, research document; decision records (ADR) | files in the repo or the work item body |
-| Change sets | PR, reviews, verdicts | PR (GitHub) · MR |
+| Pull requests | Code change, evidence, review findings, verdict, explanation | PR (GitHub) · MR |
 | Check results | Test and check output tied to the commit | CI |
 | Deployments | Which version runs where and how it ended | Dokploy |
 
@@ -63,7 +63,7 @@ The agent proposes size and risk at intake; the Operator may correct them.
 | Term | What it is |
 |---|---|
 | **Work item** | A tracked unit of work with one number; everything else links to it (CDEvents: ticket) |
-| **Change set** | A proposed modification on a branch: PR in GitHub, MR in GitLab (CDEvents: change) |
+| **Pull request** | A proposed code change on a branch: PR in GitHub, MR in GitLab (CDEvents: change) |
 | **PR head** | The last commit of a PR. An approval counts only for the head the reviewer saw |
 | **Verdict** | The judge's decision as schema JSON: `pass`, `fix` or `block`. Code picks the next step from it |
 | **Acceptance criteria** | Rules for "done", observable from outside, each with 2–3 key examples: input → expected result, boundary values, what must not happen |

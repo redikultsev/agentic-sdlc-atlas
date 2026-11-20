@@ -57,7 +57,7 @@
       }
     ]
   },
-  "hash": "-Kgc3CQm_XzYETCxTV-DpUQwYogMGdh-y6429uJDvS0",
+  "hash": "baNftC6gKofG3lZL-CoKqRq_m8Qt9IZJLk6OY9ht_1M",
   "bounds": {
     "x": -40,
     "y": -100,
@@ -341,7 +341,7 @@
         "1aqce60"
       ],
       "outEdges": [],
-      "title": "Change sets",
+      "title": "Pull requests",
       "modelRef": "changes",
       "shape": "storage",
       "color": "storecolor",
@@ -365,9 +365,9 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -87,
+        "x": -90,
         "y": 649,
-        "width": 161,
+        "width": 166,
         "height": 32
       }
     },
@@ -635,7 +635,7 @@
       },
       "parent": null,
       "relations": [
-        "1rox7mb"
+        "17el8cy"
       ],
       "color": "red",
       "line": "dashed",

@@ -7,7 +7,7 @@
 <div class="st">
   <div class="st-cell"><likec4-view view-id="storeTracker" color-scheme="light" class="sv"></likec4-view><p class="tool">{{tech:tracker}}</p><p><b>The hub.</b> Number, size, risk, state. Everything links to the number.</p></div>
   <div class="st-cell"><likec4-view view-id="storeDocs" color-scheme="light" class="sv"></likec4-view><p class="tool">{{tech:docs}}</p><p>Spec and plan of each work item; decision records (ADR).</p></div>
-  <div class="st-cell"><likec4-view view-id="storeChanges" color-scheme="light" class="sv"></likec4-view><p class="tool">{{tech:changes}}</p><p>The code change, its reviews and verdicts.</p></div>
+  <div class="st-cell"><likec4-view view-id="storeChanges" color-scheme="light" class="sv"></likec4-view><p class="tool">{{tech:changes}}</p><p>The code change, evidence, review, verdict and its explanation.</p></div>
   <div class="st-cell"><likec4-view view-id="storeCi" color-scheme="light" class="sv"></likec4-view><p class="tool">{{tech:ci}}</p><p>Test, lint and build output tied to the commit.</p></div>
   <div class="st-cell"><likec4-view view-id="storeReleases" color-scheme="light" class="sv"></likec4-view><p class="tool">{{tech:releases}}</p><p>Which version runs where and how the rollout ended.</p></div>
   <div class="st-cell"><likec4-view view-id="storeProd" color-scheme="light" class="sv"></likec4-view><p class="tool">{{tech:prod}}</p><p>Errors and incidents here start new work items.</p></div>

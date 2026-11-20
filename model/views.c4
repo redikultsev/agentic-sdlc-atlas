@@ -161,13 +161,15 @@ views {
         engine.merge.land -> engine.deploy.deployer 'right away'
       }
       if 'R1' {
-        engine.aiReview.judge -> engine.merge.mergeGate 'pass'
+        engine.aiReview.judge -> engine.aiReview.explainer 'pass'
+        engine.aiReview.explainer -> engine.merge.mergeGate 'PR + explanation'
         operator -> engine.merge.mergeGate 'evidence → yes'
         engine.merge.mergeGate -> engine.merge.land 'merge'
         engine.merge.land -> engine.deploy.deployer 'right away'
       }
       else 'R2' {
-        engine.aiReview.judge -> engine.merge.mergeGate 'pass'
+        engine.aiReview.judge -> engine.aiReview.explainer 'pass'
+        engine.aiReview.explainer -> engine.merge.mergeGate 'PR + explanation'
         operator -> engine.merge.mergeGate 'code → yes'
         engine.merge.mergeGate -> engine.merge.land 'merge'
         engine.merge.land -> engine.deploy.prodGate 'waits'
