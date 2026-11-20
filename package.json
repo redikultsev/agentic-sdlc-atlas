@@ -3,15 +3,19 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "likec4 start .",
     "check": "likec4 validate .",
-    "build": "likec4 build --output-single-file --use-hash-history -t 'Движок агентского цикла' -o ./dist ."
+    "build": "tools/build.sh --sites",
+    "deck:gen": "tools/build.sh",
+    "deck:dev": "slidev deck/slides.md",
+    "dev": "likec4 start ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@slidev/cli": "^53.1.0",
+    "@slidev/theme-default": "^0.25.0",
     "likec4": "^1.61.0"
   },
   "private": true
