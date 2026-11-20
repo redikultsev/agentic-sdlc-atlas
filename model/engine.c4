@@ -82,9 +82,9 @@ model {
         technology 'Triage agent'
         description 'Merges duplicates, proposes size S/M/L and risk R0/R1/R2 with a reason. Never closes anything itself.'
         metadata {
-          in 'Request: "we need CSV export of the report"'
-          does 'Finds no duplicate, reads the reports module'
-          out 'Work item #231: M · R1, "one module, no data changes"'
+          in 'A request, a bug or an alert'
+          does 'Finds duplicates, reads the related code'
+          out 'A work item with size, risk and the reason'
         }
       }
       admit = gate 'Accept' {
@@ -92,9 +92,9 @@ model {
         technology 'Gate'
         description 'The Operator sees size and risk, may correct them, and accepts the work item.'
         metadata {
-          in 'The draft with size, risk and the reason'
+          in 'The work item with size, risk and the reason'
           does 'The Operator accepts, corrects or cancels'
-          out '#231 Accepted, goes to Spec (M)'
+          out 'S → Implement; M, L → Spec'
         }
       }
       triage -> admit 'size and risk'
@@ -109,9 +109,9 @@ model {
         technology 'Clarify'
         description 'Asks about what is underspecified, writes the spec: why, acceptance criteria, what must not change.'
         metadata {
-          in '#231 "CSV export of the report", M · R1'
-          does 'Asks: which columns? keep the filter? row limit?'
-          out 'Spec: Export button; visible columns and current filter; up to 100k rows; PDF export unchanged'
+          in 'An accepted M or L work item'
+          does 'Asks the Operator about what is unclear'
+          out 'Spec: why, acceptance criteria, what must not change'
         }
       }
       specGate = gate 'Approve spec' {
@@ -119,9 +119,9 @@ model {
         technology 'Gate'
         description 'M and L: the Operator approves the spec.'
         metadata {
-          in 'The spec with its acceptance criteria'
+          in 'The spec'
           does 'The Operator approves or edits it'
-          out '#231 goes to Plan'
+          out 'M → Plan; L → codebase research'
         }
       }
       interviewer -> specGate 'spec'

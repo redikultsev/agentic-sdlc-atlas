@@ -37,7 +37,7 @@ def part(name):
 KIND_TAG = {'agent': 'Agent', 'script': 'Script', 'gate': 'Gate', 'human': 'Operator', 'store': 'Store', 'platform': 'Cross-cutting'}
 
 def body(el):
-    # metadata in/does/out = one worked example (the same case runs through all stages); else the description
+    # metadata in/does/out = what a part takes, does and gives; else the description
     md = el.get('metadata') or {}
     if all(k in md for k in ('in', 'does', 'out')):
         return '<dl class="eg3">' + ''.join(f'<dt>{l}</dt><dd>{md[k]}</dd>' for l, k in (('In', 'in'), ('Does', 'does'), ('Out', 'out'))) + '</dl>'

@@ -92,8 +92,8 @@ layout: default
 <div class="stg">
 <div class="dg"><likec4-view view-id="intakeDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Triage</p><dl class="eg3"><dt>In</dt><dd>Request: "we need CSV export of the report"</dd><dt>Does</dt><dd>Finds no duplicate, reads the reports module</dd><dt>Out</dt><dd>Work item #231: M · R1, "one module, no data changes"</dd></dl></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Accept</p><dl class="eg3"><dt>In</dt><dd>The draft with size, risk and the reason</dd><dt>Does</dt><dd>The Operator accepts, corrects or cancels</dd><dt>Out</dt><dd>#231 Accepted, goes to Spec (M)</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Triage</p><dl class="eg3"><dt>In</dt><dd>A request, a bug or an alert</dd><dt>Does</dt><dd>Finds duplicates, reads the related code</dd><dt>Out</dt><dd>A work item with size, risk and the reason</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Accept</p><dl class="eg3"><dt>In</dt><dd>The work item with size, risk and the reason</dd><dt>Does</dt><dd>The Operator accepts, corrects or cancels</dd><dt>Out</dt><dd>S → Implement; M, L → Spec</dd></dl></div>
 </div>
 </div>
 
@@ -111,8 +111,8 @@ layout: default
 <div class="stg">
 <div class="dg"><likec4-view view-id="specDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Interviewer</p><dl class="eg3"><dt>In</dt><dd>#231 "CSV export of the report", M · R1</dd><dt>Does</dt><dd>Asks: which columns? keep the filter? row limit?</dd><dt>Out</dt><dd>Spec: Export button; visible columns and current filter; up to 100k rows; PDF export unchanged</dd></dl></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Approve spec</p><dl class="eg3"><dt>In</dt><dd>The spec with its acceptance criteria</dd><dt>Does</dt><dd>The Operator approves or edits it</dd><dt>Out</dt><dd>#231 goes to Plan</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Interviewer</p><dl class="eg3"><dt>In</dt><dd>An accepted M or L work item</dd><dt>Does</dt><dd>Asks the Operator about what is unclear</dd><dt>Out</dt><dd>Spec: why, acceptance criteria, what must not change</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Approve spec</p><dl class="eg3"><dt>In</dt><dd>The spec</dd><dt>Does</dt><dd>The Operator approves or edits it</dd><dt>Out</dt><dd>M → Plan; L → codebase research</dd></dl></div>
 </div>
 </div>
 
