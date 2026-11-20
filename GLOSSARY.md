@@ -13,7 +13,7 @@ Terms used in this project. Stage names follow the convergent pipeline of leadin
 | 5 | Checks & review | CI outside the sandbox, then one AI reviewer reads the code, re-checks its findings, gives a pass / fix / block verdict and explains the change | script + agent |
 | 6 | Acceptance | A separate Validator, blind to the reviewer's verdict, checks the acceptance criteria on the running app and records evidence | agent |
 | 7 | Merge | By risk: R0 merges itself, R1 the Operator on evidence, R2 the Operator reads the code | script + Operator |
-| 8 | Deploy & watch | R0 and R1 right away, R2 on a yes; a watcher compares metrics before and after | script + agent |
+| 8 | Deploy & watch | Every merge deploys to everyone; the Watcher watches what the PR changed and rolls back on a regression | script + agent |
 | 9 | Learn | Mistakes and corrections become new work items, checks and rules | agent, Operator chooses |
 
 ## Size and risk
@@ -25,7 +25,7 @@ Terms used in this project. Stage names follow the convergent pipeline of leadin
 | **L** | Touches many modules. Plus a codebase research document from a separate pass |
 | **R0** | Reversible and does not leave the system (docs, tests). Merges and deploys itself |
 | **R1** | Regular code behind checks. The Operator reads the report with evidence and says yes |
-| **R2** | Irreversible or leaves the system (migrations, infrastructure, money, secrets). The Operator reads the code and deploys |
+| **R2** | Irreversible or leaves the system (migrations, infrastructure, money, secrets). The Operator reads the code; "merge" deploys at once |
 
 The agent proposes size and risk at intake; the Operator may correct them.
 
@@ -76,5 +76,6 @@ The agent proposes size and risk at intake; the Operator may correct them.
 | **Sandbox** | A disposable isolated machine per agent session (one per slice, one for the Validator): network closed by default, push only through a proxy to one branch, no merge rights |
 | **Orchestrator** | The program that moves a work item through the stages |
 | **Traces** | A record of what the agent did: calls, decisions, cost |
-| **Rollback** | Return to the previous version after a failed rollout |
+| **Rollback** | Return to the previous version after a failed rollout. The Watcher does it by itself; database migrations are never rolled back, only fixed forward |
+| **Watch window** | How long the Watcher watches a fresh deploy before the work item is Done (30 min by default, longer for R2) |
 | **Atlas** | The knowledge base in `research/atlas/`: what the world knows about each stage (areas S0–S18, X1–X11) |

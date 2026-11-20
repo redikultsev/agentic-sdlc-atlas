@@ -39,11 +39,9 @@ stateDiagram-v2
   MergeReview --> Implementing: "changes" + comment
   MergeReview --> Merged: "merge"
   MergeReview --> Implementing: queue red or conflict
-  Merged --> Live: R0/R1 right away
-  Merged --> DeployReview: R2
-  DeployReview --> Live: "deploy"
-  Live --> Done: no regression
-  Live --> RolledBack: regression, "roll back"
+  Merged --> Live: deployed to everyone
+  Live --> Done: watch window over, no regression
+  Live --> RolledBack: regression, the Watcher rolled back
   Blocked --> Accepted: Operator sorted it out
   Blocked --> Cancelled
   Done --> [*]
@@ -65,8 +63,7 @@ stateDiagram-v2
 | Verifying | CI, AI review, then acceptance | CI, AI reviewer, Validator | no | `state:verifying` | In Progress |
 | MergeReview | Awaiting merge (R1/R2) | Operator | **yes** | `state:merge-review` | In Review |
 | Merged | Merged | Deploy | no | `state:merged` | Done (dev) |
-| DeployReview | Deployment awaiting approval (R2) | Operator | **yes** | `state:deploy-review` | Awaiting Deploy |
-| Live | In production, watched | Watcher | no | `state:live` | Deployed |
+| Live | In production, inside the watch window | Watcher | no | `state:live` | Deployed |
 | Done | Done | — | — | closed | Done |
 | RolledBack | Rolled back | a new work item | — | closed + `rolled-back` | Done + label |
 | Blocked | Stuck: 3 fix rounds used up, or a block verdict | Operator | **yes** | `state:blocked` | Blocked |

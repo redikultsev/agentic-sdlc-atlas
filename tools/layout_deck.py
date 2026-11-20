@@ -43,6 +43,12 @@ LAYOUTS = {
         'engine.deploy': (1, 4.3),
         'docs': (2.6, 0), 'changes': (2.6, 3),
     },
+    'deployDeck': {
+        'engine.merge': (-0.4, 0), 'monitoring': (-0.4, 2.4), 'changes': (-0.4, 3.6),
+        'engine.deploy.deployer': (1, 0), 'engine.deploy.watcher': (1, 3),
+        'prod': (2.4, -0.6), 'releases': (2.4, 0.6),
+        'operator': (2.4, 1.8), 'engine.intake': (2.4, 3), 'engine.learn': (2.4, 4.2),
+    },
 }
 
 # edges that skip a block in the same column: drawn as an arc around its right side

@@ -5,7 +5,7 @@
   "_stage": "layouted",
   "sourcePath": "model/views.c4",
   "description": {
-    "md": "**How to read:** stages left to right; grey cylinders show where work items, specs, PRs, checks and deployments live; the Operator's arrows go into stage gates.\nClick a stage to open it. Loops back are shown on the stage views.\n\n**Colour:** purple = agent, green = script, red = the Operator decides, grey = store.\n\n**Size:** S = straight to code; M = spec and plan; L = plus codebase research.\n**Risk:** R0 merges and deploys itself; R1 = the Operator checks the evidence; R2 = the Operator reads the code and deploys."
+    "md": "**How to read:** stages left to right; grey cylinders show where work items, specs, PRs, checks and deployments live; the Operator's arrows go into stage gates.\nClick a stage to open it. Loops back are shown on the stage views.\n\n**Colour:** purple = agent, green = script, red = the Operator decides, grey = store.\n\n**Size:** S = straight to code; M = spec and plan; L = plus codebase research.\n**Risk:** R0 merges and deploys itself; R1 = the Operator checks the evidence; R2 = the Operator reads the code. Every merge deploys at once."
   },
   "title": "0. Whole pipeline",
   "id": "index",
@@ -51,14 +51,14 @@
       {
         "title": "Store",
         "shape": "storage",
-        "color": "gray",
+        "color": "storecolor",
         "kinds": [
           "store"
         ]
       }
     ]
   },
-  "hash": "wI_FIaDyrlJHkRDplr0Y3SbZ3ThdElezA3jqVaoBYXI",
+  "hash": "DaV_YsZwbkUgyH4NUmNNXx-6CjIVDfvSaTYo19y1rUk",
   "bounds": {
     "x": 20,
     "y": 80,
@@ -77,7 +77,6 @@
         "1l0mmr3",
         "1l0s5w9",
         "yi4o42",
-        "7vlpoh",
         "yiqrcu"
       ],
       "title": "Operator",
@@ -104,9 +103,7 @@
         "y": 19,
         "width": 292,
         "height": 139
-      },
-      "navigateTo": null,
-      "links": null
+      }
     },
     {
       "id": "engine",
@@ -128,7 +125,6 @@
         "1l0mmr3",
         "1l0s5w9",
         "yi4o42",
-        "7vlpoh",
         "yiqrcu"
       ],
       "outEdges": [
@@ -164,9 +160,7 @@
         "y": 0,
         "width": 54,
         "height": 15
-      },
-      "navigateTo": null,
-      "links": null
+      }
     },
     {
       "id": "engine.intake",
@@ -195,7 +189,7 @@
       "notation": "Pipeline stage",
       "technology": "Intake & triage",
       "kind": "phase",
-      "navigateTo": "intake",
+      "navigateTo": "intakeDeck",
       "x": 100,
       "y": 620,
       "width": 320,
@@ -205,8 +199,7 @@
         "y": 37,
         "width": 272,
         "height": 103
-      },
-      "links": null
+      }
     },
     {
       "id": "engine.spec",
@@ -236,7 +229,7 @@
       "notation": "Pipeline stage",
       "technology": "Specification",
       "kind": "phase",
-      "navigateTo": "spec",
+      "navigateTo": "specDeck",
       "x": 540,
       "y": 620,
       "width": 320,
@@ -246,8 +239,7 @@
         "y": 46,
         "width": 250,
         "height": 85
-      },
-      "links": null
+      }
     },
     {
       "id": "tracker",
@@ -261,7 +253,7 @@
       "title": "Work items",
       "modelRef": "tracker",
       "shape": "storage",
-      "color": "gray",
+      "color": "storecolor",
       "style": {
         "opacity": 15,
         "size": "md"
@@ -284,9 +276,7 @@
         "y": 21,
         "width": 274,
         "height": 139
-      },
-      "navigateTo": null,
-      "links": null
+      }
     },
     {
       "id": "engine.plan",
@@ -316,7 +306,7 @@
       "notation": "Pipeline stage",
       "technology": "Plan & decompose",
       "kind": "phase",
-      "navigateTo": "plan",
+      "navigateTo": "planDeck",
       "x": 980,
       "y": 620,
       "width": 320,
@@ -326,8 +316,7 @@
         "y": 46,
         "width": 279,
         "height": 85
-      },
-      "links": null
+      }
     },
     {
       "id": "engine.implement",
@@ -356,7 +345,7 @@
       "notation": "Pipeline stage",
       "technology": "Implement in sandbox",
       "kind": "phase",
-      "navigateTo": "implement",
+      "navigateTo": "implementDeck",
       "x": 1420,
       "y": 620,
       "width": 320,
@@ -366,8 +355,7 @@
         "y": 37,
         "width": 249,
         "height": 103
-      },
-      "links": null
+      }
     },
     {
       "id": "docs",
@@ -379,16 +367,16 @@
         "jgyy2q"
       ],
       "outEdges": [],
-      "title": "Specs and plans",
+      "title": "Specs, plans and decisions",
       "modelRef": "docs",
       "shape": "storage",
-      "color": "gray",
+      "color": "storecolor",
       "style": {
         "opacity": 15,
         "size": "md"
       },
       "description": {
-        "txt": "Spec: what \"done\" means. Plan: how we do it and how we prove it. For L, also a codebase research document."
+        "txt": "Per work item: the spec (what \"done\" means: acceptance criteria with key examples), the plan (how we do it and prove it), for L a codebase research document. Per project: decision records (ADR), the register of rejected requests and the auto-merge rules, so new work does not contradict old choices and rejected ideas are not argued twice."
       },
       "tags": [
         "idea"
@@ -399,15 +387,13 @@
       "x": 760,
       "y": 1090,
       "width": 320,
-      "height": 180,
+      "height": 184,
       "labelBBox": {
-        "x": 24,
-        "y": 37,
-        "width": 273,
-        "height": 103
-      },
-      "navigateTo": null,
-      "links": null
+        "x": 26,
+        "y": 21,
+        "width": 268,
+        "height": 139
+      }
     },
     {
       "id": "engine.verify",
@@ -421,7 +407,7 @@
         "11vdxv3",
         "qfp46v"
       ],
-      "title": "5. Self-verify",
+      "title": "5. Checks & review",
       "modelRef": "engine.verify",
       "shape": "rectangle",
       "color": "slate",
@@ -430,24 +416,23 @@
         "size": "md"
       },
       "description": {
-        "txt": "The agent never says \"done\" until checks are green. Rounds are capped."
+        "txt": "Cheap and deterministic first: CI outside the sandbox, then one AI reviewer reads the code. Their findings change code, so they run before the expensive acceptance pass."
       },
       "tags": [],
       "notation": "Pipeline stage",
-      "technology": "Self-verification",
+      "technology": "White-box checks",
       "kind": "phase",
-      "navigateTo": "verify",
+      "navigateTo": "verifyDeck",
       "x": 1860,
       "y": 620,
       "width": 320,
       "height": 180,
       "labelBBox": {
-        "x": 21,
-        "y": 46,
-        "width": 279,
-        "height": 85
-      },
-      "links": null
+        "x": 19,
+        "y": 19,
+        "width": 283,
+        "height": 139
+      }
     },
     {
       "id": "changes",
@@ -458,16 +443,16 @@
         "wyfqmo"
       ],
       "outEdges": [],
-      "title": "Change sets",
+      "title": "Pull requests",
       "modelRef": "changes",
       "shape": "storage",
-      "color": "gray",
+      "color": "storecolor",
       "style": {
         "opacity": 15,
         "size": "md"
       },
       "description": {
-        "txt": "A proposed code change on a branch, linked to its work item. Reviews and verdicts live here too."
+        "txt": "A proposed code change on a branch, linked to its work item. The Implementer opens it and adds fix commits to it; the Validator attaches evidence; AI review adds findings, the verdict and an explanation of the change for the Operator."
       },
       "tags": [
         "built"
@@ -478,15 +463,13 @@
       "x": 1420,
       "y": 1090,
       "width": 320,
-      "height": 180,
+      "height": 184,
       "labelBBox": {
-        "x": 31,
-        "y": 37,
-        "width": 258,
-        "height": 103
-      },
-      "navigateTo": null,
-      "links": null
+        "x": 26,
+        "y": 21,
+        "width": 269,
+        "height": 139
+      }
     },
     {
       "id": "engine.aiReview",
@@ -499,7 +482,7 @@
       "outEdges": [
         "l0sio0"
       ],
-      "title": "6. AI review",
+      "title": "6. Acceptance",
       "modelRef": "engine.aiReview",
       "shape": "rectangle",
       "color": "slate",
@@ -508,24 +491,23 @@
         "size": "md"
       },
       "description": {
-        "txt": "Reviewer agents with a fresh context check against the spec and standards. An agent approval is not a human approval."
+        "txt": "Last and most expensive: a separate Validator checks the acceptance criteria on the running app, as a user, and records evidence. It runs on code that will not change again."
       },
       "tags": [],
       "notation": "Pipeline stage",
-      "technology": "AI review & autofix",
+      "technology": "Black-box validation",
       "kind": "phase",
-      "navigateTo": "aiReview",
+      "navigateTo": "aiReviewDeck",
       "x": 2300,
       "y": 620,
       "width": 320,
       "height": 180,
       "labelBBox": {
-        "x": 19,
-        "y": 37,
-        "width": 283,
-        "height": 103
-      },
-      "links": null
+        "x": 17,
+        "y": 19,
+        "width": 287,
+        "height": 139
+      }
     },
     {
       "id": "ci",
@@ -539,13 +521,13 @@
       "title": "Check results",
       "modelRef": "ci",
       "shape": "storage",
-      "color": "gray",
+      "color": "storecolor",
       "style": {
         "opacity": 15,
         "size": "md"
       },
       "description": {
-        "txt": "Tests, lint, types, build, holdout tests, with output tied to the commit."
+        "txt": "Output of the CI run outside the sandbox: tests, lint, types, build, tied to the commit."
       },
       "tags": [
         "planned"
@@ -558,13 +540,11 @@
       "width": 320,
       "height": 180,
       "labelBBox": {
-        "x": 20,
+        "x": 21,
         "y": 46,
-        "width": 281,
+        "width": 278,
         "height": 85
-      },
-      "navigateTo": null,
-      "links": null
+      }
     },
     {
       "id": "engine.merge",
@@ -587,24 +567,23 @@
         "size": "md"
       },
       "description": {
-        "txt": "By risk: R0 merges itself, R1 the Operator merges on evidence, R2 the Operator reads the code."
+        "txt": "A script checks the auto-merge rules: a match merges without the Operator (R0), anything else goes to the Operator's gate. Everything lands through a merge queue on the latest main."
       },
       "tags": [],
       "notation": "Pipeline stage",
       "technology": "Merge",
       "kind": "phase",
-      "navigateTo": "merge",
+      "navigateTo": "mergeDeck",
       "x": 2740,
       "y": 620,
       "width": 320,
       "height": 180,
       "labelBBox": {
-        "x": 20,
-        "y": 37,
+        "x": 19,
+        "y": 19,
         "width": 282,
-        "height": 103
-      },
-      "links": null
+        "height": 139
+      }
     },
     {
       "id": "engine.deploy",
@@ -612,7 +591,6 @@
       "level": 1,
       "children": [],
       "inEdges": [
-        "7vlpoh",
         "1ki0gt5"
       ],
       "outEdges": [
@@ -629,24 +607,23 @@
         "size": "md"
       },
       "description": {
-        "txt": "R0 and R1 go to production right after merge, R2 on the Operator yes. A watcher compares metrics before and after."
+        "txt": "Every merge deploys main to all users at once. The Watcher watches the change and rolls it back by itself on a regression. No gate after merge: R2 was approved at the Merge gate."
       },
       "tags": [],
       "notation": "Pipeline stage",
       "technology": "Release, deploy & watch",
       "kind": "phase",
-      "navigateTo": "deploy",
+      "navigateTo": "deployDeck",
       "x": 3180,
       "y": 620,
       "width": 320,
       "height": 180,
       "labelBBox": {
-        "x": 17,
-        "y": 37,
-        "width": 286,
-        "height": 103
-      },
-      "links": null
+        "x": 21,
+        "y": 19,
+        "width": 279,
+        "height": 139
+      }
     },
     {
       "id": "engine.learn",
@@ -673,7 +650,7 @@
       "notation": "Pipeline stage",
       "technology": "Learn & close the loop",
       "kind": "phase",
-      "navigateTo": "learn",
+      "navigateTo": "learnDeck",
       "x": 3620,
       "y": 620,
       "width": 320,
@@ -683,8 +660,7 @@
         "y": 46,
         "width": 259,
         "height": 85
-      },
-      "links": null
+      }
     },
     {
       "id": "releases",
@@ -698,7 +674,7 @@
       "title": "Deployments",
       "modelRef": "releases",
       "shape": "storage",
-      "color": "gray",
+      "color": "storecolor",
       "style": {
         "opacity": 15,
         "size": "md"
@@ -710,7 +686,7 @@
         "built"
       ],
       "notation": "Store",
-      "technology": "Dokploy",
+      "technology": "Dokploy · TeamCity",
       "kind": "store",
       "x": 3180,
       "y": 1090,
@@ -721,9 +697,7 @@
         "y": 46,
         "width": 262,
         "height": 85
-      },
-      "navigateTo": null,
-      "links": null
+      }
     },
     {
       "id": "prod",
@@ -758,9 +732,7 @@
         "y": 55,
         "width": 219,
         "height": 67
-      },
-      "navigateTo": null,
-      "links": null
+      }
     }
   ],
   "edges": [
@@ -795,14 +767,12 @@
       },
       "parent": null,
       "relations": [
-        "1cepoiv"
+        "1hqeckl"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "1l0mmr3",
@@ -835,14 +805,12 @@
       },
       "parent": null,
       "relations": [
-        "istt3w"
+        "rcasje"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "iu2rtf",
@@ -875,15 +843,13 @@
       },
       "parent": "engine",
       "relations": [
-        "1f21nw0"
+        "lhnbjo"
       ],
       "color": "primary",
       "line": "dashed",
       "head": "normal",
       "kind": "handoff",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "1l0s5w9",
@@ -916,20 +882,18 @@
       },
       "parent": null,
       "relations": [
-        "1bbutu8"
+        "1hfuoj7"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "115wmf0",
       "source": "engine.spec",
       "target": "engine.plan",
-      "label": "[...]",
+      "label": "M, L",
       "points": [
         [
           860,
@@ -949,23 +913,22 @@
         ]
       ],
       "labelBBox": {
-        "x": 904,
+        "x": 901,
         "y": 676,
-        "width": 33,
+        "width": 38,
         "height": 25
       },
       "parent": "engine",
       "relations": [
-        "14xlw30",
-        "1xn8yix"
+        "v4sdjc",
+        "ycgj3"
       ],
       "color": "primary",
       "line": "dashed",
       "head": "normal",
       "kind": "handoff",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isCustomized": true,
+      "isLabelCustomized": true
     },
     {
       "id": "tx5iwm",
@@ -998,21 +961,19 @@
       },
       "parent": "engine",
       "relations": [
-        "zo1vdv"
+        "1mpyema"
       ],
       "color": "primary",
       "line": "dashed",
       "head": "normal",
       "kind": "handoff",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "i360xe",
       "source": "engine.implement",
       "target": "engine.verify",
-      "label": "run",
+      "label": "pushed branch",
       "points": [
         [
           1740,
@@ -1032,28 +993,26 @@
         ]
       ],
       "labelBBox": {
-        "x": 1783,
+        "x": 1747,
         "y": 676,
-        "width": 34,
+        "width": 106,
         "height": 25
       },
       "parent": "engine",
       "relations": [
-        "1kzhz10"
+        "uov12t"
       ],
       "color": "primary",
       "line": "dashed",
       "head": "normal",
       "kind": "handoff",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "11vdxv3",
       "source": "engine.verify",
       "target": "engine.aiReview",
-      "label": "PR + evidence",
+      "label": "pass: PR",
       "points": [
         [
           2180,
@@ -1073,28 +1032,26 @@
         ]
       ],
       "labelBBox": {
-        "x": 2190,
+        "x": 2207,
         "y": 676,
-        "width": 101,
+        "width": 66,
         "height": 25
       },
       "parent": "engine",
       "relations": [
-        "19q890v"
+        "1alo3do"
       ],
       "color": "primary",
       "line": "dashed",
       "head": "normal",
       "kind": "handoff",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "yi4o42",
       "source": "operator",
       "target": "engine.merge",
-      "label": "reviews evidence",
+      "label": "decides",
       "points": [
         [
           2020,
@@ -1114,27 +1071,25 @@
         ]
       ],
       "labelBBox": {
-        "x": 2555,
+        "x": 2585,
         "y": 474,
-        "width": 120,
+        "width": 61,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "ea74k2"
+        "gkbmhl"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "l0sio0",
       "source": "engine.aiReview",
       "target": "engine.merge",
-      "label": "[...]",
+      "label": "pass",
       "points": [
         [
           2620,
@@ -1154,69 +1109,26 @@
         ]
       ],
       "labelBBox": {
-        "x": 2664,
+        "x": 2659,
         "y": 676,
-        "width": 33,
+        "width": 42,
         "height": 25
       },
       "parent": "engine",
       "relations": [
-        "1g50je9",
-        "1lk84e0"
+        "1nb51hx"
       ],
-      "color": "red",
+      "color": "primary",
       "line": "dashed",
       "head": "normal",
-      "kind": "verdict",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
-    },
-    {
-      "id": "7vlpoh",
-      "source": "operator",
-      "target": "engine.deploy",
-      "label": "deploys",
-      "points": [
-        [
-          2020,
-          300
-        ],
-        [
-          2020,
-          476
-        ],
-        [
-          3340,
-          444
-        ],
-        [
-          3340,
-          620
-        ]
-      ],
-      "labelBBox": {
-        "x": 2882,
-        "y": 474,
-        "width": 62,
-        "height": 25
-      },
-      "parent": null,
-      "relations": [
-        "dldi6z"
-      ],
-      "color": "gray",
-      "line": "dashed",
-      "head": "normal",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "kind": "handoff",
+      "isLabelCustomized": true
     },
     {
       "id": "1ki0gt5",
       "source": "engine.merge",
       "target": "engine.deploy",
-      "label": "[...]",
+      "label": "merged",
       "points": [
         [
           3060,
@@ -1236,23 +1148,20 @@
         ]
       ],
       "labelBBox": {
-        "x": 3104,
+        "x": 3090,
         "y": 676,
-        "width": 33,
+        "width": 60,
         "height": 25
       },
       "parent": "engine",
       "relations": [
-        "11l7v56",
-        "vkryeh"
+        "i31tqi"
       ],
       "color": "primary",
       "line": "dashed",
       "head": "normal",
       "kind": "handoff",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "yiqrcu",
@@ -1285,14 +1194,12 @@
       },
       "parent": null,
       "relations": [
-        "os6lxt"
+        "fnjbdf"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "i51uqd",
@@ -1325,15 +1232,13 @@
       },
       "parent": "engine",
       "relations": [
-        "1d2d7uj"
+        "1u425q1"
       ],
       "color": "primary",
       "line": "dashed",
       "head": "normal",
       "kind": "handoff",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "1t1hp3i",
@@ -1366,14 +1271,12 @@
       },
       "parent": null,
       "relations": [
-        "vojwtj"
+        "1bxfzqd"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "xbu038",
@@ -1406,20 +1309,18 @@
       },
       "parent": null,
       "relations": [
-        "p0tg4q"
+        "1xiq9gm"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "jgyy2q",
       "source": "engine.plan",
       "target": "docs",
-      "label": "plan",
+      "label": "plan, research",
       "points": [
         [
           1140,
@@ -1439,21 +1340,21 @@
         ]
       ],
       "labelBBox": {
-        "x": 1010,
+        "x": 979,
         "y": 933,
-        "width": 40,
+        "width": 102,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "sfstc4"
+        "dkeauk",
+        "41hzv1"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isCustomized": true,
+      "isLabelCustomized": true
     },
     {
       "id": "wyfqmo",
@@ -1486,14 +1387,12 @@
       },
       "parent": null,
       "relations": [
-        "pkfqm"
+        "bawxyn"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "qfp46v",
@@ -1526,14 +1425,12 @@
       },
       "parent": null,
       "relations": [
-        "uh4y3q"
+        "1vluio7"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "1bm3z3v",
@@ -1566,14 +1463,12 @@
       },
       "parent": null,
       "relations": [
-        "1j367r6"
+        "1rv3gfi"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     },
     {
       "id": "en4abs",
@@ -1606,14 +1501,12 @@
       },
       "parent": null,
       "relations": [
-        "1gkcr1y"
+        "319jq4"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
-      "isLabelCustomized": true,
-      "navigateTo": null,
-      "tags": null
+      "isLabelCustomized": true
     }
   ],
   "_layout": "manual"

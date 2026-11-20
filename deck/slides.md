@@ -76,7 +76,7 @@ Nine stages that Stripe, Anthropic, Spotify, Google, Cognition, AWS AI-DLC and o
   <h3><b>Risk</b> decides who merges and deploys</h3>
   <div class="card"><span class="tag">R0</span><div><p class="what">Matches the auto-merge rules <em class="ag">merges and deploys without the Operator</em></p><p class="eg">e.g. docs, tests, patch updates; never auth or payments</p></div></div>
   <div class="card"><span class="tag">R1</span><div><p class="what">Regular code behind checks <em class="op">Operator merges on evidence</em></p><p class="eg">e.g. a regular feature; deploys right away</p></div></div>
-  <div class="card"><span class="tag">R2</span><div><p class="what">Irreversible or leaves the system <em class="op">Operator reads the code, deploys</em></p><p class="eg">e.g. a database migration, payments, sending email</p></div></div>
+  <div class="card"><span class="tag">R2</span><div><p class="what">Irreversible or leaves the system <em class="op">Operator reads the code, merge deploys</em></p><p class="eg">e.g. a database migration, payments, sending email</p></div></div>
 </div>
 </div>
 
@@ -221,18 +221,17 @@ layout: default
 
 # 8. Deploy & watch
 
-<div class="lead">R0 and R1 go to production right after merge, R2 on the Operator yes. A watcher compares metrics before and after.</div>
+<div class="lead">Every merge deploys main to all users at once. The Watcher watches the change and rolls it back by itself on a regression. No gate after merge: R2 was approved at the Merge gate.</div>
 
 <div class="stg">
 <div class="dg"><likec4-view view-id="deployDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-<div class="pcs n3">
-  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Deploy R2?</p><p class="pd">R2 only: migrations, infrastructure, money, secrets.</p></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-script">Script</span><span class="ps">built</span></div><p class="pn">Deploy</p><p class="pd">Deploys and can roll back in one step.</p></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Watcher</p><p class="pd">Read-only: compares metrics before and after; on a regression proposes a rollback to the Operator.</p></div>
+<div class="pcs n2">
+  <div class="pc"><div class="pc-top"><span class="pk k-script">Script</span><span class="ps">built</span></div><p class="pn">Deploy</p><dl class="eg3"><dt>In</dt><dd>Merged main</dd><dt>Does</dt><dd>Deploys to everyone; rolls back on the Watcher's call</dd><dt>Out</dt><dd>Running version, a record in Deployments</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Watcher</p><dl class="eg3"><dt>In</dt><dd>Deploy, the PR diff, errors, logs, metrics</dd><dt>Does</dt><dd>Watches what the PR changed, then the whole service</dd><dt>Out</dt><dd>Clean: Done. Regression: rollback, report, work item</dd></dl></div>
 </div>
 </div>
 
-<p class="sf"><b>Work item states:</b> Merged → DeployReview (R2) → Live → Done / RolledBack &nbsp;·&nbsp; <b>The Operator decides:</b> Deploy R2?</p>
+<p class="sf"><b>Work item states:</b> Merged → Live → Done / RolledBack &nbsp;·&nbsp; <b>The Operator decides:</b> nothing, this stage runs without a human</p>
 
 
 ---
@@ -307,11 +306,9 @@ stateDiagram-v2
   MergeReview --> Implementing: "changes" + comment
   MergeReview --> Merged: "merge"
   MergeReview --> Implementing: queue red or conflict
-  Merged --> Live: R0/R1 right away
-  Merged --> DeployReview: R2
-  DeployReview --> Live: "deploy"
-  Live --> Done: no regression
-  Live --> RolledBack: regression, "roll back"
+  Merged --> Live: deployed to everyone
+  Live --> Done: watch window over, no regression
+  Live --> RolledBack: regression, the Watcher rolled back
   Blocked --> Accepted: Operator sorted it out
   Blocked --> Cancelled
   Done --> [*]
@@ -344,7 +341,7 @@ layout: default
 | 5 | Tracker | Two from day one: GitHub Issues and Jira, behind a common "work items" layer; each tool is an adapter |
 | 6 | How to merge by risk | R0 merges itself on green checks and AI review; R1 the Operator merges on evidence; R2 the Operator reads the code. Revised 2026-11-20: R0 is decided by the auto-merge rules file at merge, not by the agent (decision 25) |
 | 7 | Who sets size and risk | The agent proposes with a reason; the Operator corrects when accepting the work item |
-| 8 | When a change goes to production | R0 and R1 right after merge; a watcher compares metrics and proposes a rollback. R2 the Operator deploys |
+| 8 | When a change goes to production | Every merge deploys main right away, R0, R1 and R2 alike; R2 is approved at the Merge gate, where "merge" means "deploy now". Revised 2026-11-20 (decision 26) |
 | 9 | How many work items in parallel | At most N (start with 3) wait for the Operator at once; beyond that new ones do not start |
 | 10 | Which repositories first | Personal and work ones at once |
 | 11 | How the pipeline talks to the Operator | By universal presentation rules: decision type sets the depth, a real before/after case is mandatory, "not verified" on top, form chosen by the task. Recommendation first for small decisions, after the facts for big ones |
@@ -361,6 +358,7 @@ layout: default
 | 23 | Order of checks after the code | CI → AI reviewer (white-box, stage 5 "Checks & review") → Validator (black-box, stage 6 "Acceptance"). The Validator does not see the reviewer's verdict. After any fix, the reviewer reviews only the new diff and the Validator re-checks the criteria the fix touched |
 | 24 | How a PR lands | Through a merge queue: the PR is rebuilt on the latest main with the PRs ahead and the full CI runs again; approvals stay valid while the PR's own diff is unchanged; a red build or a conflict ejects it to the Implementer, and after a conflict fix the changed part goes through checks, review and acceptance again. At the gate the Operator sees the scope first (files outside the plan, new dependencies, size), then the explanation and evidence, for R2 the code; "changes" with a comment goes back to the Implementer and does not count toward the 3 automatic rounds |
 | 25 | When a change merges without the Operator (R0) | Only when a rules file in the repo matches all facts: allowed paths and change types (docs, tests, dev tools, patch updates), size limit, no new dependencies, never-zones untouched (migrations, auth, payments, CI config), all checks green, working hours. Kill switch: a change type whose merged changes are reverted more than 5% over 30 days loses auto-merge until the rules change. The agent's R0 is only a forecast |
+| 26 | How a deploy is watched and rolled back | Deploy goes to all users at once, one merge at a time. The Watcher agent watches each deploy for a window (30 min by default): first what the PR changed (errors from the changed code, the business numbers it touches), then the whole service. On a clear regression it rolls back by itself, then reports to the Operator and sends a work item with evidence to Triage; when unsure it asks. More than 2 unneeded rollbacks in 30 days: it asks before rolling back. Migrations ship expand–contract and are never rolled back automatically |
 | 18 | How to check the model for gaps | After the deck walkthrough, every stage answers five questions: what triggers it, what it reads and writes, what it triggers next, where a human re-enters, what stops two runs doing the same work |
 
 </div>

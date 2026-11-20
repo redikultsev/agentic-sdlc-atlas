@@ -1,0 +1,877 @@
+{
+  "_type": "element",
+  "tags": null,
+  "links": null,
+  "viewOf": "engine.deploy",
+  "_stage": "layouted",
+  "sourcePath": "model/deck-views.c4",
+  "description": null,
+  "title": "8. Deploy & watch",
+  "id": "deployDeck",
+  "autoLayout": {
+    "direction": "LR",
+    "nodeSep": 50,
+    "rankSep": 40
+  },
+  "notation": {
+    "nodes": [
+      {
+        "title": "Script or check (no LLM)",
+        "shape": "component",
+        "color": "green",
+        "kinds": [
+          "script"
+        ]
+      },
+      {
+        "title": "Human",
+        "shape": "person",
+        "color": "amber",
+        "kinds": [
+          "human"
+        ]
+      },
+      {
+        "title": "Agent (LLM)",
+        "shape": "rectangle",
+        "color": "indigo",
+        "kinds": [
+          "agent"
+        ]
+      },
+      {
+        "title": "External system",
+        "shape": "rectangle",
+        "color": "slate",
+        "kinds": [
+          "external"
+        ]
+      },
+      {
+        "title": "Pipeline stage",
+        "shape": "rectangle",
+        "color": "slate",
+        "kinds": [
+          "phase"
+        ]
+      },
+      {
+        "title": "Store",
+        "shape": "storage",
+        "color": "storecolor",
+        "kinds": [
+          "store"
+        ]
+      }
+    ]
+  },
+  "hash": "_eEKuF0OAq16bpsPoAyJpwwB_FAotS-CmgyuugyburM",
+  "bounds": {
+    "x": -200.0,
+    "y": -160.0,
+    "width": 1450.0,
+    "height": 1175.0
+  },
+  "nodes": [
+    {
+      "id": "monitoring",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1vua0il"
+      ],
+      "title": "Monitoring",
+      "modelRef": "monitoring",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "External system",
+      "technology": "Errors, logs, metrics",
+      "kind": "external",
+      "isCustomized": true,
+      "x": -160.0,
+      "y": 480.0,
+      "width": 250,
+      "height": 135,
+      "labelBBox": {
+        "x": -102.0,
+        "y": 516.0,
+        "width": 135,
+        "height": 32
+      }
+    },
+    {
+      "id": "changes",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1rcnxic"
+      ],
+      "title": "Pull requests",
+      "modelRef": "changes",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "PR \u00b7 MR",
+      "kind": "store",
+      "isCustomized": true,
+      "x": -160.0,
+      "y": 720.0,
+      "width": 250,
+      "height": 135,
+      "labelBBox": {
+        "x": -118.0,
+        "y": 571.0,
+        "width": 166,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.merge",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "fpjvyj"
+      ],
+      "title": "7. Merge",
+      "modelRef": "engine.merge",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Merge",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "mergeDeck",
+      "x": -160.0,
+      "y": 0,
+      "width": 250,
+      "height": 135,
+      "labelBBox": {
+        "x": -92.0,
+        "y": -346,
+        "width": 115,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.deploy",
+      "parent": null,
+      "level": 0,
+      "children": [
+        "engine.deploy.watcher",
+        "engine.deploy.deployer"
+      ],
+      "inEdges": [
+        "1vua0il",
+        "1rcnxic",
+        "fpjvyj"
+      ],
+      "outEdges": [
+        "1jitp22",
+        "1cela21",
+        "689q35",
+        "1vfgnm5",
+        "1bb1sth"
+      ],
+      "title": "8. Deploy & watch",
+      "modelRef": "engine.deploy",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Release, deploy & watch",
+      "kind": "phase",
+      "depth": 1,
+      "isCustomized": true,
+      "navigateTo": "deploy",
+      "x": 360,
+      "y": -60,
+      "width": 330,
+      "height": 835,
+      "labelBBox": {
+        "x": -39,
+        "y": -185,
+        "width": 116,
+        "height": 15
+      }
+    },
+    {
+      "id": "engine.deploy.watcher",
+      "parent": "engine.deploy",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1vua0il",
+        "1rcnxic"
+      ],
+      "outEdges": [
+        "uf5ayw",
+        "689q35",
+        "1vfgnm5",
+        "1bb1sth"
+      ],
+      "title": "Watcher",
+      "modelRef": "engine.deploy.watcher",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "Deploy, the PR diff, errors, logs, metrics",
+        "does": "Watches what the PR changed, then the whole service",
+        "out": "Clean: Done. Regression: rollback, report, work item"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "Watch agent",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": 400,
+      "y": 600,
+      "width": 250,
+      "height": 135,
+      "labelBBox": {
+        "x": 21.0,
+        "y": 464,
+        "width": 108,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.deploy.deployer",
+      "parent": "engine.deploy",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "fpjvyj",
+        "uf5ayw"
+      ],
+      "outEdges": [
+        "1jitp22",
+        "1cela21"
+      ],
+      "title": "Deploy",
+      "modelRef": "engine.deploy.deployer",
+      "shape": "component",
+      "color": "green",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "metadata": {
+        "in": "Merged main",
+        "does": "Deploys to everyone; rolls back on the Watcher's call",
+        "out": "Running version, a record in Deployments"
+      },
+      "notation": "Script or check (no LLM)",
+      "technology": "Dokploy \u00b7 TeamCity",
+      "kind": "script",
+      "isCustomized": true,
+      "x": 400,
+      "y": 0,
+      "width": 250,
+      "height": 135,
+      "labelBBox": {
+        "x": 35.0,
+        "y": -346,
+        "width": 91,
+        "height": 32
+      }
+    },
+    {
+      "id": "operator",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "689q35"
+      ],
+      "outEdges": [],
+      "title": "Operator",
+      "modelRef": "operator",
+      "shape": "person",
+      "color": "amber",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Human",
+      "technology": "Human",
+      "kind": "human",
+      "isCustomized": true,
+      "x": 960.0,
+      "y": 360.0,
+      "width": 250,
+      "height": 135,
+      "labelBBox": {
+        "x": 134.0,
+        "y": 39.0,
+        "width": 115,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.intake",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1vfgnm5"
+      ],
+      "outEdges": [],
+      "title": "1. Intake",
+      "modelRef": "engine.intake",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Intake & triage",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "intakeDeck",
+      "x": 960.0,
+      "y": 600,
+      "width": 250,
+      "height": 135,
+      "labelBBox": {
+        "x": 135.0,
+        "y": 649,
+        "width": 111,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.learn",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1bb1sth"
+      ],
+      "outEdges": [],
+      "title": "9. Learn",
+      "modelRef": "engine.learn",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Pipeline stage",
+      "technology": "Learn & close the loop",
+      "kind": "phase",
+      "isCustomized": true,
+      "navigateTo": "learnDeck",
+      "x": 960.0,
+      "y": 840.0,
+      "width": 250,
+      "height": 135,
+      "labelBBox": {
+        "x": 138.0,
+        "y": 704.0,
+        "width": 107,
+        "height": 32
+      }
+    },
+    {
+      "id": "prod",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1jitp22"
+      ],
+      "outEdges": [],
+      "title": "Production",
+      "modelRef": "prod",
+      "shape": "rectangle",
+      "color": "slate",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "External system",
+      "technology": "Running services",
+      "kind": "external",
+      "isCustomized": true,
+      "x": 960.0,
+      "y": -120.0,
+      "width": 250,
+      "height": 135,
+      "labelBBox": {
+        "x": 122.0,
+        "y": -811.0,
+        "width": 138,
+        "height": 32
+      }
+    },
+    {
+      "id": "releases",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1cela21"
+      ],
+      "outEdges": [],
+      "title": "Deployments",
+      "modelRef": "releases",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "Dokploy \u00b7 TeamCity",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 960.0,
+      "y": 120.0,
+      "width": 250,
+      "height": 135,
+      "labelBBox": {
+        "x": 107.0,
+        "y": -386.0,
+        "width": 167,
+        "height": 32
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "1vua0il",
+      "source": "monitoring",
+      "target": "engine.deploy.watcher",
+      "label": "errors, logs, metrics",
+      "points": [
+        [
+          90,
+          548
+        ],
+        [
+          245,
+          548
+        ],
+        [
+          245,
+          638
+        ],
+        [
+          400,
+          638
+        ]
+      ],
+      "labelBBox": {
+        "x": 176,
+        "y": 562,
+        "width": 137,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "vt8yb7"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1rcnxic",
+      "source": "changes",
+      "target": "engine.deploy.watcher",
+      "label": "what changed",
+      "points": [
+        [
+          90,
+          788
+        ],
+        [
+          245,
+          788
+        ],
+        [
+          245,
+          698
+        ],
+        [
+          400,
+          698
+        ]
+      ],
+      "labelBBox": {
+        "x": 195,
+        "y": 712,
+        "width": 100,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "nm2rez"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "fpjvyj",
+      "source": "engine.merge",
+      "target": "engine.deploy.deployer",
+      "label": "merged",
+      "points": [
+        [
+          90,
+          68
+        ],
+        [
+          245,
+          68
+        ],
+        [
+          245,
+          68
+        ],
+        [
+          400,
+          68
+        ]
+      ],
+      "labelBBox": {
+        "x": 215,
+        "y": 37,
+        "width": 60,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "i31tqi"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "uf5ayw",
+      "source": "engine.deploy.watcher",
+      "target": "engine.deploy.deployer",
+      "label": "roll back",
+      "points": [
+        [
+          525,
+          600
+        ],
+        [
+          525,
+          368
+        ],
+        [
+          525,
+          368
+        ],
+        [
+          525,
+          135
+        ]
+      ],
+      "labelBBox": {
+        "x": 447,
+        "y": 355,
+        "width": 66,
+        "height": 25
+      },
+      "parent": "engine.deploy",
+      "relations": [
+        "7cbsa0"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1jitp22",
+      "source": "engine.deploy.deployer",
+      "target": "prod",
+      "label": "rollout",
+      "points": [
+        [
+          650,
+          38
+        ],
+        [
+          805,
+          38
+        ],
+        [
+          805,
+          -52
+        ],
+        [
+          960,
+          -52
+        ]
+      ],
+      "labelBBox": {
+        "x": 778,
+        "y": -38,
+        "width": 54,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "319jq4"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1cela21",
+      "source": "engine.deploy.deployer",
+      "target": "releases",
+      "label": "version",
+      "points": [
+        [
+          650,
+          98
+        ],
+        [
+          805,
+          98
+        ],
+        [
+          805,
+          188
+        ],
+        [
+          960,
+          188
+        ]
+      ],
+      "labelBBox": {
+        "x": 776,
+        "y": 112,
+        "width": 58,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1rv3gfi"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "689q35",
+      "source": "engine.deploy.watcher",
+      "target": "operator",
+      "label": "rolled back: report",
+      "points": [
+        [
+          650,
+          614
+        ],
+        [
+          805,
+          614
+        ],
+        [
+          805,
+          428
+        ],
+        [
+          960,
+          428
+        ]
+      ],
+      "labelBBox": {
+        "x": 741,
+        "y": 490,
+        "width": 128,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1mfx2vs"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1vfgnm5",
+      "source": "engine.deploy.watcher",
+      "target": "engine.intake",
+      "label": "regression: work\nitem with evidence",
+      "points": [
+        [
+          650,
+          668
+        ],
+        [
+          805,
+          668
+        ],
+        [
+          805,
+          668
+        ],
+        [
+          960,
+          668
+        ]
+      ],
+      "labelBBox": {
+        "x": 740,
+        "y": 628,
+        "width": 131,
+        "height": 42
+      },
+      "parent": null,
+      "relations": [
+        "p95zqh"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1bb1sth",
+      "source": "engine.deploy.watcher",
+      "target": "engine.learn",
+      "label": "rollout outcome",
+      "points": [
+        [
+          650,
+          722
+        ],
+        [
+          805,
+          722
+        ],
+        [
+          805,
+          908
+        ],
+        [
+          960,
+          908
+        ]
+      ],
+      "labelBBox": {
+        "x": 749,
+        "y": 784,
+        "width": 112,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1u425q1"
+      ],
+      "color": "primary",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "handoff",
+      "isLabelCustomized": true
+    }
+  ],
+  "_layout": "manual"
+}

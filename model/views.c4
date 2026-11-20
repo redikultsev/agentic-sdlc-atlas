@@ -9,7 +9,7 @@ views {
       **Colour:** purple = agent, green = script, red = the Operator decides, grey = store.
 
       **Size:** S = straight to code; M = spec and plan; L = plus codebase research.
-      **Risk:** R0 merges and deploys itself; R1 = the Operator checks the evidence; R2 = the Operator reads the code and deploys.
+      **Risk:** R0 merges and deploys itself; R1 = the Operator checks the evidence; R2 = the Operator reads the code. Every merge deploys at once.
     '''
     include
       operator,
@@ -28,6 +28,9 @@ views {
       ci,
       releases,
       prod
+    include
+      engine.spec -> engine.plan with { title 'M, L' },
+      engine.plan -> docs with { title 'plan, research' }
     exclude
       engine.intake -> engine.implement,
       engine.verify -> engine.implement,
@@ -35,6 +38,8 @@ views {
       engine.aiReview -> engine.implement,
       engine.spec -> operator,
       engine.deploy -> operator,
+      engine.deploy -> engine.intake,
+      changes -> engine.deploy,
       engine.learn -> engine.intake,
       engine.aiReview -> changes,
       engine.implement -> docs,
@@ -159,27 +164,25 @@ views {
       when 'R0: rules match' {
         engine.aiReview.validator -> engine.merge.r0check 'pass'
         engine.merge.r0check -> engine.merge.land 'match'
-        engine.merge.land -> engine.deploy.deployer 'right away'
+        engine.merge.land -> engine.deploy.deployer 'deploy'
       }
       if 'R1' {
         engine.aiReview.validator -> engine.merge.r0check 'pass'
         engine.merge.r0check -> engine.merge.mergeGate 'no match'
         operator -> engine.merge.mergeGate 'scope, evidence → merge'
         engine.merge.mergeGate -> engine.merge.land 'merge'
-        engine.merge.land -> engine.deploy.deployer 'right away'
+        engine.merge.land -> engine.deploy.deployer 'deploy'
       }
       else 'R2' {
         engine.aiReview.validator -> engine.merge.r0check 'pass'
         engine.merge.r0check -> engine.merge.mergeGate 'no match'
-        operator -> engine.merge.mergeGate 'scope, code → merge'
+        operator -> engine.merge.mergeGate 'scope, code → merge = deploy now'
         engine.merge.mergeGate -> engine.merge.land 'merge'
-        engine.merge.land -> engine.deploy.prodGate 'waits'
-        operator -> engine.deploy.prodGate 'deploy'
-        engine.deploy.prodGate -> engine.deploy.deployer 'yes'
+        engine.merge.land -> engine.deploy.deployer 'deploy'
       }
     }
-    engine.deploy.deployer -> prod 'rollout'
-    prod -> engine.deploy.watcher 'metrics before and after'
+    engine.deploy.deployer -> prod 'rollout to everyone'
+    engine.deploy.deployer -> engine.deploy.watcher 'watch window starts'
     engine.deploy.watcher -> engine.learn.retro 'outcome'
   }
 }

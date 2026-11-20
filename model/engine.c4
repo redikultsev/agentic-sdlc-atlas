@@ -241,7 +241,7 @@ model {
       mergeGate = gate 'Merge?' {
         #idea
         technology 'Gate'
-        description 'The Operator sees first the scope (files outside the plan, new dependencies, size), then the explanation and the evidence; for R2 also the code. "Merge" sends the PR to the queue; "changes" with a comment sends it back to the Implementer. Changes asked by the Operator do not count toward the 3 automatic fix rounds.'
+        description 'The Operator sees first the scope (files outside the plan, new dependencies, size), then the explanation and the evidence; for R2 also the code. "Merge" sends the PR to the queue; main deploys right after, so for R2 "merge" also means "deploy now" and the Operator picks the moment by pressing it; "changes" with a comment sends it back to the Implementer. Changes asked by the Operator do not count toward the 3 automatic fix rounds.'
         metadata {
           in 'The PR: scope, explanation, evidence; for R2 the code'
           does 'The Operator: merge or changes with a comment'
@@ -266,23 +266,28 @@ model {
     // ================= 8. Deploy & watch =================
     deploy = phase '8. Deploy & watch' {
       technology 'Release, deploy & watch'
-      description 'R0 and R1 go to production right after merge, R2 on the Operator yes. A watcher compares metrics before and after.'
-      prodGate = gate 'Deploy R2?' {
-        #idea
-        technology 'Gate'
-        description 'R2 only: migrations, infrastructure, money, secrets.'
-      }
+      description 'Every merge deploys main to all users at once. The Watcher watches the change and rolls it back by itself on a regression. No gate after merge: R2 was approved at the Merge gate.'
       deployer = script 'Deploy' {
         #built
-        technology 'Deploy'
-        description 'Deploys and can roll back in one step.'
+        technology 'Dokploy · TeamCity'
+        description 'Deploys main after every merge, one merge at a time, to all users at once, so a regression points at one PR. Records the version and the outcome in Deployments. Rolls back to the previous version in one step. Database migrations are never rolled back automatically: they ship expand–contract (add the new form, switch, remove the old in a later change), so rolling back the code is safe while the schema stays.'
+        metadata {
+          in 'Merged main'
+          does 'Deploys to everyone; rolls back on the Watcher\'s call'
+          out 'Running version, a record in Deployments'
+        }
       }
       watcher = agent 'Watcher' {
         #idea
-        technology 'Watch'
-        description 'Read-only: compares metrics before and after; on a regression proposes a rollback to the Operator.'
+        technology 'Watch agent'
+        description 'Starts on every deploy and watches for the watch window (default 30 min, longer for R2; set in config). Read-only on production; its only action is a rollback. Knows what the PR changed and watches that first: errors and logs from the changed code, the endpoints and business numbers it touches (for example orders and their sums); then the overall error rate and latency. Compares with the same hours before the deploy. On a clear regression rolls back at once through Deploy, then reports to the Operator with evidence and sends a work item with the evidence to Triage. When unsure, asks the Operator. Every rollback is recorded; when more than 2 of its rollbacks in 30 days turn out unneeded, it asks the Operator before rolling back until the Operator resets the rule. Window over with no regression: the work item is Done, the outcome goes to Learn.'
+        metadata {
+          in 'Deploy, the PR diff, errors, logs, metrics'
+          does 'Watches what the PR changed, then the whole service'
+          out 'Clean: Done. Regression: rollback, report, work item'
+        }
       }
-      prodGate -> deployer 'yes'
+      watcher -> deployer 'roll back'
     }
 
     // ================= 9. Learn =================
@@ -341,12 +346,11 @@ model {
   engine.verify.reviewer -> engine.sandbox 're-checks findings in its own'
   operator -> engine.merge.mergeGate 'decides'
   engine.merge.land -> changes 'merge'
-  engine.merge.land .handoff engine.deploy.deployer 'R0, R1'
-  engine.merge.land .handoff engine.deploy.prodGate 'R2'
-  operator -> engine.deploy.prodGate 'deploys'
+  engine.merge.land .handoff engine.deploy.deployer 'merged'
   engine.deploy.deployer -> releases 'version'
   engine.deploy.deployer -> prod 'rollout'
-  prod -> engine.deploy.watcher 'metrics'
+  monitoring -> engine.deploy.watcher 'errors, logs, metrics'
+  changes .reads engine.deploy.watcher 'what changed'
   engine.deploy.watcher .handoff engine.learn.retro 'rollout outcome'
   operator -> engine.learn.adopt 'chooses'
 
@@ -354,7 +358,8 @@ model {
   engine.verify.checks .verdict engine.implement.implementer 'red: fix, at most 3 rounds'
   engine.verify.reviewer .verdict engine.implement.implementer 'fix, same 3 rounds'
   engine.spec.interviewer -> operator 'questions'
-  engine.deploy.watcher -> operator 'regression: roll back?'
+  engine.deploy.watcher -> operator 'rolled back: report'
+  engine.deploy.watcher .handoff engine.intake.triage 'regression: work item with evidence'
   engine.learn.retro -> engine.intake.triage 'proposed work items'
   engine.learn.adopt -> engine.orchestrator 'new rule or check'
 
