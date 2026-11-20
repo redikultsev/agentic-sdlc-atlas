@@ -32,3 +32,73 @@ views {
     style * { size small textSize xlarge }
   }
 }
+
+
+// Stage views for the deck: same content as the stage views in views.c4,
+// descriptions hidden (the slide shows them as cards), compact blocks, larger text.
+views {
+  view intakeDeck of engine.intake {
+    title '1. Intake'
+    include * with { description '' }
+    include -> engine.intake.* ->
+    style * { size small textSize xlarge }
+    autoLayout LeftRight 40 50
+  }
+  view specDeck of engine.spec {
+    title '2. Spec'
+    include * with { description '' }
+    include -> engine.spec.* ->
+    style * { size small textSize xlarge }
+    autoLayout LeftRight 40 50
+  }
+  view planDeck of engine.plan {
+    title '3. Plan'
+    include * with { description '' }
+    include -> engine.plan.* ->
+    style * { size small textSize xlarge }
+    autoLayout LeftRight 40 50
+  }
+  view implementDeck of engine.implement {
+    title '4. Implement'
+    include * with { description '' }
+    include -> engine.implement.* ->
+    include engine.sandbox with { description '' }
+    style * { size small textSize xlarge }
+    autoLayout LeftRight 40 50
+  }
+  view verifyDeck of engine.verify {
+    title '5. Self-verify'
+    include * with { description '' }
+    include -> engine.verify.* ->
+    style * { size small textSize xlarge }
+    autoLayout LeftRight 40 50
+  }
+  view aiReviewDeck of engine.aiReview {
+    title '6. AI review'
+    include * with { description '' }
+    include -> engine.aiReview.* ->
+    style * { size small textSize xlarge }
+    autoLayout LeftRight 40 50
+  }
+  view mergeDeck of engine.merge {
+    title '7. Merge'
+    include * with { description '' }
+    include -> engine.merge.* ->
+    style * { size small textSize xlarge }
+    autoLayout LeftRight 40 50
+  }
+  view deployDeck of engine.deploy {
+    title '8. Deploy & watch'
+    include * with { description '' }
+    include -> engine.deploy.* ->
+    style * { size small textSize xlarge }
+    autoLayout LeftRight 40 50
+  }
+  view learnDeck of engine.learn {
+    title '9. Learn'
+    include * with { description '' }
+    include -> engine.learn.* ->
+    style * { size small textSize xlarge }
+    autoLayout LeftRight 40 50
+  }
+}

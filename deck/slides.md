@@ -89,37 +89,15 @@ layout: default
 
 <div class="lead">A signal becomes a work item. An agent proposes size and risk; the Operator accepts it.</div>
 
-<div class="grid2">
-<div>
-
-<div class="dg"><likec4-view view-id="intake" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-
-**Work item states:** New → Triaged → Accepted / Cancelled
-
-**The Operator decides:** Accept
-
-</div>
-<div>
-
-| Part | Who | Status | What it does |
-|---|---|---|---|
-| **Triage** | agent | idea | Merges duplicates, proposes size S/M/L and risk R0/R1/R2 with a reason. Never closes anything itself. |
-| **Accept** | Operator decides | idea | The Operator sees size and risk, may correct them, and accepts the work item. |
-
-<details><summary>Stage inputs and outputs</summary>
-
-**In:**
-- Monitoring → Triage: alert
-- Operator → Accept: accepts
-
-**Out:**
-- Triage → Work items: work item
-- Accept → Interviewer: M, L
-- Accept → Implementer: S: straight to code
-
-</details>
+<div class="stg">
+<div class="dg"><likec4-view view-id="intakeDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
+<div class="pcs">
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Triage</p><p class="pd">Merges duplicates, proposes size S/M/L and risk R0/R1/R2 with a reason. Never closes anything itself.</p></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Accept</p><p class="pd">The Operator sees size and risk, may correct them, and accepts the work item.</p></div>
 </div>
 </div>
+
+<p class="sf"><b>Work item states:</b> New → Triaged → Accepted / Cancelled &nbsp;·&nbsp; <b>The Operator decides:</b> Accept</p>
 
 
 ---
@@ -130,38 +108,15 @@ layout: default
 
 <div class="lead">M and L only. The agent clarifies and writes what "done" means.</div>
 
-<div class="grid2">
-<div>
-
-<div class="dg"><likec4-view view-id="spec" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-
-**Work item states:** Clarifying → SpecReview
-
-**The Operator decides:** Approve spec
-
-</div>
-<div>
-
-| Part | Who | Status | What it does |
-|---|---|---|---|
-| **Interviewer** | agent | idea | Asks about what is underspecified, writes the spec: why, acceptance criteria, what must not change. |
-| **Approve spec** | Operator decides | idea | M and L: the Operator approves the spec. |
-
-<details><summary>Stage inputs and outputs</summary>
-
-**In:**
-- Accept → Interviewer: M, L
-- Operator → Approve spec: approves
-
-**Out:**
-- Interviewer → Specs and plans: spec
-- Approve spec → Codebase researcher: L
-- Approve spec → Planner: M
-- Interviewer → Operator: questions
-
-</details>
+<div class="stg">
+<div class="dg"><likec4-view view-id="specDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
+<div class="pcs">
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Interviewer</p><p class="pd">Asks about what is underspecified, writes the spec: why, acceptance criteria, what must not change.</p></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Approve spec</p><p class="pd">M and L: the Operator approves the spec.</p></div>
 </div>
 </div>
+
+<p class="sf"><b>Work item states:</b> Clarifying → SpecReview &nbsp;·&nbsp; <b>The Operator decides:</b> Approve spec</p>
 
 
 ---
@@ -172,38 +127,16 @@ layout: default
 
 <div class="lead">M and L only. How we do it, in slices, and how we prove it is done.</div>
 
-<div class="grid2">
-<div>
-
-<div class="dg"><likec4-view view-id="plan" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-
-**Work item states:** Researching (L) → Planning → PlanReview
-
-**The Operator decides:** Approve plan
-
-</div>
-<div>
-
-| Part | Who | Status | What it does |
-|---|---|---|---|
-| **Codebase researcher** | agent | idea | L only: a separate read-only pass; the result is a short document on affected modules and invariants. |
-| **Planner** | agent | idea | A plan in slices: files, order, risks, a check command for each slice. |
-| **Approve plan** | Operator decides | idea | M and L: the main Operator gate. A wrong idea is cheaper to catch before code. |
-
-<details><summary>Stage inputs and outputs</summary>
-
-**In:**
-- Approve spec → Codebase researcher: L
-- Approve spec → Planner: M
-- Operator → Approve plan: approves
-
-**Out:**
-- Planner → Specs and plans: plan
-- Approve plan → Implementer: plan
-
-</details>
+<div class="stg">
+<div class="dg"><likec4-view view-id="planDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
+<div class="pcs">
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Codebase researcher</p><p class="pd">L only: a separate read-only pass; the result is a short document on affected modules and invariants.</p></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Planner</p><p class="pd">A plan in slices: files, order, risks, a check command for each slice.</p></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Approve plan</p><p class="pd">M and L: the main Operator gate. A wrong idea is cheaper to catch before code.</p></div>
 </div>
 </div>
+
+<p class="sf"><b>Work item states:</b> Researching (L) → Planning → PlanReview &nbsp;·&nbsp; <b>The Operator decides:</b> Approve plan</p>
 
 
 ---
@@ -214,38 +147,14 @@ layout: default
 
 <div class="lead">The agent writes the change in the sandbox. S comes here straight from intake.</div>
 
-<div class="grid2">
-<div>
-
-<div class="dg"><likec4-view view-id="implement" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-
-**Work item states:** Implementing
-
-**The Operator decides:** nothing — this stage runs without a human
-
-</div>
-<div>
-
-| Part | Who | Status | What it does |
-|---|---|---|---|
-| **Implementer** | agent | built | Reads the code it needs and writes one slice in a fresh context. |
-
-<details><summary>Stage inputs and outputs</summary>
-
-**In:**
-- Accept → Implementer: S: straight to code
-- Approve plan → Implementer: plan
-- Checks → Implementer: red: fix, at most 2 rounds
-- Judge → Implementer: fix
-- Orchestrator → Implementer: runs in sandbox
-
-**Out:**
-- Implementer → Change sets: PR
-- Implementer → Checks: run
-
-</details>
+<div class="stg">
+<div class="dg"><likec4-view view-id="implementDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
+<div class="pcs">
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Implementer</p><p class="pd">Reads the code it needs and writes one slice in a fresh context.</p></div>
 </div>
 </div>
+
+<p class="sf"><b>Work item states:</b> Implementing &nbsp;·&nbsp; <b>The Operator decides:</b> nothing, this stage runs without a human</p>
 
 
 ---
@@ -256,37 +165,16 @@ layout: default
 
 <div class="lead">The agent never says "done" until checks are green. Rounds are capped.</div>
 
-<div class="grid2">
-<div>
-
-<div class="dg"><likec4-view view-id="verify" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-
-**Work item states:** Verifying (round ≤ 3, else Blocked)
-
-**The Operator decides:** nothing — this stage runs without a human
-
-</div>
-<div>
-
-| Part | Who | Status | What it does |
-|---|---|---|---|
-| **Checks** | script | planned | Tests, lint, types, build. They run by themselves, not on the agent word. |
-| **Holdout tests** | script | idea | Scenarios the agent cannot see or edit. |
-| **Evidence** | agent | idea | Screenshots, video, command output: what the Operator looks at instead of code. |
-
-<details><summary>Stage inputs and outputs</summary>
-
-**In:**
-- Implementer → Checks: run
-
-**Out:**
-- Checks → Check results: results
-- Evidence → Reviewers: PR + evidence
-- Checks → Implementer: red: fix, at most 2 rounds
-
-</details>
+<div class="stg">
+<div class="dg"><likec4-view view-id="verifyDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
+<div class="pcs">
+  <div class="pc"><div class="pc-top"><span class="pk k-script">Script</span><span class="ps">planned</span></div><p class="pn">Checks</p><p class="pd">Tests, lint, types, build. They run by themselves, not on the agent word.</p></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-script">Script</span><span class="ps">idea</span></div><p class="pn">Holdout tests</p><p class="pd">Scenarios the agent cannot see or edit.</p></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Evidence</p><p class="pd">Screenshots, video, command output: what the Operator looks at instead of code.</p></div>
 </div>
 </div>
+
+<p class="sf"><b>Work item states:</b> Verifying (round ≤ 3, else Blocked) &nbsp;·&nbsp; <b>The Operator decides:</b> nothing, this stage runs without a human</p>
 
 
 ---
@@ -297,37 +185,15 @@ layout: default
 
 <div class="lead">Reviewer agents with a fresh context check against the spec and standards. An agent approval is not a human approval.</div>
 
-<div class="grid2">
-<div>
-
-<div class="dg"><likec4-view view-id="aiReview" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-
-**Work item states:** Verifying → MergeReview (R1/R2) or Merged (R0)
-
-**The Operator decides:** nothing — this stage runs without a human
-
-</div>
-<div>
-
-| Part | Who | Status | What it does |
-|---|---|---|---|
-| **Reviewers** | agent | built | Correctness, security, match with the spec. Findings ranked by severity, noise filtered out. |
-| **Judge** | agent | built | Turns findings into a JSON verdict: pass / fix / block. |
-
-<details><summary>Stage inputs and outputs</summary>
-
-**In:**
-- Evidence → Reviewers: PR + evidence
-
-**Out:**
-- Judge → Change sets: verdict
-- Judge → Merge script: pass, R0
-- Judge → Merge?: pass, R1/R2
-- Judge → Implementer: fix
-
-</details>
+<div class="stg">
+<div class="dg"><likec4-view view-id="aiReviewDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
+<div class="pcs">
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Reviewers</p><p class="pd">Correctness, security, match with the spec. Findings ranked by severity, noise filtered out.</p></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Judge</p><p class="pd">Turns findings into a JSON verdict: pass / fix / block.</p></div>
 </div>
 </div>
+
+<p class="sf"><b>Work item states:</b> Verifying → MergeReview (R1/R2) or Merged (R0) &nbsp;·&nbsp; <b>The Operator decides:</b> nothing, this stage runs without a human</p>
 
 
 ---
@@ -338,38 +204,15 @@ layout: default
 
 <div class="lead">By risk: R0 merges itself, R1 the Operator merges on evidence, R2 the Operator reads the code.</div>
 
-<div class="grid2">
-<div>
-
-<div class="dg"><likec4-view view-id="merge" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-
-**Work item states:** MergeReview → Merged
-
-**The Operator decides:** Merge?
-
-</div>
-<div>
-
-| Part | Who | Status | What it does |
-|---|---|---|---|
-| **Merge?** | Operator decides | idea | R1: report with evidence. R2: plus the code. |
-| **Merge script** | script | planned | Merges only if the PR head is unchanged, the review was on that head and CI is green. The agent never merges. |
-
-<details><summary>Stage inputs and outputs</summary>
-
-**In:**
-- Judge → Merge script: pass, R0
-- Judge → Merge?: pass, R1/R2
-- Operator → Merge?: reviews evidence
-
-**Out:**
-- Merge script → Change sets: merge
-- Merge script → Deploy: R0, R1
-- Merge script → Deploy R2?: R2
-
-</details>
+<div class="stg">
+<div class="dg"><likec4-view view-id="mergeDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
+<div class="pcs">
+  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Merge?</p><p class="pd">R1: report with evidence. R2: plus the code.</p></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-script">Script</span><span class="ps">planned</span></div><p class="pn">Merge script</p><p class="pd">Merges only if the PR head is unchanged, the review was on that head and CI is green. The agent never merges.</p></div>
 </div>
 </div>
+
+<p class="sf"><b>Work item states:</b> MergeReview → Merged &nbsp;·&nbsp; <b>The Operator decides:</b> Merge?</p>
 
 
 ---
@@ -380,41 +223,16 @@ layout: default
 
 <div class="lead">R0 and R1 go to production right after merge, R2 on the Operator yes. A watcher compares metrics before and after.</div>
 
-<div class="grid2">
-<div>
-
-<div class="dg"><likec4-view view-id="deploy" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-
-**Work item states:** Merged → DeployReview (R2) → Live → Done / RolledBack
-
-**The Operator decides:** Deploy R2?
-
-</div>
-<div>
-
-| Part | Who | Status | What it does |
-|---|---|---|---|
-| **Deploy R2?** | Operator decides | idea | R2 only: migrations, infrastructure, money, secrets. |
-| **Deploy** | script | built | Deploys and can roll back in one step. |
-| **Watcher** | agent | idea | Read-only: compares metrics before and after; on a regression proposes a rollback to the Operator. |
-
-<details><summary>Stage inputs and outputs</summary>
-
-**In:**
-- Merge script → Deploy: R0, R1
-- Merge script → Deploy R2?: R2
-- Operator → Deploy R2?: deploys
-- Production → Watcher: metrics
-
-**Out:**
-- Deploy → Deployments: version
-- Deploy → Production: rollout
-- Watcher → Retro: rollout outcome
-- Watcher → Operator: regression: roll back?
-
-</details>
+<div class="stg">
+<div class="dg"><likec4-view view-id="deployDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
+<div class="pcs">
+  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Deploy R2?</p><p class="pd">R2 only: migrations, infrastructure, money, secrets.</p></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-script">Script</span><span class="ps">built</span></div><p class="pn">Deploy</p><p class="pd">Deploys and can roll back in one step.</p></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Watcher</p><p class="pd">Read-only: compares metrics before and after; on a regression proposes a rollback to the Operator.</p></div>
 </div>
 </div>
+
+<p class="sf"><b>Work item states:</b> Merged → DeployReview (R2) → Live → Done / RolledBack &nbsp;·&nbsp; <b>The Operator decides:</b> Deploy R2?</p>
 
 
 ---
@@ -425,37 +243,15 @@ layout: default
 
 <div class="lead">Mistakes and corrections become new work items, checks and rules.</div>
 
-<div class="grid2">
-<div>
-
-<div class="dg"><likec4-view view-id="learn" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-
-**Work item states:** new work items in New
-
-**The Operator decides:** Adopt rule?
-
-</div>
-<div>
-
-| Part | Who | Status | What it does |
-|---|---|---|---|
-| **Retro** | agent | idea | Weekly: what repeated twice becomes a proposed rule, check or work item. |
-| **Adopt rule?** | Operator decides | idea | The Operator picks which proposals to adopt. |
-
-<details><summary>Stage inputs and outputs</summary>
-
-**In:**
-- Watcher → Retro: rollout outcome
-- Operator → Adopt rule?: chooses
-- Session traces → Retro: session traces
-
-**Out:**
-- Retro → Work items: new work items
-- Adopt rule? → Orchestrator: new rule or check
-
-</details>
+<div class="stg">
+<div class="dg"><likec4-view view-id="learnDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
+<div class="pcs">
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Retro</p><p class="pd">Weekly: what repeated twice becomes a proposed rule, check or work item.</p></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Adopt rule?</p><p class="pd">The Operator picks which proposals to adopt.</p></div>
 </div>
 </div>
+
+<p class="sf"><b>Work item states:</b> new work items in New &nbsp;·&nbsp; <b>The Operator decides:</b> Adopt rule?</p>
 
 
 ---

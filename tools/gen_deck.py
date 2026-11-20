@@ -34,17 +34,17 @@ def part(name):
     t = (root / 'deck' / 'parts' / f'{name}.md').read_text().strip()
     return re.sub(r'\{\{tech:([\w.]+)\}\}', lambda m: E[m.group(1)].get('technology', ''), t)
 
+KIND_TAG = {'agent': 'Agent', 'script': 'Script', 'gate': 'Gate', 'human': 'Operator', 'store': 'Store', 'platform': 'Cross-cutting'}
+
 def stage_slide(key):
     fqn = f'engine.{key}'; st = E[fqn]
     kids = [k for k in E if k.startswith(fqn + '.') and k.count('.') == fqn.count('.') + 1]
-    inside = lambda x: x == fqn or x.startswith(fqn + '.')
-    ins, outs = [], []
-    for r in R.values():
-        s, t = r['source']['model'], r['target']['model']
-        if inside(t) and not inside(s): ins.append(f"{title(s)} → {title(t)}: {r.get('title','')}")
-        if inside(s) and not inside(t): outs.append(f"{title(s)} → {title(t)}: {r.get('title','')}")
-    rows = '\n'.join(f"| **{cell(E[k]['title'])}** | {KIND.get(E[k]['kind'], E[k]['kind'])} | {STATUS.get((E[k].get('tags') or ['-'])[0], '—')} | {cell(txt(E[k].get('description')))} |" for k in kids)
     gates = [E[k]['title'] for k in kids if E[k]['kind'] == 'gate']
+    cards = '\n'.join(
+        f'  <div class="pc"><div class="pc-top"><span class="pk k-{E[k]["kind"]}">{KIND_TAG.get(E[k]["kind"], E[k]["kind"])}</span>'
+        f'<span class="ps">{STATUS.get((E[k].get("tags") or ["-"])[0], "")}</span></div>'
+        f'<p class="pn">{E[k]["title"]}</p><p class="pd">{txt(E[k].get("description"))}</p></div>' for k in kids)
+    decides = ', '.join(gates) if gates else 'nothing, this stage runs without a human'
     return f"""---
 layout: default
 ---
@@ -53,31 +53,14 @@ layout: default
 
 <div class="lead">{txt(st.get('description'))}</div>
 
-<div class="grid2">
-<div>
-
-<div class="dg"><likec4-view view-id="{key}" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-
-**Work item states:** {STATES[key]}
-
-**The Operator decides:** {', '.join(gates) if gates else 'nothing — this stage runs without a human'}
-
-</div>
-<div>
-
-| Part | Who | Status | What it does |
-|---|---|---|---|
-{rows}
-
-<details><summary>Stage inputs and outputs</summary>
-
-**In:**{''.join(chr(10)+'- '+cell(x) for x in ins) or ' —'}
-
-**Out:**{''.join(chr(10)+'- '+cell(x) for x in outs) or ' —'}
-
-</details>
+<div class="stg">
+<div class="dg"><likec4-view view-id="{key}Deck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
+<div class="pcs">
+{cards}
 </div>
 </div>
+
+<p class="sf"><b>Work item states:</b> {STATES[key]} &nbsp;·&nbsp; <b>The Operator decides:</b> {decides}</p>
 """
 
 states_md = (root / 'docs' / 'states.md').read_text()

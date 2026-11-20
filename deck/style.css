@@ -47,3 +47,15 @@ details summary { cursor: pointer; color: #6b7280; font-size: 0.85rem; }
 .card .eg { font-size: 17px; color: #475569; margin-top: 4px; }
 .sr-foot { margin-top: 14px; font-size: 19px; color: #334155; text-align: center; }
 .sr-col:first-child { padding-right: 32px; } .sr-col + .sr-col { border-left: 2px solid #cbd5e1; padding-left: 32px; }
+.view-stage { display: block; height: 450px; width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; }
+.dg .hint { margin-top: -8px; }
+.stg { display: grid; grid-template-columns: 1.7fr 1fr; gap: 24px; align-items: center; }
+.pcs { display: flex; flex-direction: column; gap: 12px; }
+.pc { padding: 12px 16px; border-radius: 10px; background: #f8fafc; border: 1.5px solid #cbd5e1; }
+.pc-top { display: flex; justify-content: space-between; align-items: center; }
+.pk { font-size: 15px; font-weight: 700; color: #fff; padding: 2px 10px; border-radius: 6px; background: #475569; }
+.pk.k-agent { background: #4f46e5; } .pk.k-script { background: #047857; } .pk.k-gate { background: #be123c; } .pk.k-human { background: #c2410c; }
+.ps { font-size: 15px; color: #64748b; }
+.pc .pn { margin: 6px 0 2px; font-size: 20px; font-weight: 700; color: #0f172a; }
+.pc .pd { margin: 0; font-size: 16px; line-height: 1.35; color: #334155; }
+.sf { margin-top: 12px; font-size: 18px; color: #334155; }

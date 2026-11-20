@@ -4,7 +4,7 @@ Where the project stands and what comes next. Update it at the end of every work
 
 ## Now (2026-11-20)
 
-**Deck walkthrough with the owner, slide by slide.** Slides 1–3 are accepted; continue from slide 4 ("What moves and where it lives"). For each slide: show it, say what it claims and what could be better, collect corrections, apply them to the source, regenerate, check in the browser, commit.
+**Deck walkthrough with the owner, slide by slide.** Slides 1–5 are accepted; stage slides 6–14 got a new template; continue reviewing from slide 6 ("What moves and where it lives"). For each slide: show it, say what it claims and what could be better, collect corrections, apply them to the source, regenerate, check in the browser, commit.
 
 Run both views from the repository root:
 
@@ -28,7 +28,7 @@ Deck (20 slides): 1 title · 2 how to read · 3 whole pipeline · 4 what moves a
 
 ## Known gaps
 
-1. Stage slides (6–14): block text is still small; fix when the walkthrough reaches them.
+1. Stage slides (6–14) use compact deck views (`model/deck-views.c4`, descriptions hidden). Wide stages (3. Plan) still render small.
 2. Only the overview has a manual layout. If its elements or links change, LikeC4 reports layout drift: delete `.likec4/index.likec4.snap`, nudge any block in the editor (Edit), run `node tools/layout_index.mjs`.
 3. PDF export of the deck with web components is not verified.
 4. `docs/states.md` is a draft the owner has not reviewed yet (slides 16–17).
