@@ -29,6 +29,6 @@ npm run deck:gen   # check the model, export diagram images, regenerate slides.m
 
 and commit together with the regenerated files.
 
-The overview (`index` view) has a hand-tuned layout in `.likec4/index.likec4.snap`, produced by `tools/layout_index.mjs`: Operator on top, stages in one row, stores below, straight non-crossing lines. If the overview's elements or links change, LikeC4 reports layout drift: delete the snap, nudge any block in `npm run dev` → Edit (this writes a fresh snap), then run `node tools/layout_index.mjs`. `npm run build` also builds static sites into `dist/`.
+The overview (`index` view) has a hand-tuned layout in `.likec4/index.likec4.snap`, produced by `tools/layout_index.mjs`: Operator on top, stages in one row, stores below, smooth centre-anchored curves that do not cross. If the overview's elements or links change, LikeC4 reports layout drift: delete the snap, nudge any block in `npm run dev` → Edit (this writes a fresh snap), then run `node tools/layout_index.mjs`. `npm run build` also builds static sites into `dist/`.
 
 Draft v1. Part status: built · planned · idea.

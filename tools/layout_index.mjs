@@ -1,5 +1,5 @@
 // Lays out the overview view ("index") on a clean grid and writes its manual layout snapshot.
-// Operator on top, the nine stages in one row, stores below their stages, straight non-crossing edges.
+// Operator on top, the nine stages in one row, stores below their stages, smooth centre-anchored edges.
 // Run after `likec4` has written .likec4/index.likec4.snap (any manual nudge in the editor creates it).
 import fs from 'node:fs'
 const F = '.likec4/index.likec4.snap'
@@ -23,21 +23,28 @@ const eng = node('engine')
 eng.x = col(0) - 40; eng.y = ROW_Y - 60; eng.width = col(8) + W + 40 - eng.x; eng.height = H + 100
 
 const box = id => { const n = node(id); return { x: n.x, y: n.y, w: n.width, h: n.height, cx: n.x + n.width / 2, cy: n.y + n.height / 2 } }
-const line = (a, b) => { const p = t => [Math.round(a[0] + (b[0] - a[0]) * t), Math.round(a[1] + (b[1] - a[1]) * t)]; return [p(0), p(1 / 3), p(2 / 3), p(1)] }
-const at = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]
 
+// Smooth S-curves anchored at block centres: vertical edges leave the bottom centre and enter the top centre,
+// stage-to-stage edges leave the right middle and enter the left middle.
+const bez = (a, c1, c2, b) => [a, c1, c2, b].map(p => [Math.round(p[0]), Math.round(p[1])])
+const cubicAt = (a, c1, c2, b, t) => { const u = 1 - t; return [0, 1].map(k => u*u*u*a[k] + 3*u*u*t*c1[k] + 3*u*t*t*c2[k] + t*t*t*b[k]) }
 for (const e of d.edges) {
   const s = box(e.source), t = box(e.target)
-  let a, b, lt = 0.5, dy = -16
-  if (e.source === 'operator') { a = [s.cx, s.y + s.h]; b = [t.cx, t.y]; lt = 0.72 }
-  else if (STAGES.includes(e.source) && STAGES.includes(e.target)) { a = [s.x + s.w, s.cy]; b = [t.x, t.cy]; dy = -22 }
-  else { a = [s.cx, s.y + s.h]; b = [t.cx, t.y]; dy = 0 }
-  e.points = line(a, b)
-  e.controlPoints = [{ x: Math.round((a[0] + b[0]) / 2), y: Math.round((a[1] + b[1]) / 2) }]
+  let a, b, c1, c2, lt = 0.5
+  if (STAGES.includes(e.source) && STAGES.includes(e.target)) {
+    a = [s.x + s.w, s.cy]; b = [t.x, t.cy]; const k = (b[0] - a[0]) * 0.45
+    c1 = [a[0] + k, a[1]]; c2 = [b[0] - k, b[1]]
+  } else {
+    a = [s.cx, s.y + s.h]; b = [t.cx, t.y]; const k = (b[1] - a[1]) * 0.55
+    c1 = [a[0], a[1] + k]; c2 = [b[0], b[1] - k]
+    lt = e.source === 'operator' ? 0.62 : 0.5
+  }
+  e.points = bez(a, c1, c2, b)
+  delete e.controlPoints  // without control points the renderer draws exactly these bezier points
   const lw = e.labelBBox?.width ?? 60, lh = e.labelBBox?.height ?? 24
-  const [mx, my] = at(a, b, lt)
-  const off = dy === 0 ? 14 : 0
-  e.labelBBox = { x: Math.round(mx - lw / 2 + off + (dy === 0 ? lw / 2 + 4 : 0)), y: Math.round(my - lh / 2 + dy), width: lw, height: lh }
+  const [mx, my] = cubicAt(a, c1, c2, b, lt)
+  const horizontal = STAGES.includes(e.source) && STAGES.includes(e.target)
+  e.labelBBox = { x: Math.round(mx - lw / 2), y: Math.round(my - lh / 2 - (horizontal ? 22 : 0)), width: lw, height: lh }
   e.isLabelCustomized = true
 }
 

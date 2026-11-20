@@ -775,12 +775,12 @@
           300
         ],
         [
-          1433,
-          407
+          2020,
+          476
         ],
         [
-          847,
-          513
+          260,
+          444
         ],
         [
           260,
@@ -788,8 +788,8 @@
         ]
       ],
       "labelBBox": {
-        "x": 722,
-        "y": 502,
+        "x": 799,
+        "y": 474,
         "width": 61,
         "height": 25
       },
@@ -801,12 +801,6 @@
       "line": "dashed",
       "head": "normal",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 1140,
-          "y": 460
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -821,12 +815,12 @@
           300
         ],
         [
-          1580,
-          407
+          2020,
+          476
         ],
         [
-          1140,
-          513
+          700,
+          444
         ],
         [
           700,
@@ -834,8 +828,8 @@
         ]
       ],
       "labelBBox": {
-        "x": 1035,
-        "y": 502,
+        "x": 1092,
+        "y": 474,
         "width": 70,
         "height": 25
       },
@@ -847,12 +841,6 @@
       "line": "dashed",
       "head": "normal",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 1360,
-          "y": 460
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -867,11 +855,11 @@
           710
         ],
         [
-          460,
+          474,
           710
         ],
         [
-          500,
+          486,
           710
         ],
         [
@@ -894,12 +882,6 @@
       "head": "normal",
       "kind": "handoff",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 480,
-          "y": 710
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -914,12 +896,12 @@
           300
         ],
         [
-          1727,
-          407
+          2020,
+          476
         ],
         [
-          1433,
-          513
+          1140,
+          444
         ],
         [
           1140,
@@ -927,8 +909,8 @@
         ]
       ],
       "labelBBox": {
-        "x": 1351,
-        "y": 502,
+        "x": 1390,
+        "y": 474,
         "width": 70,
         "height": 25
       },
@@ -940,12 +922,6 @@
       "line": "dashed",
       "head": "normal",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 1580,
-          "y": 460
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -960,11 +936,11 @@
           710
         ],
         [
-          900,
+          914,
           710
         ],
         [
-          940,
+          926,
           710
         ],
         [
@@ -988,12 +964,6 @@
       "head": "normal",
       "kind": "handoff",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 920,
-          "y": 710
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1008,11 +978,11 @@
           710
         ],
         [
-          1340,
+          1354,
           710
         ],
         [
-          1380,
+          1366,
           710
         ],
         [
@@ -1035,12 +1005,6 @@
       "head": "normal",
       "kind": "handoff",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 1360,
-          "y": 710
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1055,11 +1019,11 @@
           710
         ],
         [
-          1780,
+          1794,
           710
         ],
         [
-          1820,
+          1806,
           710
         ],
         [
@@ -1082,12 +1046,6 @@
       "head": "normal",
       "kind": "handoff",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 1800,
-          "y": 710
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1102,11 +1060,11 @@
           710
         ],
         [
-          2220,
+          2234,
           710
         ],
         [
-          2260,
+          2246,
           710
         ],
         [
@@ -1129,12 +1087,6 @@
       "head": "normal",
       "kind": "handoff",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 2240,
-          "y": 710
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1149,12 +1101,12 @@
           300
         ],
         [
-          2313,
-          407
+          2020,
+          476
         ],
         [
-          2607,
-          513
+          2900,
+          444
         ],
         [
           2900,
@@ -1162,8 +1114,8 @@
         ]
       ],
       "labelBBox": {
-        "x": 2594,
-        "y": 502,
+        "x": 2555,
+        "y": 474,
         "width": 120,
         "height": 25
       },
@@ -1175,12 +1127,6 @@
       "line": "dashed",
       "head": "normal",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 2460,
-          "y": 460
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1195,11 +1141,11 @@
           710
         ],
         [
-          2660,
+          2674,
           710
         ],
         [
-          2700,
+          2686,
           710
         ],
         [
@@ -1223,12 +1169,6 @@
       "head": "normal",
       "kind": "verdict",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 2680,
-          "y": 710
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1243,12 +1183,12 @@
           300
         ],
         [
-          2460,
-          407
+          2020,
+          476
         ],
         [
-          2900,
-          513
+          3340,
+          444
         ],
         [
           3340,
@@ -1256,8 +1196,8 @@
         ]
       ],
       "labelBBox": {
-        "x": 2939,
-        "y": 502,
+        "x": 2882,
+        "y": 474,
         "width": 62,
         "height": 25
       },
@@ -1269,12 +1209,6 @@
       "line": "dashed",
       "head": "normal",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 2680,
-          "y": 460
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1289,11 +1223,11 @@
           710
         ],
         [
-          3100,
+          3114,
           710
         ],
         [
-          3140,
+          3126,
           710
         ],
         [
@@ -1317,12 +1251,6 @@
       "head": "normal",
       "kind": "handoff",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 3120,
-          "y": 710
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1337,12 +1265,12 @@
           300
         ],
         [
-          2607,
-          407
+          2020,
+          476
         ],
         [
-          3193,
-          513
+          3780,
+          444
         ],
         [
           3780,
@@ -1350,8 +1278,8 @@
         ]
       ],
       "labelBBox": {
-        "x": 3255,
-        "y": 502,
+        "x": 3179,
+        "y": 474,
         "width": 64,
         "height": 25
       },
@@ -1363,12 +1291,6 @@
       "line": "dashed",
       "head": "normal",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 2900,
-          "y": 460
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1383,11 +1305,11 @@
           710
         ],
         [
-          3540,
+          3554,
           710
         ],
         [
-          3580,
+          3566,
           710
         ],
         [
@@ -1410,12 +1332,6 @@
       "head": "normal",
       "kind": "handoff",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 3560,
-          "y": 710
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1431,11 +1347,11 @@
         ],
         [
           260,
-          897
+          960
         ],
         [
           260,
-          993
+          931
         ],
         [
           260,
@@ -1443,7 +1359,7 @@
         ]
       ],
       "labelBBox": {
-        "x": 278,
+        "x": 223,
         "y": 933,
         "width": 75,
         "height": 25
@@ -1456,12 +1372,6 @@
       "line": "dashed",
       "head": "normal",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 260,
-          "y": 945
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1476,12 +1386,12 @@
           800
         ],
         [
-          773,
-          897
+          700,
+          960
         ],
         [
-          847,
-          993
+          920,
+          931
         ],
         [
           920,
@@ -1489,7 +1399,7 @@
         ]
       ],
       "labelBBox": {
-        "x": 828,
+        "x": 789,
         "y": 933,
         "width": 42,
         "height": 25
@@ -1502,12 +1412,6 @@
       "line": "dashed",
       "head": "normal",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 810,
-          "y": 945
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1522,12 +1426,12 @@
           800
         ],
         [
-          1067,
-          897
+          1140,
+          960
         ],
         [
-          993,
-          993
+          920,
+          931
         ],
         [
           920,
@@ -1535,7 +1439,7 @@
         ]
       ],
       "labelBBox": {
-        "x": 1048,
+        "x": 1010,
         "y": 933,
         "width": 40,
         "height": 25
@@ -1548,12 +1452,6 @@
       "line": "dashed",
       "head": "normal",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 1030,
-          "y": 945
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1569,11 +1467,11 @@
         ],
         [
           1580,
-          897
+          960
         ],
         [
           1580,
-          993
+          931
         ],
         [
           1580,
@@ -1581,7 +1479,7 @@
         ]
       ],
       "labelBBox": {
-        "x": 1598,
+        "x": 1565,
         "y": 933,
         "width": 30,
         "height": 25
@@ -1594,12 +1492,6 @@
       "line": "dashed",
       "head": "normal",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 1580,
-          "y": 945
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1615,11 +1507,11 @@
         ],
         [
           2020,
-          897
+          960
         ],
         [
           2020,
-          993
+          931
         ],
         [
           2020,
@@ -1627,7 +1519,7 @@
         ]
       ],
       "labelBBox": {
-        "x": 2038,
+        "x": 1993,
         "y": 933,
         "width": 55,
         "height": 25
@@ -1640,12 +1532,6 @@
       "line": "dashed",
       "head": "normal",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 2020,
-          "y": 945
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1661,11 +1547,11 @@
         ],
         [
           3340,
-          897
+          960
         ],
         [
           3340,
-          993
+          931
         ],
         [
           3340,
@@ -1673,7 +1559,7 @@
         ]
       ],
       "labelBBox": {
-        "x": 3358,
+        "x": 3311,
         "y": 933,
         "width": 58,
         "height": 25
@@ -1686,12 +1572,6 @@
       "line": "dashed",
       "head": "normal",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 3340,
-          "y": 945
-        }
-      ],
       "navigateTo": null,
       "tags": null
     },
@@ -1706,12 +1586,12 @@
           800
         ],
         [
-          3487,
-          897
+          3340,
+          960
         ],
         [
-          3633,
-          993
+          3780,
+          931
         ],
         [
           3780,
@@ -1719,7 +1599,7 @@
         ]
       ],
       "labelBBox": {
-        "x": 3578,
+        "x": 3533,
         "y": 933,
         "width": 54,
         "height": 25
@@ -1732,12 +1612,6 @@
       "line": "dashed",
       "head": "normal",
       "isLabelCustomized": true,
-      "controlPoints": [
-        {
-          "x": 3560,
-          "y": 945
-        }
-      ],
       "navigateTo": null,
       "tags": null
     }
