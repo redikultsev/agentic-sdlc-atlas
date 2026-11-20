@@ -1,0 +1,84 @@
+// Legend samples: one element of each kind, each in its own view,
+// so the deck shows the real LikeC4 blocks in an even grid.
+model {
+  legendAgent = agent 'Agent' {
+    technology 'LLM'
+  }
+  legendScript = script 'Script' {
+    technology 'no LLM'
+  }
+  legendGate = gate 'Gate' {
+    technology 'Operator decides'
+  }
+  legendOperator = human 'Operator' {
+    technology 'human'
+  }
+  legendStore = store 'Store' {
+    technology 'tool as a label'
+  }
+  legendStage = phase '1. Stage' {
+    technology 'pipeline stage'
+  }
+  legendCross = platform 'Cross-cutting' {
+    technology 'used by every stage'
+  }
+}
+
+views {
+  view legendAgent {
+    title 'Legend: Agent'
+    include legendAgent
+    style * {
+      size small
+      textSize xlarge
+    }
+  }
+  view legendScript {
+    title 'Legend: Script'
+    include legendScript
+    style * {
+      size small
+      textSize xlarge
+    }
+  }
+  view legendGate {
+    title 'Legend: Gate'
+    include legendGate
+    style * {
+      size small
+      textSize xlarge
+    }
+  }
+  view legendOperator {
+    title 'Legend: Operator'
+    include legendOperator
+    style * {
+      size small
+      textSize xlarge
+    }
+  }
+  view legendStore {
+    title 'Legend: Store'
+    include legendStore
+    style * {
+      size small
+      textSize xlarge
+    }
+  }
+  view legendStage {
+    title 'Legend: 1. Stage'
+    include legendStage
+    style * {
+      size small
+      textSize xlarge
+    }
+  }
+  view legendCross {
+    title 'Legend: Cross-cutting'
+    include legendCross
+    style * {
+      size small
+      textSize xlarge
+    }
+  }
+}

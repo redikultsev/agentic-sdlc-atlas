@@ -19,13 +19,13 @@ How a work item travels from a signal to production, who does what, and where th
 # How to read the diagrams
 
 <div class="lg">
-  <div class="lg-cell"><div class="blk" style="--f:#6366f1;--s:#4f46e5;--t:#eef2ff;--l:#c7d2fe"><b>Agent</b><i>LLM</i></div><p>Works on its own: reads, writes, calls tools</p></div>
-  <div class="lg-cell"><div class="blk comp" style="--f:#428a4f;--s:#2d5d39;--t:#f8fafc;--l:#c2f0c2"><b>Script</b><i>no LLM</i></div><p>A check or action: same input, same answer</p></div>
-  <div class="lg-cell"><div class="blk" style="--f:#AC4D39;--s:#853A2D;--t:#FBD3CB;--l:#f5b2a3"><b>Gate</b><i>Operator decides</i></div><p>Nothing moves on without the Operator's decision</p></div>
-  <div class="lg-cell"><div class="blk" style="--f:#A35829;--s:#7E451D;--t:#FFE0C2;--l:#f9b27c"><svg class="person" viewBox="0 0 40 52"><circle cx="20" cy="11" r="10"/><path d="M0 52 Q0 25 20 25 Q40 25 40 52 Z"/></svg><b>Operator</b><i>human</i></div><p>The person over the agents</p></div>
-  <div class="lg-cell"><div class="blk store" style="--f:#737373;--s:#525252;--t:#fafafa;--l:#d4d4d4"><b>Store</b><i>tool as a label</i></div><p>Where work items, PRs and checks live</p></div>
-  <div class="lg-cell"><div class="blk" style="--f:#64748b;--s:#475569;--t:#f8fafc;--l:#cbd5e1"><b>1. Stage</b><i>pipeline stage</i></div><p>Runs left to right; click to open it</p></div>
-  <div class="lg-cell"><div class="blk" style="--f:#0284c7;--s:#0369a1;--t:#f0f9ff;--l:#B6ECF7"><b>Cross-cutting</b><i>used by every stage</i></div><p>Orchestrator, sandbox, traces</p></div>
+  <div class="lg-cell"><likec4-view view-id="legendAgent" color-scheme="light" class="lv"></likec4-view><p>Works on its own: reads, writes, calls tools</p></div>
+  <div class="lg-cell"><likec4-view view-id="legendScript" color-scheme="light" class="lv"></likec4-view><p>A check or action: same input, same answer</p></div>
+  <div class="lg-cell"><likec4-view view-id="legendGate" color-scheme="light" class="lv"></likec4-view><p>Nothing moves on without the Operator's decision</p></div>
+  <div class="lg-cell"><likec4-view view-id="legendOperator" color-scheme="light" class="lv"></likec4-view><p>The person over the agents</p></div>
+  <div class="lg-cell"><likec4-view view-id="legendStore" color-scheme="light" class="lv"></likec4-view><p>Where work items, PRs and checks live</p></div>
+  <div class="lg-cell"><likec4-view view-id="legendStage" color-scheme="light" class="lv"></likec4-view><p>Runs left to right; click to open it</p></div>
+  <div class="lg-cell"><likec4-view view-id="legendCross" color-scheme="light" class="lv"></likec4-view><p>Orchestrator, sandbox, traces</p></div>
   <div class="lg-cell arrows">
     <div><svg viewBox="0 0 120 12"><line x1="2" y1="6" x2="108" y2="6" stroke="#3b82f6" stroke-width="2.5" stroke-dasharray="7 5"/><path d="M106 1 L118 6 L106 11 Z" fill="#3b82f6"/></svg><span>hand-off of work</span></div>
     <div><svg viewBox="0 0 120 12"><line x1="2" y1="6" x2="108" y2="6" stroke="#AC4D39" stroke-width="2.5" stroke-dasharray="7 5"/><path d="M106 1 L118 6 L106 11 Z" fill="#AC4D39"/></svg><span>verdict (JSON)</span></div>
@@ -39,7 +39,7 @@ How a work item travels from a signal to production, who does what, and where th
 
 # Whole pipeline
 
-<img src="/views/index.png" class="view-wide" />
+<likec4-view view-id="index" color-scheme="light" browser="true" class="view-wide"></likec4-view>
 
 Nine stages that Stripe, Anthropic, Spotify, Google, Cognition, AWS AI-DLC and others converge on. Stores at the bottom.
 
@@ -101,7 +101,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<img src="/views/intake.png" class="view" />
+<likec4-view view-id="intake" color-scheme="light" browser="true" class="view"></likec4-view>
 
 **Work item states:** New → Triaged → Accepted / Cancelled
 
@@ -142,7 +142,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<img src="/views/spec.png" class="view" />
+<likec4-view view-id="spec" color-scheme="light" browser="true" class="view"></likec4-view>
 
 **Work item states:** Clarifying → SpecReview
 
@@ -184,7 +184,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<img src="/views/plan.png" class="view" />
+<likec4-view view-id="plan" color-scheme="light" browser="true" class="view"></likec4-view>
 
 **Work item states:** Researching (L) → Planning → PlanReview
 
@@ -226,7 +226,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<img src="/views/implement.png" class="view" />
+<likec4-view view-id="implement" color-scheme="light" browser="true" class="view"></likec4-view>
 
 **Work item states:** Implementing
 
@@ -268,7 +268,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<img src="/views/verify.png" class="view" />
+<likec4-view view-id="verify" color-scheme="light" browser="true" class="view"></likec4-view>
 
 **Work item states:** Verifying (round ≤ 3, else Blocked)
 
@@ -309,7 +309,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<img src="/views/aiReview.png" class="view" />
+<likec4-view view-id="aiReview" color-scheme="light" browser="true" class="view"></likec4-view>
 
 **Work item states:** Verifying → MergeReview (R1/R2) or Merged (R0)
 
@@ -350,7 +350,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<img src="/views/merge.png" class="view" />
+<likec4-view view-id="merge" color-scheme="light" browser="true" class="view"></likec4-view>
 
 **Work item states:** MergeReview → Merged
 
@@ -392,7 +392,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<img src="/views/deploy.png" class="view" />
+<likec4-view view-id="deploy" color-scheme="light" browser="true" class="view"></likec4-view>
 
 **Work item states:** Merged → DeployReview (R2) → Live → Done / RolledBack
 
@@ -437,7 +437,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<img src="/views/learn.png" class="view" />
+<likec4-view view-id="learn" color-scheme="light" browser="true" class="view"></likec4-view>
 
 **Work item states:** new work items in New
 
@@ -471,7 +471,7 @@ layout: default
 
 # Life of one work item
 
-<img src="/views/task.png" class="view-wide" />
+<likec4-view view-id="task" color-scheme="light" browser="true" class="view-wide"></likec4-view>
 
 Branches by size (S / M / L) and risk (R0 / R1 / R2). The "checks → review → fix" loop runs at most 3 times; then the work item is blocked and waits for the Operator.
 
@@ -535,7 +535,7 @@ stateDiagram-v2
 
 # Cross-cutting parts
 
-<img src="/views/platform.png" class="view-wide" />
+<likec4-view view-id="platform" color-scheme="light" browser="true" class="view-wide"></likec4-view>
 
 
 ---

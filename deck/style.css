@@ -2,13 +2,13 @@
 .lead { font-size: 1.15rem; margin: 0.2rem 0 0.8rem; }
 .muted { color: #6b7280; font-size: 0.85rem; margin-top: 1rem; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
-.view { max-height: 300px; width: 100%; object-fit: contain; border: 1px solid #e5e7eb; border-radius: 8px; }
-.view-wide { max-height: 400px; width: 100%; object-fit: contain; }
+.view { display: block; height: 340px; width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; }
+.view-wide { display: block; height: 470px; width: 100%; }
 .small { font-size: 0.8rem; }
 table { font-size: 0.78rem; }
 details summary { cursor: pointer; color: #6b7280; font-size: 0.85rem; }
-.lg { display: grid; grid-template-columns: repeat(4, 1fr); column-gap: 32px; row-gap: 48px; margin-top: 40px; }
-.lg-cell p { margin: 14px 2px 0; font-size: 21px; line-height: 1.35; color: #1f2937; }
+.lg { display: grid; grid-template-columns: repeat(4, 1fr); column-gap: 32px; row-gap: 30px; margin-top: 24px; }
+.lg-cell p { margin: 6px 6px 0; font-size: 21px; line-height: 1.35; color: #1f2937; text-align: center; }
 .blk { height: 118px; border-radius: 8px; background: var(--f); border: 2px solid var(--s); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
 .blk b { color: var(--t); font-size: 28px; font-weight: 600; letter-spacing: 0.01em; }
 .blk i { color: var(--l); font-size: 17px; font-style: normal; margin-top: 4px; }
@@ -16,7 +16,8 @@ details summary { cursor: pointer; color: #6b7280; font-size: 0.85rem; }
 .blk.comp::before { top: 18px; } .blk.comp::after { top: 40px; }
 .blk.store { border-radius: 50% / 18%; }
 .blk .person { position: absolute; right: 16px; bottom: 0; width: 44px; height: 58px; fill: rgba(0,0,0,0.2); }
-.arrows { display: flex; flex-direction: column; justify-content: center; gap: 18px; height: 118px; }
+.arrows { display: flex; flex-direction: column; justify-content: center; gap: 18px; height: 150px; padding-left: 12px; }
 .arrows > div { display: flex; align-items: center; gap: 12px; font-size: 19px; white-space: nowrap; color: #1f2937; }
 .arrows svg { width: 110px; height: 12px; flex: none; }
-.lg-foot { margin-top: 56px; font-size: 19px; color: #4b5563; }
+.lg-foot { margin-top: 40px; text-align: center; font-size: 19px; color: #4b5563; }
+.lv { display: block; width: 100%; height: 150px; }
