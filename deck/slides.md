@@ -39,9 +39,9 @@ How a work item travels from a signal to production, who does what, and where th
 
 # Whole pipeline
 
-<likec4-view view-id="index" color-scheme="light" browser="true" class="view-wide"></likec4-view>
+<div class="dg"><likec4-view view-id="index" color-scheme="light" browser="true" class="view-wide"></likec4-view><span class="hint">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>
 
-Nine stages that Stripe, Anthropic, Spotify, Google, Cognition, AWS AI-DLC and others converge on. Stores at the bottom.
+Nine stages that Stripe, Anthropic, Spotify, Google, Cognition, AWS AI-DLC and others converge on. Stores sit above the stages that use them; the Operator is on the left.
 
 ---
 
@@ -101,7 +101,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<likec4-view view-id="intake" color-scheme="light" browser="true" class="view"></likec4-view>
+<div class="dg"><likec4-view view-id="intake" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 
 **Work item states:** New → Triaged → Accepted / Cancelled
 
@@ -142,7 +142,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<likec4-view view-id="spec" color-scheme="light" browser="true" class="view"></likec4-view>
+<div class="dg"><likec4-view view-id="spec" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 
 **Work item states:** Clarifying → SpecReview
 
@@ -184,7 +184,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<likec4-view view-id="plan" color-scheme="light" browser="true" class="view"></likec4-view>
+<div class="dg"><likec4-view view-id="plan" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 
 **Work item states:** Researching (L) → Planning → PlanReview
 
@@ -226,7 +226,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<likec4-view view-id="implement" color-scheme="light" browser="true" class="view"></likec4-view>
+<div class="dg"><likec4-view view-id="implement" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 
 **Work item states:** Implementing
 
@@ -268,7 +268,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<likec4-view view-id="verify" color-scheme="light" browser="true" class="view"></likec4-view>
+<div class="dg"><likec4-view view-id="verify" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 
 **Work item states:** Verifying (round ≤ 3, else Blocked)
 
@@ -309,7 +309,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<likec4-view view-id="aiReview" color-scheme="light" browser="true" class="view"></likec4-view>
+<div class="dg"><likec4-view view-id="aiReview" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 
 **Work item states:** Verifying → MergeReview (R1/R2) or Merged (R0)
 
@@ -350,7 +350,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<likec4-view view-id="merge" color-scheme="light" browser="true" class="view"></likec4-view>
+<div class="dg"><likec4-view view-id="merge" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 
 **Work item states:** MergeReview → Merged
 
@@ -392,7 +392,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<likec4-view view-id="deploy" color-scheme="light" browser="true" class="view"></likec4-view>
+<div class="dg"><likec4-view view-id="deploy" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 
 **Work item states:** Merged → DeployReview (R2) → Live → Done / RolledBack
 
@@ -437,7 +437,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<likec4-view view-id="learn" color-scheme="light" browser="true" class="view"></likec4-view>
+<div class="dg"><likec4-view view-id="learn" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 
 **Work item states:** new work items in New
 
@@ -471,7 +471,7 @@ layout: default
 
 # Life of one work item
 
-<likec4-view view-id="task" color-scheme="light" browser="true" class="view-wide"></likec4-view>
+<div class="dg"><likec4-view view-id="task" color-scheme="light" browser="true" class="view-wide"></likec4-view><span class="hint">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>
 
 Branches by size (S / M / L) and risk (R0 / R1 / R2). The "checks → review → fix" loop runs at most 3 times; then the work item is blocked and waits for the Operator.
 
@@ -535,7 +535,7 @@ stateDiagram-v2
 
 # Cross-cutting parts
 
-<likec4-view view-id="platform" color-scheme="light" browser="true" class="view-wide"></likec4-view>
+<div class="dg"><likec4-view view-id="platform" color-scheme="light" browser="true" class="view-wide"></likec4-view><span class="hint">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>
 
 
 ---

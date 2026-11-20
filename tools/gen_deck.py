@@ -51,7 +51,7 @@ layout: default
 <div class="grid2">
 <div>
 
-<likec4-view view-id="{key}" color-scheme="light" browser="true" class="view"></likec4-view>
+<div class="dg"><likec4-view view-id="{key}" color-scheme="light" browser="true" class="view"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 
 **Work item states:** {STATES[key]}
 
@@ -83,12 +83,12 @@ dec_tbl = '| # | Question | Decision |\n|---|---|---|\n' + '\n'.join(
     '| ' + ' | '.join(c.strip() for c in l.strip('|').split('|')[:3]) + ' |' for l in dec_rows)
 
 out = [part('00-title'), part('02-how-to-read'),
-       "---\n\n# Whole pipeline\n\n<likec4-view view-id=\"index\" color-scheme=\"light\" browser=\"true\" class=\"view-wide\"></likec4-view>\n\n" + part('03-overview-note'),
+       "---\n\n# Whole pipeline\n\n<div class=\"dg\"><likec4-view view-id=\"index\" color-scheme=\"light\" browser=\"true\" class=\"view-wide\"></likec4-view><span class=\"hint\">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>\n\n" + part('03-overview-note'),
        part('04-artifacts'), part('05-size-risk')]
 out += [stage_slide(k) for k in STAGES]
-out += ["---\n\n# Life of one work item\n\n<likec4-view view-id=\"task\" color-scheme=\"light\" browser=\"true\" class=\"view-wide\"></likec4-view>\n\n" + part('06-task-note'),
+out += ["---\n\n# Life of one work item\n\n<div class=\"dg\"><likec4-view view-id=\"task\" color-scheme=\"light\" browser=\"true\" class=\"view-wide\"></likec4-view><span class=\"hint\">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>\n\n" + part('06-task-note'),
         *["---\n\n# Work item states\n\n**" + t + "**\n\n```mermaid {scale: 0.42}\n" + m + "```\n\n" + part('07-states-note') for t, m in blocks],
-        "---\n\n# Cross-cutting parts\n\n<likec4-view view-id=\"platform\" color-scheme=\"light\" browser=\"true\" class=\"view-wide\"></likec4-view>\n",
+        "---\n\n# Cross-cutting parts\n\n<div class=\"dg\"><likec4-view view-id=\"platform\" color-scheme=\"light\" browser=\"true\" class=\"view-wide\"></likec4-view><span class=\"hint\">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>\n",
         "---\nlayout: default\n---\n\n# Decisions\n\n<div class=\"small\">\n\n" + dec_tbl + "\n\n</div>\n",
         part('08-open')]
 (root / 'deck' / 'slides.md').write_text('\n\n'.join(out) + '\n')
