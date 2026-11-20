@@ -314,7 +314,7 @@ model {
   operator -> engine.learn.adopt 'chooses'
 
   // ================= Loops back =================
-  engine.verify.checks .verdict engine.implement.implementer 'red: fix, at most 2 rounds'
+  engine.verify.checks .verdict engine.implement.implementer 'red: fix, at most 3 rounds'
   engine.aiReview.judge .verdict engine.implement.implementer 'fix'
   engine.spec.interviewer -> operator 'questions'
   engine.deploy.watcher -> operator 'regression: roll back?'
