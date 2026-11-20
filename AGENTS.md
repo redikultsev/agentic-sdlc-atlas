@@ -10,3 +10,4 @@ Rules:
 5. **Nothing personal:** no names, employers, clients, personal project names or machine paths. The human in the diagrams is "the Operator". The repository is shown to colleagues.
 6. **Slides follow `deck/DESIGN.md`:** grid, even spacing, readable text, no orphans; check every slide in the browser before committing.
 7. **Research** goes to `research/`, with a source and a date for every fact.
+8. **The model is the implementation spec.** It will be handed over to build the pipeline. Every decision goes into the descriptions of the elements it affects, in the same change: what the part does, what it takes and gives (`metadata` in / does / out), its limits and escalations. Rules an arrow cannot show (round limits, who sees what, re-runs after a fix) live in the description of the element that enforces them. `docs/decisions.md` keeps only why and what was rejected.
