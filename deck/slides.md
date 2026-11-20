@@ -183,14 +183,12 @@ layout: default
 
 # 6. AI review
 
-<div class="lead">Reviewer agents with a fresh context check against the spec and standards. An agent approval is not a human approval.</div>
+<div class="lead">One reviewer agent with a fresh context checks the PR against the spec and the code, re-checks its findings and gives a verdict. An agent approval is not a human approval.</div>
 
 <div class="stg">
 <div class="dg"><likec4-view view-id="aiReviewDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-<div class="pcs n3">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Reviewers</p><dl class="eg3"><dt>In</dt><dd>The PR, the spec, the evidence</dd><dt>Does</dt><dd>Check correctness, security, match with the spec</dd><dt>Out</dt><dd>Findings ranked by severity</dd></dl></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Judge</p><dl class="eg3"><dt>In</dt><dd>Findings</dd><dt>Does</dt><dd>Weighs them, drops noise</dd><dt>Out</dt><dd>Verdict: pass, fix or block</dd></dl></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Change explainer</p><dl class="eg3"><dt>In</dt><dd>The passed PR, the spec, the evidence</dd><dt>Does</dt><dd>Explains the change by the presentation rules</dd><dt>Out</dt><dd>Explanation in the PR: before → after, why, what is not verified</dd></dl></div>
+<div class="pcs n1">
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">AI reviewer</p><dl class="eg3"><dt>In</dt><dd>The PR with evidence, the spec, the code around it</dd><dt>Does</dt><dd>Finds and re-checks issues, skips nits, explains the change</dd><dt>Out</dt><dd>Verdict pass, fix or block; for R1/R2 an explanation in the PR</dd></dl></div>
 </div>
 </div>
 
@@ -302,7 +300,7 @@ stateDiagram-v2
   direction LR
   Implementing --> Verifying: change ready
   Verifying --> Implementing: red or fix, round ≤ 3
-  Verifying --> Blocked: out of rounds
+  Verifying --> Blocked: out of rounds or block verdict
   Verifying --> Merged: pass, R0
   Verifying --> MergeReview: pass, R1/R2
   MergeReview --> Implementing: "changes"
@@ -357,6 +355,7 @@ layout: default
 | 19 | Who resolves ambiguity | Agents resolve it themselves from the sources they can read (request, alerts, logs, code, past decisions), write down their assumptions and go on. People are reached only at the gates, where the Operator sees the assumptions and can correct them. One exception: the Interviewer in Spec asks the Operator about business choices, few and short, by the presentation rules (format still open) |
 | 20 | Who writes code and tests, and how they stay honest | One agent, the Implementer, is the only one that changes code: per slice it writes unit tests first, then code, in its own sandbox. What "done" means lives in one place: the acceptance criteria of the spec, each with 2–3 key examples. After CI (outside the sandbox) a separate Validator with a fresh context and its own sandbox checks those criteria on the running app, records evidence for the PR and never edits code. Revised 2026-11-20: no separate scenarios (first hidden, then visible); Evidence merged into the Validator |
 | 21 | Sandbox rules | A disposable sandbox per agent session; everything that changes or runs code runs inside. Network closed by default; push only through a proxy to one branch; no merge rights; the authoritative CI runs outside |
+| 22 | How AI review is built | One AI reviewer agent: fresh context, own sandbox, a different model family than the Implementer. It reads the PR, evidence, spec and surrounding code, re-checks each finding (by running the code where it can), skips style and nits by a "what not to flag" list, gives a JSON verdict and for R1/R2 explains the change to the Operator. All fix rounds share one limit of 3; a block verdict or the limit sends the work item to Blocked |
 | 18 | How to check the model for gaps | After the deck walkthrough, every stage answers five questions: what triggers it, what it reads and writes, what it triggers next, where a human re-enters, what stops two runs doing the same work |
 
 </div>

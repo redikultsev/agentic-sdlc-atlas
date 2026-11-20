@@ -28,8 +28,8 @@ LAYOUTS = {
     },
     'aiReviewDeck': {
         'engine.verify': (0, 0), 'docs': (0, 1),
-        'engine.aiReview.reviewers': (1, 0), 'engine.aiReview.judge': (1, 1), 'engine.aiReview.explainer': (1, 2),
-        'engine.implement': (2, 0), 'changes': (2, 1), 'engine.merge': (2, 2),
+        'engine.aiReview.reviewer': (1, 0.5),
+        'engine.implement': (2, -0.5), 'changes': (2, 0.5), 'engine.merge': (2, 1.5), 'engine.sandbox': (1, 2),
     },
     'implementDeck': {
         'engine.orchestrator': (1, 0), 'engine.sandbox': (2, 0),

@@ -49,7 +49,7 @@
       }
     ]
   },
-  "hash": "mXUw2bCKRqemDPSTxsgPCwRxFYzsKiWBXjXiN3qJVro",
+  "hash": "nEdxziL6n1xVjIzr-MWe4509xIOZa8t4B4XoqnoBNw8",
   "bounds": {
     "x": -40,
     "y": -40,
@@ -91,7 +91,7 @@
       "height": 135,
       "labelBBox": {
         "x": 832,
-        "y": -142,
+        "y": 62,
         "width": 175,
         "height": 66
       }
@@ -131,7 +131,7 @@
       "height": 135,
       "labelBBox": {
         "x": 440,
-        "y": -155,
+        "y": 49,
         "width": 160,
         "height": 32
       }
@@ -169,7 +169,7 @@
       "height": 135,
       "labelBBox": {
         "x": 64,
-        "y": -510,
+        "y": -306,
         "width": 111,
         "height": 32
       }
@@ -207,7 +207,7 @@
       "height": 135,
       "labelBBox": {
         "x": 74,
-        "y": -495,
+        "y": -291,
         "width": 91,
         "height": 32
       }
@@ -247,8 +247,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 413,
-        "y": 249,
+        "x": 412,
+        "y": -56,
         "width": 160,
         "height": 32
       }
@@ -260,7 +260,8 @@
       "children": [],
       "inEdges": [],
       "outEdges": [
-        "7syj35"
+        "7syj35",
+        "z03atx"
       ],
       "title": "6. AI review",
       "modelRef": "engine.aiReview",
@@ -286,7 +287,7 @@
       "height": 135,
       "labelBBox": {
         "x": 45,
-        "y": 260,
+        "y": 464,
         "width": 150,
         "height": 32
       }
@@ -335,8 +336,8 @@
       "width": 320,
       "height": 235,
       "labelBBox": {
-        "x": -29,
-        "y": -15,
+        "x": -30,
+        "y": -148,
         "width": 81,
         "height": 15
       }
@@ -388,8 +389,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 13,
-        "y": 42,
+        "x": 12,
+        "y": -91,
         "width": 160,
         "height": 32
       }
@@ -427,8 +428,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -44,
-        "y": 242,
+        "x": -45,
+        "y": 109,
         "width": 166,
         "height": 32
       }
@@ -441,7 +442,8 @@
       "inEdges": [
         "4d3tpa",
         "f9p7ux",
-        "rn1qz4"
+        "rn1qz4",
+        "z03atx"
       ],
       "outEdges": [],
       "title": "Sandbox",
@@ -468,8 +470,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -18,
-        "y": -155,
+        "x": -19,
+        "y": -130,
         "width": 115,
         "height": 32
       }
@@ -675,15 +677,15 @@
       "id": "7syj35",
       "source": "engine.aiReview",
       "target": "engine.implement.implementer",
-      "label": "fix",
+      "label": "fix, same 3 rounds",
       "points": [
         [
           240,
-          668
+          698
         ],
         [
           320,
-          668
+          698
         ],
         [
           320,
@@ -695,14 +697,14 @@
         ]
       ],
       "labelBBox": {
-        "x": 306,
-        "y": 564,
-        "width": 28,
+        "x": 256,
+        "y": 579,
+        "width": 128,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1ishpvg"
+        "1gi2vew"
       ],
       "color": "red",
       "line": "dashed",
@@ -764,16 +766,16 @@
         ],
         [
           720,
-          98
+          68
         ],
         [
           800,
-          98
+          68
         ]
       ],
       "labelBBox": {
         "x": 674,
-        "y": 225,
+        "y": 210,
         "width": 91,
         "height": 25
       },
@@ -841,16 +843,16 @@
         ],
         [
           720,
-          38
+          14
         ],
         [
           800,
-          38
+          14
         ]
       ],
       "labelBBox": {
         "x": 646,
-        "y": 22,
+        "y": 10,
         "width": 149,
         "height": 25
       },
@@ -895,6 +897,44 @@
       "parent": null,
       "relations": [
         "1eoo32"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "z03atx",
+      "source": "engine.aiReview",
+      "target": "engine.sandbox",
+      "label": "re-checks findings in its own",
+      "points": [
+        [
+          240,
+          638
+        ],
+        [
+          520,
+          638
+        ],
+        [
+          520,
+          122
+        ],
+        [
+          800,
+          122
+        ]
+      ],
+      "labelBBox": {
+        "x": 424,
+        "y": 349,
+        "width": 191,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "18pez8b"
       ],
       "color": "gray",
       "line": "dashed",

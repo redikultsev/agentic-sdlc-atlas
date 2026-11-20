@@ -60,7 +60,7 @@ model {
     orchestrator = platform 'Orchestrator' {
       #idea
       technology 'Orchestrator'
-      description 'Moves a work item through the stages. Code decides the next step from a JSON verdict, never from agent prose. Works the frontier: every slice sub-issue whose blockers are done gets a fresh Implementer session; slices on the frontier with no shared files run in parallel, each in its own sandbox. Merges slice branches into the work item branch; a conflict goes back to the Implementer. After 3 failed check rounds it sets the work item Blocked and asks the Operator. Enforces the limit: at most 3 work items wait for the Operator at once. Engine not chosen yet.'
+      description 'Moves a work item through the stages. Code decides the next step from a JSON verdict, never from agent prose. Works the frontier: every slice sub-issue whose blockers are done gets a fresh Implementer session; slices on the frontier with no shared files run in parallel, each in its own sandbox. Merges slice branches into the work item branch; a conflict goes back to the Implementer. All fix rounds of a work item share one limit of 3 (failed CI, Validator, AI review); after that, or on a block verdict, it sets the work item Blocked and asks the Operator. Enforces the limit: at most 3 work items wait for the Operator at once. Engine not chosen yet.'
     }
     sandbox = platform 'Sandbox' {
       #idea
@@ -211,39 +211,17 @@ model {
     // ================= 6. AI review =================
     aiReview = phase '6. AI review' {
       technology 'AI review & autofix'
-      description 'Reviewer agents with a fresh context check against the spec and standards. An agent approval is not a human approval.'
-      reviewers = agent 'Reviewers' {
+      description 'One reviewer agent with a fresh context checks the PR against the spec and the code, re-checks its findings and gives a verdict. An agent approval is not a human approval.'
+      reviewer = agent 'AI reviewer' {
         #built
-        technology 'Review'
-        description 'Correctness, security, match with the spec. Findings ranked by severity, noise filtered out.'
+        technology 'One agent, other model family'
+        description 'One agent with a fresh context and its own sandbox, on a different model family than the Implementer. Reads the PR, the evidence, the spec and the code around the change; checks correctness, security and match with the spec; re-checks each finding, by running the code where it can, before reporting it. Skips style and nits by a "what not to flag" list. Gives a JSON verdict (pass / fix / block) and, for R1/R2, an explanation for the Operator by the presentation rules: before → after, why, what is not verified.'
         metadata {
-          in 'The PR, the spec, the evidence'
-          does 'Check correctness, security, match with the spec'
-          out 'Findings ranked by severity'
+          in 'The PR with evidence, the spec, the code around it'
+          does 'Finds and re-checks issues, skips nits, explains the change'
+          out 'Verdict pass, fix or block; for R1/R2 an explanation in the PR'
         }
       }
-      judge = agent 'Judge' {
-        #built
-        technology 'Verdict'
-        description 'Turns findings into a JSON verdict: pass / fix / block.'
-        metadata {
-          in 'Findings'
-          does 'Weighs them, drops noise'
-          out 'Verdict: pass, fix or block'
-        }
-      }
-      explainer = agent 'Change explainer' {
-        #idea
-        technology 'Explanation for the Operator'
-        description 'Did not write the code, so it does not praise it. Explains the change by the presentation rules: what was and what is now, why this way and what was rejected, a diagram only if the structure changed, what was not verified on top. Puts it into the PR.'
-        metadata {
-          in 'The passed PR, the spec, the evidence'
-          does 'Explains the change by the presentation rules'
-          out 'Explanation in the PR: before → after, why, what is not verified'
-        }
-      }
-      reviewers -> judge 'findings'
-      judge -> explainer 'pass, R1/R2'
     }
 
     // ================= 7. Merge =================
@@ -322,7 +300,7 @@ model {
   engine.plan.planner -> tracker 'slice sub-issues, blocked by'
   engine.plan.researcher -> docs 'research document'
   docs .reads engine.implement.implementer 'plan, criteria'
-  docs .reads engine.aiReview.reviewers 'spec'
+  docs .reads engine.aiReview.reviewer 'spec'
   operator -> engine.plan.planGate 'approves'
   engine.plan.planGate .handoff engine.implement.implementer 'plan'
   engine.implement.implementer -> changes 'PR'
@@ -332,11 +310,11 @@ model {
   engine.verify.validator .verdict engine.implement.implementer 'fail: fix, same 3 rounds'
   engine.verify.validator -> engine.sandbox 'runs the app in its own'
   engine.verify.validator -> changes 'evidence on the PR'
-  engine.verify.validator .handoff engine.aiReview.reviewers 'PR + evidence'
-  engine.aiReview.judge -> changes 'verdict'
-  engine.aiReview.judge .verdict engine.merge.land 'pass, R0'
-  engine.aiReview.explainer .handoff engine.merge.mergeGate 'PR + explanation'
-  engine.aiReview.explainer -> changes 'explanation'
+  engine.verify.validator .handoff engine.aiReview.reviewer 'PR + evidence'
+  engine.aiReview.reviewer -> changes 'findings, verdict, explanation'
+  engine.aiReview.reviewer .verdict engine.merge.land 'pass, R0'
+  engine.aiReview.reviewer .verdict engine.merge.mergeGate 'pass, R1/R2 + explanation'
+  engine.aiReview.reviewer -> engine.sandbox 're-checks findings in its own'
   operator -> engine.merge.mergeGate 'reviews evidence'
   engine.merge.land -> changes 'merge'
   engine.merge.land .handoff engine.deploy.deployer 'R0, R1'
@@ -350,7 +328,7 @@ model {
 
   // ================= Loops back =================
   engine.verify.checks .verdict engine.implement.implementer 'red: fix, at most 3 rounds'
-  engine.aiReview.judge .verdict engine.implement.implementer 'fix'
+  engine.aiReview.reviewer .verdict engine.implement.implementer 'fix, same 3 rounds'
   engine.spec.interviewer -> operator 'questions'
   engine.deploy.watcher -> operator 'regression: roll back?'
   engine.learn.retro -> engine.intake.triage 'proposed work items'

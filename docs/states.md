@@ -33,7 +33,7 @@ stateDiagram-v2
   direction LR
   Implementing --> Verifying: change ready
   Verifying --> Implementing: red or fix, round ≤ 3
-  Verifying --> Blocked: out of rounds
+  Verifying --> Blocked: out of rounds or block verdict
   Verifying --> Merged: pass, R0
   Verifying --> MergeReview: pass, R1/R2
   MergeReview --> Implementing: "changes"
@@ -61,18 +61,18 @@ stateDiagram-v2
 | Planning | Plan in progress | Planner | no | `state:planning` | In Progress |
 | PlanReview | Plan awaiting approval | Operator | **yes** | `state:plan-review` | In Review |
 | Implementing | Writing the change | Implementer | no | `state:implementing` | In Progress |
-| Verifying | Checks and AI review | Checks, reviewers, judge | no | `state:verifying` | In Progress |
+| Verifying | Checks and AI review | CI, Validator, AI reviewer | no | `state:verifying` | In Progress |
 | MergeReview | Awaiting merge (R1/R2) | Operator | **yes** | `state:merge-review` | In Review |
 | Merged | Merged | Deploy | no | `state:merged` | Done (dev) |
 | DeployReview | Deployment awaiting approval (R2) | Operator | **yes** | `state:deploy-review` | Awaiting Deploy |
 | Live | In production, watched | Watcher | no | `state:live` | Deployed |
 | Done | Done | — | — | closed | Done |
 | RolledBack | Rolled back | a new work item | — | closed + `rolled-back` | Done + label |
-| Blocked | Stuck: fix rounds used up | Operator | **yes** | `state:blocked` | Blocked |
+| Blocked | Stuck: 3 fix rounds used up, or a block verdict | Operator | **yes** | `state:blocked` | Blocked |
 | Cancelled | Cancelled | — | — | closed `not planned` | Won't Do |
 
 The limit "at most 3 work items wait for the Operator" counts items in states where "Waits for the Operator" is yes.
 
 ## Pull request (PR / MR) states
 
-Draft → checks running → green or red → judge verdict (pass / fix / block) → approved by the Operator (R1/R2) → merged or closed. A pull request always links to its work item number.
+Draft → checks running → green or red → reviewer verdict (pass / fix / block) → approved by the Operator (R1/R2) → merged or closed. A pull request always links to its work item number.
