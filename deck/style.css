@@ -16,7 +16,7 @@ details summary { cursor: pointer; color: #6b7280; font-size: 0.85rem; }
 .blk.comp::before { top: 18px; } .blk.comp::after { top: 40px; }
 .blk.store { border-radius: 50% / 18%; }
 .blk .person { position: absolute; right: 16px; bottom: 0; width: 44px; height: 58px; fill: rgba(0,0,0,0.2); }
-.arrows { display: flex; flex-direction: column; justify-content: center; gap: 18px; height: 150px; padding-left: 12px; }
+.arrows { display: flex; flex-direction: column; justify-content: center; gap: 12px; height: 150px; padding-left: 12px; }
 .arrows > div { display: flex; align-items: center; gap: 12px; font-size: 19px; white-space: nowrap; color: #1f2937; }
 .arrows svg { width: 110px; height: 12px; flex: none; }
 .lg-foot { margin-top: 40px; text-align: center; font-size: 19px; color: #4b5563; }

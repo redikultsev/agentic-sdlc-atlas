@@ -57,7 +57,7 @@
       }
     ]
   },
-  "hash": "7rGk7SgIS3AN-GiYsQJ03YAd-Qtc-av39BkO-1KyoMk",
+  "hash": "NF2Ofl7g0XePGhz9eoILAuuQdU8P0fuDVa5x94MGy1A",
   "bounds": {
     "x": -40,
     "y": -100,
@@ -103,6 +103,48 @@
       }
     },
     {
+      "id": "docs",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1x8ps76",
+        "50urxi"
+      ],
+      "outEdges": [
+        "33gp1i"
+      ],
+      "title": "Specs, plans and decisions",
+      "modelRef": "docs",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "notation": "Store",
+      "technology": "files in the repo or the work item body",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 800,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 542,
+        "y": -417,
+        "width": 175,
+        "height": 66
+      }
+    },
+    {
       "id": "engine.spec",
       "parent": null,
       "level": 0,
@@ -135,7 +177,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -367,
+        "x": -728,
         "y": 49,
         "width": 99,
         "height": 32
@@ -152,6 +194,7 @@
       ],
       "inEdges": [
         "1te0nzn",
+        "33gp1i",
         "1tjism4",
         "1kl98ig"
       ],
@@ -185,7 +228,7 @@
       "width": 320,
       "height": 635,
       "labelBBox": {
-        "x": 86,
+        "x": -283,
         "y": -248,
         "width": 46,
         "height": 15
@@ -232,7 +275,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 131,
+        "x": -238,
         "y": -217,
         "width": 138,
         "height": 66
@@ -244,6 +287,7 @@
       "level": 1,
       "children": [],
       "inEdges": [
+        "33gp1i",
         "1kl98ig",
         "44bcvi"
       ],
@@ -281,7 +325,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 150,
+        "x": -219,
         "y": -200,
         "width": 101,
         "height": 32
@@ -328,7 +372,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 116,
+        "x": -253,
         "y": -200,
         "width": 169,
         "height": 32
@@ -367,50 +411,10 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 179,
+        "x": -190,
         "y": -400,
         "width": 144,
         "height": 32
-      }
-    },
-    {
-      "id": "docs",
-      "parent": null,
-      "level": 0,
-      "children": [],
-      "inEdges": [
-        "1x8ps76",
-        "50urxi"
-      ],
-      "outEdges": [],
-      "title": "Specs, plans and decisions",
-      "modelRef": "docs",
-      "shape": "storage",
-      "color": "storecolor",
-      "style": {
-        "opacity": 15,
-        "size": "sm",
-        "textSize": "xl"
-      },
-      "description": {
-        "txt": ""
-      },
-      "tags": [
-        "idea"
-      ],
-      "notation": "Store",
-      "technology": "files in the repo or the work item body",
-      "kind": "store",
-      "isCustomized": true,
-      "x": 800,
-      "y": 0,
-      "width": 240,
-      "height": 135,
-      "labelBBox": {
-        "x": -127,
-        "y": -617,
-        "width": 175,
-        "height": 66
       }
     },
     {
@@ -445,7 +449,7 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 517,
+        "x": 148,
         "y": -428,
         "width": 166,
         "height": 32
@@ -484,11 +488,50 @@
       },
       "parent": null,
       "relations": [
-        "1ckaq4d"
+        "gh1997"
       ],
       "color": "gray",
       "line": "dashed",
       "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "33gp1i",
+      "source": "docs",
+      "target": "engine.plan.planner",
+      "label": "spec, decisions",
+      "points": [
+        [
+          800,
+          68
+        ],
+        [
+          720,
+          68
+        ],
+        [
+          720,
+          232
+        ],
+        [
+          640,
+          232
+        ]
+      ],
+      "labelBBox": {
+        "x": 666,
+        "y": 119,
+        "width": 109,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "2bb2fe"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
       "isLabelCustomized": true
     },
     {
@@ -522,7 +565,7 @@
       },
       "parent": null,
       "relations": [
-        "1jsphs9"
+        "1buo5hn"
       ],
       "color": "primary",
       "line": "dashed",
@@ -561,7 +604,7 @@
       },
       "parent": null,
       "relations": [
-        "y90ioc"
+        "e3hb9q"
       ],
       "color": "primary",
       "line": "dashed",
@@ -661,22 +704,22 @@
         ],
         [
           720,
-          50
+          32
         ],
         [
           800,
-          50
+          32
         ]
       ],
       "labelBBox": {
         "x": 653,
-        "y": 28,
+        "y": 19,
         "width": 134,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "wbmxn3"
+        "3k3nws"
       ],
       "color": "gray",
       "line": "dashed",
@@ -691,11 +734,11 @@
       "points": [
         [
           640,
-          286
+          304
         ],
         [
           720,
-          286
+          304
         ],
         [
           720,
@@ -708,13 +751,13 @@
       ],
       "labelBBox": {
         "x": 626,
-        "y": 246,
+        "y": 255,
         "width": 188,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1r73pr"
+        "1o0u556"
       ],
       "color": "gray",
       "line": "dashed",
@@ -725,34 +768,34 @@
       "id": "50urxi",
       "source": "engine.plan.planner",
       "target": "docs",
-      "label": "reads spec, writes plan and ADR",
+      "label": "plan, ADR",
       "points": [
         [
           640,
-          250
+          268
         ],
         [
           720,
-          250
+          268
         ],
         [
           720,
-          86
+          104
         ],
         [
           800,
-          86
+          104
         ]
       ],
       "labelBBox": {
-        "x": 612,
-        "y": 137,
-        "width": 215,
+        "x": 683,
+        "y": 155,
+        "width": 74,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "2gqd71"
+        "ocqutn"
       ],
       "color": "gray",
       "line": "dashed",
@@ -790,7 +833,7 @@
       },
       "parent": null,
       "relations": [
-        "1nf3wa3"
+        "lzxzpf"
       ],
       "color": "primary",
       "line": "dashed",

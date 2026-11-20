@@ -42,6 +42,8 @@ views {
       engine.aiReview -> docs,
       engine.merge -> changes,
       prod -> *,
+      docs -> *,
+      tracker -> *,
       monitoring -> *
     autoLayout LeftRight 60 80
   }
