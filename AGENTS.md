@@ -1,6 +1,6 @@
 # AGENTS.md
 
-The "agentic development pipeline" project. Structure and sources: [README.md](README.md).
+The "agentic development pipeline" project. Structure and sources: [README.md](README.md). Current state and next steps: [docs/STATUS.md](docs/STATUS.md) — read it first, update it at the end of a session.
 
 Rules:
 1. **English only** in every file and commit message of this repository.

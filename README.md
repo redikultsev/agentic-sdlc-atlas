@@ -12,6 +12,7 @@ Everything on the topic in one place: how the pipeline works, why it was decided
 | `deck/` | The deck for walkthroughs and colleagues. `deck/slides.md` is **generated** from the model and `docs/`; do not edit it, edit `deck/parts/` | `npm run deck:dev` |
 | `research/atlas/` | The atlas: what is known about each stage (964 candidates, 30 areas) and raw research data | `research/atlas/README.md` |
 | `GLOSSARY.md` | Terms: stages, size and risk, stores | — |
+| `docs/STATUS.md` | Where the project stands, known gaps, next steps — start here | — |
 
 ## Keeping it current
 
