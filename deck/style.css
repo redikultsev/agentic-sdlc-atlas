@@ -34,7 +34,7 @@ details summary { cursor: pointer; color: #6b7280; font-size: 0.85rem; }
 .fine summary { cursor: pointer; }
 .st-cell p.tool { font-size: 18px; font-weight: 600; color: #334155; margin-top: 2px; }
 .chain { margin-top: 10px; font-size: 20px; color: #334155; opacity: 1 !important; }
-.sr { display: grid; grid-template-columns: 1fr 1fr; column-gap: 0; margin-top: 14px; }
+.sr { display: grid; grid-template-columns: 1fr 1fr; column-gap: 0; margin-top: 56px; }
 .sr-col h3 { font-size: 22px; font-weight: 400; color: #1f2937; margin: 0 0 12px; }
 .sr-col h3 b { font-weight: 700; }
 .card { display: flex; align-items: center; gap: 20px; padding: 20px 20px; margin-bottom: 18px; border-radius: 10px; background: #f8fafc; border: 1.5px solid #cbd5e1; }
