@@ -3,31 +3,24 @@
 model {
   legendAgent = agent 'Agent' {
     technology 'LLM'
-    description 'Works on its own: reads, writes, calls tools.'
   }
   legendScript = script 'Script' {
     technology 'No LLM'
-    description 'A check or action. Same input, same answer.'
   }
   legendGate = gate 'Gate' {
     technology 'Operator decides'
-    description 'Nothing moves on without the Operator.'
   }
   legendOperator = human 'Operator' {
     technology 'Human'
-    description 'The person over the agents.'
   }
   legendStore = store 'Store' {
     technology 'Tool as a label'
-    description 'Where work items, PRs and checks live.'
   }
   legendStage = phase '1. Stage' {
     technology 'Pipeline stage'
-    description 'Click it in the interactive diagram to open it.'
   }
   legendCross = platform 'Cross-cutting part' {
     technology 'Used by every stage'
-    description 'Orchestrator, sandbox, traces.'
   }
 
   legendAgent .handoff legendScript 'hand-off of work'
@@ -40,6 +33,21 @@ views {
   view legend {
     title 'Legend'
     include legendAgent, legendScript, legendGate, legendOperator, legendStore, legendStage, legendCross
-    autoLayout LeftRight 80 60
+    style * {
+      size small
+      textSize xlarge
+    }
+    rank same {
+      legendAgent,
+      legendScript,
+      legendGate,
+      legendStore
+    }
+    rank same {
+      legendOperator,
+      legendStage,
+      legendCross
+    }
+    autoLayout TopBottom 50 40
   }
 }
