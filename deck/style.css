@@ -27,13 +27,10 @@ details summary { cursor: pointer; color: #6b7280; font-size: 0.85rem; }
 .dg likec4-view { cursor: zoom-in; }
 @keyframes hintpulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 @media (prefers-reduced-motion: reduce) { .dg .hint { animation: none; } }
-.chain { display: flex; flex-wrap: nowrap; align-items: center; justify-content: center; gap: 6px 5px; margin-top: 18px; }
-.chain span { font-size: 20px; padding: 6px 10px; white-space: nowrap; border-radius: 8px; background: #f1f5f9; color: #1f2937; border: 1.5px solid #cbd5e1; }
-.chain span.k { background: #cbd5e1; border-color: #64748b; color: #0f172a; font-weight: 600; }
-.chain i { font-style: normal; font-size: 20px; color: #64748b; }
 .st { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 40px; row-gap: 22px; margin-top: 28px; }
 .st-cell p { margin: 4px 8px 0; font-size: 20px; line-height: 1.35; color: #1f2937; text-align: center; }
 .sv { display: block; width: 100%; height: 132px; }
 .fine { margin-top: 18px; font-size: 16px; color: #4b5563; text-align: center; }
 .fine summary { cursor: pointer; }
 .st-cell p.tool { font-size: 18px; font-weight: 600; color: #334155; margin-top: 2px; }
+.chain { margin-top: 10px; font-size: 20px; color: #334155; opacity: 1 !important; }

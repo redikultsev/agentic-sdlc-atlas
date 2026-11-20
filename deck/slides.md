@@ -47,9 +47,7 @@ Nine stages that Stripe, Anthropic, Spotify, Google, Cognition, AWS AI-DLC and o
 
 # What moves and where it lives
 
-<div class="chain">
-  <span>Signal</span><i>→</i><span class="k">Work item</span><i>→</i><span>Spec · plan</span><i>→</i><span class="k">Change set</span><i>→</i><span>Checks</span><i>→</i><span>Review · merge</span><i>→</i><span class="k">Deployment</span><i>→</i><span>Incident</span><i>↺</i>
-</div>
+<p class="chain">A work item fills these stores in order, left to right, top to bottom. An incident in production opens a new work item.</p>
 
 <div class="st">
   <div class="st-cell"><likec4-view view-id="storeTracker" color-scheme="light" class="sv"></likec4-view><p class="tool">GitHub Issues · Jira</p><p><b>The hub.</b> Number, size, risk, state. Everything links to the number.</p></div>
