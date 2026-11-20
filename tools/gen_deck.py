@@ -36,6 +36,13 @@ def part(name):
 
 KIND_TAG = {'agent': 'Agent', 'script': 'Script', 'gate': 'Gate', 'human': 'Operator', 'store': 'Store', 'platform': 'Cross-cutting'}
 
+def body(el):
+    # metadata in/does/out = one worked example (the same case runs through all stages); else the description
+    md = el.get('metadata') or {}
+    if all(k in md for k in ('in', 'does', 'out')):
+        return '<dl class="eg3">' + ''.join(f'<dt>{l}</dt><dd>{md[k]}</dd>' for l, k in (('In', 'in'), ('Does', 'does'), ('Out', 'out'))) + '</dl>'
+    return f'<p class="pd">{txt(el.get("description"))}</p>'
+
 def stage_slide(key):
     fqn = f'engine.{key}'; st = E[fqn]
     kids = [k for k in E if k.startswith(fqn + '.') and k.count('.') == fqn.count('.') + 1]
@@ -43,7 +50,7 @@ def stage_slide(key):
     cards = '\n'.join(
         f'  <div class="pc"><div class="pc-top"><span class="pk k-{E[k]["kind"]}">{KIND_TAG.get(E[k]["kind"], E[k]["kind"])}</span>'
         f'<span class="ps">{STATUS.get((E[k].get("tags") or ["-"])[0], "")}</span></div>'
-        f'<p class="pn">{E[k]["title"]}</p><p class="pd">{txt(E[k].get("description"))}</p></div>' for k in kids)
+        f'<p class="pn">{E[k]["title"]}</p>{body(E[k])}</div>' for k in kids)
     decides = ', '.join(gates) if gates else 'nothing, this stage runs without a human'
     return f"""---
 layout: default

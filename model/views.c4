@@ -34,7 +34,7 @@ views {
       engine.aiReview -> engine.implement,
       engine.spec -> operator,
       engine.deploy -> operator,
-      engine.learn -> tracker,
+      engine.learn -> engine.intake,
       engine.aiReview -> changes,
       engine.merge -> changes,
       prod -> *,

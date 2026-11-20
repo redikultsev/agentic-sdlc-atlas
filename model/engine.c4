@@ -9,6 +9,10 @@ model {
     technology 'Running services'
     description 'Running services and their data.'
   }
+  requester = human 'Requester' {
+    technology 'Colleague, user or the Operator'
+    description 'Anyone who asks for a change or reports a bug.'
+  }
   monitoring = external 'Monitoring' {
     technology 'Errors, logs, metrics'
     description 'Errors and alerts from running services.'
@@ -77,11 +81,21 @@ model {
         #idea
         technology 'Triage agent'
         description 'Merges duplicates, proposes size S/M/L and risk R0/R1/R2 with a reason. Never closes anything itself.'
+        metadata {
+          in 'Alert: "500 on /export, 42 times in an hour"'
+          does 'Finds no duplicate, reads the export code'
+          out 'Draft: S · R1, "no check for an empty report"'
+        }
       }
       admit = gate 'Accept' {
         #idea
         technology 'Gate'
         description 'The Operator sees size and risk, may correct them, and accepts the work item.'
+        metadata {
+          in 'The draft with size, risk and the reason'
+          does 'The Operator accepts, corrects or cancels'
+          out 'Work item #231, state Accepted'
+        }
       }
       triage -> admit 'size and risk'
     }
@@ -236,6 +250,7 @@ model {
 
   // ================= Main flow =================
   monitoring -> engine.intake.triage 'alert'
+  requester -> engine.intake.triage 'request or bug'
   operator -> engine.intake.admit 'accepts'
   engine.intake.triage -> tracker 'work item'
   engine.intake.admit .handoff engine.spec.interviewer 'M, L'
@@ -270,7 +285,7 @@ model {
   engine.aiReview.judge .verdict engine.implement.implementer 'fix'
   engine.spec.interviewer -> operator 'questions'
   engine.deploy.watcher -> operator 'regression: roll back?'
-  engine.learn.retro -> tracker 'new work items'
+  engine.learn.retro -> engine.intake.triage 'proposed work items'
   engine.learn.adopt -> engine.orchestrator 'new rule or check'
 
   // ================= Cross-cutting =================

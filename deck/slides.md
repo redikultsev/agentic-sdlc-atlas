@@ -92,8 +92,8 @@ layout: default
 <div class="stg">
 <div class="dg"><likec4-view view-id="intakeDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Triage</p><p class="pd">Merges duplicates, proposes size S/M/L and risk R0/R1/R2 with a reason. Never closes anything itself.</p></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Accept</p><p class="pd">The Operator sees size and risk, may correct them, and accepts the work item.</p></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Triage</p><dl class="eg3"><dt>In</dt><dd>Alert: "500 on /export, 42 times in an hour"</dd><dt>Does</dt><dd>Finds no duplicate, reads the export code</dd><dt>Out</dt><dd>Draft: S · R1, "no check for an empty report"</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Accept</p><dl class="eg3"><dt>In</dt><dd>The draft with size, risk and the reason</dd><dt>Does</dt><dd>The Operator accepts, corrects or cancels</dd><dt>Out</dt><dd>Work item #231, state Accepted</dd></dl></div>
 </div>
 </div>
 
