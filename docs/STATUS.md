@@ -58,5 +58,5 @@ Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and
 
 ## Next
 
-1. A one-day trial of Archon and cezar on the server: one real issue each, from intake to a merged PR, with a sandbox wrapper. The trial picks the base.
+1. The owner chose Archon (2026-11-21). Archon 0.14.0 runs on the trial server: Postgres, login by allowed email, telemetry off, reachable only over the VPN. Next: the Claude and GitHub tokens, then one real issue from intake to a merged PR; the sandbox as a provider plugin comes after that.
 2. The owner's choice of the base; then the engine spec on that base and a design review.
