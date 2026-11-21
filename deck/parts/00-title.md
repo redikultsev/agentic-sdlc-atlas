@@ -12,4 +12,4 @@ mdc: true
 
 How a work item travels from a signal to production, who does what, and where the human decides
 
-<div class="muted">Draft v1 · generated from the model in this repository · updated with it</div>
+<div class="muted">Generated from the model in this repository · updated with it</div>

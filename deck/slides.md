@@ -12,7 +12,7 @@ mdc: true
 
 How a work item travels from a signal to production, who does what, and where the human decides
 
-<div class="muted">Draft v1 · generated from the model in this repository · updated with it</div>
+<div class="muted">Generated from the model in this repository · updated with it</div>
 
 ---
 
@@ -334,8 +334,7 @@ layout: default
 # Open questions
 
 1. **Engine** to build the pipeline on: our own on top of an existing one, or an existing one only if it fits completely.
-2. **Work item states** — draft, awaiting approval.
-3. **Measurement on real work items:** Operator time, share done without manual help, rollbacks, $ per change.
-4. **Deep dives** on the key research topics: verification the agent cannot reach, catching false "done", agent rights in the sandbox.
+2. **Measurement on real work items:** Operator time, share done without manual help, rollbacks, $ per change.
+3. **Deep dives** on the key research topics: verification the agent cannot reach, catching false "done", agent rights in the sandbox.
 
 <div class="muted">Model, research and this deck live in one repository. The deck is built from the model with <code>npm run deck:gen</code>.</div>
