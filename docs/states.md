@@ -7,7 +7,7 @@ Approved 2026-11-21 (decision 28). The state lives in the tracker (GitHub Issues
 ```mermaid
 stateDiagram-v2
   direction LR
-  [*] --> Triaging: signal from a person, an alert or the Retro
+  [*] --> Triaging: signal from a person, an alert, the Retro or a discovery
   Triaging --> TriageReview: checked, sized, outcome proposed
   TriageReview --> Implementing: Operator accepts, S
   TriageReview --> Specifying: Operator accepts, M or L

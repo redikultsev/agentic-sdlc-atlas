@@ -100,9 +100,9 @@ model {
       triage = agent 'Triage' {
         #idea
         technology 'Triage agent'
-        description 'Works out the item on its own from the request, alerts, logs and code; never asks people. Merges duplicates, checks the behaviour is not already built and was not rejected before, reproduces a bug. Where something stays unclear, picks the most likely reading and writes it down as an assumption. Proposes size S/M/L, risk R0/R1/R2 and an outcome with a reason. R0 is only a forecast: whether a change merges without the Operator is decided at merge by the auto-merge rules. A change that weakens or removes a check is at least R2. Never closes anything itself.'
+        description 'Works out the item on its own from the request, alerts, logs and code; never asks people. Takes discoveries (a problem an agent noticed outside its own task, with its evidence) like any other signal. Merges duplicates, checks the behaviour is not already built and was not rejected before, reproduces a bug. Where something stays unclear, picks the most likely reading and writes it down as an assumption. Proposes size S/M/L, risk R0/R1/R2 and an outcome with a reason. R0 is only a forecast: whether a change merges without the Operator is decided at merge by the auto-merge rules. A change that weakens or removes a check is at least R2. Never closes anything itself.'
         metadata {
-          in 'A request, a bug or an alert'
+          in 'A request, a bug, an alert or a discovery'
           does 'Investigates on its own: duplicates, already built, rejected before, reproduces a bug; writes down assumptions'
           out 'Size, risk, assumptions and an outcome: for agent, for a human, won\'t do'
         }
@@ -164,7 +164,7 @@ model {
       planner = agent 'Planner' {
         #idea
         technology 'Planning agent'
-        description 'A plan in vertical slices, each fits one fresh context: files, risks, a check command. Each slice becomes a sub-issue of the work item with "blocked by" links. A wide refactor goes expand, migrate in batches, contract.'
+        description 'A plan in vertical slices, each fits one fresh context: files, risks, a check command. Each slice becomes a sub-issue of the work item with "blocked by" links. A wide refactor goes expand, migrate in batches, contract. A problem it finds outside the work item is not added to the plan: it goes to Triage as a discovery (decision 31).'
         metadata {
           in 'The spec, past decisions, research (L)'
           does 'Splits the work into slices'
@@ -192,7 +192,7 @@ model {
       implementer = agent 'Implementer' {
         #built
         technology 'Coding agent'
-        description 'The only agent that changes code. One slice per fresh session in its own sandbox: writes the unit tests first, then the code, runs the fast checks there. Pushes only through the proxy to its branch.'
+        description 'The only agent that changes code. One slice per fresh session in its own sandbox: writes the unit tests first, then the code, runs the fast checks there. Pushes only through the proxy to its branch. Never fixes anything outside its slice: a problem it notices there goes to Triage as a discovery with its evidence (decision 31).'
         metadata {
           in 'A slice of the plan (for S, the work item) and the code'
           does 'Unit tests first, then code; fast checks in the sandbox'
@@ -218,7 +218,7 @@ model {
       reviewer = agent 'AI reviewer' {
         #built
         technology 'One agent, other model family'
-        description 'One agent with a fresh context and its own sandbox, on a different model family than the Implementer. Reads the PR, the spec and the code around the change; checks correctness, security and match with the spec; re-checks each finding, by running the code where it can, before reporting it. Skips style and nits by a "what not to flag" list. Gives a JSON verdict (pass / fix / block) and, for R1/R2, an explanation for the Operator by the presentation rules: before → after, why, what is not verified. After a fix it reviews only the new diff.'
+        description 'One agent with a fresh context and its own sandbox, on a different model family than the Implementer. Reads the PR, the spec and the code around the change; checks correctness, security and match with the spec; re-checks each finding, by running the code where it can, before reporting it. Skips style and nits by a "what not to flag" list. Gives a JSON verdict (pass / fix / block) and, for R1/R2, an explanation for the Operator by the presentation rules: before → after, why, what is not verified. After a fix it reviews only the new diff. A problem in code the change does not touch is not a finding: it goes to Triage as a discovery (decision 31).'
         metadata {
           in 'The PR after green CI, the spec, the code around it'
           does 'Finds and re-checks issues, skips nits, explains the change'
@@ -235,7 +235,7 @@ model {
       validator = agent 'Validator' {
         #idea
         technology 'Fresh context, own sandbox'
-        description 'A separate agent with a fresh context and its own sandbox. Does not see the AI reviewer\'s verdict. Starts the app, checks each acceptance criterion and its key examples as a user and records screenshots, video and command output as it goes. Never edits code: it gives a verdict and attaches the evidence to the PR. After a fix it re-checks the criteria the fix touched.'
+        description 'A separate agent with a fresh context and its own sandbox. Does not see the AI reviewer\'s verdict. Starts the app, checks each acceptance criterion and its key examples as a user and records screenshots, video and command output as it goes. Never edits code: it gives a verdict and attaches the evidence to the PR. After a fix it re-checks the criteria the fix touched. A problem outside the acceptance criteria does not fail the PR: it goes to Triage as a discovery (decision 31).'
         metadata {
           in 'The reviewed PR, the acceptance criteria'
           does 'Checks each criterion and its examples as a user, records evidence'
@@ -383,6 +383,10 @@ model {
   engine.deploy.watcher -> operator 'rolled back: report'
   engine.deploy.watcher .handoff engine.intake.triage 'regression: work item with evidence'
   engine.learn.retro .handoff engine.intake.triage 'rule and check work items'
+  engine.implement.implementer .handoff engine.intake.triage 'discovery outside the slice'
+  engine.verify.reviewer .handoff engine.intake.triage 'discovery outside the change'
+  engine.aiReview.validator .handoff engine.intake.triage 'discovery outside the criteria'
+  engine.plan.planner .handoff engine.intake.triage 'discovery outside the work item'
 
   // ================= Cross-cutting =================
   engine.orchestrator -> engine.implement.implementer 'a session per slice'

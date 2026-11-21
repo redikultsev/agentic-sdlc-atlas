@@ -93,7 +93,7 @@ layout: default
 <div class="stg">
 <div class="dg"><likec4-view view-id="intakeDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs n2">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Triage</p><dl class="eg3"><dt>In</dt><dd>A request, a bug or an alert</dd><dt>Does</dt><dd>Investigates on its own: duplicates, already built, rejected before, reproduces a bug; writes down assumptions</dd><dt>Out</dt><dd>Size, risk, assumptions and an outcome: for agent, for a human, won't do</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Triage</p><dl class="eg3"><dt>In</dt><dd>A request, a bug, an alert or a discovery</dd><dt>Does</dt><dd>Investigates on its own: duplicates, already built, rejected before, reproduces a bug; writes down assumptions</dd><dt>Out</dt><dd>Size, risk, assumptions and an outcome: for agent, for a human, won't do</dd></dl></div>
   <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Accept</p><dl class="eg3"><dt>In</dt><dd>Size, risk, assumptions and the proposed outcome</dd><dt>Does</dt><dd>The Operator accepts, corrects or rejects</dd><dt>Out</dt><dd>Agent: S → Implement, M, L → Spec; or for a human; or won't do</dd></dl></div>
 </div>
 </div>

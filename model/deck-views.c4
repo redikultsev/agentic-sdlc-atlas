@@ -41,6 +41,10 @@ views {
     title '1. Intake'
     include * with { description '' }
     include -> engine.intake.* ->
+    exclude engine.implement.implementer -> engine.intake.triage
+    exclude engine.verify.reviewer -> engine.intake.triage
+    exclude engine.aiReview.validator -> engine.intake.triage
+    exclude engine.plan.planner -> engine.intake.triage
     style * { size small textSize xlarge }
     autoLayout LeftRight 40 50
   }
@@ -55,6 +59,7 @@ views {
     title '3. Plan'
     include * with { description '' }
     include -> engine.plan.* ->
+    exclude engine.plan.planner -> engine.intake.triage
     style * { size small textSize xlarge }
     autoLayout TopBottom 40 50
   }
@@ -63,6 +68,7 @@ views {
     include * with { description '' }
     include -> engine.implement.* ->
     include engine.sandbox with { description '' }
+    exclude engine.implement.implementer -> engine.intake.triage
     style * { size small textSize xlarge }
     autoLayout LeftRight 40 50
   }
@@ -70,6 +76,7 @@ views {
     title '5. Checks & review'
     include * with { description '' }
     include -> engine.verify.* ->
+    exclude engine.verify.reviewer -> engine.intake.triage
     style * { size small textSize xlarge }
     autoLayout LeftRight 40 50
   }
@@ -77,6 +84,7 @@ views {
     title '6. Acceptance'
     include * with { description '' }
     include -> engine.aiReview.* ->
+    exclude engine.aiReview.validator -> engine.intake.triage
     style * { size small textSize xlarge }
     autoLayout LeftRight 40 50
   }
