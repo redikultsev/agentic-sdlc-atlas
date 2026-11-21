@@ -104,7 +104,8 @@ Entries are grouped by area. "Fix" is what we did; "For our pack" is what to car
     - **What happened.** For the TypeScript tests it installed Node through `uv pip install nodejs-wheel-binaries` in a scratch venv, because the image's Node did not fit. It worked, but it means open egress.
 21. **Publishing the PR failed after a clean validation.**
     - **What happened.** A round that only merged the base and re-validated failed at `pr__publish`: "the caller named pull request 1512 to continue, but prepare declared none". The work was done and pushed (the PR head moved), but the validation was not recorded, so the item stayed `next`.
-    - **Status.** Retried (see below). A `dev`-build bug in the pack's prepare/publish contract.
+    - **Status.** A `dev`-build bug in the pack's prepare/publish contract. A retry of the build queue did not resume the publish: it asked again (high-confidence recommendation) whether to launch a validation-only round at the same head, i.e. the full `tools/check.sh` once more (~20 min) only to record it and hand off. Another Operator approval, another round.
+    - **For our pack.** A failed last step should resume at that step, not re-run the validation; our engine records the check result as its own fact so publishing can retry alone.
 22. **Cost of one small issue end to end.**
     - **Size.** One S-size issue: 7 files, +52/−11.
     - **Cost.**
