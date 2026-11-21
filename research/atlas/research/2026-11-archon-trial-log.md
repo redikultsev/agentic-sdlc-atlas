@@ -153,7 +153,9 @@ The owner's point: a person or a local Claude Code session runs this repository'
     - **For our pack.** A safety shim must be tested against the project's own test suite before rollout. Push policy belongs in the push proxy, which sees the real destination.
 30. **No git identity for the agent user.**
     - **What happened.** `git commit` refuses without `user.email`, so tests that commit fail. Archon sets none.
-    - **Fix.** `GIT_AUTHOR_*` and `GIT_COMMITTER_*` in the environment ("Archon agent", `archon@example.invalid`).
+    - **First fix, wrong.** `GIT_AUTHOR_*` and `GIT_COMMITTER_*` in the environment. Environment variables beat every config layer, so tests that set their own author failed (one more red test).
+    - **Fix.** `git config --system` at container start ("Archon agent", `archon@example.invalid`). It is the lowest layer, so a repository's or a test's own config wins. The git-heavy test files then pass (65 of 65).
+    - **Result of entries 28–30.** On the integration branch, in the fixed environment: 16 failing tests (deterministic on a serial rerun), then 15 after the identity fix, plus the 2 broken import contracts. Before the fixes it was 77 failures and 43 errors. The 15 and the 2 are the branch's own; at least one test reads the clock (time-of-day scenes).
 31. **The pack's CI step never applies the maintainer's exceptions.**
     - **What happened.** `deliver/commands/ci.md` under `ci: none` says `passed` is "true only when every part of it passed". The rulings that except known breaks on the base reach the implementer (through the issue body) but not the CI step. While the base is red, a recorded pass is impossible by construction. On top of that, the project's check stops at its first red step (`set -e`), so on a red base the later steps never run in one go.
     - **For our pack.**
