@@ -100,11 +100,11 @@ model {
       triage = agent 'Triage' {
         #idea
         technology 'Triage agent'
-        description 'Works out the item on its own from the request, alerts, logs and code; never asks people. Takes discoveries (a problem an agent noticed outside its own task, with its evidence) like any other signal. Merges duplicates, checks the behaviour is not already built and was not rejected before, reproduces a bug. Where something stays unclear, picks the most likely reading and writes it down as an assumption. Proposes size S/M/L, risk R0/R1/R2 and an outcome with a reason. R0 is only a forecast: whether a change merges without the Operator is decided at merge by the auto-merge rules. A change that weakens or removes a check is at least R2. Never closes anything itself.'
+        description 'Works out the item on its own from the request, alerts, logs and code; never asks people. Takes discoveries (a problem an agent noticed outside its own task, with its evidence) like any other signal. Merges duplicates, checks the behaviour is not already built and was not rejected before. For a bug, reproduces it and looks for the root cause, ending with one of three findings: root cause found (it goes with the work item into the spec and the plan), refuted (no change needed, with the evidence: the Operator can close it and the requester is told why) or unclear (the Operator decides at Accept) (decision 34). Where something stays unclear, picks the most likely reading and writes it down as an assumption. Proposes size S/M/L, risk R0/R1/R2 and an outcome with a reason. R0 is only a forecast: whether a change merges without the Operator is decided at merge by the auto-merge rules. A change that weakens or removes a check is at least R2. Never closes anything itself.'
         metadata {
           in 'A request, a bug, an alert or a discovery'
-          does 'Investigates on its own: duplicates, already built, rejected before, reproduces a bug; writes down assumptions'
-          out 'Size, risk, assumptions and an outcome: for agent, for a human, won\'t do'
+          does 'Investigates on its own: duplicates, already built, rejected before; for a bug, reproduces it and finds the root cause or refutes it; writes down assumptions'
+          out 'Size, risk, assumptions, for a bug its root cause, and an outcome: for agent, for a human, won\'t do'
         }
       }
       admit = gate 'Accept' {
