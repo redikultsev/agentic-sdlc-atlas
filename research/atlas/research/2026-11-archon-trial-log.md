@@ -80,6 +80,8 @@ Entries are grouped by area. "Fix" is what we did; "For our pack" is what to car
       - An issue already implemented by a merged PR (linked by number in the PR title) was triaged "ready" at $0.20.
       - The build queue, before launching any agent, found the merged PR and asked "park or verify", recommending park with high confidence.
     - **For our pack.** Our spec puts "already built" in Triage. Archon checks it only at build; either move the check or accept it there.
+    - **And it missed an open PR.** For the second issue, an open, unmerged PR by the assistant account had implemented it six days earlier, linked to the issue by number in its branch name and title. Neither triage nor the build queue found it, and Archon built the same feature again ($14, a second PR).
+    - **For our pack.** "Already in progress" is part of the duplicate check: open PRs that reference the issue (by `#n`, branch prefix, or closing keyword) before any build.
 15. **Triage output is useful as is.**
     - **What happened.** Each triage returns type, size, complexity, importance and urgency, each with a one-line reason, plus labels `archon-ready`, `archon-size-*` and `archon-type-*` on the issue. There is no risk class (our R0/R1/R2).
 
