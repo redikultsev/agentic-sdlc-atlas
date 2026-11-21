@@ -73,32 +73,87 @@ layout: default
 states_md = (root / 'docs' / 'states.md').read_text()
 st_rows = [[c.strip() for c in l.strip().strip('|').split('|')] for l in states_md.splitlines()
            if re.match(r'\| [A-Z]\w+ \| (\d|exit) \|', l)]
-END = {'Done', 'Cancelled', 'RolledBack', 'ForHuman'}  # grey: the pipeline is finished with it
-def chip(name, who, waits, cls=''):
-    kind = 'end' if name in END else ('op' if waits.startswith('**yes') else 'ag')
-    who = '' if who in ('—', '-') else f'<i>{who}</i>'
-    return f'<div class="sc sc-{kind} {cls}"><b>{name}</b>{who}</div>'
-EXITS = {'Blocked': 'Operator decides → back to Implementing, or Cancelled',
-         'RolledBack': 'the cause becomes a new work item in New',
-         'ForHuman': 'Triage outcome: a human does it, the pipeline tracks it',
-         'Cancelled': '"won\'t do" at Triage, or from Blocked'}
+# The states slide: a UML state machine drawn by hand, colours from likec4.config.json (gate red, agent indigo,
+# human amber, end gray). Initial state top left, final bottom right, every transition an arrow with an event label.
+PAL = {'op': '#be123c', 'ag': '#4f46e5', 'hu': '#c2410c', 'end': '#475569'}
+W, H = 120, 52
+A, B, C = 70, 300, 440                        # row centres: preparation, execution, exits
+X = [None, 120, 310, 500, 690, 880, 1070]     # column centres
+POS = {'New': (1, A), 'Triaged': (2, A), 'Specifying': (3, A), 'SpecReview': (4, A), 'Planning': (5, A), 'PlanReview': (6, A),
+       'Implementing': (2, B), 'Verifying': (3, B), 'MergeReview': (4, B), 'Live': (5, B), 'Done': (6, B),
+       'ForHuman': (1, C), 'Cancelled': (2, C), 'Blocked': (3, C), 'RolledBack': (5, C)}
+TAG = {'1': '1 · Intake', '2': '2 · Spec', '3': '3 · Plan', '4': '4 · Implement', '5': '5–6 · Checks', '7': '7 · Merge', '8': '8 · Deploy'}
+EXIT_TAG = {'Blocked': 'from 5–7', 'Cancelled': 'exit', 'ForHuman': 'exit', 'RolledBack': '8 · Deploy'}
+L, R = 'start', 'end'
+# (source, target, path, [(x, y, anchor, text)]); paths in slide pixels
+EDGES = [
+    ('[*]', 'New', 'M31,70 H58', []),
+    ('New', 'Triaged', 'M180,70 H248', [(215, 60, 'middle', 'checked')]),
+    ('Triaged', 'Specifying', 'M370,70 H438', [(405, 48, 'middle', 'accepted'), (405, 61, 'middle', 'M or L')]),
+    ('Triaged', 'Implementing', 'M270,96 V272', [(262, 222, R, 'accepted'), (262, 236, R, 'S')]),
+    ('Triaged', 'ForHuman', 'M256,96 L124,294', []),
+    ('Triaged', 'Cancelled', '', []),
+    ('Specifying', 'SpecReview', 'M560,70 H628', [(595, 60, 'middle', 'spec ready')]),
+    ('SpecReview', 'Specifying', 'M650,96 C650,138 540,138 540,98', [(595, 143, 'middle', 'clarify')]),
+    ('SpecReview', 'Planning', 'M750,70 H818', [(785, 60, 'middle', 'approved')]),
+    ('Planning', 'PlanReview', 'M940,70 H1008', [(975, 60, 'middle', 'plan ready')]),
+    ('PlanReview', 'Planning', 'M1030,96 C1030,138 920,138 920,98', [(975, 143, 'middle', 'redo')]),
+    ('PlanReview', 'Implementing', 'M1070,96 V170 H305 V272', [(1078, 136, L, 'approved')]),
+    ('Implementing', 'Verifying', 'M370,300 H438', [(405, 290, 'middle', 'ready')]),
+    ('Verifying', 'Implementing', 'M470,274 C470,224 360,224 360,272', [(415, 231, 'middle', 'fix · queue red')]),
+    ('Verifying', 'MergeReview', 'M560,300 H628', [(595, 278, 'middle', 'passed'), (595, 291, 'middle', 'R1, R2')]),
+    ('Verifying', 'Live', 'M530,326 C530,388 850,388 850,328', [(690, 388, 'middle', 'passed, R0: merged')]),
+    ('Verifying', 'Blocked', 'M500,326 V412', [(492, 362, R, 'out of rounds'), (492, 376, R, 'or block')]),
+    ('MergeReview', 'Implementing', 'M650,274 C650,170 335,170 335,272', [(492, 190, 'middle', 'changes · queue red')]),
+    ('MergeReview', 'Live', 'M750,300 H818', [(785, 290, 'middle', 'merged')]),
+    ('Live', 'Done', 'M940,300 H1008', [(975, 278, 'middle', 'window'), (975, 291, 'middle', 'over')]),
+    ('Live', 'RolledBack', 'M900,326 V412', [(908, 374, L, 'regression')]),
+    ('Done', '[*]', 'M1130,300 H1149', []),
+    ('Blocked', 'Implementing', 'M460,414 L333,329', [(386, 392, R, 'sorted out')]),
+    ('Blocked', 'Cancelled', 'M440,440 H372', [(405, 430, 'middle', 'cancel')]),
+    ('RolledBack', '[*]', '', []),
+]
+JUNCTION = (120, 300)  # Triaged's two exits share one line down, then split (UML junction)
+JUNCTION_EDGES = [('M120,306 V412', [(112, 362, R, 'for a human')]), ('M125,305 L248,432', [(196, 352, L, "won't do")])]
+
 def states_slide():
-    cols = []
-    for i, key in enumerate(STAGES, 1):
-        rows = [r for r in st_rows if r[1] == str(i)]
-        body = '<span class="sa">↓</span>'.join(chip(r[0], r[3], r[4]) for r in rows)
-        if key == 'aiReview':
-            v = next(r for r in st_rows if r[0] == 'Verifying')
-            body = chip(v[0], 'Validator, inside Verifying', v[4], 'sc-shared')
-        if key == 'learn':
-            body = '<p class="sn">Creates work items in <b>New</b></p>'
-        cols.append(f'<div class="scol"><h4>{title("engine." + key)}</h4>{body}</div>')
-    exits = ''.join(f'<div class="sx">{chip(r[0], r[3], r[4])}<p>{EXITS[r[0]]}</p></div>' for r in st_rows if r[1] == 'exit')
-    return ('---\nlayout: default\n---\n\n# Work item states\n\n'
-            '<div class="lead">Where a work item is now and who it waits for. Left to right along the stages; a red state waits for the Operator</div>\n\n'
-            f'<div class="sg">{"".join(cols)}</div>\n\n<h4 class="sxh">Exits</h4>\n<div class="sxs">{exits}</div>\n\n'
-            '<p class="sl"><span class="dot op"></span>waits for the Operator, at most 3 work items at once '
-            '<span class="dot ag"></span>agents work <span class="dot end"></span>out of the pipeline</p>\n\n' + part('07-states-note'))
+    rows = {r[0]: r for r in st_rows}
+    # every drawn transition must exist in docs/states.md, and every documented one must be drawn
+    doc = set(re.findall(r'^\s*(\[\*\]|\w+) --> (\[\*\]|\w+)', states_md, re.M))
+    drawn = {(s_, t) for s_, t, *_ in EDGES}
+    assert doc == drawn, (doc - drawn, drawn - doc)
+    svg = ['<svg class="sm" viewBox="0 0 1200 500" xmlns="http://www.w3.org/2000/svg">',
+           '<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
+           '<path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker></defs>']
+    for _, _, d, labels in EDGES:
+        if d:
+            svg.append(f'<path d="{d}" class="tr" marker-end="url(#ah)"/>')
+    for d, _ in JUNCTION_EDGES:
+        svg.append(f'<path d="{d}" class="tr" marker-end="url(#ah)"/>')
+    for name, (c, y) in POS.items():
+        r = rows[name]
+        kind = 'end' if name in ('Done', 'Cancelled', 'RolledBack') else 'hu' if name == 'ForHuman' else 'op' if r[4].startswith('**yes') else 'ag'
+        x = X[c] - W / 2
+        tag = EXIT_TAG.get(name) or TAG[r[1]]
+        svg.append(f'<rect x="{x}" y="{y - H / 2}" width="{W}" height="{H}" rx="10" fill="{PAL[kind]}"/>'
+                   f'<text x="{X[c]}" y="{y - 3}" class="sn">{name}</text><text x="{X[c]}" y="{y + 15}" class="sg">{tag}</text>')
+    svg.append(f'<circle cx="24" cy="70" r="7" fill="#1e293b"/>')                                  # initial state
+    svg.append(f'<circle cx="1160" cy="300" r="10" fill="none" stroke="#1e293b" stroke-width="2"/><circle cx="1160" cy="300" r="6" fill="#1e293b"/>')
+    svg.append(f'<circle cx="{JUNCTION[0]}" cy="{JUNCTION[1]}" r="5" fill="#64748b"/>')
+    for _, _, _, labels in EDGES:
+        for lx, ly, anc, t in labels:
+            svg.append(f'<text x="{lx}" y="{ly}" text-anchor="{anc}" class="tl">{t}</text>')
+    for _, labels in JUNCTION_EDGES:
+        for lx, ly, anc, t in labels:
+            svg.append(f'<text x="{lx}" y="{ly}" text-anchor="{anc}" class="tl">{t}</text>')
+    svg.append('<text x="880" y="488" class="tl" text-anchor="middle">the cause becomes a new work item in New</text>')
+    svg.append('</svg>')
+    legend = ('<p class="sl"><span class="dot" style="background:#be123c"></span>waits for the Operator, at most 3 work items at once'
+              '<span class="dot" style="background:#4f46e5"></span>an agent works'
+              '<span class="dot" style="background:#c2410c"></span>a human, outside the pipeline'
+              '<span class="dot" style="background:#475569"></span>finished · 9. Learn only adds work items in New</p>')
+    return ('---\nlayout: default\n---\n\n# Work item states\n\n<div class="smw">' + ''.join(svg) + '</div>\n\n' + legend + '\n\n' + part('07-states-note'))
+
 dec = (root / 'docs' / 'decisions.md').read_text()
 dec_rows = [l for l in dec.splitlines() if re.match(r'\| \d+ \|', l)]
 dec_tbl = '| # | Question | Decision |\n|---|---|---|\n' + '\n'.join(
