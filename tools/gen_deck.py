@@ -34,7 +34,7 @@ def part(name):
     t = (root / 'deck' / 'parts' / f'{name}.md').read_text().strip()
     return re.sub(r'\{\{tech:([\w.]+)\}\}', lambda m: E[m.group(1)].get('technology', ''), t)
 
-KIND_TAG = {'agent': 'Agent', 'script': 'Script', 'gate': 'Gate', 'human': 'Operator', 'store': 'Store', 'platform': 'Cross-cutting'}
+KIND_TAG = {'agent': 'Agent', 'script': 'Script', 'gate': 'Gate', 'human': 'Operator', 'store': 'Store', 'platform': 'Engine'}
 
 def body(el):
     # metadata in/does/out = what a part takes, does and gives; else the description
@@ -163,7 +163,7 @@ out = [part('00-title'), part('02-how-to-read'),
        part('04-artifacts'), part('05-size-risk')]
 out += [stage_slide(k) for k in STAGES]
 out += [states_slide(),
-        parts_slide('Cross-cutting parts', 'What every stage runs on: one Orchestrator starts every agent session in its own sandbox',
+        parts_slide('The engine', 'An abstract view of the engine every stage runs on: any engine with these four parts fits',
                     'platformDeck', ['engine.orchestrator', 'engine.sandbox', 'engine.cards', 'engine.traces'],
                     '<b>Limits:</b> 3 fix rounds · time and cost per session · ≤ 3 items wait for the Operator · <b>Pause:</b> the Operator stops new sessions'),
         "---\nlayout: default\n---\n\n# Decisions\n\n<div class=\"small\">\n\n" + dec_tbl + "\n\n</div>\n",

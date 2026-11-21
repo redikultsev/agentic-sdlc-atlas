@@ -268,17 +268,17 @@ layout: default
 layout: default
 ---
 
-# Cross-cutting parts
+# The engine
 
-<div class="lead">What every stage runs on: one Orchestrator starts every agent session in its own sandbox</div>
+<div class="lead">An abstract view of the engine every stage runs on: any engine with these four parts fits</div>
 
 <div class="stg">
 <div class="dg"><likec4-view view-id="platformDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs n4">
-  <div class="pc"><div class="pc-top"><span class="pk k-platform">Cross-cutting</span><span class="ps">idea</span></div><p class="pn">Orchestrator</p><dl class="eg3"><dt>In</dt><dd>Work items and their state, verdicts, the Operator's answers</dd><dt>Does</dt><dd>Starts agent sessions, moves states, enforces limits</dd><dt>Out</dt><dd>Sessions, state labels, decision requests</dd></dl></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-platform">Cross-cutting</span><span class="ps">idea</span></div><p class="pn">Sandbox</p><dl class="eg3"><dt>In</dt><dd>A session from the Orchestrator</dd><dt>Does</dt><dd>Isolates the session: closed network, push through a proxy</dd><dt>Out</dt><dd>A pushed branch; nothing else leaves</dd></dl></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-platform">Cross-cutting</span><span class="ps">idea</span></div><p class="pn">Decision requests</p><dl class="eg3"><dt>In</dt><dd>A gate, a question, a report from any stage</dd><dt>Does</dt><dd>Puts one decision in front of the Operator</dd><dt>Out</dt><dd>The Operator's answer, back to the Orchestrator</dd></dl></div>
-  <div class="pc"><div class="pc-top"><span class="pk k-platform">Cross-cutting</span><span class="ps">idea</span></div><p class="pn">Session traces</p><dl class="eg3"><dt>In</dt><dd>Every agent session</dd><dt>Does</dt><dd>Records steps, time, cost, Operator time</dd><dt>Out</dt><dd>Traces for the Retro and the weekly metrics</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-platform">Engine</span><span class="ps">idea</span></div><p class="pn">Orchestrator</p><dl class="eg3"><dt>In</dt><dd>Work items and their state, verdicts, the Operator's answers</dd><dt>Does</dt><dd>Starts agent sessions, moves states, enforces limits</dd><dt>Out</dt><dd>Sessions, state labels, decision requests</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-platform">Engine</span><span class="ps">idea</span></div><p class="pn">Sandbox</p><dl class="eg3"><dt>In</dt><dd>A session from the Orchestrator</dd><dt>Does</dt><dd>Isolates the session: closed network, push through a proxy</dd><dt>Out</dt><dd>A pushed branch; nothing else leaves</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-platform">Engine</span><span class="ps">idea</span></div><p class="pn">Decision requests</p><dl class="eg3"><dt>In</dt><dd>A gate, a question, a report from any stage</dd><dt>Does</dt><dd>Puts one decision in front of the Operator</dd><dt>Out</dt><dd>The Operator's answer, back to the Orchestrator</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-platform">Engine</span><span class="ps">idea</span></div><p class="pn">Session traces</p><dl class="eg3"><dt>In</dt><dd>Every agent session</dd><dt>Does</dt><dd>Records steps, time, cost, Operator time</dd><dt>Out</dt><dd>Traces for the Retro and the weekly metrics</dd></dl></div>
 </div>
 </div>
 
