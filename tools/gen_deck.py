@@ -76,7 +76,7 @@ st_rows = [[c.strip() for c in l.strip().strip('|').split('|')] for l in states_
 # The states slide: a UML state machine drawn by hand, colours from likec4.config.json (gate red, agent indigo,
 # human amber, end gray). Initial state top left, final bottom right, every transition an arrow with an event label.
 PAL = {'op': '#be123c', 'ag': '#4f46e5', 'hu': '#c2410c', 'end': '#475569'}
-W, H = 120, 52
+W, H = 120, 56
 A, B, C = 70, 300, 440                        # row centres: preparation, execution, exits
 X = [None, 120, 310, 500, 690, 880, 1070]     # column centres
 POS = {'New': (1, A), 'Triaged': (2, A), 'Specifying': (3, A), 'SpecReview': (4, A), 'Planning': (5, A), 'PlanReview': (6, A),
@@ -89,32 +89,32 @@ L, R = 'start', 'end'
 EDGES = [
     ('[*]', 'New', 'M31,70 H58', []),
     ('New', 'Triaged', 'M180,70 H248', [(215, 60, 'middle', 'checked')]),
-    ('Triaged', 'Specifying', 'M370,70 H438', [(405, 48, 'middle', 'accepted'), (405, 61, 'middle', 'M or L')]),
-    ('Triaged', 'Implementing', 'M270,96 V272', [(262, 222, R, 'accepted'), (262, 236, R, 'S')]),
-    ('Triaged', 'ForHuman', 'M256,96 L124,294', []),
+    ('Triaged', 'Specifying', 'M370,70 H438', [(405, 44, 'middle', 'accepted'), (405, 61, 'middle', 'M or L')]),
+    ('Triaged', 'Implementing', 'M270,98 V270', [(262, 220, R, 'accepted'), (262, 237, R, 'S')]),
+    ('Triaged', 'ForHuman', 'M256,98 L124,294', []),
     ('Triaged', 'Cancelled', '', []),
-    ('Specifying', 'SpecReview', 'M560,70 H628', [(595, 60, 'middle', 'spec ready')]),
-    ('SpecReview', 'Specifying', 'M650,96 C650,138 540,138 540,98', [(595, 143, 'middle', 'clarify')]),
+    ('Specifying', 'SpecReview', 'M560,70 H628', [(595, 60, 'middle', 'ready')]),
+    ('SpecReview', 'Specifying', 'M650,98 C650,140 540,140 540,100', [(595, 146, 'middle', 'clarify')]),
     ('SpecReview', 'Planning', 'M750,70 H818', [(785, 60, 'middle', 'approved')]),
-    ('Planning', 'PlanReview', 'M940,70 H1008', [(975, 60, 'middle', 'plan ready')]),
-    ('PlanReview', 'Planning', 'M1030,96 C1030,138 920,138 920,98', [(975, 143, 'middle', 'redo')]),
-    ('PlanReview', 'Implementing', 'M1070,96 V170 H305 V272', [(1078, 136, L, 'approved')]),
+    ('Planning', 'PlanReview', 'M940,70 H1008', [(975, 60, 'middle', 'ready')]),
+    ('PlanReview', 'Planning', 'M1030,98 C1030,140 920,140 920,100', [(975, 146, 'middle', 'redo')]),
+    ('PlanReview', 'Implementing', 'M1070,98 V170 H305 V270', [(1078, 136, L, 'approved')]),
     ('Implementing', 'Verifying', 'M370,300 H438', [(405, 290, 'middle', 'ready')]),
-    ('Verifying', 'Implementing', 'M470,274 C470,224 360,224 360,272', [(415, 231, 'middle', 'fix · queue red')]),
-    ('Verifying', 'MergeReview', 'M560,300 H628', [(595, 278, 'middle', 'passed'), (595, 291, 'middle', 'R1, R2')]),
-    ('Verifying', 'Live', 'M530,326 C530,388 850,388 850,328', [(690, 388, 'middle', 'passed, R0: merged')]),
-    ('Verifying', 'Blocked', 'M500,326 V412', [(492, 362, R, 'out of rounds'), (492, 376, R, 'or block')]),
-    ('MergeReview', 'Implementing', 'M650,274 C650,170 335,170 335,272', [(492, 190, 'middle', 'changes · queue red')]),
+    ('Verifying', 'Implementing', 'M470,272 C470,222 360,222 360,270', [(415, 231, 'middle', 'fix · queue red')]),
+    ('Verifying', 'MergeReview', 'M560,300 H628', [(595, 274, 'middle', 'passed'), (595, 291, 'middle', 'R1, R2')]),
+    ('Verifying', 'Live', 'M530,328 C530,388 850,388 850,330', [(690, 392, 'middle', 'passed, R0: merged')]),
+    ('Verifying', 'Blocked', 'M500,328 V410', [(492, 360, R, 'out of rounds'), (492, 377, R, 'or block')]),
+    ('MergeReview', 'Implementing', 'M650,272 C650,170 335,170 335,270', [(492, 190, 'middle', 'changes · queue red')]),
     ('MergeReview', 'Live', 'M750,300 H818', [(785, 290, 'middle', 'merged')]),
-    ('Live', 'Done', 'M940,300 H1008', [(975, 278, 'middle', 'window'), (975, 291, 'middle', 'over')]),
-    ('Live', 'RolledBack', 'M900,326 V412', [(908, 374, L, 'regression')]),
+    ('Live', 'Done', 'M940,300 H1008', [(975, 274, 'middle', 'window'), (975, 291, 'middle', 'over')]),
+    ('Live', 'RolledBack', 'M900,328 V410', [(908, 374, L, 'regression')]),
     ('Done', '[*]', 'M1130,300 H1149', []),
-    ('Blocked', 'Implementing', 'M460,414 L333,329', [(386, 392, R, 'sorted out')]),
+    ('Blocked', 'Implementing', 'M460,412 L333,331', [(386, 392, R, 'sorted out')]),
     ('Blocked', 'Cancelled', 'M440,440 H372', [(405, 430, 'middle', 'cancel')]),
     ('RolledBack', '[*]', '', []),
 ]
 JUNCTION = (120, 300)  # Triaged's two exits share one line down, then split (UML junction)
-JUNCTION_EDGES = [('M120,306 V412', [(112, 362, R, 'for a human')]), ('M125,305 L248,432', [(196, 352, L, "won't do")])]
+JUNCTION_EDGES = [('M120,306 V410', [(112, 362, R, 'for a human')]), ('M125,305 L248,430', [(196, 352, L, "won't do")])]
 
 def states_slide():
     rows = {r[0]: r for r in st_rows}
@@ -136,7 +136,7 @@ def states_slide():
         x = X[c] - W / 2
         tag = EXIT_TAG.get(name) or TAG[r[1]]
         svg.append(f'<rect x="{x}" y="{y - H / 2}" width="{W}" height="{H}" rx="10" fill="{PAL[kind]}"/>'
-                   f'<text x="{X[c]}" y="{y - 3}" class="sn">{name}</text><text x="{X[c]}" y="{y + 15}" class="sg">{tag}</text>')
+                   f'<text x="{X[c]}" y="{y - 3}" class="sn">{name}</text><text x="{X[c]}" y="{y + 17}" class="sg">{tag}</text>')
     svg.append(f'<circle cx="24" cy="70" r="7" fill="#1e293b"/>')                                  # initial state
     svg.append(f'<circle cx="1160" cy="300" r="10" fill="none" stroke="#1e293b" stroke-width="2"/><circle cx="1160" cy="300" r="6" fill="#1e293b"/>')
     svg.append(f'<circle cx="{JUNCTION[0]}" cy="{JUNCTION[1]}" r="5" fill="#64748b"/>')
@@ -146,7 +146,7 @@ def states_slide():
     for _, labels in JUNCTION_EDGES:
         for lx, ly, anc, t in labels:
             svg.append(f'<text x="{lx}" y="{ly}" text-anchor="{anc}" class="tl">{t}</text>')
-    svg.append('<text x="880" y="488" class="tl" text-anchor="middle">the cause becomes a new work item in New</text>')
+    svg.append('<text x="880" y="492" class="tl" text-anchor="middle">the cause becomes a new work item in New</text>')
     svg.append('</svg>')
     legend = ('<p class="sl"><span class="dot" style="background:#be123c"></span>waits for the Operator, at most 3 work items at once'
               '<span class="dot" style="background:#4f46e5"></span>an agent works'

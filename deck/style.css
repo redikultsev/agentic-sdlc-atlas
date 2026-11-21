@@ -75,8 +75,8 @@ details summary { cursor: pointer; color: #6b7280; font-size: 0.85rem; }
 /* work item states slide: a UML state machine */
 .sm { display: block; width: 100%; height: auto; margin-top: 6px; }
 .sm .tr { fill: none; stroke: #64748b; stroke-width: 1.6; }
-.sm .sn { fill: #fff; font-size: 15px; font-weight: 700; text-anchor: middle; }
-.sm .sg { fill: #fff; fill-opacity: 0.8; font-size: 11.5px; text-anchor: middle; }
-.sm .tl { fill: #334155; font-size: 12.5px; }
+.sm .sn { fill: #fff; font-size: 16.5px; font-weight: 700; text-anchor: middle; }
+.sm .sg { fill: #fff; fill-opacity: 0.9; font-size: 14.5px; text-anchor: middle; }
+.sm .tl { fill: #334155; font-size: 14.5px; }
 .sl { margin-top: 10px; font-size: 15px; color: #334155; text-align: center; }
 .sl .dot { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin: 0 6px 0 20px; }
