@@ -4,7 +4,7 @@ Where the project stands and what comes next. Update it at the end of every work
 
 ## Now (2026-11-20)
 
-**Deck walkthrough with the owner, slide by slide.** Slides 1–14 are reviewed. The "life of one work item" slide was removed (it repeated the overview, slide 5 and the states). Continue from slide 15 (states, grid shown, awaiting approval), then 17 (cross-cutting), 18 (decisions), 19 (open questions).
+**Deck walkthrough with the owner, slide by slide.** Slides 1–14 are reviewed. The "life of one work item" slide was removed (it repeated the overview, slide 5 and the states). Slide 15 (states) approved as decision 28. Continue from slide 16 (cross-cutting), then 17 (decisions), 18 (open questions).
 
 How a slide is reviewed: show it, explain in plain words what each part does, list gaps found in the model, propose before → after. When the owner doubts a design choice, run a research swarm (three or four parallel agents, each with its own angle, web through fetchira), save the synthesis to `research/atlas/research/`, then propose. After a decision: write it into the affected elements (the model is the spec), `docs/decisions.md`, glossary and states; regenerate; check in the browser at 1280×760; commit and push.
 
@@ -17,7 +17,7 @@ Run both views from the repository root:
 
 `npm run deck:gen` regenerates `deck/slides.md` and the web components after any model change. Slidev does not reload `likec4-views.js` by itself: refresh the browser tab.
 
-## What the walkthrough changed (decisions 14–27)
+## What the walkthrough changed (decisions 14–28)
 
 - **Intake:** Triage works alone from request, alerts, logs and code, never asks people; checks duplicates, already built, rejected before, reproduces bugs; writes assumptions; outcomes for agent / for a human / won't do. Requests from people and from Learn enter through Triage. States: no NeedsInfo; ForHuman added.
 - **Ambiguity (19):** agents resolve it themselves and write assumptions; people only at gates. Exception: the Interviewer asks the Operator business questions.
@@ -30,6 +30,7 @@ Run both views from the repository root:
 - **7. Merge:** an auto-merge rules file decides R0 by facts, with a kill switch on the revert rate (25); the Operator's gate shows scope first, "changes" goes back without spending the 3 rounds; merge queue on the latest main (24).
 - **8. Deploy & watch:** every merge deploys main to everyone at once, one merge at a time; no gate after merge, R2 is approved at the Merge gate (8 revised). The Watcher agent watches what the PR changed for a window, rolls back by itself, reports to the Operator, sends a work item to Triage; asks when unsure; migrations expand–contract, never auto-rolled back (26). DeployReview state removed.
 - **9. Learn:** the Adopt gate is gone; a weekly Retro reads corrections and failures, sends rule and check work items to Triage, proposes removing unused rules, sends a weekly summary of six metrics; instruction files never R0, weakening a check R2 (27).
+- **States (28):** 15 states named by who holds the item (-ing = agent, Review = Operator), one UML state machine slide in swimlanes Operator · Agents · Closed, generated with a check against `docs/states.md`.
 - **Arrows:** data flows along the arrow; dashed = writes into a store, dotted = reads from a store.
 - Change sets renamed Pull requests.
 
@@ -40,16 +41,14 @@ Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and
 1. Manual layouts: the overview (`tools/layout_index.mjs`) and the deck views in `tools/layout_deck.py` (`LAYOUTS`: plan, verify, aiReview, implement, merge, deploy; `BYPASS` draws an edge that skips a block as an arc). After a model change: `likec4 export json -o <file> .`, then `python3 tools/layout_deck.py <file>`; if a snap drifts, delete `.likec4/<view>.likec4.snap` first. The overview: if its links change, add an exclude in `views.c4` or rebuild with `node tools/layout_index.mjs`.
 2. Element ids lag behind renamed stages: `engine.verify` is "5. Checks & review", `engine.aiReview` is "6. Acceptance".
 3. PDF export of the deck with web components is not verified.
-4. `docs/states.md` reworked to 15 states (no Accepted, Merged, Researching; Clarifying → Specifying, New → Triaging, Triaged → TriageReview: an agent state ends in -ing, an Operator state in Review; Blocked → Cancelled replaced by "the Operator can cancel in any state") with a Stage column; the deck shows them as one UML state machine slide in swimlanes Operator · Agents · Closed (hand-placed in `tools/gen_deck.py`, colours from the model palette; the generator asserts every documented transition is drawn). Awaiting the owner's approval, then decision 28.
-5. No target numbers for the pipeline metrics yet.
-6. The repository is private on GitHub; making it public needs the owner's decision and a scan for personal data.
-7. How the Interviewer asks the Operator business questions (few, short, no walls of text) is not designed yet.
-8. Not every decision is written into the element cards yet; audit decisions 1–25 against the model (the model is the implementation spec, AGENTS.md rule 8).
+4. No target numbers for the pipeline metrics yet.
+5. The repository is private on GitHub; making it public needs the owner's decision and a scan for personal data.
+6. How the Interviewer asks the Operator business questions (few, short, no walls of text) is not designed yet.
+7. Not every decision is written into the element cards yet; audit decisions 1–28 against the model (the model is the implementation spec, AGENTS.md rule 8).
 
 ## Next
 
-1. Finish the walkthrough (slides 15–19) and apply corrections.
-2. Audit the model against decisions 1–25; run the five-question check (decision 18) over every stage.
-3. Approve the work item states.
-4. Research and choose the engine to build the pipeline on.
-5. Measure on real work items; then the engine spec and a design review.
+1. Finish the walkthrough (slides 16–18) and apply corrections.
+2. Audit the model against decisions 1–28; run the five-question check (decision 18) over every stage.
+3. Research and choose the engine to build the pipeline on.
+4. Measure on real work items; then the engine spec and a design review.
