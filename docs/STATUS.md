@@ -52,7 +52,8 @@ Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and
 
 **Re-check the same day** under the new constraints: our own server, the Operator works only in the engine's web UI, extend an existing engine. See [2026-11-engine-base.md](../research/atlas/research/2026-11-engine-base.md) and the per-engine reports in `research/atlas/research/engine-base/`. Six engines read in depth, four awesome lists parsed, 13 new candidates read.
 - Recommended base: **Archon** (7/10), extended through packs and plugins. Runner-up: **cezar** (6/10).
-- Our own layer in any case: a sandbox (OpenSandbox or Matchlock), a push proxy, a tracker bridge (15 states as labels, Jira), the item rules, and Watcher and Retro as workflows.
+- Head to head on 10 dimensions: [2026-11-cezar-vs-archon.md](../research/atlas/research/2026-11-cezar-vs-archon.md). cezar wins the UI and project health; Archon wins extensibility, the sandbox seam, code structure, operations and direction. Trackers connect as MCP servers (decision 5, revised).
+- Our own layer in any case: a sandbox (OpenSandbox or Matchlock), a push proxy, tracker sync (15 states as labels; any tracker through MCP), the item rules, and Watcher and Retro as workflows.
 - The earlier "own Orchestrator on Temporal" is replaced by this.
 
 ## Next

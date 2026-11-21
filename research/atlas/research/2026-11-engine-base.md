@@ -19,6 +19,7 @@ The earlier verdict, "our own Orchestrator on Temporal", counted gaps against ou
   - The earlier research did not use these lists as sources. That is how it missed Archon, Aixle Flow, OpenChamber, Paperclip and the new sandboxes.
   - Lists: [awesome-list.md](engine-base/awesome-list.md) and [awesome-lists-2.md](engine-base/awesome-lists-2.md).
 - **Scores are 0–10 as a base for us.** Sizes: S ≤ 1 day, M ≤ 1 week, L more.
+- **Trackers are not a criterion.** Jira, Linear and other trackers connect as MCP servers (decision 5, revised). The "no Jira" gaps in the per-engine reports are void; what counts is whether a step can use any MCP server.
 
 ## Answer
 
@@ -27,7 +28,7 @@ The earlier verdict, "our own Orchestrator on Temporal", counted gaps against ou
    - OpenSandbox or Matchlock, with network closed by default;
    - a push proxy that only allows the slice branch;
    - credentials removed from agent sessions.
-3. **Item-level rules sit outside every engine.** These are the shared limit of 3 fix rounds, the cap of 3 waiting items, the global pause, a limit hit counting as a failed round, the 15 states as tracker labels, and the Jira bridge. They become a small service of ours, or the engine's own scripts and packs.
+3. **Item-level rules sit outside every engine.** These are the shared limit of 3 fix rounds, the cap of 3 waiting items, the global pause, a limit hit counting as a failed round, and the 15 states as tracker labels or statuses. They become a small service of ours, or the engine's own scripts and packs.
 4. **Recommended base: Archon (7/10), extended through packs and plugins and never forked.** It is the only engine where "code picks the next step from a JSON verdict" is the house style:
    - `when:` runs over output fields and `until_bash` exits loops;
    - typed `wait` gates carry a recommendation;
@@ -44,7 +45,7 @@ The earlier verdict, "our own Orchestrator on Temporal", counted gaps against ou
 
 | Engine | Score | Ready | Main gaps (size) | Project health (2026-11-21) |
 |---|---|---|---|---|
-| [Archon](engine-base/archon.md) | 7 | YAML DAG with JSON-schema outputs, `when:` routing, typed waits, capped loops, per-node USD budget; SDLC pack (intake, build, multi-lens review, merge queue); GitHub plugin with issues, labels, checks, merge; web console, attention stream, Web Push; Claude, Codex, Pi | Repository runs isolated by worktree only (L); one GitHub token for every node (M); no Jira (M–L); shared rounds, cap of 3, wall-clock limit (M); pause only in the CLI, telemetry on by default (S) | MIT, 23,970 stars, ~85% of human commits by one author, ~900 commits a month |
+| [Archon](engine-base/archon.md) | 7 | YAML DAG with JSON-schema outputs, `when:` routing, typed waits, capped loops, per-node USD budget; SDLC pack (intake, build, multi-lens review, merge queue); GitHub plugin with issues, labels, checks, merge; web console, attention stream, Web Push; Claude, Codex, Pi | Repository runs isolated by worktree only (L); one GitHub token for every node (M); shared rounds, cap of 3, wall-clock limit (M); pause only in the CLI, telemetry on by default (S) | MIT, 23,970 stars, ~85% of human commits by one author, ~900 commits a month |
 | [cezar](engine-base/cezar.md) | 6 | Web cockpit with "needs you" queue, graph editor with Simulate, cost page; graph with fork/join, gates, wait-for-CI, PR labels; triggers on issue label and Jira status; secrets kept out of agent steps; VPS installer | No sandbox, host `gh` login reachable (S–M via a CLI wrapper); verdict is a text token (S); no dynamic slice frontier (M–L); no cap of 3 or pause (S); Jira Cloud only, no label writes | MIT, 1,118 stars, 2–3 maintainers, 1,255 merged PRs, upstream receptive |
 | [MAIster](engine-base/maister.md) | 6 | Board, run view with transcript, diff and evidence, Inbox, metrics, Flow editor, RBAC; Flow DSL with schema routing and bounded rework; web push; R0-style auto-merge with deny-list and kill switch | Agents inherit the server's environment and secrets (M); no tracker sync or Jira (M–L); rounds per loop, not per item (M); no cap of 3 or pause (S–M); no deploy or watch (M–L) | MIT, 10 stars, 99.8% of commits by one author, ~527k lines in `web/` |
 | [Kraft](engine-base/kraft.md) | 6 | Board, chain graph, gate review with diff comments, analytics, phone layout; GitHub and GitLab PR flow with merge queue; best sandbox (deny-all egress, proxy-held credentials, server-only push); time, token and dollar caps; 7 agent CLIs | No GitHub Issues or Jira intake (M+M); 9 run statuses (S in a bridge); shared rounds (M); R0 rules gate rejected upstream (M, in a fork); one password, no accounts | Apache-2.0, 14 stars, one author (1,411 commits; the next human 12) |
@@ -61,14 +62,13 @@ The earlier verdict, "our own Orchestrator on Temporal", counted gaps against ou
 |---|---|---|
 | Sandbox layer | Each agent session in OpenSandbox (Firecracker or Kata, network closed) or Matchlock; the engine starts the agent CLI through a wrapper | M |
 | Push proxy | Lets a session push only to its slice branch; the merge token lives only in the merge step | M |
-| Tracker bridge | 15 states as labels in GitHub and Jira; Jira intake and transitions; slices as sub-issues with blocked-by | M–L |
+| Tracker sync | 15 states as labels or statuses, slices as sub-issues with blocked-by; any tracker through its MCP server or API from a script step | S–M |
 | Item rules | Shared limit of 3 rounds per item, a limit hit counts as a round, cap of 3 waiting, global pause | S–M, as engine scripts or packs |
 | Stages 8–9 | Watcher per deploy, weekly Retro, six metrics | M each, as workflows of the engine |
 
 ## Not verified
 
 - Nothing was run: neither the engines, nor the sandbox wrapper inside any of them, nor Web Push on a phone.
-- Whether Archon can use GitHub for PRs and a Jira plugin for work items in one project.
 - Whether Archon's run budget works with loops and fan-out. It is rejected by the schema today.
 - Whether Matchlock or Gondolin can run Docker inside the VM for test suites.
 - Issue response times for several projects: the GitHub search API rate-limited the agents.
