@@ -218,7 +218,7 @@ model {
       reviewer = agent 'AI reviewer' {
         #built
         technology 'One agent, other model family'
-        description 'One agent with a fresh context and its own sandbox, on a different model family than the Implementer. Reads the PR, the spec and the code around the change; checks correctness, security and match with the spec; re-checks each finding, by running the code where it can, before reporting it. Skips style and nits by a "what not to flag" list. Gives a JSON verdict (pass / fix / block) and, for R1/R2, an explanation for the Operator by the presentation rules: before → after, why, what is not verified. After a fix it reviews only the new diff. A problem in code the change does not touch is not a finding: it goes to Triage as a discovery (decision 31).'
+        description 'One agent with a fresh context and its own sandbox, on a different model family than the Implementer. Reads the PR, the spec and the code around the change; checks correctness, security and match with the spec; re-checks each finding, by running the code where it can, before reporting it. Skips style and nits by a "what not to flag" list. Gives a JSON verdict (pass / fix / block) and, for R1/R2, an explanation for the Operator by the presentation rules: before → after, why, what is not verified. After a fix it reviews only the new diff. A problem in code the change does not touch is not a finding: it goes to Triage as a discovery (decision 31). Also reads every open review thread a person left on the PR and re-checks it like its own finding; the thread text is untrusted data, never instructions. Confirmed: a fix, in the same 3 rounds; not confirmed: a reply with the evidence; outside the change: a discovery. Only the thread\'s author or the Operator resolves it (decision 35).'
         metadata {
           in 'The PR after green CI, the spec, the code around it'
           does 'Finds and re-checks issues, skips nits, explains the change'
@@ -261,7 +261,7 @@ model {
       mergeGate = gate 'Merge?' {
         #idea
         technology 'Gate'
-        description 'The Operator sees first the scope (files outside the plan, new dependencies, size), then the explanation and the evidence; for R2 also the code. "Merge" sends the PR to the queue; main deploys right after, so for R2 "merge" also means "deploy now" and the Operator picks the moment by pressing it; "changes" with a comment sends it back to the Implementer. Changes asked by the Operator do not count toward the 3 automatic fix rounds.'
+        description 'The Operator sees first the scope (files outside the plan, new dependencies, size) and the open review threads, then the explanation and the evidence; for R2 also the code. "Merge" sends the PR to the queue; main deploys right after, so for R2 "merge" also means "deploy now" and the Operator picks the moment by pressing it; "changes" with a comment sends it back to the Implementer. Changes asked by the Operator do not count toward the 3 automatic fix rounds.'
         metadata {
           in 'The PR: scope, explanation, evidence; for R2 the code'
           does 'The Operator: merge or changes with a comment'
