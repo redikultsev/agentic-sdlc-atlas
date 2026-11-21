@@ -44,7 +44,7 @@ Three queues joined by a work item document in the engine's state store (`work/<
 
 ## Where Archon is weaker than our design
 
-1. **Merge without CI on the combined result** (stage 7). Two PRs green alone can break main together. Our merge queue rebuilds on the latest main with the PRs ahead. Seen in the trial: Retinue's develop went red from merges that were each green alone.
+1. **Merge without CI on the combined result** (stage 7). Two PRs green alone can break main together. Our merge queue rebuilds on the latest main with the PRs ahead. Seen in the trial: the trial repository's integration branch went red from merges that were each green alone.
 2. **Trusting the agent's validation report** under `ci: none`. Our CI runs outside the sandbox, not on the agent's word.
 3. **Agent-judged R0.** "Clear" is a model's reading of `merge.md`; ours is facts checked by a script, with a kill switch.
 4. **No gates before code.** The person meets the work at the merge question. Our main gate is the plan.

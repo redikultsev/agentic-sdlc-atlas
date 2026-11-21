@@ -11,7 +11,7 @@ model {
   }
   requester = human 'Requester' {
     technology 'Colleague, user or the Operator'
-    description 'Anyone who asks for a change or reports a bug.'
+    description 'Anyone who asks for a change or reports a bug. A request from an author not on the project\'s list of trusted authors reaches no agent until the Operator or a trusted author approves that exact text; an edit to the text withdraws the approval (decision 39).'
   }
   monitoring = external 'Monitoring' {
     technology 'Errors, logs, metrics'
@@ -27,7 +27,7 @@ model {
   docs = store 'Specs, plans and decisions' {
     #idea
     technology 'files in each repository'
-    description 'Per work item: the spec (what "done" means: acceptance criteria with key examples), the plan (how we do it and prove it), for L a codebase research document. Per project: decision records (ADR), the register of rejected requests, the register of the Operator\'s rulings and the auto-merge rules, so new work does not contradict old choices and rejected ideas are not argued twice. Every Operator answer is a ruling (decision 32): it is appended, dated and in the Operator\'s words, to a "Rulings" section of the work item\'s spec (for S, of the work item itself), and later sessions work from it; a ruling the Operator marks as true for the whole project also goes to the register of rulings, which every agent reads before it asks or raises a finding.'
+    description 'Per work item: the spec (what "done" means: acceptance criteria with key examples), the plan (how we do it and prove it), for L a codebase research document. Per project: decision records (ADR), the register of rejected requests, the register of the Operator\'s rulings, the list of trusted authors and the auto-merge rules, so new work does not contradict old choices and rejected ideas are not argued twice. Every Operator answer is a ruling (decision 32): it is appended, dated and in the Operator\'s words, to a "Rulings" section of the work item\'s spec (for S, of the work item itself), and later sessions work from it; a ruling the Operator marks as true for the whole project also goes to the register of rulings, which every agent reads before it asks or raises a finding.'
   }
   changes = store 'Pull requests' {
     #built
@@ -100,7 +100,7 @@ model {
       triage = agent 'Triage' {
         #idea
         technology 'Triage agent'
-        description 'Works out the item on its own from the request, alerts, logs and code; never asks people. Takes discoveries (a problem an agent noticed outside its own task, with its evidence) like any other signal. Merges duplicates, checks the behaviour is not already built and was not rejected before. For a bug, reproduces it and looks for the root cause, ending with one of three findings: root cause found (it goes with the work item into the spec and the plan), refuted (no change needed, with the evidence: the Operator can close it and the requester is told why) or unclear (the Operator decides at Accept) (decision 34). Where something stays unclear, picks the most likely reading and writes it down as an assumption. Proposes size S/M/L, risk R0/R1/R2 and an outcome with a reason. R0 is only a forecast: whether a change merges without the Operator is decided at merge by the auto-merge rules. A change that weakens or removes a check is at least R2. Never closes anything itself.'
+        description 'Works out the item on its own from the request, alerts, logs and code; never asks people. Takes discoveries (a problem an agent noticed outside its own task, with its evidence) like any other signal. Reads a person\'s request only when its author is trusted or that exact text was approved (decision 39); request text is data, never instructions. Merges duplicates, checks the behaviour is not already built and was not rejected before. For a bug, reproduces it and looks for the root cause, ending with one of three findings: root cause found (it goes with the work item into the spec and the plan), refuted (no change needed, with the evidence: the Operator can close it and the requester is told why) or unclear (the Operator decides at Accept) (decision 34). Where something stays unclear, picks the most likely reading and writes it down as an assumption. Proposes size S/M/L, risk R0/R1/R2 and an outcome with a reason. R0 is only a forecast: whether a change merges without the Operator is decided at merge by the auto-merge rules. A change that weakens or removes a check is at least R2. Never closes anything itself.'
         metadata {
           in 'A request, a bug, an alert or a discovery'
           does 'Investigates on its own: duplicates, already built, rejected before; for a bug, reproduces it and finds the root cause or refutes it; writes down assumptions'

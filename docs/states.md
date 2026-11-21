@@ -1,6 +1,6 @@
 # Work item states and transitions
 
-Approved 2026-11-21 (decision 28). The state lives in the tracker (GitHub Issues: a `state:…` label; Jira: a workflow status). The pipeline moves a work item only along the transitions below; a move into a "waits for the Operator" state is a gate. 15 states: 11 on the main line, 4 exits. A state says who holds the work item now: an agent state ends in -ing, an Operator state ends in Review (plus Blocked). A state that lasts seconds is not a state: "accepted" and "merged" are transitions. The Operator can cancel a work item in any state; closing it (Cancelled, ForHuman) tells the requester why.
+Approved 2026-11-21 (decision 28). The state lives in the tracker (GitHub Issues: a `state:…` label; Jira: a workflow status). The pipeline moves a work item only along the transitions below; a move into a "waits for the Operator" state is a gate. 15 states: 11 on the main line, 4 exits. A state says who holds the work item now: an agent state ends in -ing, an Operator state ends in Review (plus Blocked). A state that lasts seconds is not a state: "accepted" and "merged" are transitions. A request from an author who is not trusted enters Triaging only after the Operator or a trusted author approves its exact text (decision 39). The Operator can cancel a work item in any state; closing it (Cancelled, ForHuman) tells the requester why.
 
 ### Part 1. Preparation: from signal to approved plan
 
