@@ -1,5 +1,5 @@
 """Build deck/slides.md from the single sources: LikeC4 model (JSON export),
-docs/states.md, docs/decisions.md and hand-written deck/parts/*.md.
+docs/states.md and hand-written deck/parts/*.md.
 Run via `npm run deck:gen`; never edit deck/slides.md by hand."""
 import json, re, sys, pathlib
 
@@ -153,10 +153,6 @@ def states_slide():
               '<span class="dot" style="background:#475569"></span>closed</p>')
     return ('---\nlayout: default\n---\n\n# Work item states\n\n<div class="smw">' + ''.join(svg) + '</div>\n\n' + legend + '\n\n' + part('07-states-note'))
 
-dec = (root / 'docs' / 'decisions.md').read_text()
-dec_rows = [l for l in dec.splitlines() if re.match(r'\| \d+ \|', l)]
-dec_tbl = '| # | Question | Decision |\n|---|---|---|\n' + '\n'.join(
-    '| ' + ' | '.join(c.strip() for c in l.strip('|').split('|')[:3]) + ' |' for l in dec_rows)
 
 out = [part('00-title'), part('02-how-to-read'),
        "---\n\n# Whole pipeline\n\n<div class=\"dg\"><likec4-view view-id=\"index\" color-scheme=\"light\" browser=\"true\" class=\"view-wide\"></likec4-view><span class=\"hint\">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>\n\n" + part('03-overview-note'),
@@ -166,7 +162,6 @@ out += [states_slide(),
         parts_slide('The engine', 'An abstract view of the engine every stage runs on: any engine with these four parts fits',
                     'platformDeck', ['engine.orchestrator', 'engine.sandbox', 'engine.cards', 'engine.traces'],
                     '<b>Limits:</b> 3 fix rounds · time and cost per session · ≤ 3 items wait for the Operator · <b>Pause:</b> the Operator stops new sessions'),
-        "---\nlayout: default\n---\n\n# Decisions\n\n<div class=\"small\">\n\n" + dec_tbl + "\n\n</div>\n",
         part('08-open')]
 (root / 'deck' / 'slides.md').write_text('\n\n'.join(out) + '\n')
 print('slides:', sum(1 for _ in re.finditer(r'^---$', '\n'.join(out), re.M)))

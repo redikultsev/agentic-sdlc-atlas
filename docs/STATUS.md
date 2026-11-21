@@ -4,7 +4,7 @@ Where the project stands and what comes next. Update it at the end of every work
 
 ## Now (2026-11-20)
 
-**Deck walkthrough with the owner, slide by slide.** Slides 1–14 are reviewed. The "life of one work item" slide was removed (it repeated the overview, slide 5 and the states). Slides 15 (states, decision 28) and 16 (cross-cutting, decisions 29–30) reviewed. Continue from slide 17 (decisions), then 18 (open questions).
+**Deck walkthrough with the owner, slide by slide.** Slides 1–14 are reviewed. The "life of one work item" slide was removed (it repeated the overview, slide 5 and the states). Slides 15 (states, decision 28) and 16 (cross-cutting, decisions 29–30) reviewed. The decisions slide was removed: the log lives in `docs/decisions.md`, each decision shows on its stage slide. Continue from the open questions slide.
 
 How a slide is reviewed: show it, explain in plain words what each part does, list gaps found in the model, propose before → after. When the owner doubts a design choice, run a research swarm (three or four parallel agents, each with its own angle, web through fetchira), save the synthesis to `research/atlas/research/`, then propose. After a decision: write it into the affected elements (the model is the spec), `docs/decisions.md`, glossary and states; regenerate; check in the browser at 1280×760; commit and push.
 
@@ -49,7 +49,7 @@ Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and
 
 ## Next
 
-1. Finish the walkthrough (slides 17–18) and apply corrections.
+1. Finish the walkthrough (open questions slide) and apply corrections.
 2. Audit the model against decisions 1–30; run the five-question check (decision 18) over every stage.
 3. Research and choose the engine to build the pipeline on.
 4. Measure on real work items; then the engine spec and a design review.
