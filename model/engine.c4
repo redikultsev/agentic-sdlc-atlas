@@ -27,7 +27,7 @@ model {
   docs = store 'Specs, plans and decisions' {
     #idea
     technology 'files in each repository'
-    description 'Per work item: the spec (what "done" means: acceptance criteria with key examples), the plan (how we do it and prove it), for L a codebase research document. Per project: decision records (ADR), the register of rejected requests and the auto-merge rules, so new work does not contradict old choices and rejected ideas are not argued twice.'
+    description 'Per work item: the spec (what "done" means: acceptance criteria with key examples), the plan (how we do it and prove it), for L a codebase research document. Per project: decision records (ADR), the register of rejected requests, the register of the Operator\'s rulings and the auto-merge rules, so new work does not contradict old choices and rejected ideas are not argued twice. Every Operator answer is a ruling (decision 32): it is appended, dated and in the Operator\'s words, to a "Rulings" section of the work item\'s spec (for S, of the work item itself), and later sessions work from it; a ruling the Operator marks as true for the whole project also goes to the register of rulings, which every agent reads before it asks or raises a finding.'
   }
   changes = store 'Pull requests' {
     #built
@@ -55,11 +55,11 @@ model {
     cards = platform 'Decision requests' {
       #idea
       technology 'Decision requests'
-      description 'The only channel through which the pipeline asks the Operator anything: gate decisions (accept, spec, plan, merge, Blocked), the Interviewer\'s business questions, the Watcher\'s reports and doubts, the Retro\'s weekly summary. Each request says what to decide, why it reached the Operator, the options and the evidence, by the presentation rules. For now: Claude Desktop.'
+      description 'The only channel through which the pipeline asks the Operator anything: gate decisions (accept, spec, plan, merge, Blocked), the Interviewer\'s business questions, the Watcher\'s reports and doubts, the Retro\'s weekly summary. Each request says what to decide, why it reached the Operator, the options and the evidence, by the presentation rules, and lets the Operator mark the answer as true for this work item or for the whole project. The Orchestrator records every answer as a ruling (decision 32). For now: Claude Desktop.'
       metadata {
         in 'A gate, a question, a report from any stage'
         does 'Puts one decision in front of the Operator'
-        out 'The Operator\'s answer, back to the Orchestrator'
+        out 'The Operator\'s answer, recorded as a ruling'
       }
     }
     orchestrator = platform 'Orchestrator' {
@@ -397,5 +397,6 @@ model {
   engine.cards -> operator 'decision request'
   operator -> engine.orchestrator 'pause / resume'
   engine.orchestrator -> engine.traces 'records every session'
+  engine.orchestrator -> docs 'the Operator\'s rulings'
   engine.traces -> engine.learn.retro 'session traces'
 }
