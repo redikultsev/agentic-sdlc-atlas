@@ -128,6 +128,38 @@ Entries are grouped by area. "Fix" is what we did; "For our pack" is what to car
       - Total about $14, on Claude only; Codex was not connected, and still no recorded validation.
     - **Effort.** Five Operator decisions and three deployment fixes to reach a ready PR.
 
+## Root causes of the stuck validation (diagnosis 2026-11-21)
+
+The owner's point: a person or a local Claude Code session runs this repository's check fine, so the question is not "which checks to except" but why the engine's agents stumble. Four causes, three of them ours:
+
+28. **The agent host was not a developer machine for the project.**
+    - **What happened.** The Archon image has none of what the project's check needs:
+      - no `uv`, so every Python step fails as written;
+      - no real Node: `node` is a Bun shim, so the TypeScript steps fail;
+      - no pnpm and no Docker;
+      - no PostgreSQL for the store tests.
+    - The agents improvised: they installed Node from a pip wheel, ran pytest from the wrong env, skipped steps. That is where most of the "inherited failures" and the endless rounds came from.
+    - **Fix.** A layer over Archon's image, built by compose from the base service (`additional_contexts: base: service:archon-base`). It adds:
+      - uv 0.13.9;
+      - Node 24 and pnpm 11.24.0 through corepack;
+      - gitleaks v8.30.1, copied from the image the project pins;
+      - rsync;
+      - a throwaway PostgreSQL service with data in tmpfs, `fsync=off`, passed by conninfo in an environment variable the project's check reads.
+    - After the fix, the frontend checks pass in full (typecheck, lint, 344 tests) and gitleaks passes.
+    - **For our pack.** Per repository, a declared toolchain image ("what `check` needs"). It is built and verified once by running the check on the base branch before any agent is let loose; a red check on a clean base means the environment is wrong, not the code.
+29. **Our own merge guard broke the tests.**
+    - **What happened.** The `git` wrapper refused every `git push … main`, including pushes to local bare repositories that the project's tests create. Result: 43 test errors plus most of 77 failures with exit code 3, the wrapper's own code. The agents read them as "red on develop too" and asked to except them.
+    - **Fix.** Guard only pushes whose remote URL is on GitHub (`git remote get-url`). Local remotes pass. Verified: local `main` push passes, GitHub `develop` push refused, task branch passes. The same wrapper runs in our other agent host and likely has the same bug.
+    - **For our pack.** A safety shim must be tested against the project's own test suite before rollout. Push policy belongs in the push proxy, which sees the real destination.
+30. **No git identity for the agent user.**
+    - **What happened.** `git commit` refuses without `user.email`, so tests that commit fail. Archon sets none.
+    - **Fix.** `GIT_AUTHOR_*` and `GIT_COMMITTER_*` in the environment ("Archon agent", `archon@example.invalid`).
+31. **The pack's CI step never applies the maintainer's exceptions.**
+    - **What happened.** `deliver/commands/ci.md` under `ci: none` says `passed` is "true only when every part of it passed". The rulings that except known breaks on the base reach the implementer (through the issue body) but not the CI step. While the base is red, a recorded pass is impossible by construction. On top of that, the project's check stops at its first red step (`set -e`), so on a red base the later steps never run in one go.
+    - **For our pack.**
+      - Keep the base green: a red base is its own work item with top priority, and no feature PR validates until it is fixed.
+      - Exceptions, if ever allowed, are data the check step applies mechanically (a list of test ids at a base commit), not prose.
+
 ## Merge safety
 
 24. **Agents get the full GitHub token.**
@@ -146,6 +178,6 @@ Entries are grouped by area. "Fix" is what we did; "For our pack" is what to car
 
 ## Open
 
-- Whether the retry of the publish step succeeds (entries 21–22).
+- Entries 21–22 and 28–31: after the environment fixes, whether develop is red for real, and whether PR validation then records a pass.
 - Codex as the cross-family reviewer is not connected yet.
 - The sandbox (microVM per session, closed egress, push proxy) is not built yet; agents run in the Archon container with open network.
