@@ -55,6 +55,7 @@ Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and
 - Head to head on 10 dimensions: [2026-11-cezar-vs-archon.md](../research/atlas/research/2026-11-cezar-vs-archon.md). cezar wins the UI and project health; Archon wins extensibility, the sandbox seam, code structure, operations and direction. Trackers connect as MCP servers (decision 5, revised).
 - Our own layer in any case: a sandbox (OpenSandbox or Matchlock), a push proxy, tracker sync (15 states as labels; any tracker through MCP), the item rules, and Watcher and Retro as workflows.
 - The earlier "own Orchestrator on Temporal" is replaced by this.
+- Trial log (breaks, surprises, workarounds, what they mean for our pack): [2026-11-archon-trial-log.md](../research/atlas/research/2026-11-archon-trial-log.md).
 
 ## Next
 
