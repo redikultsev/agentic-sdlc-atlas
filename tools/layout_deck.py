@@ -49,6 +49,11 @@ LAYOUTS = {
         'prod': (2.4, -0.6), 'releases': (2.4, 0.6),
         'operator': (2.4, 1.8), 'engine.intake': (2.4, 3), 'engine.learn': (2.4, 4.2),
     },
+    'platformDeck': {
+        'tracker': (-0.25, 0), 'operator': (-0.25, 2.4),
+        'engine.orchestrator': (1, 1), 'engine.cards': (1, 2.4),
+        'engine.sandbox': (2, 0), 'engine.traces': (2, 1.6), 'engine.learn.retro': (2, 2.8),
+    },
     'learnDeck': {
         'tracker': (-0.4, 0), 'changes': (-0.4, 1), 'releases': (-0.4, 2), 'engine.traces': (-0.4, 3), 'engine.deploy': (-0.4, 4),
         'engine.learn.retro': (1, 2),

@@ -1,0 +1,637 @@
+{
+  "_type": "element",
+  "tags": null,
+  "links": null,
+  "_stage": "layouted",
+  "sourcePath": "model/deck-views.c4",
+  "description": null,
+  "title": "Cross-cutting parts",
+  "id": "platformDeck",
+  "autoLayout": {
+    "direction": "LR",
+    "nodeSep": 50,
+    "rankSep": 40
+  },
+  "notation": {
+    "nodes": [
+      {
+        "title": "Human",
+        "shape": "person",
+        "color": "amber",
+        "kinds": [
+          "human"
+        ]
+      },
+      {
+        "title": "Agent (LLM)",
+        "shape": "rectangle",
+        "color": "indigo",
+        "kinds": [
+          "agent"
+        ]
+      },
+      {
+        "title": "Cross-cutting part",
+        "shape": "rectangle",
+        "color": "sky",
+        "kinds": [
+          "platform"
+        ]
+      },
+      {
+        "title": "Store",
+        "shape": "storage",
+        "color": "storecolor",
+        "kinds": [
+          "store"
+        ]
+      }
+    ]
+  },
+  "hash": "O7XQgbTtZPjD6qdtaoN9k1u89ho32vaU4yXcafiVVjk",
+  "bounds": {
+    "x": -140.0,
+    "y": -40,
+    "width": 1220.0,
+    "height": 775.0
+  },
+  "nodes": [
+    {
+      "id": "tracker",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [],
+      "outEdges": [
+        "1s0qph8"
+      ],
+      "title": "Work items",
+      "modelRef": "tracker",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "",
+      "kind": "store",
+      "isCustomized": true,
+      "x": -100.0,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -52.0,
+        "y": -262,
+        "width": 144,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.orchestrator",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1tk37k4",
+        "1s0qph8"
+      ],
+      "outEdges": [
+        "f9p7ux",
+        "d9mjj7",
+        "ftxree"
+      ],
+      "title": "Orchestrator",
+      "modelRef": "engine.orchestrator",
+      "shape": "rectangle",
+      "color": "sky",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "Work items and their state, verdicts, the Operator's answers",
+        "does": "Starts agent sessions, moves states, enforces limits",
+        "out": "Sessions, state labels, decision requests"
+      },
+      "notation": "Cross-cutting part",
+      "technology": "",
+      "kind": "platform",
+      "isCustomized": true,
+      "x": 400,
+      "y": 200,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 101.0,
+        "y": -62,
+        "width": 160,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.sandbox",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "f9p7ux"
+      ],
+      "outEdges": [],
+      "title": "Sandbox",
+      "modelRef": "engine.sandbox",
+      "shape": "rectangle",
+      "color": "sky",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "A session from the Orchestrator",
+        "does": "Isolates the session: closed network, push through a proxy",
+        "out": "A pushed branch; nothing else leaves"
+      },
+      "notation": "Cross-cutting part",
+      "technology": "",
+      "kind": "platform",
+      "isCustomized": true,
+      "x": 800,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 94.0,
+        "y": 49,
+        "width": 115,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.cards",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "d9mjj7"
+      ],
+      "outEdges": [
+        "9c97f1"
+      ],
+      "title": "Decision requests",
+      "modelRef": "engine.cards",
+      "shape": "rectangle",
+      "color": "sky",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "A gate, a question, a report from any stage",
+        "does": "Puts one decision in front of the Operator",
+        "out": "The Operator's answer, back to the Orchestrator"
+      },
+      "notation": "Cross-cutting part",
+      "technology": "",
+      "kind": "platform",
+      "isCustomized": true,
+      "x": 400,
+      "y": 480.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -305.0,
+        "y": 201.0,
+        "width": 111,
+        "height": 66
+      }
+    },
+    {
+      "id": "engine.traces",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "ftxree"
+      ],
+      "outEdges": [
+        "zos398"
+      ],
+      "title": "Session traces",
+      "modelRef": "engine.traces",
+      "shape": "rectangle",
+      "color": "sky",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "Every agent session",
+        "does": "Records steps, time, cost, Operator time",
+        "out": "Traces for the Retro and the weekly metrics"
+      },
+      "notation": "Cross-cutting part",
+      "technology": "",
+      "kind": "platform",
+      "isCustomized": true,
+      "x": 800,
+      "y": 320.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 57.0,
+        "y": -127.0,
+        "width": 188,
+        "height": 32
+      }
+    },
+    {
+      "id": "operator",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "9c97f1"
+      ],
+      "outEdges": [
+        "1tk37k4"
+      ],
+      "title": "Operator",
+      "modelRef": "operator",
+      "shape": "person",
+      "color": "amber",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [],
+      "notation": "Human",
+      "technology": "",
+      "kind": "human",
+      "isCustomized": true,
+      "x": -100.0,
+      "y": 480.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -1202.0,
+        "y": 302.0,
+        "width": 115,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.learn.retro",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "zos398"
+      ],
+      "outEdges": [],
+      "title": "Retro",
+      "modelRef": "engine.learn.retro",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "Corrections, Blocked items, rounds, findings, rollbacks, traces",
+        "does": "Finds what repeated twice; proposes adding or removing rules",
+        "out": "Rule and check work items to Triage; weekly summary"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": 800,
+      "y": 560.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -281.0,
+        "y": 113.0,
+        "width": 72,
+        "height": 32
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "f9p7ux",
+      "source": "engine.orchestrator",
+      "target": "engine.sandbox",
+      "label": "one per agent session",
+      "points": [
+        [
+          640,
+          238
+        ],
+        [
+          720,
+          238
+        ],
+        [
+          720,
+          68
+        ],
+        [
+          800,
+          68
+        ]
+      ],
+      "labelBBox": {
+        "x": 645,
+        "y": 122,
+        "width": 150,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1rqyo8x"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "d9mjj7",
+      "source": "engine.orchestrator",
+      "target": "engine.cards",
+      "label": "asks the Operator",
+      "points": [
+        [
+          520,
+          335
+        ],
+        [
+          520,
+          408
+        ],
+        [
+          520,
+          408
+        ],
+        [
+          520,
+          480
+        ]
+      ],
+      "labelBBox": {
+        "x": 384,
+        "y": 395,
+        "width": 124,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "pp1dyh"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "ftxree",
+      "source": "engine.orchestrator",
+      "target": "engine.traces",
+      "label": "records every session",
+      "points": [
+        [
+          640,
+          298
+        ],
+        [
+          720,
+          298
+        ],
+        [
+          720,
+          388
+        ],
+        [
+          800,
+          388
+        ]
+      ],
+      "labelBBox": {
+        "x": 646,
+        "y": 312,
+        "width": 148,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "yxpzve"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "9c97f1",
+      "source": "engine.cards",
+      "target": "operator",
+      "label": "decision request",
+      "points": [
+        [
+          400,
+          548
+        ],
+        [
+          270,
+          548
+        ],
+        [
+          270,
+          578
+        ],
+        [
+          140,
+          578
+        ]
+      ],
+      "labelBBox": {
+        "x": 212,
+        "y": 532,
+        "width": 116,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1l330g8"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1tk37k4",
+      "source": "operator",
+      "target": "engine.orchestrator",
+      "label": "pause / resume",
+      "points": [
+        [
+          140,
+          518
+        ],
+        [
+          270,
+          518
+        ],
+        [
+          270,
+          298
+        ],
+        [
+          400,
+          298
+        ]
+      ],
+      "labelBBox": {
+        "x": 215,
+        "y": 377,
+        "width": 110,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "tocxfk"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1s0qph8",
+      "source": "tracker",
+      "target": "engine.orchestrator",
+      "label": "frontier",
+      "points": [
+        [
+          140,
+          68
+        ],
+        [
+          270,
+          68
+        ],
+        [
+          270,
+          238
+        ],
+        [
+          400,
+          238
+        ]
+      ],
+      "labelBBox": {
+        "x": 240,
+        "y": 122,
+        "width": 59,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "yugnw5"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "zos398",
+      "source": "engine.traces",
+      "target": "engine.learn.retro",
+      "label": "session traces",
+      "points": [
+        [
+          920,
+          455
+        ],
+        [
+          920,
+          508
+        ],
+        [
+          920,
+          508
+        ],
+        [
+          920,
+          560
+        ]
+      ],
+      "labelBBox": {
+        "x": 806,
+        "y": 495,
+        "width": 102,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1bwzvch"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    }
+  ],
+  "_layout": "manual"
+}

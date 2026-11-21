@@ -395,6 +395,11 @@
       "tags": [
         "idea"
       ],
+      "metadata": {
+        "in": "A session from the Orchestrator",
+        "does": "Isolates the session: closed network, push through a proxy",
+        "out": "A pushed branch; nothing else leaves"
+      },
       "notation": "Cross-cutting part",
       "technology": "Sandbox",
       "kind": "platform",

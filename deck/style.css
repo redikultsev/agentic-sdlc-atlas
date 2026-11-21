@@ -82,3 +82,4 @@ details summary { cursor: pointer; color: #6b7280; font-size: 0.85rem; }
 .sm .lt { fill: #64748b; font-size: 14.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
 .sl { margin-top: 10px; font-size: 15px; color: #334155; text-align: center; }
 .sl .dot { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin: 0 6px 0 20px; }
+.pk.k-platform { background: #0369a1; }

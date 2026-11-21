@@ -49,7 +49,7 @@
       }
     ]
   },
-  "hash": "nvykcPzJIN8ZntkP7csPRsgCZ_FC473VA_iorPshv2U",
+  "hash": "bfPzZt9uQs-1DS1YVp--NnS9VSvQm8CWgfvFO24gTYI",
   "bounds": {
     "x": -40,
     "y": -40,
@@ -121,6 +121,11 @@
       "tags": [
         "idea"
       ],
+      "metadata": {
+        "in": "Work items and their state, verdicts, the Operator's answers",
+        "does": "Starts agent sessions, moves states, enforces limits",
+        "out": "Sessions, state labels, decision requests"
+      },
       "notation": "Cross-cutting part",
       "technology": "Orchestrator",
       "kind": "platform",
@@ -501,6 +506,11 @@
       "tags": [
         "idea"
       ],
+      "metadata": {
+        "in": "A session from the Orchestrator",
+        "does": "Isolates the session: closed network, push through a proxy",
+        "out": "A pushed branch; nothing else leaves"
+      },
       "notation": "Cross-cutting part",
       "technology": "Sandbox",
       "kind": "platform",
@@ -911,7 +921,7 @@
       "id": "f9p7ux",
       "source": "engine.orchestrator",
       "target": "engine.sandbox",
-      "label": "creates per work item",
+      "label": "one per agent session",
       "points": [
         [
           640,
@@ -931,9 +941,9 @@
         ]
       ],
       "labelBBox": {
-        "x": 646,
+        "x": 645,
         "y": 10,
-        "width": 149,
+        "width": 150,
         "height": 25
       },
       "parent": null,

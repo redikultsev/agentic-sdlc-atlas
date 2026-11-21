@@ -74,8 +74,10 @@ The agent proposes size and risk at intake; the Operator may correct them.
 | **Expand–contract** | How to do a wide refactor: add the new form beside the old, migrate callers in batches, delete the old |
 | **ADR** | Architecture decision record: what was chosen, why, what was rejected |
 | **Sandbox** | A disposable isolated machine per agent session (one per slice, one for the Validator): network closed by default, push only through a proxy to one branch, no merge rights |
-| **Orchestrator** | The program that moves a work item through the stages |
-| **Traces** | A record of what the agent did: calls, decisions, cost |
+| **Orchestrator** | The program that moves a work item along its states, starts every agent session in its own sandbox and enforces the limits (3 fix rounds, time and cost per session, at most 3 items waiting for the Operator) |
+| **Decision requests** | The only channel through which the pipeline asks the Operator anything: gates, questions, reports, the weekly summary |
+| **Pause** | The Operator's switch that stops new agent sessions; running ones finish to their next state |
+| **Traces** | A record of every agent session: steps and tool calls, verdicts, time, cost, Operator time |
 | **Rollback** | Return to the previous version after a failed rollout. The Watcher does it by itself; database migrations are never rolled back, only fixed forward |
 | **Watch window** | How long the Watcher watches a fresh deploy before the work item is Done (30 min by default, longer for R2) |
 | **Atlas** | The knowledge base in `research/atlas/`: what the world knows about each stage (areas S0–S18, X1–X11) |

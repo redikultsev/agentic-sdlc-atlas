@@ -103,3 +103,21 @@ views {
     autoLayout LeftRight 40 50
   }
 }
+
+// Cross-cutting parts for the deck: what every stage runs on
+views {
+  view platformDeck {
+    title 'Cross-cutting parts'
+    include
+      engine.orchestrator with { description '' technology '' },
+      engine.sandbox with { description '' technology '' },
+      engine.cards with { description '' technology '' },
+      engine.traces with { description '' technology '' },
+      operator with { description '' technology '' },
+      tracker with { description '' technology '' },
+      engine.learn.retro with { description '' technology '' }
+    exclude engine.implement.implementer, engine, engine.learn, tracker -> engine.learn.retro, engine.learn.retro -> operator
+    style * { size small textSize xlarge }
+    autoLayout LeftRight 40 50
+  }
+}

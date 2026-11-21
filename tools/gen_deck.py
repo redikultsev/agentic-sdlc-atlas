@@ -46,28 +46,34 @@ def body(el):
 def stage_slide(key):
     fqn = f'engine.{key}'; st = E[fqn]
     kids = [k for k in E if k.startswith(fqn + '.') and k.count('.') == fqn.count('.') + 1]
+    return parts_slide(st['title'], txt(st.get('description')), f'{key}Deck', kids,
+                       f"<b>Work item states:</b> {STATES[key]} &nbsp;·&nbsp; <b>The Operator decides:</b> {decides_of(kids)}")
+
+def decides_of(kids):
     gates = [E[k]['title'] for k in kids if E[k]['kind'] == 'gate']
+    return ', '.join(gates) if gates else 'nothing, this stage runs without a human'
+
+def parts_slide(title_, lead, view, kids, foot):
     cards = '\n'.join(
         f'  <div class="pc"><div class="pc-top"><span class="pk k-{E[k]["kind"]}">{KIND_TAG.get(E[k]["kind"], E[k]["kind"])}</span>'
         f'<span class="ps">{STATUS.get((E[k].get("tags") or ["-"])[0], "")}</span></div>'
         f'<p class="pn">{E[k]["title"]}</p>{body(E[k])}</div>' for k in kids)
-    decides = ', '.join(gates) if gates else 'nothing, this stage runs without a human'
     return f"""---
 layout: default
 ---
 
-# {st['title']}
+# {title_}
 
-<div class="lead">{txt(st.get('description'))}</div>
+<div class="lead">{lead}</div>
 
 <div class="stg">
-<div class="dg"><likec4-view view-id="{key}Deck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
+<div class="dg"><likec4-view view-id="{view}" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs n{len(kids)}">
 {cards}
 </div>
 </div>
 
-<p class="sf"><b>Work item states:</b> {STATES[key]} &nbsp;·&nbsp; <b>The Operator decides:</b> {decides}</p>
+<p class="sf">{foot}</p>
 """
 
 states_md = (root / 'docs' / 'states.md').read_text()
@@ -157,7 +163,9 @@ out = [part('00-title'), part('02-how-to-read'),
        part('04-artifacts'), part('05-size-risk')]
 out += [stage_slide(k) for k in STAGES]
 out += [states_slide(),
-        "---\n\n# Cross-cutting parts\n\n<div class=\"dg\"><likec4-view view-id=\"platform\" color-scheme=\"light\" browser=\"true\" class=\"view-wide\"></likec4-view><span class=\"hint\">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>\n",
+        parts_slide('Cross-cutting parts', 'What every stage runs on: one Orchestrator starts every agent session in its own sandbox',
+                    'platformDeck', ['engine.orchestrator', 'engine.sandbox', 'engine.cards', 'engine.traces'],
+                    '<b>Limits:</b> 3 fix rounds · time and cost per session · ≤ 3 items wait for the Operator · <b>Pause:</b> the Operator stops new sessions'),
         "---\nlayout: default\n---\n\n# Decisions\n\n<div class=\"small\">\n\n" + dec_tbl + "\n\n</div>\n",
         part('08-open')]
 (root / 'deck' / 'slides.md').write_text('\n\n'.join(out) + '\n')

@@ -206,6 +206,11 @@
       "tags": [
         "idea"
       ],
+      "metadata": {
+        "in": "Every agent session",
+        "does": "Records steps, time, cost, Operator time",
+        "out": "Traces for the Retro and the weekly metrics"
+      },
       "notation": "Cross-cutting part",
       "technology": "Traces",
       "kind": "platform",
@@ -583,7 +588,7 @@
       },
       "parent": null,
       "relations": [
-        "vit5c"
+        "1bwzvch"
       ],
       "color": "gray",
       "line": "dashed",

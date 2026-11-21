@@ -112,7 +112,7 @@ layout: default
 <div class="stg">
 <div class="dg"><likec4-view view-id="specDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs n2">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Interviewer</p><dl class="eg3"><dt>In</dt><dd>An accepted M or L work item</dd><dt>Does</dt><dd>Asks the Operator about what is unclear</dd><dt>Out</dt><dd>Spec: why, criteria with key examples, what must not change</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Interviewer</p><dl class="eg3"><dt>In</dt><dd>An accepted M or L work item</dd><dt>Does</dt><dd>Asks the Operator business questions</dd><dt>Out</dt><dd>Spec: why, criteria with key examples, what must not change</dd></dl></div>
   <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Approve spec</p><dl class="eg3"><dt>In</dt><dd>The spec</dd><dt>Does</dt><dd>The Operator approves or edits it</dd><dt>Out</dt><dd>M → Plan; L → codebase research</dd></dl></div>
 </div>
 </div>
@@ -265,10 +265,24 @@ layout: default
 <div class="fine">The Operator can cancel a work item in any state; closing it tells the requester why. 9. Learn only adds work items in Triaging. The state lives in the tracker: a <code>state:…</code> label in GitHub, a status in Jira; transitions in <code>docs/states.md</code>.</div>
 
 ---
+layout: default
+---
 
 # Cross-cutting parts
 
-<div class="dg"><likec4-view view-id="platform" color-scheme="light" browser="true" class="view-wide"></likec4-view><span class="hint">⤢ Click the diagram to explore: zoom, pan, open any stage</span></div>
+<div class="lead">What every stage runs on: one Orchestrator starts every agent session in its own sandbox</div>
+
+<div class="stg">
+<div class="dg"><likec4-view view-id="platformDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
+<div class="pcs n4">
+  <div class="pc"><div class="pc-top"><span class="pk k-platform">Cross-cutting</span><span class="ps">idea</span></div><p class="pn">Orchestrator</p><dl class="eg3"><dt>In</dt><dd>Work items and their state, verdicts, the Operator's answers</dd><dt>Does</dt><dd>Starts agent sessions, moves states, enforces limits</dd><dt>Out</dt><dd>Sessions, state labels, decision requests</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-platform">Cross-cutting</span><span class="ps">idea</span></div><p class="pn">Sandbox</p><dl class="eg3"><dt>In</dt><dd>A session from the Orchestrator</dd><dt>Does</dt><dd>Isolates the session: closed network, push through a proxy</dd><dt>Out</dt><dd>A pushed branch; nothing else leaves</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-platform">Cross-cutting</span><span class="ps">idea</span></div><p class="pn">Decision requests</p><dl class="eg3"><dt>In</dt><dd>A gate, a question, a report from any stage</dd><dt>Does</dt><dd>Puts one decision in front of the Operator</dd><dt>Out</dt><dd>The Operator's answer, back to the Orchestrator</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-platform">Cross-cutting</span><span class="ps">idea</span></div><p class="pn">Session traces</p><dl class="eg3"><dt>In</dt><dd>Every agent session</dd><dt>Does</dt><dd>Records steps, time, cost, Operator time</dd><dt>Out</dt><dd>Traces for the Retro and the weekly metrics</dd></dl></div>
+</div>
+</div>
+
+<p class="sf"><b>Limits:</b> 3 fix rounds · time and cost per session · ≤ 3 items wait for the Operator · <b>Pause:</b> the Operator stops new sessions</p>
 
 
 ---
@@ -308,6 +322,8 @@ layout: default
 | 26 | How a deploy is watched and rolled back | Deploy goes to all users at once, one merge at a time. The Watcher agent watches each deploy for a window (30 min by default): first what the PR changed (errors from the changed code, the business numbers it touches), then the whole service. On a clear regression it rolls back by itself, then reports to the Operator and sends a work item with evidence to Triage; when unsure it asks. More than 2 unneeded rollbacks in 30 days: it asks before rolling back. Migrations ship expand–contract and are never rolled back automatically |
 | 27 | How the pipeline learns | A weekly Retro agent reads corrections and failures (Operator changes and edits, Blocked items, fix rounds, reviewer findings, Validator failures, rollbacks, traces); what repeated twice becomes a work item for Triage with the cases and the file to change. A rule that must hold becomes a check with a fix hint; guidance becomes an instruction line; guidance broken again becomes a check. Rules unused for 8 weeks are proposed for removal; root instructions ≤150 lines. Instruction and rules files never R0; weakening a check is R2. Weekly summary of six metrics to the Operator |
 | 28 | Work item states | 15 states named by who holds the item: agent states end in -ing (Triaging, Specifying, Planning, Implementing, Verifying, Live), Operator states end in Review (TriageReview, SpecReview, PlanReview, MergeReview) plus Blocked; closed: Done, RolledBack, ForHuman, Cancelled. No states that last seconds (accepted, merged are transitions); Researching is part of Planning. The Operator can cancel in any state; closing tells the requester why. Shown as a UML state machine in swimlanes Operator · Agents · Closed |
+| 29 | Limits on an agent session | Every agent session has a time and a cost limit, set in config; first values come from the first measured work items. The Orchestrator stops a session that hits a limit, and it counts as a failed fix round |
+| 30 | Pausing the pipeline | The Operator can pause the whole pipeline: no new agent sessions start, running ones finish to their next state; resume starts them again |
 | 18 | How to check the model for gaps | After the deck walkthrough, every stage answers five questions: what triggers it, what it reads and writes, what it triggers next, where a human re-enters, what stops two runs doing the same work |
 
 </div>
