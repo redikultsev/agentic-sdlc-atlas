@@ -26,7 +26,7 @@ model {
   }
   docs = store 'Specs, plans and decisions' {
     #idea
-    technology 'files in the repo or the work item body'
+    technology 'files in each repository'
     description 'Per work item: the spec (what "done" means: acceptance criteria with key examples), the plan (how we do it and prove it), for L a codebase research document. Per project: decision records (ADR), the register of rejected requests and the auto-merge rules, so new work does not contradict old choices and rejected ideas are not argued twice.'
   }
   changes = store 'Pull requests' {
@@ -290,17 +290,17 @@ model {
       deployer = script 'Deploy' {
         #built
         technology 'Dokploy · TeamCity'
-        description 'Deploys main after every merge, one merge at a time, to all users at once, so a regression points at one PR. Records the version and the outcome in Deployments. Rolls back to the previous version in one step. Database migrations are never rolled back automatically: they ship expand–contract (add the new form, switch, remove the old in a later change), so rolling back the code is safe while the schema stays.'
+        description 'Deploys main to all users at once as soon as a merge lands; deploys never run in parallel and do not wait for a watch window. Records the version and the outcome in Deployments. Rolls back on the Watcher\'s call: one PR by deploying main with that PR reverted (the revert needs no gate), or, when the culprit is unclear, to the last version before all open watch windows. Database migrations are never rolled back automatically: they ship expand–contract (add the new form, switch, remove the old in a later change), so rolling back the code is safe while the schema stays.'
         metadata {
           in 'Merged main'
-          does 'Deploys to everyone; rolls back on the Watcher\'s call'
+          does 'Deploys every merge to everyone; reverts one PR or rolls back'
           out 'Running version, a record in Deployments'
         }
       }
       watcher = agent 'Watcher' {
         #idea
         technology 'Watch agent'
-        description 'Starts on every deploy and watches for the watch window (default 30 min, longer for R2; set in config). Read-only on production; its only action is a rollback. Knows what the PR changed and watches that first: errors and logs from the changed code, the endpoints and business numbers it touches (for example orders and their sums); then the overall error rate and latency. Compares with the same hours before the deploy. On a clear regression rolls back at once through Deploy, then reports to the Operator with evidence and sends a work item with the evidence to Triage. When unsure, asks the Operator. Every rollback is recorded; when more than 2 of its rollbacks in 30 days turn out unneeded, it asks the Operator before rolling back until the Operator resets the rule. Window over with no regression: the work item is Done, the outcome goes to Learn.'
+        description 'One Watcher per deploy; it watches for the watch window (default 30 min, longer for R2; set in config), and windows of later deploys overlap. Read-only on production; its only action is a rollback. Knows what the PR changed and watches that first: errors and logs from the changed code, the endpoints and business numbers it touches (for example orders and their sums); then the overall error rate and latency. Compares with the same hours before the deploy. On a clear regression in what its PR changed it rolls back that PR at once through Deploy; a regression it cannot pin on one PR rolls back to the last version before all open windows, then reports to the Operator with evidence and sends a work item with the evidence to Triage. When unsure, asks the Operator. Every rollback is recorded; when more than 2 of its rollbacks in 30 days turn out unneeded, it asks the Operator before rolling back until the Operator resets the rule. Window over with no regression: the work item is Done, the outcome goes to Learn.'
         metadata {
           in 'Deploy, the PR diff, errors, logs, metrics'
           does 'Watches what the PR changed, then the whole service'

@@ -4,7 +4,7 @@ Where the project stands and what comes next. Update it at the end of every work
 
 ## Now (2026-11-20)
 
-**Deck walkthrough with the owner, slide by slide: finished 2026-11-21.** Slides 1–14 are reviewed. The "life of one work item" slide was removed (it repeated the overview, slide 5 and the states). Slides 15 (states, decision 28) and 16 (cross-cutting, decisions 29–30) reviewed. The decisions slide was removed: the log lives in `docs/decisions.md`, each decision shows on its stage slide. The open questions slide was removed too: plans live here, not in the deck. **The walkthrough is finished.**
+**Deck walkthrough with the owner, slide by slide: finished 2026-11-21.** Slides 1–14 are reviewed. The "life of one work item" slide was removed (it repeated the overview, slide 5 and the states). Slides 15 (states, decision 28) and 16 (cross-cutting, decisions 29–30) reviewed. The decisions slide was removed: the log lives in `docs/decisions.md`, each decision shows on its stage slide. The open questions slide was removed too: plans live here, not in the deck. **The walkthrough is finished.** The model was audited against decisions 1–30 and the five-question check (decision 18) on 2026-11-21: every decision is in the element cards; the check found overlapping deploy windows (decision 26 revised) and engine files in work repositories (decision 10 revised).
 
 How a slide is reviewed: show it, explain in plain words what each part does, list gaps found in the model, propose before → after. When the owner doubts a design choice, run a research swarm (three or four parallel agents, each with its own angle, web through fetchira), save the synthesis to `research/atlas/research/`, then propose. After a decision: write it into the affected elements (the model is the spec), `docs/decisions.md`, glossary and states; regenerate; check in the browser at 1280×760; commit and push.
 
@@ -28,7 +28,7 @@ Run both views from the repository root:
 - **6. Acceptance:** the Validator, blind to the review verdict, checks the criteria on the running app as a user and records evidence (20, 23).
 - **Fix rounds:** one shared limit of 3 per work item (CI, review, acceptance); after that or on block → Blocked and a decision request (15, 22).
 - **7. Merge:** an auto-merge rules file decides R0 by facts, with a kill switch on the revert rate (25); the Operator's gate shows scope first, "changes" goes back without spending the 3 rounds; merge queue on the latest main (24).
-- **8. Deploy & watch:** every merge deploys main to everyone at once, one merge at a time; no gate after merge, R2 is approved at the Merge gate (8 revised). The Watcher agent watches what the PR changed for a window, rolls back by itself, reports to the Operator, sends a work item to Triage; asks when unsure; migrations expand–contract, never auto-rolled back (26). DeployReview state removed.
+- **8. Deploy & watch:** every merge deploys main to everyone at once, as soon as it lands; one Watcher per deploy, windows overlap; a regression on one PR reverts that PR; no gate after merge, R2 is approved at the Merge gate (8 revised). The Watcher agent watches what the PR changed for a window, rolls back by itself, reports to the Operator, sends a work item to Triage; asks when unsure; migrations expand–contract, never auto-rolled back (26). DeployReview state removed.
 - **9. Learn:** the Adopt gate is gone; a weekly Retro reads corrections and failures, sends rule and check work items to Triage, proposes removing unused rules, sends a weekly summary of six metrics; instruction files never R0, weakening a check R2 (27).
 - **States (28):** 15 states named by who holds the item (-ing = agent, Review = Operator), one UML state machine slide in swimlanes Operator · Agents · Closed, generated with a check against `docs/states.md`.
 - **Cross-cutting (29, 30):** the Orchestrator starts every agent session, moves states only along `docs/states.md`, stops a session at its time or cost limit (counts as a failed round); the Operator can pause the pipeline. Sandbox per agent session; every session writes traces; Decision requests is the only channel to the Operator. Slide in the stage format: `platformDeck` view plus four cards.
@@ -45,10 +45,8 @@ Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and
 4. No target numbers for the pipeline metrics yet.
 5. The repository is private on GitHub; making it public needs the owner's decision and a scan for personal data.
 6. How the Interviewer asks the Operator business questions (few, short, no walls of text) is not designed yet.
-7. Not every decision is written into the element cards yet; audit decisions 1–30 against the model (the model is the implementation spec, AGENTS.md rule 8).
 
 ## Next
 
-1. Audit the model against decisions 1–30; run the five-question check (decision 18) over every stage.
-2. Research and choose the engine to build the pipeline on.
-3. Measure on real work items; then the engine spec and a design review.
+1. Research and choose the engine to build the pipeline on.
+2. Measure on real work items; then the engine spec and a design review.
