@@ -161,7 +161,6 @@ out += [stage_slide(k) for k in STAGES]
 out += [states_slide(),
         parts_slide('The engine', 'An abstract view of the engine every stage runs on: any engine with these four parts fits',
                     'platformDeck', ['engine.orchestrator', 'engine.sandbox', 'engine.cards', 'engine.traces'],
-                    '<b>Limits:</b> 3 fix rounds · time and cost per session · ≤ 3 items wait for the Operator · <b>Pause:</b> the Operator stops new sessions'),
-        part('08-open')]
+                    '<b>Limits:</b> 3 fix rounds · time and cost per session · ≤ 3 items wait for the Operator · <b>Pause:</b> the Operator stops new sessions')]
 (root / 'deck' / 'slides.md').write_text('\n\n'.join(out) + '\n')
 print('slides:', sum(1 for _ in re.finditer(r'^---$', '\n'.join(out), re.M)))
