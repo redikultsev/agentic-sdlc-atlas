@@ -1,18 +1,18 @@
 # Work item states and transitions
 
-**Draft, awaiting approval.** The state lives in the tracker (GitHub Issues: a `state:…` label; Jira: a workflow status). The pipeline moves a work item only along the transitions below; a move into a "waits for the Operator" state is a gate. 15 states: 11 on the main line, 4 exits. A state that lasts seconds is not a state: "accepted" and "merged" are transitions.
+**Draft, awaiting approval.** The state lives in the tracker (GitHub Issues: a `state:…` label; Jira: a workflow status). The pipeline moves a work item only along the transitions below; a move into a "waits for the Operator" state is a gate. 15 states: 11 on the main line, 4 exits. A state says who holds the work item now: an agent state ends in -ing, an Operator state ends in Review (plus Blocked). A state that lasts seconds is not a state: "accepted" and "merged" are transitions. The Operator can cancel a work item in any state; closing it (Cancelled, ForHuman) tells the requester why.
 
 ### Part 1. Preparation: from signal to approved plan
 
 ```mermaid
 stateDiagram-v2
   direction LR
-  [*] --> New: signal
-  New --> Triaged: checked, sized, outcome proposed
-  Triaged --> Implementing: Operator accepts, S
-  Triaged --> Specifying: Operator accepts, M or L
-  Triaged --> ForHuman: Operator, for a human
-  Triaged --> Cancelled: "won't do"
+  [*] --> Triaging: signal from a person, an alert or the Retro
+  Triaging --> TriageReview: checked, sized, outcome proposed
+  TriageReview --> Implementing: Operator accepts, S
+  TriageReview --> Specifying: Operator accepts, M or L
+  TriageReview --> ForHuman: Operator, for a human
+  TriageReview --> Cancelled: "won't do"
   Specifying --> SpecReview: spec ready
   SpecReview --> Specifying: "clarify"
   SpecReview --> Planning: approved, M or L
@@ -40,16 +40,15 @@ stateDiagram-v2
   Live --> Done: watch window over, no regression
   Live --> RolledBack: regression, the Watcher rolled back
   Blocked --> Implementing: Operator sorted it out
-  Blocked --> Cancelled
   Done --> [*]
-  RolledBack --> [*]: new work item in New
+  RolledBack --> [*]: new work item in Triaging
 ```
 
 | State | Stage | Meaning | Who moves it on | Waits for the Operator | GitHub Issues | Jira |
 |---|---|---|---|---|---|---|
-| New | 1 | Signal recorded, not triaged | Triage agent | no | `state:new` | To Do |
-| Triaged | 1 | Checked, size, risk and outcome proposed | Operator | **yes** | `state:triaged` | To Do + label |
-| Specifying | 2 | Spec in progress; the Interviewer may ask the Operator business questions | Interviewer | **yes**, while questions are open | `state:specifying` | In Progress |
+| Triaging | 1 | Signal received; the Triage agent checks duplicates, reproduces, sizes | Triage agent | no | `state:triaging` | To Do |
+| TriageReview | 1 | Size, risk and outcome proposed; the Operator accepts, hands to a human or cancels | Operator | **yes** | `state:triage-review` | To Do + label |
+| Specifying | 2 | Spec in progress; the Interviewer may ask the Operator business questions | Interviewer | no | `state:specifying` | In Progress |
 | SpecReview | 2 | Spec awaiting approval | Operator | **yes** | `state:spec-review` | In Review |
 | Planning | 3 | Plan in progress; for L codebase research first | Researcher, Planner | no | `state:planning` | In Progress |
 | PlanReview | 3 | Plan awaiting approval | Operator | **yes** | `state:plan-review` | In Review |
@@ -63,7 +62,7 @@ stateDiagram-v2
 | ForHuman | exit | A human does it; the pipeline only tracks it | a human | no | `state:for-human` | To Do (human) |
 | Cancelled | exit | Cancelled | — | — | closed `not planned` | Won't Do |
 
-The Stage column is the stage number on the overview; stage 6 (Acceptance) shares Verifying with stage 5, stage 9 (Learn) only creates work items in New. The limit "at most 3 work items wait for the Operator" counts items in states where "Waits for the Operator" is yes. The deck's states slide is generated from this table.
+The Stage column is the stage number on the overview; stage 6 (Acceptance) shares Verifying with stage 5, stage 9 (Learn) only creates work items in Triaging. The limit "at most 3 work items wait for the Operator" counts items in states where "Waits for the Operator" is yes. The deck's states slide is generated from this table.
 
 ## Pull request (PR / MR) states
 
