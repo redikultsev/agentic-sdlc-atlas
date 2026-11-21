@@ -49,7 +49,6 @@ Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and
 
 ## Next
 
-1. Finish the walkthrough (open questions slide) and apply corrections.
-2. Audit the model against decisions 1–30; run the five-question check (decision 18) over every stage.
-3. Research and choose the engine to build the pipeline on.
-4. Measure on real work items; then the engine spec and a design review.
+1. Audit the model against decisions 1–30; run the five-question check (decision 18) over every stage.
+2. Research and choose the engine to build the pipeline on.
+3. Measure on real work items; then the engine spec and a design review.
