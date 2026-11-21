@@ -50,15 +50,12 @@ Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and
 
 323 candidates read, the 12 strongest re-checked by two skeptics each: [research/atlas/research/2026-11-engine-choice.md](../research/atlas/research/2026-11-engine-choice.md), all candidates in [2026-11-engine-candidates.md](../research/atlas/research/2026-11-engine-candidates.md). Finding: no finished engine runs the pipeline; the gaps are all Orchestrator logic (15 states mirrored to tracker labels, shared fix limit, limit hit as a failed round, slice frontier, pause, cap of 3 waiting).
 
-Recommended stack, awaiting the owner's choice:
-- **O:** our own Orchestrator on Temporal (MIT); sessions through the Claude Agent SDK, the reviewer through Codex CLI `--output-schema`.
-- **S:** OpenSandbox (default-deny egress, credential vault, VM-grade runtimes) plus our own git push proxy limited to one branch.
-- **D:** our own MCP server with an MCP Apps card in Claude Desktop, ntfy for the push alert.
-- **T:** Claude Code OpenTelemetry plus our `pipeline.*` spans, stored in self-hosted Langfuse.
-- **Runner-up:** Kraft pinned to one version with an outer layer for intake, states, deploy and retro.
+**Re-check the same day** under the new constraints: our own server, the Operator works only in the engine's web UI, extend an existing engine. See [2026-11-engine-base.md](../research/atlas/research/2026-11-engine-base.md) and the per-engine reports in `research/atlas/research/engine-base/`. Six engines read in depth, four awesome lists parsed, 13 new candidates read.
+- Recommended base: **Archon** (7/10), extended through packs and plugins. Runner-up: **cezar** (6/10).
+- Our own layer in any case: a sandbox (OpenSandbox or Matchlock), a push proxy, a tracker bridge (15 states as labels, Jira), the item rules, and Watcher and Retro as workflows.
+- The earlier "own Orchestrator on Temporal" is replaced by this.
 
 ## Next
 
-1. The owner chooses the stack and the Orchestrator language (Python or TypeScript).
-2. Verify what the research left unchecked: OpenSandbox egress in practice, single-node Temporal footprint, MCP Apps card in Claude Desktop.
-3. Measure on real work items; then the engine spec and a design review.
+1. A one-day trial of Archon and cezar on the server: one real issue each, from intake to a merged PR, with a sandbox wrapper. The trial picks the base.
+2. The owner's choice of the base; then the engine spec on that base and a design review.
