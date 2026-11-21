@@ -57,6 +57,10 @@ Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and
 - The earlier "own Orchestrator on Temporal" is replaced by this.
 - Trial log (breaks, surprises, workarounds, what they mean for our pack): [2026-11-archon-trial-log.md](../research/atlas/research/2026-11-archon-trial-log.md).
 
+## Archon's pack against our model (2026-11-22)
+
+Archon's bundled SDLC pack read in full and compared stage by stage: [2026-11-archon-pipelines-vs-ours.md](../research/atlas/research/2026-11-archon-pipelines-vs-ours.md). It covers intake, plan (partly), implement, review and merge; nothing for spec, black-box acceptance, deploy, watch and learn. Weaker than our design where it merges a PR behind main on its old CI, trusts the agent's own validation under `ci: none`, lets an agent decide R0, and has no sandbox. The owner went through its 16 ideas one by one: taken as decisions 31–43 and a revision of 29 (discoveries to Triage, the Operator's rulings, verdicts tied to the diff, bug root cause in Triage, people's review threads, three review rules, scope in fix rounds, typed decision requests and the follow rate, trusted authors, manual switches per stage, stub tests of the pipeline, calibrated judges, stuck items, idle and unknown-cost limits). Not taken: a red main freezing the merge queue; a re-check before each paid round.
+
 ## Next
 
 1. The owner chose Archon (2026-11-21). Archon 0.14.0 runs on the trial server: Postgres, login by allowed email, telemetry off, reachable only over the VPN. Next: the Claude and GitHub tokens, then one real issue from intake to a merged PR; the sandbox as a provider plugin comes after that.
