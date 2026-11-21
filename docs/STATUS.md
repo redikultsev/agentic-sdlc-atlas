@@ -46,7 +46,19 @@ Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and
 5. The repository is private on GitHub; making it public needs the owner's decision and a scan for personal data.
 6. How the Interviewer asks the Operator business questions (few, short, no walls of text) is not designed yet.
 
+## Engine research (2026-11-21)
+
+323 candidates read, the 12 strongest re-checked by two skeptics each: [research/atlas/research/2026-11-engine-choice.md](../research/atlas/research/2026-11-engine-choice.md), all candidates in [2026-11-engine-candidates.md](../research/atlas/research/2026-11-engine-candidates.md). Finding: no finished engine runs the pipeline; the gaps are all Orchestrator logic (15 states mirrored to tracker labels, shared fix limit, limit hit as a failed round, slice frontier, pause, cap of 3 waiting).
+
+Recommended stack, awaiting the owner's choice:
+- **O:** our own Orchestrator on Temporal (MIT); sessions through the Claude Agent SDK, the reviewer through Codex CLI `--output-schema`.
+- **S:** OpenSandbox (default-deny egress, credential vault, VM-grade runtimes) plus our own git push proxy limited to one branch.
+- **D:** our own MCP server with an MCP Apps card in Claude Desktop, ntfy for the push alert.
+- **T:** Claude Code OpenTelemetry plus our `pipeline.*` spans, stored in self-hosted Langfuse.
+- **Runner-up:** Kraft pinned to one version with an outer layer for intake, states, deploy and retro.
+
 ## Next
 
-1. Research and choose the engine to build the pipeline on.
-2. Measure on real work items; then the engine spec and a design review.
+1. The owner chooses the stack and the Orchestrator language (Python or TypeScript).
+2. Verify what the research left unchecked: OpenSandbox egress in practice, single-node Temporal footprint, MCP Apps card in Claude Desktop.
+3. Measure on real work items; then the engine spec and a design review.
