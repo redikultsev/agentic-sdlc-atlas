@@ -106,34 +106,46 @@ Entries are grouped by area. "Fix" is what we did; "For our pack" is what to car
     - **What happened.** A round that only merged the base and re-validated failed at `pr__publish`: "the caller named pull request 1512 to continue, but prepare declared none". The work was done and pushed (the PR head moved), but the validation was not recorded, so the item stayed `next`.
     - **Status.** A `dev`-build bug in the pack's prepare/publish contract. A retry of the build queue did not resume the publish: it asked again (high-confidence recommendation) whether to launch a validation-only round at the same head, i.e. the full `tools/check.sh` once more (~20 min) only to record it and hand off. Another Operator approval, another round.
     - **For our pack.** A failed last step should resume at that step, not re-run the validation; our engine records the check result as its own fact so publishing can retry alone.
-22. **Cost of one small issue end to end.**
+22. **Under `ci: none`, a host without Docker can never record a pass.**
+    - **What happened.**
+      - The validation-only round ran the full check again and still recorded `passed: false`, for three reasons:
+        - the project's check script stops at its Docker steps (gitleaks, the PostgreSQL store tests);
+        - the CI step called `uv run pytest`, which fails because the venv has no pytest;
+        - it read the excepted, inherited pytest failures as "not a pass".
+      - The agent said so itself: "Six rounds have now run without a recorded validation."
+      - It asked whether to except the Docker steps or park until a runner with Docker exists. Meanwhile the PR stays a draft and drifts behind the base.
+    - **For our pack.**
+      - The agent host must run every step of the project's own check.
+      - An exception ruling must be applied by the CI step, not only by the implementer.
+      - A loop of "validate again" rounds needs a stop: our shared limit of 3 rounds would have parked this item after the third.
+23. **Cost of one small issue end to end.**
     - **Size.** One S-size issue: 7 files, +52/−11.
     - **Cost.**
       - triage: $0.20;
       - build decisions: $0.14 each;
       - first deliver round with multi-lens review: $6.17;
-      - validation rounds: $2.64 and $1.67.
-      - Total about $10.5, on Claude only; Codex was not connected.
+      - validation rounds: $2.64, $1.67, $0.32 (decision) and $2.94.
+      - Total about $14, on Claude only; Codex was not connected, and still no recorded validation.
     - **Effort.** Five Operator decisions and three deployment fixes to reach a ready PR.
 
 ## Merge safety
 
-23. **Agents get the full GitHub token.**
+24. **Agents get the full GitHub token.**
     - **What happened.** Archon passes `GH_TOKEN` to agent sessions, so an agent can `gh pr merge` or push to the integration branch.
     - **Fix.** Wrapper scripts for `gh` and `git` in `/usr/local/bin`, ahead of `/usr/bin`. They refuse `gh pr merge`, merge calls through `gh api`, and pushes to `develop`/`main`/`master`; verified with real commands. Archon's own merge step uses the forge REST API, not `gh`, so it is unaffected.
     - **For our pack.** This is a stopgap. The real fix is the sandbox with a push proxy limited to one branch.
-24. **In 0.14.0 the merge queue's agent merges by itself.**
+25. **In 0.14.0 the merge queue's agent merges by itself.**
     - **What happened.** In `dev` the agent only declares `merge` and a script gates and merges. With `merge_lane: manual`, nothing merges without a maintainer's approval at the PR head.
 
 ## Operator experience
 
-25. **Good: questions carry a recommendation and its reason.**
+26. **Good: questions carry a recommendation and its reason.**
     - **What happened.** Every stop came as one question with options, what each does, a recommended option with confidence and why, and a ready `respond` command. `--recommended` answers with the recommended option.
-26. **Weak: the manual run form and the stalled-between-steps feel.**
+27. **Weak: the manual run form and the stalled-between-steps feel.**
     - **What happened.** Without bindings the Operator (or we) must re-run the queue after each answer. The web form for starting a workflow is a raw list of webhook fields.
 
 ## Open
 
-- Whether the retry of the publish step succeeds (entry 21).
+- Whether the retry of the publish step succeeds (entries 21–22).
 - Codex as the cross-family reviewer is not connected yet.
 - The sandbox (microVM per session, closed egress, push proxy) is not built yet; agents run in the Archon container with open network.
