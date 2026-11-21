@@ -32,7 +32,7 @@ model {
   changes = store 'Pull requests' {
     #built
     technology 'PR · MR'
-    description 'A proposed code change on a branch, linked to its work item. The Implementer opens it and adds fix commits to it; the Validator attaches evidence; AI review adds findings, the verdict and an explanation of the change for the Operator.'
+    description 'A proposed code change on a branch, linked to its work item. The Implementer opens it and adds fix commits to it; the Validator attaches evidence; AI review adds findings, the verdict and an explanation of the change for the Operator. Every verdict on it (CI, AI reviewer, Validator, the Operator\'s merge) is recorded with the fingerprint of the PR\'s own diff it was given on (decision 33).'
   }
   ci = store 'Check results' {
     #planned
@@ -271,7 +271,7 @@ model {
       land = script 'Merge queue' {
         #planned
         technology 'Merge queue'
-        description 'Tests the PR on top of the latest main and the PRs ahead of it with the full CI, then lands it. Approvals stay valid while the PR\'s own diff is unchanged. A red build or a conflict ejects the PR back to the Implementer; after a conflict is resolved the diff changed, so checks, review and acceptance run again for what changed. The agent never merges.'
+        description 'Tests the PR on top of the latest main and the PRs ahead of it with the full CI, then lands it. Approvals stay valid while the PR\'s own diff is unchanged, checked by code: before landing it compares the fingerprint of the PR\'s diff with the one every verdict was recorded on and refuses if any differs; only the stale checks run again (decision 33). A rebase onto a newer main that leaves the diff unchanged keeps the verdicts. A red build or a conflict ejects the PR back to the Implementer; after a conflict is resolved the diff changed, so checks, review and acceptance run again for what changed. The agent never merges.'
         metadata {
           in 'An approved PR'
           does 'Rebuilds on the latest main, runs the full CI'
