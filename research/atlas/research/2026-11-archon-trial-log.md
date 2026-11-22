@@ -166,7 +166,7 @@ The owner's point: a person or a local Claude Code session runs this repository'
 
 32. **A pack cannot be installed from a private repository.**
     - **What happened.** `archon plugin add redikultsev/agentic-sdlc-atlas/implementations/archon@archon-pack-v0.0.1` resolved the commit, then failed: the manifest is read unauthenticated from `raw.githubusercontent.com`, which returns 404 for a private repository. The CLI reference says so (`reference/cli.md`: "a private repository cannot be installed").
-    - **Fix.** Global packaged workflows instead: Archon keeps a clone of this repository at `/.archon/src/agentic-sdlc-atlas` and `rsync`s `implementations/archon/` to `/.archon/workflows/agentic-pipeline/`. The install check `pipeline-ping` validates and runs from there (2026-11-22).
+    - **Fix.** Global packaged workflows instead: Archon keeps a clone of this repository at `/.archon/src/agentic-sdlc-atlas` and `rsync`s `implementations/archon/` to `/.archon/workflows/agentic-pipeline/`. The install check `pipeline-ping` validated and ran from there (2026-11-22). The same day the repository went public and `archon plugin add` installed the tag; the copy was removed.
     - **For our pack.** Updating the pack is a pull plus a copy on the server, not `archon plugin update`; versions are atlas commits. An upstream candidate: read the manifest through the same authenticated `git fetch` the tree already uses.
 
 ## Merge safety
