@@ -4,11 +4,11 @@ What the pack contains, node by node, and why each node is an agent, a script or
 
 ## Shape in one screen
 
-- **One run = one step, no in-run loops.** Archon refuses a `wait` that is not the only sink of a loop body and any sub-run inside a loop. So every stage workflow runs once per attempt and ends either at its gate or by firing the next step. A retry ("clarify", "redo", a fix round, "changes") is a new run of a workflow, and the count lives in the item's document, never in the engine.
-- **Item key.** Every run carries `--item issue-<n>`; a slice child carries `issue-<n>/slice-<id>`. Archon admits one non-terminal run of a workflow per item; a second fire is `queued` or `skipped`, and the firing script records which.
+- **Gates sit inside a run.** A `wait` pauses the run and releases its slot; the answer resumes the same run, and the nodes after the gate apply it. Repeats of a gate ("clarify", "redo") are a `loop_group` whose body ends with the gate as its only sink (Archon's rule), with `until_bash` on the decision and the ruling of the previous round recorded at the start of the next. The one place that needs separate runs is the implementation round, because a fan-out of slices (`workflow:` children) is refused inside a loop: each round is one run of `pipeline-round`, and the count lives in the item's document.
+- **Item key.** Every run for an item carries `--item issue-<n>`. Archon admits one non-terminal run of a workflow per item; chain bindings use `overlap: queue`, so a fire from a run that is still finishing waits for it. Slice children carry no item; `fan_out.max_parallel` bounds them. Item-less runs (the poll, revisit, retro, ping) do not reconcile.
 - **State.** The `state:*` label is the only state (decision 28). `.shared/state.ts` moves it with `workitem.label.add` and `label.remove` (not `labels.set`, which replaces the whole set and races people), reads it back, and refuses a move from a label it did not expect: it raises a request instead of overwriting. The Archon state document `work/<n>` (project scope, under 64 KiB) holds only facts tied to the current state: rounds used, "changes" used, verdicts with their diff fingerprint, the base check result, slices, flags. Every run starts with `reconcile`: label and document agree, or the run stops and asks.
-- **Chaining.** The last script of a step calls `trigger.fire(<absolute path of the binding file>, inputs, {item})`. Binding files are written once by `archon pack bindings --out <dir>`; the pack setting `bindings_dir` names that directory. Fire-only bindings need no registration.
-- **Gates** are the last node of a run: `wait` with `form: select`, options with `value.effect`, the head SHA shown on the card in the value, `recommendation`, `other: true` (its effect: record the text as a ruling, state unchanged). The next run reads the answer from the previous run's output through its inputs. Answers keyed by run and wait; a second answer to a closed wait is refused. A running `archon serve` continues answered runs.
+- **Chaining** between stages is the last script node calling `trigger.fire(<absolute path of the binding file>, inputs, {item})`; every target workflow declares `inputs:` (fire inputs reach only declared ones); binding files come from `archon pack bindings --out <dir>`, named by the pack setting `bindings_dir`. Scripts that fire, read state or call the forge run on the host, never in a container. The disposition (admitted, queued, skipped, null) is recorded in `work/<n>`.
+- **Gate options** have `value.effect`; the head SHA shown on a merge card is written in the option's `does` text (the console does not show `value`) and also in `value` for the script; `other: true` records the text as a ruling and leaves the state. A second answer to the same wait is refused by Archon.
 - **Agents judge, scripts act.** Agent nodes return `output_format` JSON (Codex strict mode: every property listed in `required`, optional ones as `["array","null"]`) and write nothing public. Every public write is a script that checks the current state first, writes, and reads back, so a retry never writes twice.
 - **Policy is read from the base, never from the item branch:** scripts read `.pipeline/*` with `git show origin/<base>:.pipeline/<file>`. A PR that touches `.pipeline/`, `.archon/`, `.github/workflows/` or check configuration is never R0 and is flagged first on the merge card.
 - **Operator-owned files** in each project, on the base branch: `.pipeline/project.yaml` (base branch, check command and toolchain, deploy hook, Watcher signals, total time and cost limits for the revisit check), `.pipeline/trusted.json` (decision 39), `.pipeline/automerge.yaml` (R0 rules with never-zones and working hours, decision 25). Model aliases live in `.archon/config.yaml`, where Archon reads them.
@@ -18,27 +18,23 @@ What the pack contains, node by node, and why each node is an agent, a script or
 
 ## Workflows
 
-A = agent, S = script, W = wait. Every run starts with `S reconcile` (not repeated below).
+A = agent, S = script, W = wait, L = loop_group. Item runs start with `S reconcile` (not repeated below).
 
 | Workflow | Started by | Nodes | Ends |
 |---|---|---|---|
-| `pipeline-intake` | schedule every 300 s: the next open issue with no `state:*` label, oldest first (a poll, not webhooks: installed-pack event bindings need the pack in the project's own workflows) | S `cap` (stop if 3 items have an open request) · S `trust` (trusted author, or an approval: the label `pipeline:approved` set by the Operator or a trusted author, pinned to the body digest; otherwise label `pipeline:needs-approval`, end) · S `state` Triaging · A `triage` (also searches open and merged PRs for the same issue or files) · S `evidence` · S `state` TriageReview · W `accept` | next: `pipeline-intake-apply` |
-| `pipeline-intake-apply` | fire | S `apply` (labels, ruling comment, `pipeline:rejected`, closing comment, discoveries) | fires spec (M, L) or deliver (S); ForHuman; Cancelled |
-| `pipeline-spec` | fire | S `cap` · A `questions` · W `ask` (when there are questions; all in one message) | fires `pipeline-spec-write` |
-| `pipeline-spec-write` | fire | A `interviewer` · S `commit-spec` · S `state` SpecReview · W `spec-gate` (approve / clarify + comment) | fires `pipeline-spec-apply` |
-| `pipeline-spec-apply` | fire | S `ruling` · S `count` (clarify ≤3, then the request asks) | approve: fires plan; clarify: fires spec-write |
-| `pipeline-plan` | fire | A `researcher` (L) · S `check-refs` · A `planner` · S `check-plan` · S `state` PlanReview · W `plan-gate` | fires `pipeline-plan-apply` |
-| `pipeline-plan-apply` | fire | S `ruling` · S `count` · S `slices` (sub-issues with blocked-by, idempotent by slice id) | approve: fires deliver; redo: fires plan |
-| `pipeline-deliver` | fire: from intake-apply (S), plan-apply, merge "changes", land conflict or red | S `rounds` (reads `work/<n>`: at 3 failed rounds → Blocked) · S `route` (another PR or a merged change already does this: W park / verify / continue) · S `base` (the full check at the base commit: failing test ids stored; a base that is red beyond known ids → W wait / except listed ids / for a human) · S `state` Implementing · S `frontier` · `workflow: pipeline-slice` fan_out (isolation: worktree, `max_parallel` 1 until the project declares per-slice resources) | fires `pipeline-verify` |
-| `pipeline-slice` | child | A `implementer` (fresh session, progress file on its branch; returns branch, `steps_skipped[]`, discoveries) · S `commit` | `pushed` or `failed(reason)`; a failed slice is one failed round, dependents stay out of the frontier, passing branches are kept |
-| `pipeline-verify` | fire | S `join` (slice branches into `pipeline/<n>`; conflict → back to deliver) · S `frontier-left` (slices unblocked by this round → fire deliver, no round spent) · S `push` · S `publish` (opens or updates the draft PR and its description, decision 43) · S `state` Verifying · S `ci` (checks at the head, timeout from `project.yaml`; ids also failing at the base are not counted) · S `guard` (deleted or skipped tests, lowered thresholds, policy or check files) · S `threads` (trusted people's open threads) · A `review` · A `validator` (when the item has criteria) · S `round` (classifies failures: a usage limit or a 5xx holds without a round; a crash, a missing verdict or a fix verdict is a round; records verdicts with the fingerprint; discoveries, at most 3 per item) | pass: fires merge; fix: fires deliver; Blocked: W `blocked` (one more round / back to plan / for a human / cancel, with the trend, decision 37) |
-| `pipeline-merge` | fire | S `rules` (reads `guard` flags; R0 by facts; manual merge setting; kill switch by the revert rate) · S `state` MergeReview · W `merge-gate` (merge, carrying the head SHA shown / changes + comment) | fires `pipeline-land` |
-| `pipeline-land` | fire; `resource: merge`, capacity 1 | S `ruling` (changes: comment as a ruling; "changes" ≤3, then the request offers back to plan) · S `land` (head equals the SHA on the card or back to MergeReview with a new card; update on the latest base; wait for CI; every verdict's fingerprint current or only the stale checks run again; merge pinned to the head; read back; at most 3 update attempts, then a request) | merged: fires deploy; changes, conflict or red: fires deliver |
-| `pipeline-deploy` | fire; `resource: deploy`, capacity 1 | S `deploy` (the project's hook) · S `state` Live · S `watch-start` | fires `pipeline-watch` every 5 minutes until the window ends |
-| `pipeline-watch` | fire | S `signals` (before/after for the signals this PR touches and the whole service, excluding the minutes of other deploys) · A `watcher` (returns `coverage: full or health-only`) · S `outcome` | clean at the end: Done (health-only noted); regression in this PR: revert PR through land, deploy, RolledBack, report, a work item with evidence; unsure: a request |
-| `pipeline-revisit` | schedule every 900 s | S `blocked` (blocker closed: update the request) · S `orphans` (an Operator-free state label with no live run and no open request: a request; a run past the total time or cost limit: cancel and count a round) · S `stale` (two unreadable reads: set aside) | — |
-| `pipeline-retro` | schedule every 604800 s | S `metrics` (seven numbers) · A `retro` · S `file` (proposals as issues, never discoveries) · S `summary` | — |
-| `pipeline-ping` | by hand | install check; the git and gh guard against the project's own test suite; GitHub access for `gh api`; Codex credentials; bindings directory | — |
+| `pipeline-poll` | schedule every 300 s, `overlap: skip`, `resource: intake` capacity 1 | S `pick` (through `gh api`: the oldest open issue with no `state:*`, `pipeline:needs-approval` or `pipeline:rejected` label) · S `cap` (3 items with an open request: stop) | fires `pipeline-triage` on `issue-<n>` |
+| `pipeline-triage` | fire | S `trust` (trusted author, or the label `pipeline:approved` set by the Operator or a trusted author and pinned to the body digest; else label `pipeline:needs-approval`, end) · S `state` Triaging · A `triage` (also searches open and merged PRs) · S `evidence` · S `state` TriageReview · W `accept` · S `apply` (labels, ruling comment, `pipeline:rejected`, closing comment) | fires spec (M, L) or round (S); ForHuman; Cancelled |
+| `pipeline-spec` | fire | S `cap` · S `state` Specifying · A `questions` · W `ask` (only when there are questions) · L ≤3 { S `prev-ruling` · A `interviewer` · S `commit-spec` · S `state` SpecReview · W `spec-gate` } until approve · S `apply` | approve: fires plan; 3 × clarify: a request |
+| `pipeline-plan` | fire | S `state` Planning · A `researcher` (L) · S `check-refs` · L ≤3 { S `prev-ruling` · A `planner` · S `check-plan` · S `state` PlanReview · W `plan-gate` } until approve · S `slices` (sub-issues with blocked-by, idempotent by slice id) | fires round |
+| `pipeline-round` | fire: from triage (S), plan, merge "changes", land conflict or red, and from itself; `isolation: worktree` | S `rounds` (at 3 failed rounds: Blocked) · S `route` (another PR or a merged change already does this: W park / verify / continue) · S `base` (full check at the base commit, failing ids stored; red beyond known ids: W wait / except listed ids / for a human) · S `state` Implementing · S `frontier` · `workflow: pipeline-slice` fan_out (`max_parallel` 1 until the project declares per-slice resources) · S `join` · S `push` · S `publish` (draft PR and its description, decision 43) · S `state` Verifying · S `ci` (timeout from `project.yaml`; base-failing ids not counted) · S `guard` · S `threads` · S `reviewer-ready` (Codex configured, else W "review unavailable") · A `review` · A `validator` (items with criteria) · S `round` (verdicts with the fingerprint; a crash, a missing verdict or a fix verdict is a round; discoveries ≤3 per item) · W `blocked` (only at 3 rounds or a block verdict: one more round / back to plan / for a human / cancel, with the trend) · S `next` | pass and no slices left: fires merge; slices left: fires round, no round spent; fix: fires round |
+| `pipeline-slice` | child | A `implementer` (fresh session, progress file on its branch; returns branch, `steps_skipped[]`, discoveries) · S `commit` | `pushed` or `failed(reason)`; a failed slice is one failed round, dependents stay out of the frontier, passing branches kept |
+| `pipeline-merge` | fire; `resource: merge` capacity 1 | S `rules` (R0 by facts from the base; `guard` flags; manual merge setting; kill switch) · S `state` MergeReview · W `merge-gate` (merge with the head SHA / changes + comment) · S `ruling` ("changes" ≤3, then the request offers back to plan) · S `land` (head equals the card's SHA or a new card; update on the latest base; CI; fingerprints current or stale checks re-run; merge pinned to the head; read back; ≤3 update attempts, then a request) | merged: fires deploy; changes, conflict or red: fires round |
+| `pipeline-deploy` | fire; `resource: deploy` capacity 1 | S `deploy` (the project's hook) · S `state` Live · L until the window ends { S `signals` (excluding the minutes of other deploys) · A `watcher` (`coverage` full or health-only) · S `act` · W `pause` (`duration_ms` 300000) } · S `outcome` | Done (health-only noted); regression in this PR: a revert PR through merge (the revert is not watched again), RolledBack, report, a work item; unsure: a request |
+| `pipeline-revisit` | schedule every 900 s, `overlap: skip` | S `blocked` (blocker closed: update the request) · S `orphans` (a running-state label with no live run, no queued start and no open request: a request; a run past the total time or cost limit: `archon workflow cancel` or `abandon` through `ARCHON_CLI_COMMAND`, one round counted) · S `stale` | — |
+| `pipeline-retro` | schedule every 604800 s | S `metrics` · A `retro` · S `file` (proposals as issues) · S `summary` | — |
+| `pipeline-ping` | by hand | install check; guard against the project's test suite; `gh api` access; Codex credentials; bindings directory | — |
+
+A usage limit is not a failure: Archon pauses the run at the provider's limit and resumes it at the reset, so no round is spent. Codex cost is estimated by `round` from the run's token usage.
 
 ## Shared modules (`.shared/`)
 
@@ -52,13 +48,13 @@ A = agent, S = script, W = wait. Every run starts with `S reconcile` (not repeat
 | `trust.ts` | trusted authors from the base, approval pinned to the body digest, marking of untrusted text | 39 |
 | `policy.ts` | reads `.pipeline/*` from the base, settings `implement_lane`, `merge_lane`, `bindings_dir`, `base` | 10, 25, 40 |
 | `github.ts` | what the forge lacks, through `gh api`: sub-issues, blocked-by, branch update, PR search | 16 |
-| `fire.ts` | `trigger.fire` with the binding path, records admitted, queued or skipped | — |
+| `fire.ts` | `trigger.fire` with the binding path; records the disposition, including null | — |
 
 Forge operations declared in `.pack/pack.yaml` `forge.operations`: `workitem.view|list|comments|create|close|comment.upsert|label.add|label.remove`, `repo.label.ensure|file`, `pr.view|create|edit-body|ready|draft|files|merge|merge-state|threads|thread.reply`, `checks.state|commit`. All labels are ensured at install.
 
 ## Agents and models
 
-Aliases in `.archon/config.yaml`; every `model:` is a list ending in a tier. The reviewer's list has no fallback to the Implementer's family: when Codex is not available the review node fails closed and the item waits on a request "review unavailable". Limits are written in each workflow YAML: `idle_timeout` on every agent node, `maxBudgetUsd` on Claude nodes; Codex cost is estimated from tokens and marked as an estimate (decision 29 revised); the total wall clock is enforced by `pipeline-revisit` until the sandbox provider plugin does it per session.
+Aliases in `.archon/config.yaml`; every `model:` is a list of at least two entries ending in a tier. A model list cannot fail closed (the tier always resolves), so the script `reviewer-ready` checks that the reviewer's alias resolves to another family than the Implementer's before the review runs. Limits are written in each workflow YAML: `idle_timeout` (milliseconds) on every agent node, `maxBudgetUsd` on Claude nodes; Codex cost is estimated from tokens and marked as an estimate (decision 29 revised); the total wall clock is enforced by `pipeline-revisit` until the sandbox provider plugin does it per session.
 
 | Node | Model | Reads | Returns |
 |---|---|---|---|
@@ -67,14 +63,14 @@ Aliases in `.archon/config.yaml`; every `model:` is a list ending in a tier. The
 | researcher | `[@researcher, large]` | code | modules and invariants with file:line |
 | planner | `[@planner, large]` | spec, research, code | slices: files, risks, check command, criterion ids, blocked-by |
 | implementer | `[@implementer, large]` | slice or findings, progress file | branch, `steps_skipped[]`, discoveries |
-| review | `[@review]` (Codex) | PR, spec, code around it, trusted threads | pass / fix / block, findings re-checked, explanation for R1/R2 |
+| review | `[@review, large]` (Codex; checked by `reviewer-ready`) | PR, spec, code around it, trusted threads | pass / fix / block, findings re-checked, explanation for R1/R2 |
 | validator | `[@validator, large]` | criteria, the running app | per criterion: pass or fail, runnable check and output |
 | watcher | `[@watcher, medium]` | numbers from `signals`, the PR diff | clean / regression in this PR / unclear / unsure, coverage |
 | retro | `[@retro, large]` | traces, corrections, rounds, rollbacks | proposals with cases |
 
 ## Tests
 
-Every workflow has `fixtures/*.stubs.yaml`, one per transition it makes, asserting `reached` nodes and status. A dry run executes every script node that is not stubbed, so fixtures stub every script that writes or fires. Fixtures exist for: a fourth round across runs; "changes" three times; a land conflict; a head pushed after the card; a red base; a usage limit; a crashed reviewer; Codex unavailable; a failed slice beside passing ones; 50 waiting issues against the cap; a PR editing `.pipeline/automerge.yaml`; a duplicate PR found by `route`; an orphaned label after a restart. `archon workflow test` runs them all; a pack change does not merge while any is red (decision 41).
+Every workflow has `fixtures/*.stubs.yaml`, one per transition it makes, asserting `reached` nodes and status. A dry run executes every script node that is not stubbed, so fixtures stub every script that writes or fires. Fixtures exist for: a fourth round across runs; "changes" three times; a land conflict; a head pushed after the card; a red base; a usage limit; a crashed reviewer; Codex unavailable; a failed slice beside passing ones; 50 waiting issues against the cap; a PR editing `.pipeline/automerge.yaml`; a duplicate PR found by `route`; an orphaned label after a restart; a queued fire not taken for an orphan; a second clarify and a third. `archon workflow test` runs them all; a pack change does not merge while any is red (decision 41).
 
 ## Settings and setup per project
 
@@ -115,11 +111,11 @@ Not checked: the "World" test for Interviewer and Planner (they only read the re
 
 ## Review
 
-Design review 2026-11-22 on the first draft: task shape check, then three independent critics (Archon facts against the source at `f9d1d2b`; replay of the trial episodes and variants; opponent with a premortem). Not done yet: a second pass by a fresh critic on this revision, and live verification.
+Design review 2026-11-22 on the first draft: task shape check, then three independent critics (Archon facts against the source at `f9d1d2b`; replay of the trial episodes and variants; opponent with a premortem). A second pass by a fresh critic followed (below). Not done: live verification on Archon; every claim about Archon is from its source at `f9d1d2b`, not from a run.
 
 | # | Finding | Decision |
 |---|---|---|
-| 1 | Two waits in one loop body and sub-runs inside a loop are refused at load | ✅ one run per step, no in-run loops; retries are new runs |
+| 1 | Two waits in one loop body and sub-runs inside a loop are refused at load | ✅ superseded by #37–38: gates inside runs, loops with the gate as the only sink, separate runs only for implementation rounds |
 | 2 | `trigger.fire` takes a binding file path; fire may be queued or skipped | ✅ `bindings_dir` setting, `fire.ts` records the disposition |
 | 3 | Node limits are static YAML; Codex has no cost; no wall clock | ✅ limits in YAML, Codex cost estimated (29 revised), wall clock by `revisit` ⏸ per session until the sandbox |
 | 4 | Round cap reset by re-fired runs | ✅ counts in `work/<n>`, read at every start; fixture for a fourth round |
@@ -155,3 +151,22 @@ Design review 2026-11-22 on the first draft: task shape check, then three indepe
 | 34 | Simplest design: one workflow per item with a stage switch | ✗ one workflow per step is what Archon's loop rules allow; a stage switch would be one large workflow with the same steps |
 | 35 | Cut M, L, Validator, deploy, Retro for the first run | ✗ the owner asked for the whole pipeline; live runs still go shortest route first (build plan) |
 | 36 | Guard breaks the project's tests (trial 29) | ✅ `pipeline-ping` runs the suite through the guard |
+
+### Second pass (fresh critic on the revision)
+
+| # | Finding | Decision |
+|---|---|---|
+| 37 | After a gate at the end of a run nothing can fire; a timer-started run has no item for an asks trigger; fire inputs need declared `inputs:` | ✅ gates inside runs, the answer resumes the run; repeats as a loop with the gate as the only sink; the poll is split from triage; every target declares `inputs:` |
+| 38 | The rationale overstated Archon's rule: a wait is allowed as a loop's only sink | ✅ rewritten; separate runs only for implementation rounds |
+| 39 | `model: [@review]` is refused and a tier always resolves | ✅ lists of two ending in a tier; `reviewer-ready` script fails closed |
+| 40 | The head SHA in `value` is not shown | ✅ in `does` as well |
+| 41 | Slice children carry no item | ✅ slice keys dropped; `max_parallel` bounds them |
+| 42 | `frontier-left` fired a round while verification still ran | ✅ remaining slices are fired by the round's last node |
+| 43 | Overlap unspecified; poll starvation on untrusted issues; concurrent polls | ✅ `queue` for chains, `skip` for timers; `needs-approval` excluded; `resource: intake` |
+| 44 | Watch cadence had no mechanism | ✅ a loop with a timed wait as its only sink; reverts not watched again |
+| 45 | No script API to cancel; paused runs need `abandon`; container scripts cannot fire | ✅ CLI through `ARCHON_CLI_COMMAND`; firing scripts run on the host |
+| 46 | A queued fire looks like an orphan | ✅ queued starts count as live |
+| 47 | Usage limit "holds" with no mechanism | ✅ Archon pauses at the provider limit and resumes at reset; no round |
+| 48 | Rounds share one checkout | ✅ `isolation: worktree` on `pipeline-round` |
+| 49 | Cut the task-shape table, module and agent tables, review table | ✗ kept: the spec is the build reference, and the review record is required here |
+
