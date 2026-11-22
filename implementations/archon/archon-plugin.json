@@ -16,6 +16,7 @@
     "pipeline-deploy": "pipeline-deploy/pipeline-deploy.yaml",
     "pipeline-revisit": "pipeline-revisit/pipeline-revisit.yaml",
     "pipeline-retro": "pipeline-retro/pipeline-retro.yaml",
-    "pipeline-ping": "pipeline-ping/pipeline-ping.yaml"
+    "pipeline-ping": "pipeline-ping/pipeline-ping.yaml",
+    "pipeline-slice": "pipeline-slice/pipeline-slice.yaml"
   }
 }
