@@ -1,7 +1,8 @@
 /**
  * The oldest open issue that is new to the pipeline. New means: no `state:*` label, not
  * rejected, not the rulings register, not a slice, and not waiting for approval unless the
- * Operator or a trusted author has since approved it. An issue this poll already started
+ * Operator or a trusted author has since approved it. With the pack setting `intake_label`,
+ * only issues carrying that label count at all. An issue this poll already started
  * triage for under the same delivery id is passed over, so one triage run that ended
  * without a label (refused, crashed) does not starve every issue behind it: revisit finds it.
  *
@@ -20,9 +21,11 @@ const NOT_NEW = [MARKS.rejected, MARKS.rulings, MARKS.slice] as const;
 
 function main(): void {
   const repo = repoOf(input('repo_host'), input('repo_path'));
+  const only = (input('intake_label') ?? '').trim();
   let passed = 0;
   for (const issue of openIssuesOldestFirst(repo)) {
     const labels = issue.labels.map(l => l.name);
+    if (only !== '' && !labels.includes(only)) continue;
     if (labels.some(l => l.startsWith('state:'))) continue;
     if (labels.some(l => (NOT_NEW as readonly string[]).includes(l))) continue;
     const approved = labels.includes(MARKS.approved);

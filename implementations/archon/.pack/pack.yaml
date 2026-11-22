@@ -24,6 +24,21 @@ inputs:
     description: >-
       auto: a PR the auto-merge rules match merges without the Operator (R0). manual: every
       PR goes to the Merge gate (decision 40). Starts manual until the rules are measured.
+  intake_label:
+    type: string
+    default: ""
+    description: >-
+      When set, the poll takes only open issues carrying this label (set by the Operator),
+      so the pipeline works a chosen set on a busy repository. Empty: every new issue.
+  review_family:
+    type: enum
+    values: [strict, same-allowed]
+    default: strict
+    description: >-
+      strict: the AI reviewer must be another model family than the Implementer, or the
+      item waits on "review unavailable" (decision 22). same-allowed: a same-family review
+      runs and the merge card carries the flag review-same-family, which also keeps the PR
+      off the R0 path. A stopgap until a second family is connected.
   pipeline_login:
     type: string
     default: ""

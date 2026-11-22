@@ -10,10 +10,12 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { emit } from 'archon:script';
+import { emit, input } from 'archon:script';
 import { git } from '../../.shared/git.ts';
 import { isObject } from '../../.shared/inputs.ts';
 import { buildRequest, card, NO_CARD, run } from './lib/item.ts';
+import { updateWork } from '../../.shared/work.ts';
+import { runInputs } from '../../.shared/repo.ts';
 
 type Config = Record<string, unknown>;
 
@@ -53,6 +55,18 @@ run(() => {
   const review = providerOf('@review', layers);
   const implementer = providerOf('@implementer', layers);
   const ready = review.provider === 'codex' && review.provider !== implementer.provider;
+  // Stopgap (pack setting review_family): a same-family review runs, flagged on the merge card.
+  const allowSame = (input('review_family') ?? 'strict') === 'same-allowed';
+  if (!ready && allowSame) {
+    const { number } = runInputs();
+    if (number !== undefined) {
+      updateWork(number, doc => {
+        if (!doc.flags.includes('guard:review-same-family')) doc.flags.push('guard:review-same-family');
+      });
+    }
+    emit({ ready: true, review: review.provider, implementer: implementer.provider, ...NO_CARD });
+    return;
+  }
   if (ready) {
     emit({ ready: true, review: review.provider, implementer: implementer.provider, ...NO_CARD });
     return;
