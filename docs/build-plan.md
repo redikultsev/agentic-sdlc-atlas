@@ -18,8 +18,8 @@ Sources: what Archon gives and where it falls short, `research/atlas/research/en
 The whole pipeline is built: all nine stages, the cross-cutting rules and the sandbox. The order only decides what runs live first, so that failures of different stages do not pile up in one first run.
 
 1. **Write the whole pack** with stub tests for every transition (decision 41): stages 1–9 as workflows, `policy.ts`, decision requests, state labels.
-2. **Live runs, shortest route first** on Retinue (the owner's choice, 2026-11-22): an S item (Triage → Accept → Implementer → CI → AI review → Merge gate → merged). Then M and L through spec and plan with slices, then acceptance with evidence, merge by rules on the latest main, deploy and watch with rollback, the weekly Retro.
+2. **Live runs, shortest route first** on the trial repository (an active open-source project with a second developer; the owner's choice, 2026-11-22): an S item (Triage → Accept → Implementer → CI → AI review → Merge gate → merged). Then M and L through spec and plan with slices, then acceptance with evidence, merge by rules on the latest main, deploy and watch with rollback, the weekly Retro.
 3. **Sandbox in parallel:** provider plugin `claude-vm` / `codex-vm` (microVM, no GitHub token, egress allowlist, wall clock), push proxy, a separate merge credential. On before the pipeline touches any work repository.
 4. **Console patch** (pause and hold, a board of the 15 states, image evidence, asks), proposed upstream.
 
-Until the sandbox lands, agents run in Archon worktrees on the host behind the git and gh merge guard already deployed in the trial, on Retinue only. Retinue's own red tests and a second developer merging every 20–40 minutes will mix with the pipeline's failures: each live run notes which is which in the trial log.
+Until the sandbox lands, agents run in Archon worktrees on the host behind the git and gh merge guard already deployed in the trial, on the trial repository only. Its own red tests and a second developer merging every 20–40 minutes will mix with the pipeline's failures: each live run notes which is which in the trial log.

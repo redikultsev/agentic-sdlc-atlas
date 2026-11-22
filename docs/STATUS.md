@@ -43,7 +43,7 @@ Research from the walkthrough: `research/atlas/research/2026-11-*.md` (roles and
 2. Element ids lag behind renamed stages: `engine.verify` is "5. Checks & review", `engine.aiReview` is "6. Acceptance".
 3. PDF export of the deck with web components is not verified.
 4. No target numbers for the pipeline metrics yet.
-5. The repository is private on GitHub; making it public needs the owner's decision and a scan for personal data.
+5. The repository is public since 2026-11-22, after a scan of files and history for personal data and secrets (gitleaks: none). Keep it so: nothing personal (AGENTS.md rule 5).
 6. How the Interviewer asks the Operator business questions (few, short, no walls of text) is not designed yet.
 
 ## Engine research (2026-11-21)
