@@ -1,0 +1,336 @@
+name: pipeline-spec
+description: |
+  The spec stage of an accepted M or L item (stage 2): Specifying, the Interviewer's
+  business questions to the Operator when there are any, then up to three spec drafts,
+  each committed to the item branch as .pipeline/work/<n>/spec.md and put to the Operator
+  at SpecReview. Approve starts the plan stage; "other" is a clarify, counted in work/<n>;
+  after three clarifies the card becomes a request.
+
+  Use when: pipeline-triage fires it after Accept (M, L).
+  NOT for: planning (pipeline-plan).
+
+inputs:
+  repo_host:
+    default: ""
+    description: The forge host of the repository the pipeline works.
+  repo_path:
+    default: ""
+    description: The owner/name path of that repository.
+  number:
+    required: true
+    description: The issue number of the item.
+  pipeline_plan_binding:
+    default: ""
+    description: Absolute path of the pipeline-plan binding file; apply starts the plan stage through it.
+
+# Agents read the launch checkout; the spec is committed to the item branch by plumbing,
+# never through this checkout.
+worktree: { enabled: false }
+mutates_checkout: false
+
+nodes:
+  - id: reconcile
+    script: reconcile
+    runtime: bun
+    timeout: 120000
+    output_format:
+      type: object
+      properties:
+        ok: { type: boolean }
+        reason: { type: string }
+        question: { type: string }
+        options: &options
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              label: { type: string }
+              does: { type: string }
+              value: { type: object }
+            required: [id, label, does, value]
+        recommendation: &recommendation
+          type: object
+          properties:
+            option: { type: string }
+            why: { type: string }
+            confidence: { type: string, enum: [low, medium, high] }
+          required: [option, why, confidence]
+        state: { type: string }
+      required: [ok, reason, question, options, recommendation, state]
+
+  # The waiting cap (decision 9): hold, five minutes at a time, while three other items
+  # wait for the Operator. Four hours without room fails the run; revisit raises it.
+  - id: cap
+    depends_on: [reconcile]
+    when: "$reconcile.output.ok == 'true'"
+    loop_group:
+      max_iterations: 48
+      until_bash: 'u=$count.output.under; [ "$u" = true ]'
+      nodes:
+        - id: count
+          script: count
+          runtime: bun
+          timeout: 120000
+          output_format:
+            type: object
+            properties:
+              under: { type: boolean }
+              waiting: { type: integer }
+              cap: { type: integer }
+            required: [under, waiting, cap]
+        - id: hold
+          depends_on: [count]
+          when: "$count.output.under == 'false'"
+          wait:
+            duration_ms: 300000
+
+  # SPEC's "state Specifying", joined with reconcile so one stop request covers both.
+  - id: enter
+    script: enter
+    runtime: bun
+    timeout: 120000
+    depends_on: [reconcile, cap]
+    trigger_rule: none_failed_min_one_success
+    with:
+      reconcile: { from: "$reconcile.output" }
+    output_format:
+      type: object
+      properties:
+        ok: { type: boolean }
+        reason: { type: string }
+        question: { type: string }
+        options: *options
+        recommendation: *recommendation
+        go: { type: boolean }
+        ask: { type: boolean }
+      required: [ok, reason, question, options, recommendation, go, ask]
+
+  - id: stop
+    depends_on: [enter]
+    when: "$enter.output.ask == 'true'"
+    wait:
+      attention: "$enter.output.question"
+      form: select
+      options: "$enter.output.options"
+      recommendation: "$enter.output.recommendation"
+      other: true
+      labels: { gate: stop, stage: spec, item: "$INPUTS.number" }
+
+  - id: gather
+    script: gather
+    runtime: bun
+    timeout: 300000
+    depends_on: [enter, stop]
+    trigger_rule: none_failed_min_one_success
+    when: "$enter.output.go == 'true'"
+    output_format:
+      type: object
+      properties:
+        context: { type: string }
+        size: { type: string }
+      required: [context, size]
+
+  - id: questions
+    command: questions
+    depends_on: [gather]
+    model: ['@interviewer', large]
+    context: fresh
+    idle_timeout: 600000
+    maxBudgetUsd: 3
+    with:
+      context: "$gather.output.context"
+    output_format:
+      type: object
+      additionalProperties: false
+      properties:
+        needed: { type: boolean }
+        questions:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              id: { type: string }
+              question: { type: string }
+              why: { type: string }
+              assume: { type: string }
+            required: [id, question, why, assume]
+        message: { type: string }
+      required: [needed, questions, message]
+
+  # Business questions, only when there are any. The answer is a ruling.
+  - id: ask
+    depends_on: [questions]
+    when: "$questions.output.needed == 'true'"
+    wait:
+      attention: "$questions.output.message"
+      form: message
+      labels: { gate: questions, stage: spec, item: "$INPUTS.number" }
+
+  - id: answers
+    script: answers
+    runtime: bun
+    timeout: 120000
+    depends_on: [questions, ask]
+    trigger_rule: none_failed_min_one_success
+    with:
+      text: { from: "$ask.output.text", if_skipped: "" }
+    output_format:
+      type: object
+      properties:
+        text: { type: string }
+      required: [text]
+
+  # At most three drafts. The SpecReview gate is the body's only sink; "other" or the
+  # declared clarify runs another round, anything else ends the loop.
+  - id: rounds
+    depends_on: [answers]
+    loop_group:
+      max_iterations: 4
+      until_bash: 'd=$spec-gate.output.decision; [ "$d" != other ] && [ "$d" != clarify ]'
+      nodes:
+        - id: prev-ruling
+          script: prev-ruling
+          runtime: bun
+          timeout: 120000
+          with:
+            prev_decision: "$LOOP_PREV.spec-gate.output.decision"
+            prev_text: "$LOOP_PREV.spec-gate.output.text"
+            prev_problems: "$LOOP_PREV.review.output.problems"
+          output_format:
+            type: object
+            properties:
+              go: { type: boolean }
+              over: { type: boolean }
+              mismatch: { type: string }
+              clarify: { type: integer }
+              correction: { type: string }
+              rulings: { type: string }
+            required: [go, over, mismatch, clarify, correction, rulings]
+
+        - id: interviewer
+          command: interviewer
+          depends_on: [prev-ruling]
+          when: "$prev-ruling.output.go == 'true'"
+          model: ['@interviewer', large]
+          context: fresh
+          idle_timeout: 900000
+          maxBudgetUsd: 5
+          with:
+            context: "$gather.output.context"
+            answers: "$answers.output.text"
+            rulings: "$prev-ruling.output.rulings"
+            correction: "$prev-ruling.output.correction"
+            previous: "$LOOP_PREV.interviewer.output"
+          output_format:
+            type: object
+            additionalProperties: false
+            properties:
+              title: { type: string }
+              summary: { type: string }
+              criteria:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    id: { type: string }
+                    text: { type: string }
+                    examples:
+                      type: array
+                      items:
+                        type: object
+                        additionalProperties: false
+                        properties:
+                          given: { type: string }
+                          when: { type: string }
+                          then: { type: string }
+                        required: [given, when, then]
+                  required: [id, text, examples]
+              not_in_scope: { type: array, items: { type: string } }
+              assumptions:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    text: { type: string }
+                    source: { type: string }
+                  required: [text, source]
+              decisions:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    id: { type: string }
+                    quote: { type: string }
+                  required: [id, quote]
+              open_points: { type: array, items: { type: string } }
+            required: [title, summary, criteria, not_in_scope, assumptions, decisions, open_points]
+
+        - id: commit-spec
+          script: commit-spec
+          runtime: bun
+          timeout: 300000
+          depends_on: [interviewer]
+          with:
+            spec: "$interviewer.output"
+          output_format:
+            type: object
+            properties:
+              commit: { type: string }
+              branch: { type: string }
+              path: { type: string }
+              url: { type: string }
+              criteria: { type: array, items: { type: string } }
+              problems: { type: array, items: { type: string } }
+            required: [commit, branch, path, url, criteria, problems]
+
+        # SPEC's "state SpecReview": the move and the request.
+        - id: review
+          script: card
+          runtime: bun
+          timeout: 120000
+          depends_on: [prev-ruling, commit-spec]
+          trigger_rule: none_failed_min_one_success
+          with:
+            round: { from: "$prev-ruling.output" }
+            commit: { from: "$commit-spec.output", if_skipped: null }
+          output_format:
+            type: object
+            properties:
+              ok: { type: boolean }
+              reason: { type: string }
+              question: { type: string }
+              options: *options
+              recommendation: *recommendation
+              over: { type: boolean }
+              url: { type: string }
+              criteria: { type: array, items: { type: string } }
+              problems: { type: array, items: { type: string } }
+            required: [ok, reason, question, options, recommendation, over, url, criteria, problems]
+
+        - id: spec-gate
+          depends_on: [review]
+          wait:
+            attention: "$review.output.question"
+            form: select
+            options: "$review.output.options"
+            recommendation: "$review.output.recommendation"
+            other: true
+            labels: { gate: spec-review, stage: spec, item: "$INPUTS.number" }
+
+  - id: apply
+    script: apply
+    runtime: bun
+    timeout: 300000
+    depends_on: [rounds]
+    output_format:
+      type: object
+      properties:
+        effect: { type: string, enum: [approve, stop] }
+        fired: { type: string }
+        summary: { type: string }
+      required: [effect, fired, summary]

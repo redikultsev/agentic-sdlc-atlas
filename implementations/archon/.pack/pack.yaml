@@ -131,6 +131,7 @@ bindings:
       repo_path: { repo: path }
       pipeline_round_binding: { binding: pipeline-round }
       pipeline_plan_binding: { binding: pipeline-plan }
+      pipeline_merge_binding: { binding: pipeline-merge }
       pipeline_deploy_binding: { binding: pipeline-deploy }
 
   pipeline-deploy:

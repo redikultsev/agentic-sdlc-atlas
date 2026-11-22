@@ -30,19 +30,23 @@ export type State = keyof typeof STATES;
 export const NONE = 'none' as const;
 export type From = State | typeof NONE;
 
-/** Allowed moves, read off the two diagrams in docs/states.md. `none` is an issue with no state label. */
+/**
+ * Allowed moves, read off the two diagrams in docs/states.md. `none` is an issue with no
+ * state label. The Operator can cancel in any state, and hand an item to a human at any
+ * of their own gates (docs/states.md, text above the diagrams).
+ */
 export const MOVES: Readonly<Record<From, readonly State[]>> = {
   none: ['triaging'],
-  triaging: ['triage-review'],
+  triaging: ['triage-review', 'cancelled'],
   'triage-review': ['implementing', 'specifying', 'for-human', 'cancelled'],
-  specifying: ['spec-review'],
-  'spec-review': ['specifying', 'planning'],
-  planning: ['plan-review'],
-  'plan-review': ['planning', 'implementing'],
-  implementing: ['verifying', 'blocked'],
-  verifying: ['implementing', 'blocked', 'merge-review', 'live'],
-  'merge-review': ['implementing', 'live'],
-  live: ['done', 'rolled-back'],
+  specifying: ['spec-review', 'cancelled'],
+  'spec-review': ['specifying', 'planning', 'cancelled', 'for-human'],
+  planning: ['plan-review', 'cancelled'],
+  'plan-review': ['planning', 'implementing', 'cancelled', 'for-human'],
+  implementing: ['verifying', 'blocked', 'cancelled'],
+  verifying: ['implementing', 'blocked', 'merge-review', 'live', 'cancelled'],
+  'merge-review': ['implementing', 'live', 'cancelled', 'for-human'],
+  live: ['done', 'rolled-back', 'cancelled'],
   blocked: ['implementing', 'planning', 'for-human', 'cancelled'],
   'for-human': [],
   done: [],
@@ -99,4 +103,6 @@ export const MARKS = {
   rulings: 'pipeline:rulings',
   slice: 'pipeline:slice',
   retro: 'pipeline:retro',
+  needsAttention: 'pipeline:needs-attention',
+  setAside: 'pipeline:set-aside',
 } as const;

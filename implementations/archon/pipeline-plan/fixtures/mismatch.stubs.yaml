@@ -1,0 +1,21 @@
+# The item is in Implementing already: reconcile stops with a request instead of planning over it.
+reconcile:
+  ok: false
+  reason: "stub: #7 is implementing; this stage starts only from spec-review or planning"
+  question: "stub: #7: the plan stage stopped instead of overwriting what it found."
+  options: [{ id: stop, label: "Stop this run", does: "Ends this run and changes nothing.", value: { effect: stop } }]
+  recommendation: { option: stop, why: "stub", confidence: high }
+  state: implementing
+enter:
+  ok: false
+  reason: "stub: #7 is implementing"
+  question: "stub: #7: the plan stage stopped instead of overwriting what it found."
+  options: [{ id: stop, label: "Stop this run", does: "Ends this run and changes nothing.", value: { effect: stop } }]
+  recommendation: { option: stop, why: "stub", confidence: high }
+  go: false
+  ask: true
+stop: { decision: stop, text: "", value: { effect: stop } }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7" }
+  expect: completed
+  reached: [reconcile, enter, stop]

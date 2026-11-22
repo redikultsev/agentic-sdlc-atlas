@@ -2,6 +2,9 @@
  * The item's document `work/<n>` in Archon's state store: facts tied to the item's
  * current state, never the state itself (that is the label). Conditional writes, so two
  * runs never overwrite each other; the document stays far under the 64 KiB cap.
+ * Each workflow checks at its start that the label and this document agree (its own
+ * `reconcile` script); there is no shared reconcile, because what counts as agreeing
+ * differs per step.
  */
 
 import { state } from 'archon:script';
@@ -32,6 +35,14 @@ export interface WorkDoc {
   /** Where the last fire of the next step went: admitted, queued, skipped or unknown. */
   lastFire: { what: string; disposition: string; at: string } | null;
   flags: string[];
+  /** The fix the next round must make (findings, failing ids), set by pipeline-round. */
+  fix: unknown;
+  /** One line per round: when, what failed, findings count, for the Blocked trend (decision 37). */
+  history: unknown[];
+  /** The last review verdict and findings, for the class-level rule (decision 36). */
+  review: unknown;
+  /** Branch updates tried by land on the current card (at most 3). */
+  landAttempts: number;
 }
 
 export function emptyWork(): WorkDoc {
@@ -48,6 +59,10 @@ export function emptyWork(): WorkDoc {
     discoveries: 0,
     lastFire: null,
     flags: [],
+    fix: null,
+    history: [],
+    review: null,
+    landAttempts: 0,
   };
 }
 

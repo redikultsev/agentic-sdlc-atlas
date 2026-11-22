@@ -1,0 +1,8 @@
+# An author who is not trusted and no approval: pipeline:needs-approval, the run ends.
+reconcile: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, state: none }
+trust: { proceed: false, author: "visitor", reason: "stub: `visitor` is not a trusted author and nobody approved the request" }
+enter: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, go: false, ask: false }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7" }
+  expect: completed
+  reached: [reconcile, trust, enter]

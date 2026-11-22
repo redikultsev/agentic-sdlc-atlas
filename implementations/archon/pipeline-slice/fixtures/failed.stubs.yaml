@@ -1,0 +1,6 @@
+# The Implementer could not finish (a test it cannot make pass): the slice ends
+# failed(reason); passing sibling branches are kept by the round.
+prepare: {"branch": "pipeline/7-slice-item", "start": "fixturestart", "continued": false, "progress": ".pipeline/work/7/progress/item.md", "has_progress": false, "brief": "stub brief", "id": "item"}
+implement: {"status": "failed", "branch": "pipeline/7-slice-item", "steps_skipped": ["integration tests: no database on this host"], "discoveries": [], "scope_question": null, "reason": "stub: the parser test still fails", "summary": "stub: added the import command with tests"}
+commit: {"status": "failed", "reason": "stub: the parser test still fails", "branch": "pipeline/7-slice-item", "head": null, "steps_skipped": ["integration tests: no database on this host"], "discoveries": [], "summary": "stub: added the import command with tests"}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7", "slice": "{\"id\": \"item\", \"issue\": 7, \"branch\": \"pipeline/7-slice-item\", \"item_branch\": \"pipeline/7\", \"base\": \"main\", \"progress\": \".pipeline/work/7/progress/item.md\", \"brief\": \"stub\", \"fix\": false}"}, "expect": "completed", "authored": "failed", "reached": ["prepare", "implement", "commit"]}

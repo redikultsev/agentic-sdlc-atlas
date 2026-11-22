@@ -1,0 +1,21 @@
+# The issue is already in SpecReview: reconcile stops with a request instead of triaging over it.
+reconcile:
+  ok: false
+  reason: "stub: #7 is spec-review; this stage starts only from none or triaging"
+  question: "stub: #7: the triage stage stopped instead of overwriting what it found."
+  options: [{ id: stop, label: "Stop this run", does: "Ends this run and changes nothing.", value: { effect: stop } }]
+  recommendation: { option: stop, why: "stub", confidence: high }
+  state: spec-review
+enter:
+  ok: false
+  reason: "stub: #7 is spec-review"
+  question: "stub: #7: the triage stage stopped instead of overwriting what it found."
+  options: [{ id: stop, label: "Stop this run", does: "Ends this run and changes nothing.", value: { effect: stop } }]
+  recommendation: { option: stop, why: "stub", confidence: high }
+  go: false
+  ask: true
+stop: { decision: stop, text: "", value: { effect: stop } }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7" }
+  expect: completed
+  reached: [reconcile, enter, stop]

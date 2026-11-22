@@ -1,0 +1,30 @@
+# The summary waits for the Operator: the run pauses at the request.
+metrics:
+  week: 2026-W47
+  window: { since: "2026-11-16T00:00:00Z", until: "2026-11-23T00:00:00Z" }
+  numbers:
+    operator_minutes_per_item: 22.5
+    done_without_help: 0.5
+    fix_rounds_to_green: 1.33
+    prs_merged_share: 0.75
+    rollbacks: 1
+    cost_per_merged_change: 3.1
+    follow_rate: [{ type: merge, asked: 4, answered: 4, followed: 3, rate: 0.75 }]
+  counts: { items: 6, done: 2, merged: 3, closed_unmerged: 1, cost_unknown_runs: 0 }
+  cases:
+    - { item: 7, state: done, rounds: 2, changes: 1 }
+    - { item: 8, state: blocked, rounds: 3, changes: 0 }
+  notes: ["operator minutes are an upper bound: the engine does not expose when a wait opened"]
+retro: { proposals: [], summary: "stub: nothing repeated twice" }
+file: { filed: [], dropped: [{ title: "stub: one-off", why: "rests on 1 known case(s); a lesson needs two" }] }
+summary:
+  question: "stub: Weekly summary 2026-W47"
+  options:
+    - { id: noted, label: Send to Triage, does: "Leaves the proposal issues as they are.", value: { effect: noted } }
+    - { id: hold, label: Hold the proposals, does: "Adds pipeline:needs-approval to them.", value: { effect: hold } }
+  recommendation: { option: noted, why: "stub: Triage judges each", confidence: medium }
+  filed: []
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo }
+  expect: paused
+  reached: [metrics, retro, file, summary]

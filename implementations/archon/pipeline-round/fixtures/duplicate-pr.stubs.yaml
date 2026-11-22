@@ -1,0 +1,9 @@
+# Another open PR mentions the item: the run pauses on park / verify / continue
+# before anything is built.
+reconcile: {"ok": true, "state": "triage-review", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
+reconcile-ruling: {"go": true}
+rounds: {"go": true, "at_cap": false, "rounds": 0, "ask": false, "question": "", "options": [], "recommendation": null}
+route: {"hits": [9], "ask": true, "question": "stub: #7: 1 other PR mentions this item.", "options": [{"id": "park", "label": "Park the item", "does": "Ends this run.", "value": {"effect": "park"}}, {"id": "verify", "label": "Verify #9 instead", "does": "Takes PR #9 as this item's change.", "value": {"effect": "verify", "pr": 9}}, {"id": "continue", "label": "Build it anyway", "does": "Implements it.", "value": {"effect": "continue", "ruled": [9]}}], "recommendation": {"option": "verify", "why": "stub: recommended", "confidence": "medium"}}
+route-ruling: {"mode": "implement", "pr": null}
+base-ruling: {"go": true}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "paused", "reached": ["reconcile", "rounds", "route"]}

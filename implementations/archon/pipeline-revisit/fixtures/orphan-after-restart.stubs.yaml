@@ -1,0 +1,14 @@
+# After a restart #7 is Implementing with no live run, no queued start and no question:
+# it is flagged. #9 also has no run, but its last fire is queued in work/9: it counts as
+# live and is left alone (the stub records only #7).
+blocked: { checked: 0, notified: [], errors: [] }
+orphans:
+  orphans: [{ item: 7, state: implementing, flagged: true }]
+  stopped: []
+  cost_unknown: []
+  errors: []
+stale: { checked: 2, failing: [], set_aside: [], restored: [], errors: [] }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo }
+  expect: completed
+  reached: [blocked, orphans, stale]

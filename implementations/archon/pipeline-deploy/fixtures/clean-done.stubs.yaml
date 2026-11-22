@@ -1,0 +1,21 @@
+# A clean window: the item goes Live, the Watcher reads clean numbers, the window ends, Done.
+reconcile: { mode: watch, state: merge-review, pr: 12, reason: "stub: PR 12 merged" }
+deploy: { deployed: true, ok: true, at: "2026-11-20T10:00:00Z", hook: "./deploy.sh", note: deployed by the hook, window_minutes: 30 }
+state: { state: live }
+signals:
+  coverage: full
+  ended: true
+  health: { deploy_ok: true }
+  signals: []
+  window: { deployed_at: "2026-11-20T10:00:00Z", now: "2026-11-20T10:31:00Z", ends_at: "2026-11-20T10:30:00Z", ended: true, elapsed_minutes: 31 }
+  excluded: []
+  pr: 12
+  files: [{ path: src/orders.ts, status: modified }]
+  patches: ""
+watcher: { verdict: clean, coverage: full, reason: "stub: errors 0.2/min before and after", evidence: [{ signal: errors, before: 0.2, after: 0.2, note: flat }], confidence: high }
+act: { result: done, stop: true, coverage: full, revert_pr: null, fire: "", reason: "stub: clean" }
+outcome: { result: done, coverage: full, summary: "stub: #7 is Done", question: "", options: [], recommendation: null }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", pipeline_merge_binding: /srv/bindings/pipeline-merge.json }
+  expect: completed
+  reached: [reconcile, deploy, state, signals, watcher, act, outcome]

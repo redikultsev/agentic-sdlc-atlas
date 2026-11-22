@@ -1,0 +1,14 @@
+# The guard refuses a git command the project's own tests run (trial 29), and no bindings
+# directory was given: the report fails and names the refusal; bindings read as not run.
+repo: { host: github.com, path: example/repo, source: origin remote }
+labels: { ok: true, total: 23, created: [], existing: [state:triaging], failed: [] }
+access: { ok: true, host: github.com, login: acme-bot, expected_login: "", login_matches: null, repo_error: null, error: null }
+bindings: { ok: null, dir: "", declared: [pipeline-poll], found: [], missing: [], problems: ["bindings_dir is not set: the check did not run"] }
+codex: { configured: false, provider: null, model: null, credential: null, notes: ["no @review alias: the review node falls back to its tier"] }
+tests: { ran: true, ok: false, command: bun test, guard: true, where: { git: /opt/guard/git, gh: null }, exit: 1, timed_out: false, refusals: ["guard: refused git push in a test fixture"], tail: [], note: ran through the guard }
+report: { pack: agentic-pipeline, ok: false, report: "stub: the guard refused git push in the test suite" }
+fixture:
+  inputs: {}
+  expect: completed
+  authored: failed
+  reached: [repo, labels, access, bindings, codex, tests, report]

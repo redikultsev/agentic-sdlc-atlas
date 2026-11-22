@@ -1,0 +1,3 @@
+# The label is not Verifying or MergeReview: the run asks instead of merging.
+reconcile: {"ok": false, "state": "implementing", "problems": ["stub"], "ask": true, "question": "stub: #7: the label and the record disagree.", "options": [{"id": "stop", "label": "Stop this run", "does": "Ends the run.", "value": {"effect": "stop"}}], "recommendation": {"option": "stop", "why": "stub", "confidence": "medium"}}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "paused", "reached": ["reconcile"]}

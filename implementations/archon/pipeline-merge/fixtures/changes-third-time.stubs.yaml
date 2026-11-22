@@ -1,0 +1,10 @@
+# "Changes" was already used 3 times: the card offers back to the plan instead; the
+# Operator takes it, the item moves to Planning and pipeline-plan is fired.
+reconcile: {"ok": true, "state": "verifying", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
+reconcile-ruling: {"go": true}
+rules: {"path": "gate", "r0": false, "reasons": ["merge_lane is manual"], "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "stale": [], "ask": true, "question": "stub: Merge PR #11 for #7 at abc1234def56?", "options": [{"id": "merge", "label": "Merge at abc1234def56", "does": "Merges PR #11 pinned to head abc1234def5678, after updating it on the latest main and green CI; it deploys at once. A different head is refused.", "value": {"effect": "merge", "head": "abc1234def5678", "fingerprint": "fixtureprint"}}, {"id": "back-to-plan", "label": "Back to the plan", "does": "\"Changes\" was used 3 times; moves the item to Planning.", "value": {"effect": "back-to-plan"}}], "recommendation": {"option": "merge", "why": "stub", "confidence": "medium"}}
+ruling: {"decision": "back-to-plan", "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "operator": true, "revert": false}
+next: {"did": "pipeline-plan: admitted"}
+merge-review: {"state": "merge-review"}
+merge-gate: {"decision": "back-to-plan", "text": "stub: split the export from the import", "value": {"effect": "back-to-plan"}}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "completed", "reached": ["reconcile", "rules", "merge-review", "ruling", "next"]}

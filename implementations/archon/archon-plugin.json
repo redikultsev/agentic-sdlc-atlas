@@ -3,6 +3,19 @@
   "kind": "workflow-pack",
   "name": "agentic-pipeline",
   "description": "The agentic development pipeline from this repository's model, as an Archon workflow pack",
-  "compatibility": { "archon": ">=0.14.0" },
-  "entrypoints": { "pipeline-ping": "pipeline-ping/pipeline-ping.yaml" }
+  "compatibility": {
+    "archon": ">=0.14.0"
+  },
+  "entrypoints": {
+    "pipeline-poll": "pipeline-poll/pipeline-poll.yaml",
+    "pipeline-triage": "pipeline-triage/pipeline-triage.yaml",
+    "pipeline-spec": "pipeline-spec/pipeline-spec.yaml",
+    "pipeline-plan": "pipeline-plan/pipeline-plan.yaml",
+    "pipeline-round": "pipeline-round/pipeline-round.yaml",
+    "pipeline-merge": "pipeline-merge/pipeline-merge.yaml",
+    "pipeline-deploy": "pipeline-deploy/pipeline-deploy.yaml",
+    "pipeline-revisit": "pipeline-revisit/pipeline-revisit.yaml",
+    "pipeline-retro": "pipeline-retro/pipeline-retro.yaml",
+    "pipeline-ping": "pipeline-ping/pipeline-ping.yaml"
+  }
 }

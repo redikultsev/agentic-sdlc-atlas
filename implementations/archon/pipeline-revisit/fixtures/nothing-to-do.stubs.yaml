@@ -1,0 +1,8 @@
+# A quiet pass: no Blocked item has a closed blocker, nothing is orphaned, every item reads.
+blocked: { checked: 1, notified: [], errors: [] }
+orphans: { orphans: [], stopped: [], cost_unknown: [], errors: [] }
+stale: { checked: 4, failing: [], set_aside: [], restored: [], errors: [] }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo }
+  expect: completed
+  reached: [blocked, orphans, stale]

@@ -12,7 +12,7 @@
 
 import { forge } from 'archon:script';
 import type { Repo } from './repo.ts';
-import { STATES } from './states.ts';
+import { MARKS, STATES } from './states.ts';
 
 export interface Option {
   readonly id: string;
@@ -75,6 +75,9 @@ export function waitingCount(repo: Repo): number {
     const listed = forge('workitem.list', { repo, label });
     for (const item of listed.items) if (item.kind === 'issue' && item.state === 'open') numbers.add(item.ref.number);
   }
+  // A set-aside item waits for nobody: it frees its place.
+  const aside = forge('workitem.list', { repo, label: MARKS.setAside });
+  for (const item of aside.items) numbers.delete(item.ref.number);
   return numbers.size;
 }
 

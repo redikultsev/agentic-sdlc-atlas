@@ -1,0 +1,8 @@
+# Edited after approval: the label is removed, a comment, pipeline:needs-approval; the run ends.
+reconcile: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, state: none }
+trust: { proceed: false, author: "visitor", reason: "stub: the body changed after approval (approved 0123456789abcdef, now fedcba9876543210)" }
+enter: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, go: false, ask: false }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7" }
+  expect: completed
+  reached: [reconcile, trust, enter]

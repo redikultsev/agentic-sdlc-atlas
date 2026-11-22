@@ -1,0 +1,14 @@
+# Every check passes: labels ensured, gh access as the pipeline login, every binding file
+# found, Codex configured, the test suite green through the guard.
+repo: { host: github.com, path: example/repo, source: inputs }
+labels: { ok: true, total: 23, created: [state:triaging], existing: [], failed: [] }
+access: { ok: true, host: github.com, login: acme-bot, expected_login: acme-bot, login_matches: true, repo_error: null, error: null }
+bindings: { ok: true, dir: /srv/bindings, declared: [pipeline-poll], found: [pipeline-poll], missing: [], problems: [] }
+codex: { configured: true, provider: codex, model: gpt-codex, credential: CODEX_API_KEY, notes: [] }
+tests: { ran: true, ok: true, command: bun test, guard: true, where: { git: /opt/guard/git, gh: /opt/guard/gh }, exit: 0, timed_out: false, refusals: [], tail: [], note: ran through the guard }
+report: { pack: agentic-pipeline, ok: true, report: "stub: every check passed" }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, bindings_dir: /srv/bindings }
+  expect: completed
+  authored: succeeded
+  reached: [repo, labels, access, bindings, codex, tests, report]

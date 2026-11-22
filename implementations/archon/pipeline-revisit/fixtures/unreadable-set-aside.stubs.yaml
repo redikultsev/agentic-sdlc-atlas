@@ -1,0 +1,14 @@
+# #6 failed its second read in a row: it is set aside. #3 read again after being set
+# aside: it is restored.
+blocked: { checked: 0, notified: [], errors: [] }
+orphans: { orphans: [], stopped: [], cost_unknown: [], errors: [] }
+stale:
+  checked: 2
+  failing: [{ item: 6, failures: 2, why: "tracker: rate limited" }]
+  set_aside: [6]
+  restored: [3]
+  errors: []
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo }
+  expect: completed
+  reached: [blocked, orphans, stale]

@@ -1,0 +1,8 @@
+# The revert PR is red on the latest base: it is never sent to an implementation round;
+# the run pauses on the landing request.
+reconcile: {"ok": true, "state": "verifying", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
+reconcile-ruling: {"go": true}
+rules: {"path": "revert", "r0": false, "reasons": [], "pr": 12, "head": "abc1234def5678", "fingerprint": "", "stale": [], "ask": false, "question": "", "options": [], "recommendation": null}
+ruling: {"decision": "merge", "pr": 12, "head": "abc1234def5678", "fingerprint": "", "operator": false, "revert": true}
+land: {"outcome": "stuck", "head": "abc1234def5678", "detail": "stub: the revert PR #12 did not land (red)", "merge_commit": null, "attempts": 0, "ask": true, "question": "stub: landing gave up after 3 branch updates.", "options": [{"id": "retry", "label": "Try landing again", "does": "Starts the merge step again.", "value": {"effect": "retry"}}, {"id": "round", "label": "Back to a round", "does": "Starts a round.", "value": {"effect": "round"}}, {"id": "hold", "label": "Hold", "does": "Ends this run.", "value": {"effect": "hold"}}], "recommendation": {"option": "retry", "why": "stub", "confidence": "low"}}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "paused", "reached": ["reconcile", "rules", "ruling", "land"]}

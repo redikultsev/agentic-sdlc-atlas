@@ -1,0 +1,7 @@
+# The revert this pipeline opened has merged: its deploy runs and nothing is watched (decision 26), no state moves.
+reconcile: { mode: revert, state: rolled-back, pr: 13, reason: "stub: PR 13 is the revert" }
+deploy: { deployed: true, ok: true, at: "2026-11-20T10:40:00Z", hook: "./deploy.sh", note: deployed by the hook, window_minutes: 30 }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", pipeline_merge_binding: /srv/bindings/pipeline-merge.json }
+  expect: completed
+  reached: [reconcile, deploy]

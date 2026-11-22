@@ -1,0 +1,7 @@
+# The Operator answers "stop" to the mismatch: nothing runs and nothing is fired.
+reconcile: {"ok": false, "state": "spec-review", "problems": ["stub"], "ask": true, "question": "stub: #7: the label and the record disagree.", "options": [{"id": "proceed", "label": "Continue from verifying", "does": "Takes the label as the truth.", "value": {"effect": "proceed"}}, {"id": "stop", "label": "Stop this run", "does": "Ends the run.", "value": {"effect": "stop"}}], "recommendation": {"option": "stop", "why": "stub: recommended", "confidence": "medium"}}
+reconcile-ruling: {"go": false}
+round: {"outcome": "none", "spent": false, "rounds": 0, "effect": "", "summary": "stub: none", "ask": false, "question": "", "options": [], "recommendation": null}
+next: {"did": "nothing"}
+reconcile-ask: {"decision": "stop", "text": "", "value": {"effect": "stop"}}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "completed", "reached": ["reconcile", "round", "next"]}

@@ -1,0 +1,9 @@
+# The base is red beyond the known failure ids: the run pauses on the red-base request
+# before any agent works.
+reconcile: {"ok": true, "state": "triage-review", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
+reconcile-ruling: {"go": true}
+rounds: {"go": true, "at_cap": false, "rounds": 0, "ask": false, "question": "", "options": [], "recommendation": null}
+route: {"hits": [], "ask": false, "question": "", "options": [], "recommendation": null}
+route-ruling: {"mode": "implement", "pr": null}
+base: {"go": false, "commit": "fixturebase", "failing": ["test/a.test.ts > parses"], "fresh": ["test/a.test.ts > parses"], "ask": true, "question": "stub: #7: the base main at fixturebase is red beyond the known failures.", "options": [{"id": "wait", "label": "Wait for the base", "does": "Ends this run.", "value": {"effect": "wait"}}, {"id": "except", "label": "Except these ids", "does": "Records 1 id as inherited.", "value": {"effect": "except", "ids": ["test/a.test.ts > parses"], "commit": "fixturebase"}}, {"id": "for-human", "label": "For a human", "does": "Moves the item to ForHuman.", "value": {"effect": "for-human"}}], "recommendation": {"option": "wait", "why": "stub: recommended", "confidence": "medium"}}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "paused", "reached": ["reconcile", "rounds", "route", "base"]}

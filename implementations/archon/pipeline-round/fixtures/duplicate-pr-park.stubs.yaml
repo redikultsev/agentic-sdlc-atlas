@@ -1,0 +1,11 @@
+# The Operator parks the item: the run ends and nothing is fired.
+reconcile: {"ok": true, "state": "triage-review", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
+reconcile-ruling: {"go": true}
+rounds: {"go": true, "at_cap": false, "rounds": 0, "ask": false, "question": "", "options": [], "recommendation": null}
+route: {"hits": [9], "ask": true, "question": "stub: #7: 1 other PR mentions this item.", "options": [{"id": "park", "label": "Park the item", "does": "Ends this run.", "value": {"effect": "park"}}, {"id": "verify", "label": "Verify #9 instead", "does": "Takes PR #9 as this item's change.", "value": {"effect": "verify", "pr": 9}}, {"id": "continue", "label": "Build it anyway", "does": "Implements it.", "value": {"effect": "continue", "ruled": [9]}}], "recommendation": {"option": "verify", "why": "stub: recommended", "confidence": "medium"}}
+route-ruling: {"mode": "stop", "pr": null}
+verifying: {"go": false, "pr": 0, "head": "", "branch": "", "fingerprint": "", "criteria": [], "has_criteria": false, "spec": ""}
+round: {"outcome": "none", "spent": false, "rounds": 0, "effect": "", "summary": "stub: none", "ask": false, "question": "", "options": [], "recommendation": null}
+next: {"did": "nothing"}
+route-ask: {"decision": "park", "text": "", "value": {"effect": "park"}}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "completed", "reached": ["reconcile", "rounds", "route", "verifying", "round", "next"]}

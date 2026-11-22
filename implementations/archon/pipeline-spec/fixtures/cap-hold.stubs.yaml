@@ -1,0 +1,7 @@
+# Three other items wait for the Operator: the stage holds (a five-minute wait) before Specifying.
+reconcile: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, state: specifying }
+count: { under: false, waiting: 3, cap: 3 }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", pipeline_plan_binding: /bindings/pipeline-plan.yaml }
+  expect: paused
+  reached: [reconcile, count]

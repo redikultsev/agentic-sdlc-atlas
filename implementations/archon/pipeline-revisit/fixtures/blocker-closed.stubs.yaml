@@ -1,0 +1,8 @@
+# #5 is Blocked by #4, which closed: one comment tells the Operator the cause is gone.
+blocked: { checked: 1, notified: [{ item: 5, blockers: [4] }], errors: [] }
+orphans: { orphans: [], stopped: [], cost_unknown: [], errors: [] }
+stale: { checked: 1, failing: [], set_aside: [], restored: [], errors: [] }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo }
+  expect: completed
+  reached: [blocked, orphans, stale]
