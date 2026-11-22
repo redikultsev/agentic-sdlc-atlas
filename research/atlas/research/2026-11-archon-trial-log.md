@@ -169,6 +169,15 @@ The owner's point: a person or a local Claude Code session runs this repository'
     - **Fix.** Global packaged workflows instead: Archon keeps a clone of this repository at `/.archon/src/agentic-sdlc-atlas` and `rsync`s `implementations/archon/` to `/.archon/workflows/agentic-pipeline/`. The install check `pipeline-ping` validated and ran from there (2026-11-22). The same day the repository went public and `archon plugin add` installed the tag; the copy was removed.
     - **For our pack.** Updating the pack is a pull plus a copy on the server, not `archon plugin update`; versions are atlas commits. An upstream candidate: read the manifest through the same authenticated `git fetch` the tree already uses.
 
+33. **An installed pack dispatches only its entrypoints as child runs.**
+    - **What happened.** `pipeline-round` fans out `pipeline-slice` as a `workflow:` child. As a project pack it validated; installed with `archon plugin add` it failed: "only entrypoints are dispatchable". A local stand with the pack under the project's `.archon/workflows/` does not catch it.
+    - **Fix.** `pipeline-slice` is listed in `archon-plugin.json` entrypoints (v0.1.1).
+    - **For our pack.** Validate the installed form on the server before every tag goes live, not only the project form on the stand.
+34. **`archon workflow test` skips a symlinked pack.**
+    - **What happened.** With the pack linked into a test project, `workflow test` said "No fixtures found": fixture discovery checks `Dirent.isDirectory()`, which is false for a symlink. Validation follows the link, so the gap is silent.
+    - **Fix.** The stand copies the pack into a plain directory before every test run.
+    - **For our pack.** An upstream candidate: follow symlinks in fixture discovery, or warn when a workflow folder is a link.
+
 ## Merge safety
 
 24. **Agents get the full GitHub token.**
