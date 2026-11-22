@@ -1,22 +1,22 @@
 {
   "schemaVersion": 1,
   "kind": "workflow-pack",
-  "name": "agentic-pipeline",
-  "description": "The agentic development pipeline from this repository's model, as an Archon workflow pack",
+  "name": "unify-sdlc",
+  "description": "Unify SDLC: the agentic development pipeline from this repository's model, as an Archon workflow pack",
   "compatibility": {
     "archon": ">=0.14.0"
   },
   "entrypoints": {
-    "pipeline-poll": "pipeline-poll/pipeline-poll.yaml",
-    "pipeline-triage": "pipeline-triage/pipeline-triage.yaml",
-    "pipeline-spec": "pipeline-spec/pipeline-spec.yaml",
-    "pipeline-plan": "pipeline-plan/pipeline-plan.yaml",
-    "pipeline-round": "pipeline-round/pipeline-round.yaml",
-    "pipeline-merge": "pipeline-merge/pipeline-merge.yaml",
-    "pipeline-deploy": "pipeline-deploy/pipeline-deploy.yaml",
-    "pipeline-revisit": "pipeline-revisit/pipeline-revisit.yaml",
-    "pipeline-retro": "pipeline-retro/pipeline-retro.yaml",
-    "pipeline-ping": "pipeline-ping/pipeline-ping.yaml",
-    "pipeline-slice": "pipeline-slice/pipeline-slice.yaml"
+    "unify-poll": "unify-poll/unify-poll.yaml",
+    "unify-triage": "unify-triage/unify-triage.yaml",
+    "unify-spec": "unify-spec/unify-spec.yaml",
+    "unify-plan": "unify-plan/unify-plan.yaml",
+    "unify-round": "unify-round/unify-round.yaml",
+    "unify-merge": "unify-merge/unify-merge.yaml",
+    "unify-deploy": "unify-deploy/unify-deploy.yaml",
+    "unify-revisit": "unify-revisit/unify-revisit.yaml",
+    "unify-retro": "unify-retro/unify-retro.yaml",
+    "unify-ping": "unify-ping/unify-ping.yaml",
+    "unify-slice": "unify-slice/unify-slice.yaml"
   }
 }

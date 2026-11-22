@@ -35,7 +35,7 @@ export interface WorkDoc {
   /** Where the last fire of the next step went: admitted, queued, skipped or unknown. */
   lastFire: { what: string; disposition: string; at: string } | null;
   flags: string[];
-  /** The fix the next round must make (findings, failing ids), set by pipeline-round. */
+  /** The fix the next round must make (findings, failing ids), set by unify-round. */
   fix: unknown;
   /** One line per round: when, what failed, findings count, for the Blocked trend (decision 37). */
   history: unknown[];

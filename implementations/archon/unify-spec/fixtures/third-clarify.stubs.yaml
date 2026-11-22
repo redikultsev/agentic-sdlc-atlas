@@ -1,0 +1,27 @@
+# After a third clarify no fourth draft is written: the card is a request (approve as is
+# or stop); the Operator stops and the item stays in SpecReview.
+reconcile: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, state: specifying }
+count: { under: true, waiting: 1, cap: 3 }
+enter: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, go: true, ask: false }
+gather: { context: "stub: <untrusted source=\"issue #7 body\">Add CSV export</untrusted>", size: M }
+questions: { needed: false, questions: [], message: "" }
+answers: { text: "" }
+prev-ruling: { go: false, over: true, mismatch: "", clarify: 3, correction: "stub: still not right", rulings: "stub: three rulings" }
+review:
+  ok: true
+  reason: ""
+  question: "stub: #7: three clarify rounds are used. Approve the last spec as it is, or stop?"
+  options:
+    - { id: approve, label: "Approve the last spec as it is", does: "Moves the item to Planning.", value: { effect: approve } }
+    - { id: stop, label: "Stop here", does: "Ends this run; the item stays in SpecReview.", value: { effect: stop } }
+  recommendation: { option: stop, why: "stub", confidence: medium }
+  over: true
+  url: "https://github.com/example/repo/tree/pipeline/7/.pipeline/work/7"
+  criteria: []
+  problems: []
+spec-gate: { decision: stop, text: "", value: { effect: stop } }
+apply: { effect: stop, fired: "", summary: "stub: #7: stop (stop)" }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", unify_plan_binding: /bindings/unify-plan.yaml }
+  expect: completed
+  reached: [prev-ruling, review, apply]

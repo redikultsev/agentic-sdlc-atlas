@@ -63,7 +63,7 @@ Archon's bundled SDLC pack read in full and compared stage by stage: [2026-11-ar
 
 ## The pack (2026-11-22–23)
 
-The Archon implementation is written: `implementations/archon/`, spec `implementations/archon/SPEC.md` (two design-review passes, 49 findings decided). Eleven workflows, shared modules for states, the item document, rulings, decision requests, trust, policy, fingerprints and chaining; 84 stub fixtures pass; installed on the trial server at `archon-pack-v0.1.1` and every workflow validates there. Nothing has run live yet.
+Unify SDLC, the Archon implementation, is written: `implementations/archon/`, spec `implementations/archon/SPEC.md` (two design-review passes, 49 findings decided). Eleven workflows, shared modules for states, the item document, rulings, decision requests, trust, policy, fingerprints and chaining; 84 stub fixtures pass; installed on the trial server at `unify-sdlc-v0.2.0` and every workflow validates there. Nothing has run live yet.
 
 Before the first live run: the project's `.pipeline/` files (base, check, trusted authors, auto-merge rules) in the trial repository; the binding files (`archon pack bindings`) and the two timers; Codex credentials for the cross-family reviewer; the owner's call on a fine-grained token for the trial repository (SPEC "Known gaps"); `pipeline-ping` green on the server.
 

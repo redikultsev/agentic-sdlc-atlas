@@ -1,0 +1,20 @@
+# Inside the window with clean numbers so far: the pass ends at the 5-minute timed wait, and the run pauses there.
+reconcile: { mode: watch, state: merge-review, pr: 12, reason: "stub: PR 12 merged" }
+deploy: { deployed: true, ok: true, at: "2026-11-20T10:00:00Z", hook: "./deploy.sh", note: deployed by the hook, window_minutes: 30 }
+state: { state: live }
+signals:
+  coverage: full
+  ended: false
+  health: { deploy_ok: true }
+  signals: []
+  window: { deployed_at: "2026-11-20T10:00:00Z", now: "2026-11-20T10:31:00Z", ends_at: "2026-11-20T10:30:00Z", ended: false, elapsed_minutes: 31 }
+  excluded: []
+  pr: 12
+  files: [{ path: src/orders.ts, status: modified }]
+  patches: ""
+watcher: { verdict: clean, coverage: full, reason: "stub: flat so far", evidence: [], confidence: medium }
+act: { result: continue, stop: false, coverage: full, revert_pr: null, fire: "", reason: "stub: keep watching" }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", unify_merge_binding: /srv/bindings/unify-merge.json }
+  expect: paused
+  reached: [reconcile, deploy, state, signals, watcher, act]

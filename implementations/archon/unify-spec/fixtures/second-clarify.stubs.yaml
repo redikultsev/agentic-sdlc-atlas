@@ -1,0 +1,34 @@
+# The round after a second clarify: counted (2 of 3), a new draft, back at SpecReview.
+reconcile: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, state: specifying }
+count: { under: true, waiting: 1, cap: 3 }
+enter: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, go: true, ask: false }
+gather: { context: "stub: <untrusted source=\"issue #7 body\">Add CSV export</untrusted>", size: M }
+questions: { needed: false, questions: [], message: "" }
+answers: { text: "" }
+prev-ruling: { go: true, over: false, mismatch: "", clarify: 2, correction: "stub: exports must respect the page filters", rulings: "stub: two rulings" }
+interviewer:
+  title: "stub: CSV export of the report"
+  summary: "stub: the report page offers a CSV download"
+  criteria:
+    - id: AC1
+      text: "stub: the report page has a CSV download"
+      examples: [{ given: "a report with 3 rows", when: "the user clicks Download CSV", then: "a file with a header and 3 rows downloads" }]
+  not_in_scope: ["stub: Excel export"]
+  assumptions: [{ text: "stub: UTF-8 with a header row", source: "the request" }]
+  decisions: []
+  open_points: []
+commit-spec: { commit: "abc1234", branch: "pipeline/7", path: ".pipeline/work/7/spec.md", url: "https://github.com/example/repo/blob/abc1234/.pipeline/work/7/spec.md", criteria: [AC1], problems: [] }
+review:
+  ok: true
+  reason: ""
+  question: "stub: #7: approve this spec, or answer other with what to clarify?"
+  options: [{ id: approve, label: "Approve the spec", does: "Moves the item to Planning and starts the plan stage.", value: { effect: approve } }]
+  recommendation: { option: approve, why: "stub", confidence: medium }
+  over: false
+  url: "https://github.com/example/repo/blob/abc1234/.pipeline/work/7/spec.md"
+  criteria: [AC1]
+  problems: []
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", unify_plan_binding: /bindings/unify-plan.yaml }
+  expect: paused
+  reached: [prev-ruling, interviewer, commit-spec, review]

@@ -1,0 +1,21 @@
+# A regression in this PR: act reverts it and fires unify-merge for the revert, the loop ends at once, RolledBack with a report and a new issue.
+reconcile: { mode: watch, state: merge-review, pr: 12, reason: "stub: PR 12 merged" }
+deploy: { deployed: true, ok: true, at: "2026-11-20T10:00:00Z", hook: "./deploy.sh", note: deployed by the hook, window_minutes: 30 }
+state: { state: live }
+signals:
+  coverage: full
+  ended: false
+  health: { deploy_ok: true }
+  signals: []
+  window: { deployed_at: "2026-11-20T10:00:00Z", now: "2026-11-20T10:31:00Z", ends_at: "2026-11-20T10:30:00Z", ended: false, elapsed_minutes: 31 }
+  excluded: []
+  pr: 12
+  files: [{ path: src/orders.ts, status: modified }]
+  patches: ""
+watcher: { verdict: regression-in-this-pr, coverage: full, reason: "stub: order errors 0.1 -> 4.0/min, from src/orders.ts", evidence: [{ signal: order-errors, before: 0.1, after: 4.0, note: "src/orders.ts" }], confidence: high }
+act: { result: rolled-back, stop: true, coverage: full, revert_pr: 13, fire: "unify-merge: admitted", reason: "stub: regression" }
+outcome: { result: rolled-back, coverage: full, summary: "stub: #7 is RolledBack; revert #13; new item #14", question: "", options: [], recommendation: null }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", unify_merge_binding: /srv/bindings/unify-merge.json }
+  expect: completed
+  reached: [reconcile, deploy, state, signals, watcher, act, outcome]

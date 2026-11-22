@@ -6,7 +6,7 @@
  * own pack does, so no script guesses a file name. Chain bindings use `overlap: queue`:
  * a fire from a run that is still ending waits for it. The delivery id is built from
  * values a retry repeats, so one decision starts at most one run. What happened to the
- * fire is recorded in `work/<n>`; pipeline-revisit finds a fire that did not start.
+ * fire is recorded in `work/<n>`; unify-revisit finds a fire that did not start.
  */
 
 import { input, trigger } from 'archon:script';

@@ -1,8 +1,0 @@
-# A verdict no longer carries the current diff fingerprint: nothing merges; a round
-# re-runs the stale checks.
-reconcile: {"ok": true, "state": "verifying", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
-reconcile-ruling: {"go": true}
-rules: {"path": "stale", "r0": false, "reasons": ["stale: review"], "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "stale": ["review"], "ask": false, "question": "", "options": [], "recommendation": null}
-ruling: {"decision": "stale", "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "operator": false, "revert": false}
-next: {"did": "pipeline-round: queued"}
-fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "completed", "reached": ["reconcile", "rules", "ruling", "next"]}

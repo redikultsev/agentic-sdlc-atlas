@@ -1,7 +1,0 @@
-# The label says Implementing: nothing deploys, the item is flagged for the Operator.
-reconcile: { mode: stop, state: implementing, pr: 12, reason: "stub: #7 is implementing" }
-flag: { ok: false, summary: "stub: deploy not started" }
-fixture:
-  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", pipeline_merge_binding: /srv/bindings/pipeline-merge.json }
-  expect: completed
-  reached: [reconcile, flag]

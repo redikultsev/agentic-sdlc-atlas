@@ -1,0 +1,15 @@
+# A running round past the total time limit is cancelled, a paused one past the cost limit
+# abandoned, each counted as one failed round in work/<n>.
+blocked: { checked: 0, notified: [], errors: [] }
+orphans:
+  orphans: []
+  stopped:
+    - { item: 7, run: run-a, workflow: unify-round, action: cancel, why: "ran 75 min, over the 60 min limit", ok: true, detail: "" }
+    - { item: 8, run: run-b, workflow: unify-plan, action: abandon, why: "cost $12.40, over the $10 limit", ok: true, detail: "" }
+  cost_unknown: [{ item: 9, run: run-c }]
+  errors: []
+stale: { checked: 3, failing: [], set_aside: [], restored: [], errors: [] }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo }
+  expect: completed
+  reached: [blocked, orphans, stale]

@@ -2,7 +2,7 @@
  * What Archon's forge does not offer, through the GitHub API with the host's `gh`:
  * listing issues by what they lack, sub-issues, "blocked by" links, PR search, and
  * updating a PR branch. Works only where the container's `gh` is logged in or the run has
- * Archon's App token; pipeline-ping checks it before anything relies on it.
+ * Archon's App token; unify-ping checks it before anything relies on it.
  */
 
 import type { IssueRef, Repo } from './repo.ts';

@@ -1,0 +1,17 @@
+# A slice branch conflicts with the item branch: the join aborts, nothing is pushed
+# or verified, the round counts it and fires the next round to resolve it.
+reconcile: {"ok": true, "state": "triage-review", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
+reconcile-ruling: {"go": true}
+rounds: {"go": true, "at_cap": false, "rounds": 0, "ask": false, "question": "", "options": [], "recommendation": null}
+route: {"hits": [], "ask": false, "question": "", "options": [], "recommendation": null}
+route-ruling: {"mode": "implement", "pr": null}
+base: {"go": true, "commit": "fixturebase", "failing": [], "fresh": [], "ask": false, "question": "", "options": [], "recommendation": null}
+base-ruling: {"go": true}
+implementing: {"ok": true, "mode": "implement", "branch": "pipeline/7"}
+frontier: {"slices": [{"id": "item", "issue": 7, "title": "stub: add the import command", "brief": "stub brief", "branch": "pipeline/7-slice-item", "item_branch": "pipeline/7", "base": "main", "progress": ".pipeline/work/7/progress/item.md", "work_dir": ".pipeline/work/7", "fix": false}], "left": 0, "fix": false}
+slices: [{"status": "pushed", "reason": "", "branch": "pipeline/7-slice-item", "head": "fixtureslice", "steps_skipped": [], "discoveries": [], "summary": "stub: added the command"}]
+join: {"go": false, "outcome": "conflict", "pushed": [], "failed": [{"id": "item", "reason": "merge conflict with pipeline/7: CONFLICT (content)"}], "steps_skipped": [], "discoveries": [], "summaries": ["item: stub"], "head": "fixturehead"}
+verifying: {"go": false, "pr": 0, "head": "", "branch": "", "fingerprint": "", "criteria": [], "has_criteria": false, "spec": ""}
+round: {"outcome": "fix", "spent": true, "rounds": 1, "effect": "", "summary": "stub: fix", "ask": false, "question": "", "options": [], "recommendation": null}
+next: {"did": "unify-round: queued"}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "completed", "reached": ["reconcile", "rounds", "route", "base", "implementing", "frontier", "slices", "join", "verifying", "round", "next"]}

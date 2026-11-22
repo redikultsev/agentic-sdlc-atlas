@@ -1,0 +1,8 @@
+# A new issue under the cap: triage starts on it.
+pick: { found: true, number: 7, delivery: "unify-triage:github.com/example/repo#7", title: "stub: add export", passed: 0 }
+cap: { go: true, waiting: 1, cap: 3 }
+fire: { fired: 7, disposition: "unify-triage: admitted" }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, unify_triage_binding: /bindings/unify-triage.yaml }
+  expect: completed
+  reached: [pick, cap, fire]

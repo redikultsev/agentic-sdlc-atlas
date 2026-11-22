@@ -1,9 +1,0 @@
-# The deploy step opened revert PR #12 for a regression (decision 26): it merges with
-# no gate, through land's head, update and CI checks, while the item is Live; deploy is fired.
-reconcile: {"ok": true, "state": "live", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
-reconcile-ruling: {"go": true}
-rules: {"path": "revert", "r0": false, "reasons": ["a revert merges without the gate (decision 26)"], "pr": 12, "head": "abc1234def5678", "fingerprint": "", "stale": [], "ask": false, "question": "", "options": [], "recommendation": null}
-ruling: {"decision": "merge", "pr": 12, "head": "abc1234def5678", "fingerprint": "", "operator": false, "revert": true}
-land: {"outcome": "merged", "head": "abc1234def5678", "detail": "stub: merged", "merge_commit": "fixturemerge", "attempts": 0, "ask": false, "question": "", "options": [], "recommendation": null}
-next: {"did": "pipeline-deploy: admitted"}
-fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "completed", "reached": ["reconcile", "reconcile-ruling", "rules", "ruling", "land", "next"]}

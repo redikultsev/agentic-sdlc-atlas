@@ -1,5 +1,5 @@
-# The agentic-pipeline pack: settings, the forge operations its scripts call, and the
-# trigger bindings. A project sets the settings in `.archon/packs/redikultsev.agentic-pipeline.yaml`
+# The unify-sdlc pack: settings, the forge operations its scripts call, and the
+# trigger bindings. A project sets the settings in `.archon/packs/redikultsev.unify-sdlc.yaml`
 # under `settings:`. Nothing here starts a run: the Operator writes the binding files once
 # with `archon pack bindings` (see ../SPEC.md, "Settings and setup per project").
 
@@ -61,8 +61,8 @@ forge:
 # waits for it instead of being dropped. Timers use overlap: skip. Each binding passes the
 # paths of the bindings its workflow may fire as `<name>_binding` inputs.
 bindings:
-  pipeline-poll:
-    workflow: pipeline-poll
+  unify-poll:
+    workflow: unify-poll
     resource: intake
     capacity: 1
     overlap: skip
@@ -70,10 +70,10 @@ bindings:
     inputs:
       repo_host: { repo: host }
       repo_path: { repo: path }
-      pipeline_triage_binding: { binding: pipeline-triage }
+      unify_triage_binding: { binding: unify-triage }
 
-  pipeline-triage:
-    workflow: pipeline-triage
+  unify-triage:
+    workflow: unify-triage
     resource: triage
     capacity: 5
     overlap: queue
@@ -81,11 +81,11 @@ bindings:
     inputs:
       repo_host: { repo: host }
       repo_path: { repo: path }
-      pipeline_spec_binding: { binding: pipeline-spec }
-      pipeline_round_binding: { binding: pipeline-round }
+      unify_spec_binding: { binding: unify-spec }
+      unify_round_binding: { binding: unify-round }
 
-  pipeline-spec:
-    workflow: pipeline-spec
+  unify-spec:
+    workflow: unify-spec
     resource: spec
     capacity: 5
     overlap: queue
@@ -93,10 +93,10 @@ bindings:
     inputs:
       repo_host: { repo: host }
       repo_path: { repo: path }
-      pipeline_plan_binding: { binding: pipeline-plan }
+      unify_plan_binding: { binding: unify-plan }
 
-  pipeline-plan:
-    workflow: pipeline-plan
+  unify-plan:
+    workflow: unify-plan
     resource: plan
     capacity: 5
     overlap: queue
@@ -104,10 +104,10 @@ bindings:
     inputs:
       repo_host: { repo: host }
       repo_path: { repo: path }
-      pipeline_round_binding: { binding: pipeline-round }
+      unify_round_binding: { binding: unify-round }
 
-  pipeline-round:
-    workflow: pipeline-round
+  unify-round:
+    workflow: unify-round
     resource: round
     capacity: 3
     overlap: queue
@@ -116,12 +116,12 @@ bindings:
     inputs:
       repo_host: { repo: host }
       repo_path: { repo: path }
-      pipeline_round_binding: { binding: pipeline-round }
-      pipeline_plan_binding: { binding: pipeline-plan }
-      pipeline_merge_binding: { binding: pipeline-merge }
+      unify_round_binding: { binding: unify-round }
+      unify_plan_binding: { binding: unify-plan }
+      unify_merge_binding: { binding: unify-merge }
 
-  pipeline-merge:
-    workflow: pipeline-merge
+  unify-merge:
+    workflow: unify-merge
     resource: merge
     capacity: 1
     overlap: queue
@@ -129,13 +129,13 @@ bindings:
     inputs:
       repo_host: { repo: host }
       repo_path: { repo: path }
-      pipeline_round_binding: { binding: pipeline-round }
-      pipeline_plan_binding: { binding: pipeline-plan }
-      pipeline_merge_binding: { binding: pipeline-merge }
-      pipeline_deploy_binding: { binding: pipeline-deploy }
+      unify_round_binding: { binding: unify-round }
+      unify_plan_binding: { binding: unify-plan }
+      unify_merge_binding: { binding: unify-merge }
+      unify_deploy_binding: { binding: unify-deploy }
 
-  pipeline-deploy:
-    workflow: pipeline-deploy
+  unify-deploy:
+    workflow: unify-deploy
     resource: deploy
     capacity: 1
     overlap: queue
@@ -143,10 +143,10 @@ bindings:
     inputs:
       repo_host: { repo: host }
       repo_path: { repo: path }
-      pipeline_merge_binding: { binding: pipeline-merge }
+      unify_merge_binding: { binding: unify-merge }
 
-  pipeline-revisit:
-    workflow: pipeline-revisit
+  unify-revisit:
+    workflow: unify-revisit
     resource: revisit
     overlap: skip
     schedule: { interval_seconds: 900 }
@@ -154,8 +154,8 @@ bindings:
       repo_host: { repo: host }
       repo_path: { repo: path }
 
-  pipeline-retro:
-    workflow: pipeline-retro
+  unify-retro:
+    workflow: unify-retro
     resource: retro
     overlap: skip
     schedule: { interval_seconds: 604800 }

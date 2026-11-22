@@ -1,0 +1,10 @@
+# "Changes" with a comment: a ruling and the next round's fix, counted in `changes`,
+# not in rounds; a round is fired and land does not run.
+reconcile: {"ok": true, "state": "verifying", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
+reconcile-ruling: {"go": true}
+rules: {"path": "gate", "r0": false, "reasons": ["merge_lane is manual"], "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "stale": [], "ask": true, "question": "stub: Merge PR #11 for #7 at abc1234def56?", "options": [{"id": "merge", "label": "Merge at abc1234def56", "does": "Merges PR #11 pinned to head abc1234def5678, after updating it on the latest main and green CI; it deploys at once. A different head is refused.", "value": {"effect": "merge", "head": "abc1234def5678", "fingerprint": "fixtureprint"}}, {"id": "changes", "label": "Changes", "does": "Sends your comment to the Implementer.", "value": {"effect": "changes"}}], "recommendation": {"option": "merge", "why": "stub", "confidence": "medium"}}
+ruling: {"decision": "changes", "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "operator": true, "revert": false}
+next: {"did": "unify-round: queued"}
+merge-review: {"state": "merge-review"}
+merge-gate: {"decision": "changes", "text": "stub: name the flag --dry-run", "value": {"effect": "changes"}}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "completed", "reached": ["reconcile", "rules", "merge-review", "ruling", "next"]}

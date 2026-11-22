@@ -1,0 +1,36 @@
+name: unify-revisit
+description: |
+  The periodic check over items the pipeline holds, every 900 seconds, item-less. Tells a
+  Blocked item when its blocker closed; flags items in an agent state that nothing is
+  working (no live run, no queued start, no open question) with a comment and
+  `pipeline:needs-attention`; cancels or abandons runs past the project's total time or
+  cost limit and counts one round; and sets aside items after two failed reads in a row.
+
+  Use when: its timer binding starts it. NOT for: working an item (every other
+  pipeline-* workflow).
+
+inputs:
+  repo_host:
+    required: true
+    description: The forge host of the repository.
+  repo_path:
+    required: true
+    description: The owner/name path of the repository.
+
+# Reads the tracker and the engine and writes only there: no checkout is touched.
+worktree: { enabled: false }
+mutates_checkout: false
+
+# The three checks are independent: one failing does not stop the others.
+nodes:
+  - id: blocked
+    script: blocked
+    runtime: bun
+
+  - id: orphans
+    script: orphans
+    runtime: bun
+
+  - id: stale
+    script: stale
+    runtime: bun

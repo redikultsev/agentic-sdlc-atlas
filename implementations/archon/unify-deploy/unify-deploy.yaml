@@ -1,0 +1,213 @@
+name: unify-deploy
+description: |
+  Deploy and watch one merged item (decision 26). Runs the project's deploy hook, moves the
+  item to Live, then watches it for the project's window: every 5 minutes a script
+  computes before/after numbers for the project's signals (other deploys' minutes left
+  out), the Watcher agent reads them, and a script acts. A regression in this PR is
+  reverted at once (the revert goes to unify-merge and its deploy is not watched
+  again), then RolledBack with a report and a new issue with the evidence. A clean window
+  is Done (health-only coverage noted). When unsure, the Operator decides.
+
+  Use when: unify-merge fires it after a merge. NOT for: merging (unify-merge), or
+  watching a change that did not go through the pipeline.
+
+inputs:
+  repo_host:
+    required: true
+    description: The forge host of the repository.
+  repo_path:
+    required: true
+    description: The owner/name path of the repository.
+  number:
+    required: true
+    description: The work item's issue number.
+  unify_merge_binding:
+    default: ""
+    description: The absolute path of the unify-merge fire-only binding file; a revert is sent to merge through it.
+
+# Runs in the launch checkout: the deploy hook deploys the merged base, not an item branch.
+worktree: { enabled: false }
+
+nodes:
+  - id: reconcile
+    script: reconcile
+    runtime: bun
+    output_format:
+      type: object
+      properties:
+        mode: { type: string, enum: [watch, revert, stop] }
+        state: { type: string }
+        pr: { type: [integer, 'null'] }
+        reason: { type: string }
+      required: [mode, state, pr, reason]
+
+  # Label and record disagree: nothing deploys, the item is put in front of the Operator.
+  - id: flag
+    script: flag
+    runtime: bun
+    depends_on: [reconcile]
+    when: "$reconcile.output.mode == 'stop'"
+    with:
+      reason: "$reconcile.output.reason"
+
+  - id: deploy
+    script: deploy
+    runtime: bun
+    depends_on: [reconcile]
+    when: "$reconcile.output.mode != 'stop'"
+    with:
+      mode: "$reconcile.output.mode"
+      pr: "$reconcile.output.pr"
+    output_format:
+      type: object
+      properties:
+        deployed: { type: boolean }
+        ok: { type: boolean }
+        at: { type: string }
+        hook: { type: [string, 'null'] }
+        note: { type: string }
+        window_minutes: { type: number }
+      required: [deployed, ok, at, hook, note, window_minutes]
+
+  - id: state
+    script: state
+    runtime: bun
+    depends_on: [reconcile, deploy]
+    when: "$reconcile.output.mode == 'watch'"
+
+  # One pass every 5 minutes until the window ends or the Watcher's call ends it. The
+  # timed wait is the body's only terminal sink; it is skipped on the pass that ends the
+  # watch, so the loop ends without waiting again.
+  - id: watch
+    depends_on: [reconcile, deploy, state]
+    loop_group:
+      max_iterations: 288
+      on_exhausted: complete
+      fresh_context: true
+      until_bash: 'result=$act.output.result; [ "$result" != continue ]'
+      nodes:
+        - id: signals
+          script: signals
+          runtime: bun
+          with:
+            pr: "$reconcile.output.pr"
+            deployed_at: "$deploy.output.at"
+            deploy_ok: "$deploy.output.ok"
+          output_format:
+            type: object
+            properties:
+              coverage: { type: string, enum: [full, health-only] }
+              ended: { type: boolean }
+              health: { type: object }
+              signals: { type: array, items: { type: object } }
+              window: { type: object }
+              excluded: { type: array, items: { type: object } }
+              pr: { type: [integer, 'null'] }
+              files: { type: array, items: { type: object } }
+              patches: { type: string }
+            required: [coverage, ended, health, signals, window, excluded, pr, files, patches]
+
+        - id: watcher
+          command: watcher
+          depends_on: [signals]
+          model: ['@watcher', medium]
+          idle_timeout: 600000
+          maxBudgetUsd: 1
+          with:
+            signals: { from: "$signals.output" }
+          output_format:
+            type: object
+            additionalProperties: false
+            properties:
+              verdict: { type: string, enum: [clean, regression-in-this-pr, unclear, unsure] }
+              coverage: { type: string, enum: [full, health-only] }
+              reason: { type: string }
+              evidence:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    signal: { type: string }
+                    before: { type: [number, 'null'] }
+                    after: { type: [number, 'null'] }
+                    note: { type: string }
+                  required: [signal, before, after, note]
+              confidence: { type: string, enum: [low, medium, high] }
+            required: [verdict, coverage, reason, evidence, confidence]
+
+        - id: act
+          script: act
+          runtime: bun
+          depends_on: [signals, watcher]
+          with:
+            pr: "$reconcile.output.pr"
+            watcher: { from: "$watcher.output" }
+            ended: "$signals.output.ended"
+            coverage: "$signals.output.coverage"
+          output_format:
+            type: object
+            properties:
+              result: { type: string, enum: [continue, done, rolled-back, unsure] }
+              stop: { type: boolean }
+              coverage: { type: string }
+              revert_pr: { type: [integer, 'null'] }
+              fire: { type: string }
+              reason: { type: string }
+            required: [result, stop, coverage, revert_pr, fire, reason]
+
+        - id: pause
+          depends_on: [act]
+          when: "$act.output.result == 'continue'"
+          wait:
+            duration_ms: 300000
+
+  - id: outcome
+    script: outcome
+    runtime: bun
+    depends_on: [reconcile, watch]
+    with:
+      pr: "$reconcile.output.pr"
+    output_format:
+      type: object
+      properties:
+        result: { type: string, enum: [done, rolled-back, unsure] }
+        coverage: { type: string }
+        summary: { type: string }
+        question: { type: string }
+        options:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              label: { type: string }
+              does: { type: string }
+              value: { type: object }
+            required: [id, label, does, value]
+        recommendation: { type: [object, 'null'] }
+      required: [result, coverage, summary, question, options, recommendation]
+
+  # The Watcher is unsure: the Operator decides. The run pauses and gives its slot back.
+  - id: ask
+    depends_on: [outcome]
+    when: "$outcome.output.question != ''"
+    wait:
+      attention: "$outcome.output.question"
+      form: select
+      options: "$outcome.output.options"
+      other: true
+      recommendation: "$outcome.output.recommendation"
+      labels:
+        gate: watch
+        item: "issue-$INPUTS.number"
+
+  - id: answer
+    script: answer
+    runtime: bun
+    depends_on: [reconcile, ask]
+    with:
+      pr: "$reconcile.output.pr"
+      decision: "$ask.output.decision"
+      text: "$ask.output.text"
+      value: "$ask.output.value"

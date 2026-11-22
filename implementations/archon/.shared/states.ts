@@ -94,7 +94,7 @@ export function moveState(ref: IssueRef, expected: readonly From[], to: State): 
   if (after !== to) throw new Error(`#${ref.number} reads ${after} after the move to ${to}`);
 }
 
-/** Pipeline labels besides the states; all are ensured at install by pipeline-ping. */
+/** Pipeline labels besides the states; all are ensured at install by unify-ping. */
 export const MARKS = {
   approved: 'pipeline:approved',
   needsApproval: 'pipeline:needs-approval',

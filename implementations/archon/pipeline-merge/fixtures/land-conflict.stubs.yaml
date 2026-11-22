@@ -1,9 +1,0 @@
-# The PR conflicts with the latest base at landing: the conflict becomes the next
-# round's fix and a round is fired.
-reconcile: {"ok": true, "state": "verifying", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
-reconcile-ruling: {"go": true}
-rules: {"path": "r0", "r0": true, "reasons": [], "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "stale": [], "ask": false, "question": "", "options": [], "recommendation": null}
-ruling: {"decision": "merge", "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "operator": false, "revert": false}
-land: {"outcome": "conflict", "head": "abc1234def5678", "detail": "stub: conflicts with main", "merge_commit": null, "attempts": 0, "ask": false, "question": "", "options": [], "recommendation": null}
-next: {"did": "pipeline-round: queued"}
-fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "completed", "reached": ["reconcile", "reconcile-ruling", "rules", "ruling", "land", "next"]}

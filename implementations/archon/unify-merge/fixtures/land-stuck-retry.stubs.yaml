@@ -1,0 +1,9 @@
+# The Operator retries a stuck landing: the attempts reset and merge is fired again.
+reconcile: {"ok": true, "state": "verifying", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
+reconcile-ruling: {"go": true}
+rules: {"path": "r0", "r0": true, "reasons": [], "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "stale": [], "ask": false, "question": "", "options": [], "recommendation": null}
+ruling: {"decision": "merge", "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "operator": false, "revert": false}
+land: {"outcome": "stuck", "head": "abc1234def5678", "detail": "stub: merged", "merge_commit": null, "attempts": 3, "ask": true, "question": "stub: landing gave up after 3 branch updates.", "options": [{"id": "retry", "label": "Try landing again", "does": "Starts the merge step again.", "value": {"effect": "retry"}}, {"id": "round", "label": "Back to a round", "does": "Starts a round.", "value": {"effect": "round"}}, {"id": "hold", "label": "Hold", "does": "Ends this run.", "value": {"effect": "hold"}}], "recommendation": {"option": "retry", "why": "stub", "confidence": "low"}}
+next: {"did": "unify-merge: queued"}
+land-ask: {"decision": "retry", "text": "", "value": {"effect": "retry"}}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7", "unify_merge_binding": "/bindings/unify-merge.yaml"}, "expect": "completed", "reached": ["reconcile", "reconcile-ruling", "rules", "ruling", "land", "next"]}
