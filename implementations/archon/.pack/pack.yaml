@@ -1,0 +1,163 @@
+# The agentic-pipeline pack: settings, the forge operations its scripts call, and the
+# trigger bindings. A project sets the settings in `.archon/packs/redikultsev.agentic-pipeline.yaml`
+# under `settings:`. Nothing here starts a run: the Operator writes the binding files once
+# with `archon pack bindings` (see ../SPEC.md, "Settings and setup per project").
+
+inputs:
+  base:
+    type: string
+    default: main
+    description: >-
+      The branch changes merge into and policy is read from (`.pipeline/*` on it, never on
+      an item's branch).
+  implement_lane:
+    type: enum
+    values: [auto, manual]
+    default: auto
+    description: >-
+      auto: an accepted item starts implementing by itself. manual: every Implementer start
+      is a decision request with a recommendation (decision 40).
+  merge_lane:
+    type: enum
+    values: [auto, manual]
+    default: manual
+    description: >-
+      auto: a PR the auto-merge rules match merges without the Operator (R0). manual: every
+      PR goes to the Merge gate (decision 40). Starts manual until the rules are measured.
+  pipeline_login:
+    type: string
+    default: ""
+    description: >-
+      The forge login the pipeline acts as. Its approval comments count; a marker in any
+      other untrusted comment is ignored.
+
+forge:
+  repository: { host: repo_host, path: repo_path }
+  operations:
+    - workitem.view
+    - workitem.list
+    - workitem.comments
+    - workitem.create
+    - workitem.close
+    - workitem.comment.upsert
+    - workitem.label.add
+    - workitem.label.remove
+    - repo.label.ensure
+    - repo.file
+    - pr.view
+    - pr.create
+    - pr.edit-body
+    - pr.ready
+    - pr.draft
+    - pr.files
+    - pr.merge
+    - pr.merge-state
+    - pr.threads
+    - pr.thread.reply
+    - checks.state
+    - checks.commit
+
+# Chain bindings (fire-only) use overlap: queue, so a fire from a run that is still ending
+# waits for it instead of being dropped. Timers use overlap: skip. Each binding passes the
+# paths of the bindings its workflow may fire as `<name>_binding` inputs.
+bindings:
+  pipeline-poll:
+    workflow: pipeline-poll
+    resource: intake
+    capacity: 1
+    overlap: skip
+    schedule: { interval_seconds: 300 }
+    inputs:
+      repo_host: { repo: host }
+      repo_path: { repo: path }
+      pipeline_triage_binding: { binding: pipeline-triage }
+
+  pipeline-triage:
+    workflow: pipeline-triage
+    resource: triage
+    capacity: 5
+    overlap: queue
+    item: { field: number, prefix: issue- }
+    inputs:
+      repo_host: { repo: host }
+      repo_path: { repo: path }
+      pipeline_spec_binding: { binding: pipeline-spec }
+      pipeline_round_binding: { binding: pipeline-round }
+
+  pipeline-spec:
+    workflow: pipeline-spec
+    resource: spec
+    capacity: 5
+    overlap: queue
+    item: { field: number, prefix: issue- }
+    inputs:
+      repo_host: { repo: host }
+      repo_path: { repo: path }
+      pipeline_plan_binding: { binding: pipeline-plan }
+
+  pipeline-plan:
+    workflow: pipeline-plan
+    resource: plan
+    capacity: 5
+    overlap: queue
+    item: { field: number, prefix: issue- }
+    inputs:
+      repo_host: { repo: host }
+      repo_path: { repo: path }
+      pipeline_round_binding: { binding: pipeline-round }
+
+  pipeline-round:
+    workflow: pipeline-round
+    resource: round
+    capacity: 3
+    overlap: queue
+    isolation: { kind: worktree }
+    item: { field: number, prefix: issue- }
+    inputs:
+      repo_host: { repo: host }
+      repo_path: { repo: path }
+      pipeline_round_binding: { binding: pipeline-round }
+      pipeline_plan_binding: { binding: pipeline-plan }
+      pipeline_merge_binding: { binding: pipeline-merge }
+
+  pipeline-merge:
+    workflow: pipeline-merge
+    resource: merge
+    capacity: 1
+    overlap: queue
+    item: { field: number, prefix: issue- }
+    inputs:
+      repo_host: { repo: host }
+      repo_path: { repo: path }
+      pipeline_round_binding: { binding: pipeline-round }
+      pipeline_plan_binding: { binding: pipeline-plan }
+      pipeline_deploy_binding: { binding: pipeline-deploy }
+
+  pipeline-deploy:
+    workflow: pipeline-deploy
+    resource: deploy
+    capacity: 1
+    overlap: queue
+    item: { field: number, prefix: issue- }
+    inputs:
+      repo_host: { repo: host }
+      repo_path: { repo: path }
+      pipeline_merge_binding: { binding: pipeline-merge }
+
+  pipeline-revisit:
+    workflow: pipeline-revisit
+    resource: revisit
+    overlap: skip
+    schedule: { interval_seconds: 900 }
+    inputs:
+      repo_host: { repo: host }
+      repo_path: { repo: path }
+
+  pipeline-retro:
+    workflow: pipeline-retro
+    resource: retro
+    overlap: skip
+    schedule: { interval_seconds: 604800 }
+    inputs:
+      repo_host: { repo: host }
+      repo_path: { repo: path }
