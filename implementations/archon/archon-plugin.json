@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "kind": "workflow-pack",
+  "name": "agentic-pipeline",
+  "description": "The agentic development pipeline from this repository's model, as an Archon workflow pack",
+  "compatibility": { "archon": ">=0.14.0" },
+  "entrypoints": { "pipeline-ping": "pipeline-ping/pipeline-ping.yaml" }
+}

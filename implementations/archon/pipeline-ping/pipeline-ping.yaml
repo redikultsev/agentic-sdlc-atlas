@@ -1,0 +1,7 @@
+name: pipeline-ping
+description: "Install check for the agentic-pipeline pack: one bash node, no agent, no writes."
+worktree: { enabled: false }
+mutates_checkout: false
+nodes:
+  - id: ping
+    bash: "echo '{\"pack\":\"agentic-pipeline\",\"ok\":true}'"
