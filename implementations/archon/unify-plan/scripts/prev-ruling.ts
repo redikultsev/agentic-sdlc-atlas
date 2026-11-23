@@ -12,7 +12,8 @@
  * becomes a stop request. Emits `{ go, over, mismatch, redo, correction, rulings }`.
  */
 
-import { emit, forge, input, refuse, runId } from 'archon:script';
+import { emit, input, refuse, runId } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { selfLogin } from '../../.shared/github.ts';
 import { runInputs } from '../../.shared/repo.ts';
 import { recordRuling } from '../../.shared/rulings.ts';

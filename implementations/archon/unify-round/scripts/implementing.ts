@@ -4,7 +4,8 @@
  * the found PR, which becomes this item's PR.
  */
 
-import { emit, forge, input } from 'archon:script';
+import { emit, input } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { itemBranch } from '../../.shared/repo.ts';
 import { moveState } from '../../.shared/states.ts';
 import { bound, run, updateItem } from './lib/item.ts';

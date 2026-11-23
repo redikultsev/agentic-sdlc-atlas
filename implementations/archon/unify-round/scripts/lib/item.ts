@@ -5,7 +5,8 @@
  * `unify-merge/scripts/lib/item.ts`; it belongs in `.shared/` once the pack takes it.
  */
 
-import { forge, refuse } from 'archon:script';
+import { refuse } from 'archon:script';
+import { forge } from '../../../.shared/forge.ts';
 import { nullableJson, isObject } from '../../../.shared/inputs.ts';
 import type { IssueRef } from '../../../.shared/repo.ts';
 import { buildRequest, type Option, type Request } from '../../../.shared/request.ts';

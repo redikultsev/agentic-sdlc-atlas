@@ -25,7 +25,8 @@
  * Bound inputs: the workflow's INPUTS_REPO_HOST, INPUTS_REPO_PATH and INPUTS_SINCE.
  */
 
-import { emit, forge, input, refuse, state } from 'archon:script';
+import { emit, input, refuse, state } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { isObject } from '../../.shared/inputs.ts';
 import { repoOf } from '../../.shared/repo.ts';
 import { stateOf } from '../../.shared/states.ts';

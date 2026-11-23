@@ -4,7 +4,8 @@
  * (and the pipeline's own login) is passed only as marked data. Nothing here resolves a thread.
  */
 
-import { emit, forge, input } from 'archon:script';
+import { emit, input } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { trustedAuthors } from '../../.shared/policy.ts';
 import { isTrusted, untrusted } from '../../.shared/trust.ts';
 import { run } from './lib/item.ts';

@@ -8,7 +8,8 @@
  * Bound inputs: INPUTS_HOST and INPUTS_PATH from the repo node.
  */
 
-import { emit, forge, input, refuse } from 'archon:script';
+import { emit, input, refuse } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { repoOf } from '../../.shared/repo.ts';
 import { MARKS, STATES } from '../../.shared/states.ts';
 

@@ -7,7 +7,8 @@
  * At most 3 update attempts across runs, then a request.
  */
 
-import { emit, forge, input } from 'archon:script';
+import { emit, input } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { updatePrBranch } from '../../.shared/github.ts';
 import { projectPolicy } from '../../.shared/policy.ts';
 import { bound, buildRequest, card, findingKey, NO_CARD, readItem, run, updateItem, type Card, type Finding } from './lib/item.ts';

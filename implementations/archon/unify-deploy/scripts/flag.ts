@@ -7,7 +7,8 @@
  * INPUTS_REASON from reconcile.
  */
 
-import { emit, forge, input, refuse, runId } from 'archon:script';
+import { emit, input, refuse, runId } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { itemNumber, repoOf } from '../../.shared/repo.ts';
 
 const NEEDS_ATTENTION = 'pipeline:needs-attention';

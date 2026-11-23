@@ -8,7 +8,8 @@
  * Bound inputs: the workflow's INPUTS_REPO_HOST and INPUTS_REPO_PATH.
  */
 
-import { emit, forge, input, refuse } from 'archon:script';
+import { emit, input, refuse } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { repoOf } from '../../.shared/repo.ts';
 import { STATES } from '../../.shared/states.ts';
 import { blockedBy, message, openWithLabel } from './lib.ts';

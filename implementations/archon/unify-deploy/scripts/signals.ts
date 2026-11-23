@@ -24,7 +24,8 @@
  * deploy nodes.
  */
 
-import { emit, forge, input, refuse, runId } from 'archon:script';
+import { emit, input, refuse, runId } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { projectPolicy } from '../../.shared/policy.ts';
 import { itemNumber, repoOf } from '../../.shared/repo.ts';
 import { untrusted } from '../../.shared/trust.ts';

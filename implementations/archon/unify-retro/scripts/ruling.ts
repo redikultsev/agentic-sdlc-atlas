@@ -10,7 +10,8 @@
  * wait.
  */
 
-import { emit, forge, input, refuse, state } from 'archon:script';
+import { emit, input, refuse, state } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { nullableJson, record } from '../../.shared/inputs.ts';
 import { repoOf } from '../../.shared/repo.ts';
 import { MARKS } from '../../.shared/states.ts';

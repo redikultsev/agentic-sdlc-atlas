@@ -12,7 +12,8 @@
  * card (the loop's output: the last card, with its slices). Emits `{ effect, slices, fired, summary }`.
  */
 
-import { emit, forge, input, refuse, runId } from 'archon:script';
+import { emit, input, refuse, runId } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { fireNext } from '../../.shared/fire.ts';
 import { addBlockedBy, addSubIssue } from '../../.shared/github.ts';
 import { runInputs } from '../../.shared/repo.ts';

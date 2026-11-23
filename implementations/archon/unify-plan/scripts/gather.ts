@@ -7,7 +7,8 @@
  * Emits `{ context, spec, criteria, base_commit, size }`.
  */
 
-import { emit, forge, input, refuse } from 'archon:script';
+import { emit, input, refuse } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { git, gitOrThrow } from '../../.shared/git.ts';
 import { selfLogin } from '../../.shared/github.ts';
 import { trustedAuthors } from '../../.shared/policy.ts';

@@ -9,7 +9,8 @@
  * INPUTS_CASES from metrics; INPUTS_RETRO, the agent's proposals.
  */
 
-import { emit, forge, input, refuse } from 'archon:script';
+import { emit, input, refuse } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { repoOf } from '../../.shared/repo.ts';
 import { MARKS } from '../../.shared/states.ts';
 import { message } from './lib.ts';

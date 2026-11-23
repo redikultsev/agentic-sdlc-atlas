@@ -9,7 +9,8 @@
  * takes it.
  */
 
-import { forge, outcomes } from 'archon:script';
+import { outcomes } from 'archon:script';
+import { forge } from './forge.ts';
 import { git, gitOrThrow } from './git.ts';
 import type { IssueRef, Repo } from './repo.ts';
 import { buildRequest, type Request } from './request.ts';

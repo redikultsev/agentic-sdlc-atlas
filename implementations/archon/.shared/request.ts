@@ -10,7 +10,7 @@
  * Operator state.
  */
 
-import { forge } from 'archon:script';
+import { forge } from './forge.ts';
 import type { Repo } from './repo.ts';
 import { MARKS, STATES } from './states.ts';
 

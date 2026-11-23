@@ -7,7 +7,7 @@
  */
 
 import { createHash } from 'node:crypto';
-import { forge } from 'archon:script';
+import { forge } from './forge.ts';
 import type { IssueRef } from './repo.ts';
 
 export function digest(text: string): string {

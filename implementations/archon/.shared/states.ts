@@ -5,7 +5,7 @@
  * people), reads it back, and refuses a move from a label it did not expect.
  */
 
-import { forge } from 'archon:script';
+import { forge } from './forge.ts';
 import type { IssueRef } from './repo.ts';
 
 export const STATES = {

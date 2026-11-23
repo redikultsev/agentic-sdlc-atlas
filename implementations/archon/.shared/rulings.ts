@@ -6,7 +6,8 @@
  * the whole project is also appended to the pinned "Pipeline rulings" issue.
  */
 
-import { forge, runId } from 'archon:script';
+import { runId } from 'archon:script';
+import { forge } from './forge.ts';
 import type { IssueRef, Repo } from './repo.ts';
 import { MARKS } from './states.ts';
 

@@ -14,7 +14,8 @@
  * gate (decision 26), and the deploy that follows its merge is not watched again.
  */
 
-import { forge, state } from 'archon:script';
+import { state } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { fireNext } from '../../.shared/fire.ts';
 import type { IssueRef, Repo } from '../../.shared/repo.ts';
 import { moveState } from '../../.shared/states.ts';

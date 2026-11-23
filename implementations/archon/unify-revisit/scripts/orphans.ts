@@ -20,7 +20,8 @@
  * INPUTS_BASE.
  */
 
-import { emit, forge, input, refuse } from 'archon:script';
+import { emit, input, refuse } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { projectPolicy } from '../../.shared/policy.ts';
 import { itemKey, repoOf } from '../../.shared/repo.ts';
 import { STATES, type State } from '../../.shared/states.ts';

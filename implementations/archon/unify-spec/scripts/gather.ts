@@ -6,7 +6,8 @@
  * Inputs: repo_host, repo_path, number, base, pipeline_login. Emits `{ context, size }`.
  */
 
-import { emit, forge, input, refuse } from 'archon:script';
+import { emit, input, refuse } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { selfLogin } from '../../.shared/github.ts';
 import { trustedAuthors } from '../../.shared/policy.ts';
 import { runInputs } from '../../.shared/repo.ts';

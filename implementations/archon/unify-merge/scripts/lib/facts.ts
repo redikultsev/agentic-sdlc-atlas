@@ -4,7 +4,7 @@
  * Every value comes in as an argument: scripts read their inputs as literal `input()`.
  */
 
-import { forge } from 'archon:script';
+import { forge } from '../../../.shared/forge.ts';
 import { git, gitOrThrow } from '../../../.shared/git.ts';
 import { itemBranch, repoOf, type IssueRef, type Repo } from '../../../.shared/repo.ts';
 

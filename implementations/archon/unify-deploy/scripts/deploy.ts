@@ -14,7 +14,8 @@
  * pack setting INPUTS_BASE; INPUTS_MODE and INPUTS_PR from reconcile.
  */
 
-import { emit, forge, input, refuse, runId } from 'archon:script';
+import { emit, input, refuse, runId } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { projectPolicy } from '../../.shared/policy.ts';
 import { itemNumber, repoOf } from '../../.shared/repo.ts';
 import { readDeploy, updateDeploy } from './lib.ts';

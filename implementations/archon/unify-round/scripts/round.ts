@@ -12,7 +12,8 @@
  * findings outside the change are filed as discoveries, at most 3 per item.
  */
 
-import { emit, forge, input, outcomes, runId } from 'archon:script';
+import { emit, input, outcomes, runId } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { isObject } from '../../.shared/inputs.ts';
 import { MARKS } from '../../.shared/states.ts';
 import { untrusted } from '../../.shared/trust.ts';

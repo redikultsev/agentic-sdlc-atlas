@@ -4,7 +4,7 @@
  * R0 kill switch reads (decision 25), through the host's `gh`.
  */
 
-import { forge } from 'archon:script';
+import { forge } from '../../../.shared/forge.ts';
 import { fingerprint } from '../../../.shared/fingerprint.ts';
 import { currentVerdicts } from '../../../.shared/work.ts';
 import type { IssueRef, Repo } from '../../../.shared/repo.ts';

@@ -4,7 +4,8 @@
  * GitHub "blocked by" read that the forge does not offer.
  */
 
-import { forge, items, type ItemWindow } from 'archon:script';
+import { items, type ItemWindow } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { archonCommand } from '../../.shared/host.ts';
 import type { Repo } from '../../.shared/repo.ts';
 

@@ -6,7 +6,8 @@
  * anyone reaches the Implementer only as marked data.
  */
 
-import { emit, forge, input } from 'archon:script';
+import { emit, input } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { projectPolicy } from '../../.shared/policy.ts';
 import { itemBranch } from '../../.shared/repo.ts';
 import { untrusted } from '../../.shared/trust.ts';

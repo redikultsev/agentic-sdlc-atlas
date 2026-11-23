@@ -5,7 +5,8 @@
  * body is written only when it differs; both are read back.
  */
 
-import { emit, forge, input } from 'archon:script';
+import { emit, input } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { bound, readItem, run, updateItem } from './lib/item.ts';
 import { baseName, itemPr, itemRef } from './lib/facts.ts';
 

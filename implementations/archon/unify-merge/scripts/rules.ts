@@ -8,7 +8,8 @@
  * Merge gate with the head SHA on the card, flags first (decision 24).
  */
 
-import { emit, forge, input } from 'archon:script';
+import { emit, input } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { ALWAYS_NEVER, automergeRules, globMatch } from '../../.shared/policy.ts';
 import { buildRequest, card, NO_CARD, readItem, run, type Option } from './lib/item.ts';
 import { baseName, itemRef, prChecks } from './lib/facts.ts';

@@ -9,7 +9,8 @@
  * Inputs: repo_host, repo_path. Emits `{ found, number, delivery, title, passed }`.
  */
 
-import { emit, forge, input, refuse } from 'archon:script';
+import { emit, input, refuse } from 'archon:script';
+import { forge } from '../../.shared/forge.ts';
 import { openIssuesOldestFirst } from '../../.shared/github.ts';
 import { repoOf } from '../../.shared/repo.ts';
 import { MARKS } from '../../.shared/states.ts';
