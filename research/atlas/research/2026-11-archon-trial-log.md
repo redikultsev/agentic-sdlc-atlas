@@ -178,6 +178,13 @@ The owner's point: a person or a local Claude Code session runs this repository'
     - **Fix.** The stand copies the pack into a plain directory before every test run.
     - **For our pack.** An upstream candidate: follow symlinks in fixture discovery, or warn when a workflow folder is a link.
 
+## Unify SDLC, first live run (2026-11-23)
+
+35. **Timer bindings fired nothing.** The binding file names its interval `schedule.intervalSeconds`; our timer loop read `interval_seconds`, found none and skipped every file. Fixed in the loop (compose `timers` config). Archon has no timer of its own on Linux, so the loop is ours to keep right.
+36. **The poll never saw a fresh issue.** It read one page of 100 open issues, oldest first; the trial repository has more, so the labelled issue was never reached. Fixed: every page, and by label on the server side when `intake_label` is set (v0.2.2).
+37. **Every marked comment was refused.** Archon's forge finds a marked comment again by its body's first line and refuses a write whose first line is not exactly the marker. Our scripts put the marker elsewhere. Fixed once for all writes: `.shared/forge.ts` puts the canonical marker on the first line (v0.2.3).
+38. **It reached the Operator.** Triage on the issue: S, R1, root cause at the view switch handler with file and lines, docs to update, a test to add; the evidence check put "no recorded reproduction" on top. Cost $0.17. The Operator accepted from chat; the round started at once.
+
 ## Merge safety
 
 24. **Agents get the full GitHub token.**
