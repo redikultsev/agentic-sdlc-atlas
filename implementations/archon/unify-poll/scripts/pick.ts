@@ -23,7 +23,7 @@ function main(): void {
   const repo = repoOf(input('repo_host'), input('repo_path'));
   const only = (input('intake_label') ?? '').trim();
   let passed = 0;
-  for (const issue of openIssuesOldestFirst(repo)) {
+  for (const issue of openIssuesOldestFirst(repo, only)) {
     const labels = issue.labels.map(l => l.name);
     if (only !== '' && !labels.includes(only)) continue;
     if (labels.some(l => l.startsWith('state:'))) continue;

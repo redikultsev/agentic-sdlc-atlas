@@ -33,10 +33,19 @@ interface GhIssue {
   readonly user: { login: string } | null;
 }
 
-/** Open issues (not PRs), oldest first, one page of up to 100. */
-export function openIssuesOldestFirst(repo: Repo): GhIssue[] {
-  const page = gh([`repos/${repo.path}/issues?state=open&sort=created&direction=asc&per_page=100`]) as GhIssue[];
-  return page.filter(issue => issue.pull_request === undefined);
+/**
+ * Open issues (not PRs), oldest first, every page. With `label`, only issues carrying it
+ * (GitHub filters server-side), which keeps a busy repository to the chosen few.
+ */
+export function openIssuesOldestFirst(repo: Repo, label = ''): GhIssue[] {
+  const filter = label === '' ? '' : `&labels=${encodeURIComponent(label)}`;
+  const all: GhIssue[] = [];
+  for (let page = 1; page <= 50; page++) {
+    const batch = gh([`repos/${repo.path}/issues?state=open&sort=created&direction=asc&per_page=100&page=${page}${filter}`]) as GhIssue[];
+    all.push(...batch);
+    if (batch.length < 100) break;
+  }
+  return all.filter(issue => issue.pull_request === undefined);
 }
 
 /** The REST id of an issue, which the sub-issue and dependency endpoints take. */
