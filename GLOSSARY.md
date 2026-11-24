@@ -49,7 +49,7 @@ The agent proposes size and risk at intake; the Operator may correct them.
 | **Script** | A check or action with no LLM. Same input, same answer | green |
 | **Gate** | A point where nothing moves without the Operator's decision | red |
 | **Store** | Where the state of the work lives outside the agent's head | grey cylinder |
-| **Cross-cutting part** | What every stage runs on: orchestrator, sandbox, traces | light blue |
+| **Cross-cutting part** | What every stage runs on: orchestrator, connector, Supervisor, sandbox, traces | light blue |
 
 ## Part status
 
@@ -95,3 +95,13 @@ The agent proposes size and risk at intake; the Operator may correct them.
 | **Watch window** | How long the Watcher watches a fresh deploy before the work item is Done (30 min by default, longer for R2); one of the checks an environment may declare |
 | **Smoke check** | A real input sent through the system right after a deploy and traced to its result; one of the checks an environment may declare |
 | **Atlas** | The knowledge base in `research/atlas/`: what the world knows about each stage (areas S0–S18, X1–X11) |
+| **Scout** | An agent that looks for work nobody asked for: on a schedule, read-only, over one area the project names, with its own memory and budget. It files findings with evidence and changes nothing; at most 2 of its findings wait untriaged |
+| **Finding** | A problem seen with its evidence and not yet a request: an agent's discovery outside its own task, or what a scout found |
+| **Findings buffer** | Where findings wait in the engine's store. Triage goes through it once a day, or when the Operator says so: one request per group of findings with one cause. An urgent finding skips it |
+| **Code-health measures** | What a project chooses to measure about its code over time (complexity, duplication, size, share of tests), computed by a script: a weekly trend and each change's contribution at the Merge gate. No merge is refused by them |
+| **Red record** | The raw failing output of a new test, run by the Implementer before the implementation: proof that the test checks the change |
+| **Provenance record** | What built and checked a work item: pack version, the model that ran each role, the version of the project map and settings, checks passed and skipped, rounds, time and cost |
+| **Toggle** | A setting that turns shipped code on or off without a deploy. Where a project declares toggles, turning one off is the first rollback |
+| **Supervisor** | The Operator's single interface: one chat agent for all projects. It reads everything and runs every reversible command on the Operator's word; it prepares what needs the Operator's signature and cannot give it |
+| **Operator's signature** | An act that is the Operator's own: a gate answer, starting a release, an irreversible or wide command. It is a control the engine draws, and pressing it reaches the engine past any model |
+| **Standing instruction** | Something the Operator wants done the same way every time. Never remembered by an agent: a rule file the Operator ratifies and code evaluates |

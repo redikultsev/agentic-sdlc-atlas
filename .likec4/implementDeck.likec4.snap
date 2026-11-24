@@ -422,8 +422,8 @@
       ],
       "metadata": {
         "in": "A slice of the plan (for S, the work item) and the code",
-        "does": "Unit tests first, then code; fast checks in the sandbox",
-        "out": "A pushed branch, a PR"
+        "does": "Unit tests first, each seen red, then code; fast checks in the sandbox",
+        "out": "A pushed branch, a PR with the red records"
       },
       "notation": "Agent (LLM)",
       "technology": "Coding agent",

@@ -99,8 +99,9 @@ layout: default
 
 <div class="stg">
 <div class="dg"><likec4-view view-id="intakeDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-<div class="pcs n2">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Triage</p><dl class="eg3"><dt>In</dt><dd>A request, a bug, an alert or a discovery</dd><dt>Does</dt><dd>Investigates on its own: duplicates, already built, rejected before; for a bug, reproduces it and finds the root cause or refutes it; writes down assumptions</dd><dt>Out</dt><dd>Size, risk, assumptions, for a bug its root cause, and an outcome: for agent, for a human, won't do</dd></dl></div>
+<div class="pcs n3">
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Scout</p><dl class="eg3"><dt>In</dt><dd>A schedule, one area the project names, its own memory</dd><dt>Does</dt><dd>Looks for work nobody asked for; changes nothing</dd><dt>Out</dt><dd>Findings with evidence, at most 2 untriaged</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Triage</p><dl class="eg3"><dt>In</dt><dd>A request, a bug, an alert; the findings buffer</dd><dt>Does</dt><dd>Investigates on its own: duplicates, already built, rejected before; for a bug, reproduces it and finds the root cause or refutes it; writes down assumptions</dd><dt>Out</dt><dd>Size, risk, assumptions, for a bug its root cause, and an outcome: for agent, for a human, won't do</dd></dl></div>
   <div class="pc"><div class="pc-top"><span class="pk k-gate">Gate</span><span class="ps">idea</span></div><p class="pn">Accept</p><dl class="eg3"><dt>In</dt><dd>Size, risk, assumptions and the proposed outcome</dd><dt>Does</dt><dd>The Operator accepts, corrects or rejects</dd><dt>Out</dt><dd>Agent: S → Implement, M, L → Spec; or for a human; or won't do</dd></dl></div>
 </div>
 </div>
@@ -158,7 +159,7 @@ layout: default
 <div class="stg">
 <div class="dg"><likec4-view view-id="implementDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs n1">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Implementer</p><dl class="eg3"><dt>In</dt><dd>A slice of the plan (for S, the work item) and the code</dd><dt>Does</dt><dd>Unit tests first, then code; fast checks in the sandbox</dd><dt>Out</dt><dd>A pushed branch, a PR</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">built</span></div><p class="pn">Implementer</p><dl class="eg3"><dt>In</dt><dd>A slice of the plan (for S, the work item) and the code</dd><dt>Does</dt><dd>Unit tests first, each seen red, then code; fast checks in the sandbox</dd><dt>Out</dt><dd>A pushed branch, a PR with the red records</dd></dl></div>
 </div>
 </div>
 
@@ -278,14 +279,15 @@ layout: default
 
 # The engine
 
-<div class="lead">An abstract view of the engine every stage runs on: any engine with these six parts fits</div>
+<div class="lead">An abstract view of the engine every stage runs on: any engine with these parts fits</div>
 
 <div class="stg">
 <div class="dg"><likec4-view view-id="platformDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
-<div class="pcs n6">
+<div class="pcs n7">
   <div class="pc"><div class="pc-top"><span class="pk k-platform">Engine</span><span class="ps">idea</span></div><p class="pn">Orchestrator</p><dl class="eg3"><dt>In</dt><dd>Work items and their state, verdicts, the Operator's answers</dd><dt>Does</dt><dd>Starts agent sessions, moves states, enforces limits</dd><dt>Out</dt><dd>Sessions, states, writes through the connector, decision requests</dd></dl></div>
   <div class="pc"><div class="pc-top"><span class="pk k-platform">Engine</span><span class="ps">planned</span></div><p class="pn">Project connector</p><dl class="eg3"><dt>In</dt><dd>An operation from the Orchestrator or a stage; the project map</dd><dt>Does</dt><dd>Calls the project's tools through MCP, reads back, retries</dd><dt>Out</dt><dd>What was written and read; a refusal as a difference</dd></dl></div>
   <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Setup agent</p><dl class="eg3"><dt>In</dt><dd>A project's MCP servers and repository</dd><dt>Does</dt><dd>Composes and probes the project map</dd><dt>Out</dt><dd>A map and recipes for the Operator to approve</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Supervisor</p><dl class="eg3"><dt>In</dt><dd>The Operator's messages; Pipeline state</dd><dt>Does</dt><dd>Answers, runs reversible commands, prepares what needs a signature</dd><dt>Out</dt><dd>Answers, commands to the Orchestrator, prepared decision requests</dd></dl></div>
   <div class="pc"><div class="pc-top"><span class="pk k-platform">Engine</span><span class="ps">idea</span></div><p class="pn">Sandbox</p><dl class="eg3"><dt>In</dt><dd>A session from the Orchestrator</dd><dt>Does</dt><dd>Isolates the session: closed network, push through a proxy</dd><dt>Out</dt><dd>A pushed branch; nothing else leaves</dd></dl></div>
   <div class="pc"><div class="pc-top"><span class="pk k-platform">Engine</span><span class="ps">idea</span></div><p class="pn">Decision requests</p><dl class="eg3"><dt>In</dt><dd>A gate, a question, a report from any stage</dd><dt>Does</dt><dd>Puts one decision in front of the Operator</dd><dt>Out</dt><dd>The Operator's answer, recorded as a ruling</dd></dl></div>
   <div class="pc"><div class="pc-top"><span class="pk k-platform">Engine</span><span class="ps">idea</span></div><p class="pn">Session traces</p><dl class="eg3"><dt>In</dt><dd>Every agent session</dd><dt>Does</dt><dd>Records steps, time, cost, Operator time</dd><dt>Out</dt><dd>Traces for the Retro and the weekly metrics</dd></dl></div>

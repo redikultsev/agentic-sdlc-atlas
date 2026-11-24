@@ -105,6 +105,19 @@ Problems, in the order they are worked. Each one ends as decisions in `docs/deci
 5. The setup agent as a workflow (`unify-setup`): compose the map, probe it on one test item.
 6. Probe the second project's Jira through its MCP server with a hand-written map: label, a transition with a required field, a comment, read back, the creator field.
 
+**Decided 2026-11-24, later the same day (decisions 55–62; revisions of 20, 26, 31, 48, 53).** Two talks on software factories were read against the model (`research/atlas/research/2026-11-two-talks.md`) and the owner went through eight ideas one by one; for the last one a research swarm of four reports was run (`research/atlas/research/2026-11-supervisor-agent.md`). In the model, the glossary and the deck; **nothing of it is in the pack.**
+
+- **Scouts (55).** Scheduled read-only agents that look for work and file findings with evidence; 2 untriaged findings per scout at most; people's requests first; an outside system files as a trusted author.
+- **Code health (56).** Weekly measures by a script, each change's contribution at the Merge gate, the reviewer proposes verifiable removals, a scout for the worst spot. No gate.
+- **Hard to reverse (57).** No new gate: the Accept request shows the irreversible part when R2 is forecast; spec and plan requests list such decisions first.
+- **Red before green (58).** The Implementer runs each new test before the code and keeps the failing output; the reviewer reads it; required for the test of a bug fix. No separate script and no second run.
+- **Provenance (59).** What built and checked an item, one line at the Merge gate.
+- **Findings buffer (60).** Findings wait in the engine; Triage makes one request per cause, daily or when the Operator says.
+- **Toggles (61).** An optional first rollback.
+- **Supervisor (62).** One chat agent as the Operator's interface: reads and reversible commands free; gate answers and irreversible commands are the Operator's signature, a control the engine draws; rules and its own limits only by PR. Precondition: the engine's write routes check who calls.
+
+Order for the pack, after the six steps above: the provenance record and red records (cheap, inside existing workflows); the findings buffer; a read-only surface of the pipeline state; caller identity on write routes; then the Supervisor and scouts.
+
 **Still open:** one work item across several repositories; the code-host seam for a host the engine does not speak; the move Blocked → Planning missing from `docs/states.md`; pre-existing edges in the model that show the rejected-requests register in the Specs store (decision 44 puts it elsewhere). On the deck, stage slides draw data flows to the stores, not the connector that carries them; the engine slide shows the connector.
 
 ## Next

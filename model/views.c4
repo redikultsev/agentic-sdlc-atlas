@@ -112,8 +112,8 @@ views {
 
   view platform {
     title '10. Cross-cutting parts'
-    description 'What every stage runs on: orchestrator, pipeline state, project connector, sandbox, decision requests, session traces.'
-    include engine.orchestrator, engine.connector, engine.setup, pstate, engine.sandbox, engine.cards, engine.traces, operator, tracker, engine.implement.implementer, engine.learn.retro
+    description 'What every stage runs on: orchestrator, pipeline state, project connector, Supervisor, sandbox, decision requests, session traces.'
+    include engine.orchestrator, engine.connector, engine.setup, engine.supervisor, pstate, engine.sandbox, engine.cards, engine.traces, operator, tracker, engine.implement.implementer, engine.learn.retro
     autoLayout LeftRight
   }
 

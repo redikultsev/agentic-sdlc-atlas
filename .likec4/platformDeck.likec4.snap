@@ -48,7 +48,7 @@
       }
     ]
   },
-  "hash": "_VHoA2FmJ0zmzs-LrgsyZJE70GmjmWg5vKglzglrfvc",
+  "hash": "CQUDgiDqmobk5PhnlJFOqh42mxDbM9IMaBfs6dptUrI",
   "bounds": {
     "x": -140.0,
     "y": -120.0,
@@ -57,11 +57,59 @@
   },
   "nodes": [
     {
+      "id": "engine.supervisor",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1zj7iy"
+      ],
+      "outEdges": [
+        "d7lkt0",
+        "fz6ef1"
+      ],
+      "title": "Supervisor",
+      "modelRef": "engine.supervisor",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "The Operator's messages; Pipeline state",
+        "does": "Answers, runs reversible commands, prepares what needs a signature",
+        "out": "Answers, commands to the Orchestrator, prepared decision requests"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": -100.0,
+      "y": 480.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -49.0,
+        "y": 459.0,
+        "width": 138,
+        "height": 32
+      }
+    },
+    {
       "id": "engine.orchestrator",
       "parent": null,
       "level": 0,
       "children": [],
       "inEdges": [
+        "d7lkt0",
         "17zwo8z",
         "1tk37k4"
       ],
@@ -101,8 +149,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 440.0,
-        "y": -121,
+        "x": 12.0,
+        "y": -132,
         "width": 160,
         "height": 32
       }
@@ -148,10 +196,10 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -475.0,
-        "y": 272.0,
+        "x": -903.0,
+        "y": -108.0,
         "width": 127,
-        "height": 66
+        "height": 65
       }
     },
     {
@@ -190,8 +238,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 2.0,
-        "y": -216.0,
+        "x": -426.0,
+        "y": -967.0,
         "width": 172,
         "height": 32
       }
@@ -234,8 +282,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 431.0,
-        "y": -321,
+        "x": 3.0,
+        "y": -702,
         "width": 115,
         "height": 32
       }
@@ -246,7 +294,8 @@
       "level": 0,
       "children": [],
       "inEdges": [
-        "d9mjj7"
+        "d9mjj7",
+        "fz6ef1"
       ],
       "outEdges": [
         "9c97f1"
@@ -280,10 +329,10 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 32.0,
-        "y": -354.0,
+        "x": -396.0,
+        "y": 443.0,
         "width": 111,
-        "height": 66
+        "height": 65
       }
     },
     {
@@ -326,8 +375,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 394.0,
-        "y": -186.0,
+        "x": -34.0,
+        "y": -197.0,
         "width": 188,
         "height": 32
       }
@@ -367,8 +416,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -977.0,
-        "y": 49,
+        "x": -1405.0,
+        "y": -312,
         "width": 144,
         "height": 32
       }
@@ -383,7 +432,8 @@
       ],
       "outEdges": [
         "1tk37k4",
-        "ys8zm5"
+        "ys8zm5",
+        "1zj7iy"
       ],
       "title": "Operator",
       "modelRef": "operator",
@@ -403,12 +453,12 @@
       "kind": "human",
       "isCustomized": true,
       "x": -100.0,
-      "y": 480.0,
+      "y": 720.0,
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -962.0,
-        "y": -246.0,
+        "x": -1390.0,
+        "y": 699.0,
         "width": 115,
         "height": 32
       }
@@ -452,8 +502,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -41.0,
-        "y": 54.0,
+        "x": -469.0,
+        "y": 43.0,
         "width": 72,
         "height": 32
       }
@@ -491,13 +541,13 @@
       "technology": "",
       "kind": "agent",
       "isCustomized": true,
-      "x": -100.0,
+      "x": 400,
       "y": 720.0,
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -1387.0,
-        "y": -6.0,
+        "x": -1315.0,
+        "y": 699.0,
         "width": 155,
         "height": 32
       }
@@ -512,11 +562,11 @@
       "points": [
         [
           400,
-          238
+          214
         ],
         [
           270,
-          238
+          214
         ],
         [
           270,
@@ -529,13 +579,51 @@
       ],
       "labelBBox": {
         "x": 214,
-        "y": 242,
+        "y": 230,
         "width": 111,
         "height": 25
       },
       "parent": null,
       "relations": [
         "1vrned4"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "d7lkt0",
+      "source": "engine.supervisor",
+      "target": "engine.orchestrator",
+      "label": "reversible commands",
+      "points": [
+        [
+          140,
+          518
+        ],
+        [
+          270,
+          518
+        ],
+        [
+          270,
+          268
+        ],
+        [
+          400,
+          268
+        ]
+      ],
+      "labelBBox": {
+        "x": 196,
+        "y": 362,
+        "width": 148,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "10mj9ca"
       ],
       "color": "gray",
       "line": "dashed",
@@ -696,6 +784,44 @@
       "isLabelCustomized": true
     },
     {
+      "id": "fz6ef1",
+      "source": "engine.supervisor",
+      "target": "engine.cards",
+      "label": "prepares requests",
+      "points": [
+        [
+          140,
+          578
+        ],
+        [
+          270,
+          578
+        ],
+        [
+          270,
+          518
+        ],
+        [
+          400,
+          518
+        ]
+      ],
+      "labelBBox": {
+        "x": 206,
+        "y": 517,
+        "width": 127,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "n9tzpe"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
       "id": "ftxree",
       "source": "engine.orchestrator",
       "target": "engine.traces",
@@ -741,24 +867,24 @@
       "points": [
         [
           400,
-          548
-        ],
-        [
-          270,
-          548
+          578
         ],
         [
           270,
           578
+        ],
+        [
+          270,
+          788
         ],
         [
           140,
-          578
+          788
         ]
       ],
       "labelBBox": {
         "x": 212,
-        "y": 532,
+        "y": 652,
         "width": 116,
         "height": 25
       },
@@ -779,24 +905,24 @@
       "points": [
         [
           140,
-          518
+          734
         ],
         [
           270,
-          518
+          734
         ],
         [
           270,
-          298
+          322
         ],
         [
           400,
-          298
+          322
         ]
       ],
       "labelBBox": {
         "x": 215,
-        "y": 377,
+        "y": 497,
         "width": 110,
         "height": 25
       },
@@ -816,31 +942,69 @@
       "label": "approves the map",
       "points": [
         [
-          20,
-          615
+          140,
+          842
         ],
         [
-          20,
-          668
+          270,
+          842
         ],
         [
-          20,
-          668
+          270,
+          788
         ],
         [
-          20,
-          720
+          400,
+          788
         ]
       ],
       "labelBBox": {
-        "x": -117,
-        "y": 655,
+        "x": 208,
+        "y": 784,
         "width": 125,
         "height": 25
       },
       "parent": null,
       "relations": [
         "ge4zx6"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1zj7iy",
+      "source": "operator",
+      "target": "engine.supervisor",
+      "label": "asks, commands",
+      "points": [
+        [
+          20,
+          720
+        ],
+        [
+          20,
+          668
+        ],
+        [
+          20,
+          668
+        ],
+        [
+          20,
+          615
+        ]
+      ],
+      "labelBBox": {
+        "x": -109,
+        "y": 655,
+        "width": 117,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "a090q3"
       ],
       "color": "gray",
       "line": "dashed",

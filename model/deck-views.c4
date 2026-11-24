@@ -121,6 +121,7 @@ views {
       engine.orchestrator with { description '' technology '' },
       engine.connector with { description '' technology '' },
       engine.setup with { description '' technology '' },
+      engine.supervisor with { description '' technology '' },
       pstate with { description '' technology '' },
       engine.sandbox with { description '' technology '' },
       engine.cards with { description '' technology '' },
@@ -128,7 +129,7 @@ views {
       operator with { description '' technology '' },
       tracker with { description '' technology '' },
       engine.learn.retro with { description '' technology '' }
-    exclude engine.implement.implementer, engine, engine.learn, engine.learn.retro -> operator, engine.setup -> engine.connector
+    exclude engine.implement.implementer, engine, engine.learn, engine.learn.retro -> operator, engine.setup -> engine.connector, pstate -> engine.supervisor
     style * { size small textSize xlarge }
     autoLayout LeftRight 40 50
   }
