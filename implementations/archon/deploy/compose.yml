@@ -1,0 +1,197 @@
+# Archon (dev build): trial as the base engine of the agentic SDLC pipeline (2026-11-21).
+# Deployed as a Dokploy compose; reach it only from a private network (VPN) through your reverse proxy.
+# Secrets live only in the environment: GH_TOKEN, CLAUDE_CODE_OAUTH_TOKEN, BETTER_AUTH_SECRET, POSTGRES_PASSWORD,
+# ARCHON_AUTH_ALLOWED_EMAILS, and ARCHON_PUBLIC_URL (the console's https address).
+services:
+  # Archon itself, built from its dev branch at a pinned commit (CI green 2026-11-20). Release 0.14.0 lacks the SDLC
+  # pack's manual lanes, item links and asks. Runs once and exits: it only provides the base image below.
+  archon-base:
+    build:
+      context: https://github.com/coleam00/Archon.git#f9d1d2b2b9a930ca87108ec787ec223da7cbf294
+    image: archon-dev:f9d1d2b
+    entrypoint: ["true"]
+    restart: "no"
+
+  archon:
+    # The base plus what the repositories' own checks need on the agents' machine. Without these the agents improvised
+    # (Node from a pip wheel, pytest from the wrong env, skipped Docker steps) and no round could record a validation.
+    build:
+      additional_contexts:
+        base: service:archon-base
+      dockerfile_inline: |
+        FROM base
+        USER root
+        COPY --from=ghcr.io/astral-sh/uv:0.13.9 /uv /uvx /usr/local/bin/
+        COPY --from=node:24-trixie-slim@sha256:af02d57b57719b9657a45199a79264a9437940cd55b3c7b3fc99615654f124a0 /usr/local/bin/node /usr/local/bin/node
+        COPY --from=node:24-trixie-slim@sha256:af02d57b57719b9657a45199a79264a9437940cd55b3c7b3fc99615654f124a0 /usr/local/lib/node_modules /usr/local/lib/node_modules
+        COPY --from=ghcr.io/gitleaks/gitleaks@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f /usr/bin/gitleaks /usr/local/bin/gitleaks
+        ENV COREPACK_HOME=/opt/corepack COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+        RUN ln -sf ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
+         && ln -sf ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
+         && ln -sf ../lib/node_modules/corepack/dist/corepack.js /usr/local/bin/corepack \
+         && corepack enable --install-directory /usr/local/bin pnpm \
+         && corepack prepare pnpm@11.24.0 --activate \
+         && chmod -R a+rX /opt/corepack \
+         && apt-get update && apt-get install -y --no-install-recommends rsync && rm -rf /var/lib/apt/lists/* \
+         && node -v && pnpm -v && uv --version && gitleaks version
+    image: archon-dev-tools:f9d1d2b
+    depends_on:
+      archon-base:
+        condition: service_completed_successfully
+      archon-db:
+        condition: service_healthy
+      archon-testpg:
+        condition: service_healthy
+    configs:
+      - source: gh-guard
+        target: /run/guard/gh
+      - source: git-guard
+        target: /run/guard/git
+      - source: timers
+        target: /run/timers/loop
+    # Compose outside swarm ignores a config's mode, so the files arrive unreadable for appuser:
+    # root installs them with the right mode, then the image's own entrypoint runs as usual.
+    # A git identity for agents and the tests they run (git refuses to commit without one) goes into /etc/gitconfig:
+    # the lowest layer, so a repository's or a test's own config wins (GIT_AUTHOR_* in the environment broke tests).
+    entrypoint: ["/bin/sh", "-c", "install -m 0755 /run/guard/gh /usr/local/bin/gh && install -m 0755 /run/guard/git /usr/local/bin/git && /usr/bin/git config --system user.name 'Archon agent' && /usr/bin/git config --system user.email archon@example.invalid && install -m 0755 /run/timers/loop /usr/local/bin/archon-timers && (gosu appuser archon-timers &) && exec docker-entrypoint.sh"]
+    container_name: archon
+    # bun runs as PID 1 and does not reap orphans: agent sessions and check runs left ~2000 zombies,
+    # the pids limit was hit and every new process failed. tini (init: true) reaps them.
+    init: true
+    restart: unless-stopped
+    environment:
+      ARCHON_DOCKER: "true"
+      PORT: "3000"
+      ARCHON_TELEMETRY_DISABLED: "1"
+      # The trigger host the pack's bindings name: the server starts their runs (chained stages).
+      ARCHON_TRIGGER_HOST: archon-server
+      DO_NOT_TRACK: "1"
+      DATABASE_URL: postgresql://archon:${POSTGRES_PASSWORD}@archon-db:5432/archon
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      BETTER_AUTH_URL: ${ARCHON_PUBLIC_URL}
+      ARCHON_AUTH_ALLOWED_EMAILS: ${ARCHON_AUTH_ALLOWED_EMAILS}
+      CLAUDE_CODE_OAUTH_TOKEN: ${CLAUDE_CODE_OAUTH_TOKEN:-}
+      GH_TOKEN: ${GH_TOKEN:-}
+      # The throwaway PostgreSQL below, for repositories whose checks take a test server's conninfo
+      # (the variable name is the trial repository's; rename it for yours).
+      RETINUE_TEST_PG: host=archon-testpg port=5432 user=postgres password=throwaway dbname=postgres
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+    volumes:
+      - archon-data:/.archon
+      - archon-home:/home/appuser
+    networks: [dokploy-network, archon-internal]
+    mem_limit: 6g
+    cpus: 4
+    pids_limit: 2048
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  archon-db:
+    image: postgres:17-alpine
+    container_name: archon-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: archon
+      POSTGRES_USER: archon
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - archon-pg:/var/lib/postgresql/data
+    networks: [archon-internal]
+    mem_limit: 1g
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U archon -d archon"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Throwaway PostgreSQL for the agents' test runs: data in memory, internal network only, no secret worth keeping.
+  archon-testpg:
+    image: postgres:17-alpine@sha256:d3244e8ce3f165ee3c93d9c4a4b1d0fe48b3a89e2287b717fdcbbde92d405065
+    container_name: archon-testpg
+    restart: unless-stopped
+    command: ["postgres", "-c", "fsync=off", "-c", "max_connections=200"]
+    environment:
+      POSTGRES_PASSWORD: throwaway
+    tmpfs:
+      - /var/lib/postgresql/data
+    networks: [archon-internal]
+    mem_limit: 1g
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+configs:
+  # Merge guard (as in cezar): agents must not merge PRs or push to develop/main. The owner merges.
+  # Covers agent shells (gh, git on PATH); Archon's own merge step goes through the forge REST API.
+  gh-guard:
+    content: |
+      #!/bin/sh
+      if [ "$${ARCHON_MAY_MERGE:-}" != 1 ]; then
+        if [ "$$1" = pr ] && [ "$$2" = merge ]; then
+          echo "merge guard: agents do not merge. The owner merges after review." >&2; exit 3
+        fi
+        if [ "$$1" = api ] && printf '%s ' "$$@" | grep -Eq 'pulls/[0-9]+/merge|/merges( |$$)'; then
+          echo "merge guard: merging through the API is not allowed for agents." >&2; exit 3
+        fi
+      fi
+      exec /usr/bin/gh "$$@"
+  # Archon has no timer on Linux: this loop fires every binding file in /.archon/bindings
+  # that carries a schedule, at its interval (Unify SDLC: poll, revisit, retro).
+  timers:
+    content: |
+      #!/bin/sh
+      dir=/.archon/bindings
+      mkdir -p "$$dir/.last"
+      sleep 60
+      while true; do
+        now=$$(date +%s)
+        for f in "$$dir"/*.json; do
+          [ -f "$$f" ] || continue
+          iv=$$(bun -e 'const j=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")); const s=j.schedule??j.binding?.schedule; console.log(s?.intervalSeconds??s?.interval_seconds??"")' "$$f" 2>/dev/null)
+          [ -n "$$iv" ] || continue
+          name=$$(basename "$$f")
+          last=$$(cat "$$dir/.last/$$name" 2>/dev/null || echo 0)
+          if [ $$((now - last)) -ge "$$iv" ]; then
+            echo "$$now" > "$$dir/.last/$$name"
+            (cd /.archon && bun /app/packages/cli/src/cli.ts trigger fire --config "$$f" > "$$dir/.last/$$name.log" 2>&1) || echo "archon-timers: fire failed for $$name, see $$dir/.last/$$name.log" >&2
+          fi
+        done
+        sleep 60
+      done
+  # Only pushes to GitHub are guarded: tests create local repositories and push their own main, which is no merge.
+  git-guard:
+    content: |
+      #!/bin/sh
+      if [ "$$1" = push ] && [ "$${ARCHON_MAY_MERGE:-}" != 1 ]; then
+        remote=""
+        for a in "$$@"; do
+          case "$$a" in push|-*) ;; *) remote="$$a"; break;; esac
+        done
+        url=$$(/usr/bin/git remote get-url "$${remote:-origin}" 2>/dev/null || printf '%s' "$$remote")
+        case "$$url" in
+          *github.com*)
+            for a in "$$@"; do
+              case "$$a" in
+                develop|main|master|*:develop|*:main|*:master|*refs/heads/develop|*refs/heads/main|*refs/heads/master)
+                  echo "merge guard: agents do not push to $$a on GitHub. Push the task branch; the owner merges." >&2; exit 3;;
+              esac
+            done;;
+        esac
+      fi
+      exec /usr/bin/git "$$@"
+
+volumes:
+  archon-data:
+  archon-home:
+  archon-pg:
+
+networks:
+  dokploy-network:
+    external: true
+  archon-internal: {}
