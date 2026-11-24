@@ -4,19 +4,27 @@
  * the branch is brought up to date with the latest base on GitHub's side; CI must pass at
  * the new head; every verdict must still carry the current diff fingerprint, or the
  * stale checks run again in a round; then the merge is pinned to the head and read back.
- * At most 3 update attempts across runs, then a request.
+ * At most 3 update attempts across runs, then a request. Once merged, the item leaves every
+ * environment hold (the next holders are in `start`), and each pre-merge approval's tree is
+ * compared with the merged base's (decision 49): equal, Releasing; different, the item stays
+ * in Verifying and a request lists the files in two groups. A fix outcome also leaves the
+ * holds: a hold is not kept through a fix (decision 51).
  */
 
 import { emit, input } from 'archon:script';
 import { script } from '../../.shared/connector.ts';
+import { filesOf, restrictedTree, treeDifference } from '../../.shared/candidate.ts';
+import { readDeploys, type Deploys } from '../../.shared/environments.ts';
+import { releaseAll } from '../../.shared/holds.ts';
 import type { ItemKey } from '../../.shared/item.ts';
 import { runInputs } from '../../.shared/repo.ts';
 import { forge } from '../../.shared/forge.ts';
 import { updatePrBranch } from '../../.shared/github.ts';
 import { projectPolicy } from '../../.shared/policy.ts';
 import { moveState, readState } from '../../.shared/states.ts';
-import { bound, buildRequest, card, findingKey, NO_CARD, readItem, updateItem, type Card, type Finding } from './lib/item.ts';
-import { awaitChecks, baseName } from './lib/facts.ts';
+import { bound, buildRequest, card, findingKey, NO_CARD, readItem, updateItem, type Card, type Finding, type ItemDoc } from './lib/item.ts';
+import { awaitChecks, baseName, fetchBranch } from './lib/facts.ts';
+import { RECHECK } from './lib/envs.ts';
 import { prAt, printAt, staleKinds } from './lib/gate.ts';
 
 const ATTEMPTS = 3;
@@ -38,6 +46,51 @@ function stuckCard(key: ItemKey, head: string, detail: string): Card {
   ));
 }
 
+interface TreeDifference {
+  readonly at: string;
+  readonly insignificant: readonly string[];
+  readonly rest: readonly string[];
+}
+
+/** Each approval whose restricted tree is not what merged, with the files that differ (decision 49). */
+function treeDifferences(deploys: Deploys, approvals: ItemDoc['approvals'], merge: string): TreeDifference[] {
+  const differs: TreeDifference[] = [];
+  for (const a of approvals) {
+    const paths = deploys.services.find(s => s.name === a.service)?.paths ?? ['**'];
+    if (restrictedTree(merge, paths) === a.tree) continue;
+    const at = `${a.env}/${a.service}`;
+    try {
+      const diff = treeDifference(filesOf(a.commit, paths), filesOf(merge, paths), deploys.insignificant);
+      differs.push({ at, insignificant: diff.insignificant, rest: diff.rest });
+    } catch {
+      differs.push({ at, insignificant: [], rest: [`the approved candidate ${a.commit} is no longer in the repository: the files cannot be listed`] });
+    }
+  }
+  return differs;
+}
+
+function treeCard(key: ItemKey, merge: string, differs: readonly TreeDifference[]): Card {
+  const minorOnly = differs.every(d => d.rest.length === 0);
+  return card(buildRequest(
+    {
+      decide: `${key} merged as ${merge.slice(0, 12)}, and what merged differs from what was approved on ${differs.map(d => d.at).join(', ')}. Accept it for release, or back to the environment?`,
+      why: 'something else landed next to it or a conflict was resolved: the approval was given on other files (decision 49).',
+      notVerified: ['whether the differing files change behaviour'],
+      facts: differs.flatMap(d => [
+        `${d.at}, insignificant paths: ${d.insignificant.join(', ') || 'none'}`,
+        `${d.at}, the rest: ${d.rest.join(', ') || 'none'}`,
+      ]),
+    },
+    [
+      { id: 'accept', label: 'Accept', does: 'Moves the item to Releasing as merged.', effect: 'accept' },
+      { id: 'back-to-env', label: 'Back to the environment', does: 'Deploys the merged base to the environment again and asks for a new approval there.', effect: 'back-to-env' },
+    ],
+    minorOnly
+      ? { option: 'accept', why: 'only the project\'s insignificant paths differ.', confidence: 'medium' }
+      : { option: 'back-to-env', why: 'files outside the insignificant paths differ from what was approved.', confidence: 'medium' }
+  ));
+}
+
 async function main(): Promise<void> {
   const { repo, key } = runInputs();
   if (key === undefined) return;
@@ -55,11 +108,32 @@ async function main(): Promise<void> {
     if (findings.length > 0) updateItem(key, d => {
       d.fix = { from: `merge ${outcome}`, findings };
     });
-    // Merged: the item waits for the release that carries it (decision 48). A revert's item stays where it is.
-    // A land re-run after the deploy already took the item finds it Live and leaves it.
-    if (outcome === 'merged' && !ruled.revert && (await readState(key)) !== 'live') await moveState(key, ['verifying', 'releasing'], 'releasing');
-    const asked: Card = outcome === 'stuck' ? stuckCard(key, head, detail) : NO_CARD;
-    emit({ outcome, head, detail, merge_commit: merge, attempts: readItem(key).landAttempts, ...asked });
+    // The hold of a shared environment ends at the merge, and is not kept through a fix (decision 51).
+    const start = !ruled.revert && (outcome === 'merged' || findings.length > 0) ? releaseAll(key) : [];
+    let asked: Card = outcome === 'stuck' ? stuckCard(key, head, detail) : NO_CARD;
+    let landed = outcome;
+    if (outcome === 'merged' && !ruled.revert) {
+      const doc = readItem(key);
+      // The merge commit must be local for the tree check; an older run's merge falls back to the base's tip.
+      const tip = fetchBranch(base);
+      const commit = merge ?? doc.mergeCommit ?? tip;
+      if (commit === null) throw new Error(`origin has no ${base} after the merge`);
+      const differs = doc.flags.includes(RECHECK) ? [] : treeDifferences(readDeploys(base), doc.approvals, commit);
+      if (differs.length > 0) {
+        // The item stays in Verifying until the Operator accepts the difference or sends it back (decision 49).
+        landed = 'tree';
+        asked = treeCard(key, commit, differs);
+      } else if ((await readState(key)) !== 'live') {
+        // Merged: the item waits for the release that carries it (decision 48). A revert's item stays where it is.
+        // A land re-run after the deploy already took the item finds it Live and leaves it; one after a
+        // crash between test-ruling's approval and its move finds it still in TestReview.
+        await moveState(key, ['verifying', 'test-review', 'releasing'], 'releasing');
+      }
+      updateItem(key, d => {
+        d.flags = d.flags.filter(f => f !== RECHECK);
+      });
+    }
+    emit({ outcome: landed, head, detail, merge_commit: merge, attempts: readItem(key).landAttempts, start, ...asked });
   };
   const finding = (source: Finding['source'], text: string): Finding[] => [{ key: findingKey(source, text), source, text, repeated: false }];
 
@@ -108,6 +182,7 @@ async function main(): Promise<void> {
     if (after.state !== 'merged') throw new Error(`PR #${prRef.number} reads ${after.state} after the merge`);
     updateItem(key, d => {
       d.landAttempts = 0;
+      if (!ruled.revert) d.mergeCommit = merged.landed.commit;
       if (ruled.revert) d.flags = d.flags.filter(f => f !== `revert-pr:${prRef.number}`);
     });
     return result('merged', pr.head, `merged at ${pr.head}`, merged.landed.commit);

@@ -1,7 +1,7 @@
 /**
- * The numbers the Watcher reads: before and after this deploy, for every signal the
- * project declares in `.pipeline/project.yaml` (`deploy.signals`), computed here and never
- * by the agent.
+ * The numbers the Watcher reads: before and after this release's deploy to the watched
+ * environment, for every signal that environment declares in `.pipeline/project.yaml`
+ * (`watch.signals`; `deploy.signals` in shape A), computed here and never by the agent.
  *
  * A signal is `"<name>: <command>"` (or a bare command, named by itself). The command
  * runs with SIGNAL_FROM and SIGNAL_TO (ISO times) and prints one number for that span: an
@@ -10,27 +10,30 @@
  *   after       [D, N]
  *   before      [D - (N - D), D]          the same length just before the deploy
  *   day_before  [D - 24h, N - 24h]        the same hours a day earlier
- * Each window leaves out the minutes of every other deploy (its record from start to end
- * plus 5 minutes to settle), so another change's effect is not read as this one's; the
- * window is cut into the spans between them and a signal is the duration-weighted mean
- * over those spans. A project that declares no signals gets the health check only: the
- * deploy hook's result, and `coverage: health-only`, which `outcome` notes at Done.
+ * After a toggle was turned off in this window (decision 61), D in `after` and
+ * `day_before` is the last toggle, so the minutes before it do not count against it.
+ * Each window leaves out the minutes of every other deploy to the same environment (its
+ * record from start to end plus 5 minutes to settle), so another change's effect is not
+ * read as this one's; the window is cut into the spans between them and a signal is the
+ * duration-weighted mean over those spans. An environment that declares no signals gets
+ * the health check only: the deploy's result, and `coverage: health-only`, which
+ * `outcome` notes at Done.
  *
- * Also hands the Watcher the paths the PR changed and their patches (marked untrusted,
- * cut at 20 KB): it watches what the PR touches first.
+ * Also hands the Watcher every item of the release with its PR and the paths it changed,
+ * and their patches (marked untrusted, cut at 20 KB in all): it watches what the items
+ * touch first and names the culprit.
  *
- * Bound inputs: the workflow's INPUTS_REPO_HOST, INPUTS_REPO_PATH, INPUTS_NUMBER; the
- * pack setting INPUTS_BASE; INPUTS_PR, INPUTS_DEPLOYED_AT, INPUTS_DEPLOY_OK from the
- * deploy nodes.
+ * Bound inputs: the workflow's INPUTS_REPO_HOST, INPUTS_REPO_PATH; the pack setting
+ * INPUTS_BASE; INPUTS_RELEASE from cut; INPUTS_ENV, INPUTS_DEPLOYED_AT and
+ * INPUTS_DEPLOY_OK from promote.
  */
 
 import { emit, input, runId } from 'archon:script';
 import { script } from '../../.shared/connector.ts';
-import { forge } from '../../.shared/forge.ts';
-import { projectPolicy } from '../../.shared/policy.ts';
+import { readDeploys } from '../../.shared/environments.ts';
 import { runInputs } from '../../.shared/repo.ts';
 import { untrusted } from '../../.shared/trust.ts';
-import { allDeploys } from './lib.ts';
+import { allDeploys, itemFiles, mustRelease, readDeploy, releaseSubject, watchedEnv } from './lib.ts';
 
 const MINUTE = 60_000;
 const SETTLE = 5 * MINUTE;
@@ -87,32 +90,38 @@ function round(value: number | null): number | null {
   return value === null ? null : Math.round(value * 1000) / 1000;
 }
 
+
 async function main(): Promise<void> {
-  const { repo, key } = runInputs();
-  if (key === undefined) return;
+  const { repo } = runInputs();
   const base = input('base').trim() || 'main';
-  const pr = Number(input('pr')) || null;
+  const id = input('release').trim();
+  const env = watchedEnv(readDeploys(base), input('env').trim());
+  const release = mustRelease(id);
   const deployedAtText = input('deployed_at').trim();
   const deployOk = input('deploy_ok').trim() !== 'false';
-  const policy = projectPolicy(base);
   const run = runId();
+  const minutes = env.watch?.minutes ?? 30;
+  const toggled = readDeploy(releaseSubject(id, env.name), run).record?.watch?.toggled ?? [];
 
   const deployedAt = Date.parse(deployedAtText);
   if (!Number.isFinite(deployedAt)) throw new Error(`no deploy time (got '${deployedAtText}')`);
   const now = Date.now();
-  const endsAt = deployedAt + policy.deploy.windowMinutes * MINUTE;
-  const elapsed = Math.max(0, now - deployedAt);
+  const endsAt = deployedAt + minutes * MINUTE;
+  const lastToggle = toggled.length === 0 ? null : Date.parse(toggled[toggled.length - 1].at);
+  const from = lastToggle === null ? deployedAt : Math.max(deployedAt, lastToggle);
+  const elapsed = Math.max(0, now - from);
 
-  const others = allDeploys().filter(record => record.runId !== run);
+  // A record from before environments is production's.
+  const others = allDeploys().filter(record => record.runId !== run && (record.env ?? 'production') === env.name);
   const excluded: Span[] = others.map(record => {
-    const from = Date.parse(record.startedAt);
-    const to = record.endedAt === null ? now : Date.parse(record.endedAt);
-    return [from, to + SETTLE] as const;
+    const start = Date.parse(record.startedAt);
+    const end = record.endedAt === null ? now : Date.parse(record.endedAt);
+    return [start, end + SETTLE] as const;
   });
   const windows = {
-    after: [deployedAt, now] as const,
+    after: [from, now] as const,
     before: [deployedAt - elapsed, deployedAt] as const,
-    day_before: [deployedAt - 86_400_000, now - 86_400_000] as const,
+    day_before: [from - 86_400_000, now - 86_400_000] as const,
   };
   const spans = {
     after: cut(windows.after, excluded),
@@ -121,9 +130,9 @@ async function main(): Promise<void> {
   };
   const excludedNearby = others
     .filter(record => Date.parse(record.startedAt) <= now && (record.endedAt === null ? now : Date.parse(record.endedAt)) + SETTLE >= windows.day_before[0])
-    .map(record => ({ item: record.item, pr: record.pr, from: record.startedAt, to: record.endedAt }));
+    .map(record => ({ item: record.item, items: record.items ?? [record.item], pr: record.pr, reason: record.reason ?? (record.revert ? 'rollback' : 'normal'), from: record.startedAt, to: record.endedAt }));
 
-  const declared = policy.deploy.signals.map(parseSignal);
+  const declared = (env.watch?.signals ?? []).map(parseSignal);
   const signals = declared.map(({ name, command }) => {
     const after = measure(command, spans.after);
     const before = measure(command, spans.before);
@@ -139,37 +148,41 @@ async function main(): Promise<void> {
     };
   });
 
-  let files: { path: string; status: string }[] = [];
-  let patches = '';
-  if (pr !== null) {
-    const listed = forge('pr.files', { ref: { repo, number: pr } });
-    files = listed.files.map(file => ({ path: file.path, status: file.status }));
-    let budget = PATCH_BUDGET;
-    const parts: string[] = [];
-    for (const file of listed.files) {
+  const changed = itemFiles(repo, release.items);
+  const items = changed.map(i => ({ key: i.key, pr: i.pr, files: i.files.map(f => ({ path: f.path, status: f.status })) }));
+  let budget = PATCH_BUDGET;
+  const parts: string[] = [];
+  for (const item of changed) {
+    for (const file of item.files) {
       if (file.patch === null || budget <= 0) continue;
-      const piece = `--- ${file.path}\n${file.patch}`.slice(0, budget);
+      const piece = `--- ${item.key} ${file.path}\n${file.patch}`.slice(0, budget);
       budget -= piece.length;
       parts.push(piece);
     }
-    patches = parts.length === 0 ? '' : untrusted(`diff of PR #${String(pr)}`, parts.join('\n'));
   }
+  const single = items.length === 1 ? items[0] : null;
 
   emit({
     coverage: declared.length === 0 ? 'health-only' : 'full',
+    ended: now >= endsAt,
     health: { deploy_ok: deployOk },
     signals,
     window: {
       deployed_at: new Date(deployedAt).toISOString(),
+      after_from: new Date(from).toISOString(),
       now: new Date(now).toISOString(),
       ends_at: new Date(endsAt).toISOString(),
       ended: now >= endsAt,
       elapsed_minutes: Math.round(elapsed / MINUTE),
     },
     excluded: excludedNearby,
-    pr,
-    files,
-    patches,
+    release: id,
+    env: env.name,
+    items,
+    toggled,
+    pr: single?.pr ?? null,
+    files: single?.files ?? [],
+    patches: parts.length === 0 ? '' : untrusted(`diff of release ${id}`, parts.join('\n')),
   });
 }
 

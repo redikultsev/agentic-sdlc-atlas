@@ -1,7 +1,9 @@
 /**
  * Move the item to TriageReview and build the Accept request (decisions 11, 38): what to
  * decide, what was not verified on top, then the facts with their evidence. Options:
- * accept, for a human, won't do; each carries `value.effect`, the action `apply` takes.
+ * accept, accept as urgent (decision 53: `value.urgent`, front of every queue and a release
+ * right after the merge), for a human, won't do; each carries `value.effect`, the action
+ * `apply` takes.
  * A size or risk the Operator disagrees with is corrected through `other`: the text is a
  * ruling and triage runs again with it. With implement_lane manual, an S item's accept
  * option is the explicit start of the Implementer, and the card says so. A label changed
@@ -66,6 +68,13 @@ async function main(): Promise<void> {
         : 'Moves the item to Specifying and starts the spec stage (questions, then a spec for your review).',
       effect: 'accept',
     },
+    {
+      id: 'accept-urgent',
+      label: manualStart ? `Accept as ${v.size}, ${v.risk}, urgent, and start implementing` : `Accept as ${v.size}, ${v.risk}, urgent`,
+      does: 'The same as accept, and the item is urgent: front of every queue (environment holds) and a release right after its merge, without waiting for the release trigger.',
+      effect: 'accept',
+      extra: { urgent: true },
+    },
     { id: 'for-human', label: 'For a human', does: 'Moves the item to ForHuman and comments why; the pipeline only tracks it.', effect: 'for-human' },
     { id: 'wont-do', label: "Won't do", does: 'Labels it pipeline:rejected, comments the reason and closes the item as not planned.', effect: 'wont-do' },
   ];
@@ -82,6 +91,7 @@ async function main(): Promise<void> {
       facts: [
         `Kind: ${v.kind}. Size ${v.size} (files and changed lines, no time estimate), risk ${v.risk}.`,
         ...(manualStart ? ['implement_lane is manual: nothing starts unless you choose "Accept … and start implementing".'] : []),
+        'Urgent (decision 53): the item goes to the front of every queue and a release is cut right after its merge; choose it only when waiting costs more than the jump.',
         ...v.claims.map(c => `${c.kind}: ${c.statement} — ${evidenceOf(c)}`),
         ...v.root_cause.map(r => `Root cause at ${r.file_line}: ${r.explanation}`),
         ...v.duplicates.map(d => `${d.relation}: ${d.url} "${d.quote.slice(0, 200)}"`),

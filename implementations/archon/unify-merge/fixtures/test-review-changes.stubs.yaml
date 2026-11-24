@@ -1,0 +1,12 @@
+# The answerer asks for changes: the comment is the next round's fix (no round spent),
+# the item goes to Implementing, the hold goes to the next item (started), this item
+# back at the front of the queue; a round is fired and land does not run.
+reconcile: {"ok": true, "state": "verifying", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
+reconcile-ruling: {"go": true}
+rules: {"path": "approved", "r0": false, "reasons": ["the Operator's merge holds at fixtureprint"], "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "stale": [], "ask": false, "question": "", "options": [], "recommendation": null}
+ruling: {"decision": "merge", "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "operator": true, "revert": false}
+env: {"go": "gate", "kind": "test-gate", "env": "test", "service": "api", "commit": "cand1234cand5678", "tree": "tree1234", "answerers": "alice, bob", "remaining": 0, "start": [], "notes": ["stub: smoke green on test/api"], "ask": true, "question": "stub: #7 runs on test/api at cand1234cand: approve it, ask for changes, or hold?", "options": [{"id": "approve", "label": "Approve", "does": "Records the approval.", "value": {"effect": "approve"}}, {"id": "changes", "label": "Changes", "does": "Sends your comment to the Implementer.", "value": {"effect": "changes"}}, {"id": "hold", "label": "Hold", "does": "Ends this run.", "value": {"effect": "hold"}}], "recommendation": {"option": "approve", "why": "stub", "confidence": "low"}}
+test-gate: {"decision": "changes", "text": "stub: the export button does nothing", "value": {"effect": "changes"}}
+test-ruling: {"go": "round", "start": ["#9"]}
+next: {"did": "unify-round: queued; started unify-merge: queued"}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7", "unify_merge_binding": "/bindings/unify-merge.yaml", "unify_deploy_binding": "/bindings/unify-deploy.yaml", "unify_round_binding": "/bindings/unify-round.yaml"}, "expect": "completed", "reached": ["reconcile", "rules", "ruling", "env", "test-gate", "test-ruling", "next"]}

@@ -32,6 +32,8 @@ export interface RoundFacts {
   review: { readonly fingerprint: string; readonly head: string; readonly explanation: string } | null;
   /** Update attempts in land since the last merge card. */
   landAttempts: number;
+  /** The commit the PR merged as (merge only): the tree check after the merge reads it (decision 49). */
+  mergeCommit: string | null;
 }
 
 export type ItemDoc = WorkDoc & RoundFacts;
@@ -43,6 +45,7 @@ export function withFacts(doc: WorkDoc): ItemDoc {
     history: raw.history ?? [],
     review: raw.review ?? null,
     landAttempts: raw.landAttempts ?? 0,
+    mergeCommit: raw.mergeCommit ?? null,
   });
 }
 

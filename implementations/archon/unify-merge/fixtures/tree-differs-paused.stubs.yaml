@@ -1,0 +1,10 @@
+# What merged differs from the approved tree: the item stays in Verifying and the run
+# pauses on the request.
+reconcile: {"ok": true, "state": "verifying", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
+reconcile-ruling: {"go": true}
+rules: {"path": "approved", "r0": false, "reasons": ["the Operator's merge holds at fixtureprint"], "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "stale": [], "ask": false, "question": "", "options": [], "recommendation": null}
+ruling: {"decision": "merge", "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "operator": true, "revert": false}
+env: {"go": "land", "kind": "", "env": "test", "service": "api", "commit": "cand1234cand5678", "tree": "tree1234", "answerers": "", "remaining": 0, "start": [], "notes": [], "ask": false, "question": "", "options": [], "recommendation": null}
+test-ruling: {"go": "land", "start": []}
+land: {"outcome": "tree", "head": "abc1234def5678", "detail": "stub: merged", "merge_commit": "fixturemerge", "attempts": 0, "ask": true, "question": "stub: #7 merged as fixturemerge, and what merged differs from what was approved on test/api. Accept it for release, or back to the environment?", "options": [{"id": "accept", "label": "Accept", "does": "Moves the item to Releasing.", "value": {"effect": "accept"}}, {"id": "back-to-env", "label": "Back to the environment", "does": "Deploys the merged base again.", "value": {"effect": "back-to-env"}}], "recommendation": {"option": "accept", "why": "stub: only CHANGELOG.md differs", "confidence": "medium"}, "start": []}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7", "unify_merge_binding": "/bindings/unify-merge.yaml", "unify_deploy_binding": "/bindings/unify-deploy.yaml", "unify_round_binding": "/bindings/unify-round.yaml"}, "expect": "paused", "reached": ["reconcile", "rules", "ruling", "env", "test-ruling", "land"]}

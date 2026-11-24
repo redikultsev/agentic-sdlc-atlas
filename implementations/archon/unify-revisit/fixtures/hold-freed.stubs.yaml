@@ -1,0 +1,16 @@
+# #7 held test/api and was cancelled: the hold is freed and handed to #9, the head of the
+# queue, whose run unify-merge starts (delivery id: the hold, #9 and the hand-over time).
+# #11 carried queued:test/web, which no hold lists any more: the flag is dropped.
+blocked: { checked: 0, notified: [], errors: [] }
+orphans: { orphans: [], stopped: [], cost_unknown: [], errors: [] }
+stale: { checked: 3, failing: [], set_aside: [], restored: [], errors: [] }
+holds:
+  freed: [{ env: test, service: api, item: 7, state: cancelled, next: 9 }]
+  left: []
+  started: [{ env: test, service: api, item: 9, fired: "unify-merge: admitted" }]
+  unflagged: [{ item: 11, flag: "queued:test/web" }]
+  errors: []
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, unify_merge_binding: /bindings/unify-merge.yaml }
+  expect: completed
+  reached: [blocked, orphans, stale, holds]

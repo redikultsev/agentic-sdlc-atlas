@@ -1,7 +1,7 @@
-# The label says Implementing: nothing deploys, the item is flagged for the Operator.
-reconcile: { mode: stop, state: implementing, pr: 12, reason: "stub: #7 is implementing" }
+# The run's item has a merged revert but its label disagrees with its record: nothing deploys, the item is flagged for the Operator.
+cut: { mode: stop, release: "", items: ["#7"], pr: 13, legacy: true, summary: "stub: #7: the engine holds rolled-back; the tracker shows implementing", question: "", options: [], recommendation: null }
 flag: { ok: false, summary: "stub: deploy not started" }
 fixture:
-  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", unify_merge_binding: /srv/bindings/unify-merge.json }
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", reason: revert, unify_merge_binding: /srv/bindings/unify-merge.json, unify_deploy_binding: /srv/bindings/unify-deploy.json }
   expect: completed
-  reached: [reconcile, flag]
+  reached: [cut, flag]

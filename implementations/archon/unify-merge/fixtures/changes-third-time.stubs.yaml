@@ -7,4 +7,5 @@ ruling: {"decision": "back-to-plan", "pr": 11, "head": "abc1234def5678", "finger
 next: {"did": "unify-plan: admitted"}
 merge-review: {"state": "merge-review"}
 merge-gate: {"decision": "back-to-plan", "text": "stub: split the export from the import", "value": {"effect": "back-to-plan"}}
+test-ruling: {"go": "stop", "start": []}
 fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "completed", "reached": ["reconcile", "rules", "merge-review", "ruling", "next"]}

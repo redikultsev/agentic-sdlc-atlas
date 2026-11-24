@@ -1,0 +1,19 @@
+# release.trigger: operator, nothing urgent: one request for the whole release; the Operator releases it, which starts the next release run.
+cut:
+  mode: ask
+  release: ""
+  items: ["#7", "#8"]
+  pr: null
+  legacy: false
+  summary: "stub: asking the Operator to release #7, #8"
+  question: "stub: Release these 2 items to production now?"
+  options:
+    - { id: release, label: Release, does: "Cuts a release of #7, #8.", value: { effect: release, items: ["#7", "#8"] } }
+    - { id: not-now, label: Not now, does: "Leaves them in Releasing.", value: { effect: not-now, items: ["#7", "#8"] } }
+  recommendation: { option: release, why: "stub: both merged", confidence: medium }
+release-ask: { decision: release, text: "" }
+release-answer: { effect: release, summary: "stub: the Operator released #7, #8; unify-deploy: queued" }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "", reason: schedule, unify_merge_binding: /srv/bindings/unify-merge.json, unify_deploy_binding: /srv/bindings/unify-deploy.json }
+  expect: completed
+  reached: [cut, release-ask, release-answer]

@@ -30,6 +30,10 @@ Your previous plan, as JSON (empty on the first round):
 
 $INPUTS.previous
 
+Toggles, a fact the pipeline read from `.pipeline/project.yaml`:
+
+$INPUTS.toggles
+
 ## Rules the script checks
 
 - Every criterion id of the spec is covered by at least one slice (`criteria`); no slice names an id the spec does not have.
@@ -42,7 +46,8 @@ $INPUTS.previous
 - Slices that touch the same files are ordered with `blocked_by`, never parallel.
 - Size is files and `changed_lines` (your estimate of lines changed). Never write time estimates.
 - `risks`: what could break, in words a reviewer can check.
+- `toggle`: only when the project declares toggles (the fact above says so). Name one toggle (one word: letters, digits, `.`, `-`, `_`) when the change should ship switched off and be turned on later, so that switching it off is the first rollback; the slices then build the new path behind it. Otherwise `null`. A toggle named while the project declares none is a check problem.
 
 ## What to return
 
-The JSON your output schema asks for: `summary` (three sentences at most) and `slices` (each `id`, `title`, `files`, `risks`, `check`, `criteria`, `blocked_by`, `changed_lines`).
+The JSON your output schema asks for: `summary` (three sentences at most), `slices` (each `id`, `title`, `files`, `risks`, `check`, `criteria`, `blocked_by`, `changed_lines`) and `toggle` (a name or `null`).

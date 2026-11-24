@@ -4,8 +4,11 @@
  * working hours, kill switch), the guard's flags in `work/<key>`, the `merge_lane` setting,
  * the never-R0 paths of `.shared/policy.ts`, new dependencies, CI at the head, and every
  * verdict current at the diff fingerprint (decision 33). A stale verdict sends the item
- * back to a round for the stale checks; otherwise R0 lands, and anything else goes to the
- * Merge gate with the head SHA on the card, flags first (decision 24).
+ * back to a round for the stale checks. The Operator's merge verdict current at the
+ * fingerprint is the `approved` path: a merge run started again (after an environment's
+ * queue, after TestReview, back to the environment after the merge) asks no second gate.
+ * Otherwise R0 lands, and anything else goes to the Merge gate with the head SHA on the
+ * card, flags first (decision 24).
  */
 
 import { emit, input } from 'archon:script';
@@ -13,10 +16,11 @@ import { script } from '../../.shared/connector.ts';
 import { runInputs } from '../../.shared/repo.ts';
 import { forge } from '../../.shared/forge.ts';
 import { ALWAYS_NEVER, automergeRules, globMatch } from '../../.shared/policy.ts';
-import { docName } from '../../.shared/work.ts';
+import { currentVerdicts, docName } from '../../.shared/work.ts';
 import { buildRequest, card, NO_CARD, readItem, type Option } from './lib/item.ts';
 import { baseName, prChecks } from './lib/facts.ts';
 import { inHours, prAt, printAt, revertRate, staleKinds } from './lib/gate.ts';
+import { RECHECK } from './lib/envs.ts';
 
 const MANIFESTS = /(^|\/)(package\.json|package-lock\.json|yarn\.lock|pnpm-lock\.yaml|bun\.lockb?|go\.mod|go\.sum|Cargo\.toml|Cargo\.lock|requirements[^/]*\.txt|pyproject\.toml|poetry\.lock|uv\.lock|Gemfile(\.lock)?|composer\.(json|lock)|pom\.xml|build\.gradle(\.kts)?)$/;
 const CHANGES_CAP = 3;
@@ -37,12 +41,22 @@ async function main(): Promise<void> {
   }
   if (doc.pr === null) throw new Error(`${docName(key)} records no PR`);
   const pr = prAt(repo, doc.pr);
+  if (doc.flags.includes(RECHECK)) {
+    // Back to the environment on the merged base (decision 49): the Operator's merge stands.
+    if (pr.state !== 'merged') throw new Error(`${docName(key)} is flagged ${RECHECK}, but PR #${pr.number} is ${pr.state}`);
+    emit({ path: 'approved', r0: false, reasons: ['merged; back to the environment on the merged base'], pr: pr.number, head: pr.head, fingerprint: '', stale: [], ...NO_CARD });
+    return;
+  }
   if (pr.state !== 'open') throw new Error(`PR #${pr.number} is ${pr.state}`);
   const print = printAt(base, pr.branch, pr.head);
   const stale = staleKinds(doc, print, false);
   const short = pr.head.slice(0, 12);
   if (stale.length > 0) {
     emit({ path: 'stale', r0: false, reasons: [`stale at ${short}: ${stale.join(', ')}`], pr: pr.number, head: pr.head, fingerprint: print, stale, ...NO_CARD });
+    return;
+  }
+  if (currentVerdicts(doc, print).some(v => v.kind === 'operator' && v.verdict === 'merge')) {
+    emit({ path: 'approved', r0: false, reasons: [`the Operator's merge holds at ${print}`], pr: pr.number, head: pr.head, fingerprint: print, stale: [], ...NO_CARD });
     return;
   }
 
@@ -85,7 +99,7 @@ async function main(): Promise<void> {
     {
       id: 'merge',
       label: `Merge at ${short}`,
-      does: `Merges PR #${pr.number} pinned to head ${pr.head}, after updating it on the latest ${base} and green CI; it deploys at once. A different head is refused.`,
+      does: `Merges PR #${pr.number} pinned to head ${pr.head}, after updating it on the latest ${base} and green CI, once the project's pre-merge environments pass (if it has any). A different head is refused.`,
       effect: 'merge',
       extra: { head: pr.head, fingerprint: print },
     },

@@ -1,7 +1,7 @@
-# The revert this pipeline opened has merged: its deploy runs and nothing is watched (decision 26), no state moves.
-reconcile: { mode: revert, state: rolled-back, pr: 13, reason: "stub: PR 13 is the revert" }
-deploy: { deployed: true, ok: true, at: "2026-11-20T10:40:00Z", hook: "./deploy.sh", note: deployed by the hook, window_minutes: 30 }
+# Shape A: the revert this pipeline opened has merged; its deploy runs with PIPELINE_REASON=rollback and nothing is watched (decision 26), no state moves. The items sent back to Releasing get one release run, started by deploy.
+cut: { mode: revert, release: "", items: ["#7"], pr: 13, legacy: true, summary: "stub: PR 13 is the revert", question: "", options: [], recommendation: null }
+deploy: { deployed: true, ok: true, at: "2026-11-20T10:40:00Z", hook: "./deploy.sh", note: "deployed by the hook; release: unify-deploy: admitted", window_minutes: 30 }
 fixture:
-  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", unify_merge_binding: /srv/bindings/unify-merge.json }
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", reason: revert, unify_merge_binding: /srv/bindings/unify-merge.json, unify_deploy_binding: /srv/bindings/unify-deploy.json }
   expect: completed
-  reached: [reconcile, deploy]
+  reached: [cut, deploy]

@@ -1,0 +1,6 @@
+# The hourly run (no item) finds a release to deploy, or one whose release run is gone: it starts a release run under the engine key `release` and ends with none; nothing deploys in this run.
+cut: { mode: none, release: "r-abc123", items: ["#7", "#8"], pr: null, legacy: false, summary: "stub: release r-abc123 is watched in production, and no release run is left: resumed from where it stopped; handed to a release run (unify-deploy: admitted)", question: "", options: [], recommendation: null }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "", reason: schedule, unify_merge_binding: /srv/bindings/unify-merge.json, unify_deploy_binding: /srv/bindings/unify-deploy.json }
+  expect: completed
+  reached: [cut]

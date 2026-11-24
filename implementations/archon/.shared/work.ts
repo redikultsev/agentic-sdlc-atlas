@@ -47,6 +47,14 @@ export interface WorkDoc {
   review: unknown;
   /** Branch updates tried by land on the current card (at most 3). */
   landAttempts: number;
+  /** Set by the Operator at Accept or later: front of every queue, a release right after the merge (decision 53). */
+  urgent: boolean;
+  /** The toggle the change ships behind, when the plan names one (decision 61). */
+  toggle: string | null;
+  /** Approvals on pre-merge environments, each bound to the candidate's restricted tree (decisions 49, 50). */
+  approvals: { env: string; service: string; commit: string; tree: string; by: string; at: string }[];
+  /** The release that carries the item, once one took it (decision 48). */
+  release: string | null;
 }
 
 export function emptyWork(): WorkDoc {
@@ -69,6 +77,10 @@ export function emptyWork(): WorkDoc {
     history: [],
     review: null,
     landAttempts: 0,
+    urgent: false,
+    toggle: null,
+    approvals: [],
+    release: null,
   };
 }
 

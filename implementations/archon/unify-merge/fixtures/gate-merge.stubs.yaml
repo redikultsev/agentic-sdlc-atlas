@@ -8,4 +8,6 @@ land: {"outcome": "merged", "head": "abc1234def5678", "detail": "stub: merged", 
 next: {"did": "unify-deploy: admitted"}
 merge-review: {"state": "merge-review"}
 merge-gate: {"decision": "merge", "text": "", "value": {"effect": "merge", "head": "abc1234def5678", "fingerprint": "fixtureprint"}}
+env: {"go": "land", "kind": "", "env": "", "service": "", "commit": "", "tree": "", "answerers": "", "remaining": 0, "start": [], "notes": ["stub: no pre-merge environment"], "ask": false, "question": "", "options": [], "recommendation": null}
+test-ruling: {"go": "land", "start": []}
 fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "completed", "reached": ["reconcile", "rules", "merge-review", "ruling", "land", "next"]}

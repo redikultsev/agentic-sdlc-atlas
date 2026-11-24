@@ -1,0 +1,10 @@
+# Another item holds the shared environment: this one joins its queue, stays in
+# Verifying with queued:test/api, and the run ends with no card.
+reconcile: {"ok": true, "state": "verifying", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
+reconcile-ruling: {"go": true}
+rules: {"path": "approved", "r0": false, "reasons": ["the Operator's merge holds at fixtureprint"], "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "stale": [], "ask": false, "question": "", "options": [], "recommendation": null}
+ruling: {"decision": "merge", "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "operator": true, "revert": false}
+env: {"go": "queued", "kind": "", "env": "test", "service": "api", "commit": "", "tree": "", "answerers": "", "remaining": 0, "start": [], "notes": ["stub: queued on test/api at place 1, behind #5"], "ask": false, "question": "", "options": [], "recommendation": null}
+test-ruling: {"go": "stop", "start": []}
+next: {"did": "queued on test/api"}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7", "unify_merge_binding": "/bindings/unify-merge.yaml", "unify_deploy_binding": "/bindings/unify-deploy.yaml", "unify_round_binding": "/bindings/unify-round.yaml"}, "expect": "completed", "reached": ["reconcile", "rules", "ruling", "env", "test-ruling", "next"]}

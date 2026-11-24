@@ -1,15 +1,28 @@
 name: unify-deploy
 description: |
-  Deploy and watch one merged item (decision 26). Runs the project's deploy hook, moves the
-  item to Live, then watches it for the project's window: every 5 minutes a script
-  computes before/after numbers for the project's signals (other deploys' minutes left
-  out), the Watcher agent reads them, and a script acts. A regression in this PR is
-  reverted at once (the revert goes to unify-merge and its deploy is not watched
-  again), then RolledBack with a report and a new item with the evidence. A clean window
-  is Done (health-only coverage noted). When unsure, the Operator decides.
+  The release run (decisions 48, 52, 53, 61; shape A is decision 26). Runs under the
+  engine key `release`, so releases never run in parallel; the hourly run, which has no
+  item, starts one for what it finds and deploys nothing itself. `cut` takes every merged
+  item waiting in Releasing into one release, or resumes the open one (also one deploying,
+  watched or at a gate whose release run is gone); a project that releases
+  on the Operator's word gets one request for the whole release, and a release line
+  blocked after a rollback is one request too. `promote` deploys the release to every
+  environment after merge in order (recipe, version read from the target, smoke check),
+  stopping at a person's gate on a non-production environment (promote / hold; the answer
+  starts the next run). Then the items are Live and production is watched: every 5 minutes
+  a script computes before/after numbers (other deploys' minutes left out), the Watcher
+  agent reads them and names the culprit item when it can, and a script acts. A
+  regression is rolled back at once: a toggle off first, then the environment's rollback
+  (revert in shape A, the previous verified release otherwise); the culprit is RolledBack
+  with a report and a new item, the others go back to Releasing, the line is blocked after
+  a redeploy. No culprit, or unsure: the Operator decides. A clean window is Done, with
+  the toggle's cleanup filed. A merged revert this pipeline opened is deployed unwatched
+  in shape A and clears the release line; the items waiting in Releasing then get one
+  release run at once.
 
-  Use when: unify-merge fires it after a merge. NOT for: merging (unify-merge), or
-  watching a change that did not go through the pipeline.
+  Use when: unify-merge fires it after a merge or a revert's merge, the hourly schedule,
+  or an answer to a release request. NOT for: merging (unify-merge), deploying before
+  merge (unify-round), or watching a change that did not go through the pipeline.
 
 inputs:
   repo_host:
@@ -19,45 +32,65 @@ inputs:
     required: true
     description: The owner/name path of the repository.
   number:
-    required: true
-    description: "The item's key: an issue number or a tracker key such as PROJ-123."
+    default: ""
+    description: "The item whose merge or revert started the run, if any: an issue number or a tracker key such as PROJ-123."
+  reason:
+    default: schedule
+    description: "What started the run: merge, schedule, operator (the Operator's word to release) or revert."
   unify_merge_binding:
     default: ""
     description: The absolute path of the unify-merge fire-only binding file; a revert is sent to merge through it.
+  unify_deploy_binding:
+    default: ""
+    description: The absolute path of this workflow's fire-only binding file; an answer to a release request starts the next release run through it.
 
-# Runs in the launch checkout: the deploy hook deploys the merged base, not an item branch.
+# Runs in the launch checkout: recipes deploy the release's commit, not an item branch.
 worktree: { enabled: false }
 
 nodes:
-  - id: reconcile
-    script: reconcile
+  - id: cut
+    script: cut
     runtime: bun
     output_format:
       type: object
       properties:
-        mode: { type: string, enum: [watch, revert, stop] }
-        state: { type: string }
+        mode: { type: string, enum: [release, revert, ask, blocked, none, stop] }
+        release: { type: string }
+        items: { type: array, items: { type: string } }
         pr: { type: [integer, 'null'] }
-        reason: { type: string }
-      required: [mode, state, pr, reason]
+        legacy: { type: boolean }
+        summary: { type: string }
+        question: { type: string }
+        options:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              label: { type: string }
+              does: { type: string }
+              value: { type: object }
+            required: [id, label, does, value]
+        recommendation: { type: [object, 'null'] }
+      required: [mode, release, items, pr, legacy, summary, question, options, recommendation]
 
-  # Label and record disagree: nothing deploys, the item is put in front of the Operator.
+  # The run's item and its record disagree: nothing deploys, the item is put in front of the Operator.
   - id: flag
     script: flag
     runtime: bun
-    depends_on: [reconcile]
-    when: "$reconcile.output.mode == 'stop'"
+    depends_on: [cut]
+    when: "$cut.output.mode == 'stop'"
     with:
-      reason: "$reconcile.output.reason"
+      why: "$cut.output.summary"
 
+  # Shape A: the merged revert deploys at once, unwatched (decision 26).
   - id: deploy
     script: deploy
     runtime: bun
-    depends_on: [reconcile]
-    when: "$reconcile.output.mode != 'stop'"
+    depends_on: [cut]
+    when: "$cut.output.mode == 'revert'"
     with:
-      mode: "$reconcile.output.mode"
-      pr: "$reconcile.output.pr"
+      pr: "$cut.output.pr"
     output_format:
       type: object
       properties:
@@ -69,17 +102,121 @@ nodes:
         window_minutes: { type: number }
       required: [deployed, ok, at, hook, note, window_minutes]
 
-  - id: state
-    script: state
+  # release.trigger: operator: one request for the whole release (decision 48).
+  - id: release-ask
+    depends_on: [cut]
+    when: "$cut.output.mode == 'ask'"
+    wait:
+      attention: "$cut.output.question"
+      form: select
+      options: "$cut.output.options"
+      other: true
+      recommendation: "$cut.output.recommendation"
+      labels: { gate: release, stage: release, kind: release-ask, item: "$INPUTS.number" }
+
+  - id: release-answer
+    script: decide
     runtime: bun
-    depends_on: [reconcile, deploy]
-    when: "$reconcile.output.mode == 'watch'"
+    depends_on: [cut, release-ask]
+    with:
+      gate: release
+      release: ""
+      env: ""
+      items: { from: "$cut.output.items" }
+      decision: "$release-ask.output.decision"
+      text: "$release-ask.output.text"
+      value: "$release-ask.output.value"
+
+  # The release line is blocked after a rollback (decision 52): wait, or end the block. The
+  # suspending nodes are chained (each after the one before, skipped or not), so only one
+  # owns the run's cursor.
+  - id: line-ask
+    depends_on: [cut, release-ask]
+    trigger_rule: none_failed_min_one_success
+    when: "$cut.output.mode == 'blocked'"
+    wait:
+      attention: "$cut.output.question"
+      form: select
+      options: "$cut.output.options"
+      other: true
+      recommendation: "$cut.output.recommendation"
+      labels: { gate: release-line, stage: release, kind: line-ask, item: "$INPUTS.number" }
+
+  - id: line-answer
+    script: decide
+    runtime: bun
+    depends_on: [cut, line-ask]
+    with:
+      gate: line
+      release: ""
+      env: ""
+      items: { from: "$cut.output.items" }
+      decision: "$line-ask.output.decision"
+      text: "$line-ask.output.text"
+      value: "$line-ask.output.value"
+
+  - id: promote
+    script: promote
+    runtime: bun
+    depends_on: [cut, line-ask]
+    trigger_rule: none_failed_min_one_success
+    when: "$cut.output.mode == 'release'"
+    with:
+      release: "$cut.output.release"
+    output_format:
+      type: object
+      properties:
+        result: { type: string, enum: [gate, production, done] }
+        env: { type: string }
+        deployed_at: { type: string }
+        window_minutes: { type: number }
+        summary: { type: string }
+        question: { type: string }
+        options:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              label: { type: string }
+              does: { type: string }
+              value: { type: object }
+            required: [id, label, does, value]
+        recommendation: { type: [object, 'null'] }
+      required: [result, env, deployed_at, window_minutes, summary, question, options, recommendation]
+
+  # A person's gate on a non-production environment (decision 50): outside the waiting cap.
+  - id: promote-ask
+    depends_on: [promote]
+    when: "$promote.output.result == 'gate'"
+    wait:
+      attention: "$promote.output.question"
+      form: select
+      options: "$promote.output.options"
+      other: true
+      recommendation: "$promote.output.recommendation"
+      labels: { gate: promote, stage: release, kind: promote-ask, env: "$promote.output.env", release: "$cut.output.release" }
+
+  - id: promote-answer
+    script: decide
+    runtime: bun
+    depends_on: [cut, promote, promote-ask]
+    with:
+      gate: promote
+      release: "$cut.output.release"
+      env: "$promote.output.env"
+      items: { from: "$cut.output.items" }
+      decision: "$promote-ask.output.decision"
+      text: "$promote-ask.output.text"
+      value: "$promote-ask.output.value"
 
   # One pass every 5 minutes until the window ends or the Watcher's call ends it. The
   # timed wait is the body's only terminal sink; it is skipped on the pass that ends the
   # watch, so the loop ends without waiting again.
   - id: watch
-    depends_on: [reconcile, deploy, state]
+    depends_on: [cut, promote, promote-ask]
+    trigger_rule: none_failed_min_one_success
+    when: "$cut.output.mode == 'release' && $promote.output.result == 'production'"
     loop_group:
       max_iterations: 288
       on_exhausted: complete
@@ -90,9 +227,10 @@ nodes:
           script: signals
           runtime: bun
           with:
-            pr: "$reconcile.output.pr"
-            deployed_at: "$deploy.output.at"
-            deploy_ok: "$deploy.output.ok"
+            release: "$cut.output.release"
+            env: "$promote.output.env"
+            deployed_at: "$promote.output.deployed_at"
+            deploy_ok: "true"
           output_format:
             type: object
             properties:
@@ -102,10 +240,14 @@ nodes:
               signals: { type: array, items: { type: object } }
               window: { type: object }
               excluded: { type: array, items: { type: object } }
+              release: { type: string }
+              env: { type: string }
+              items: { type: array, items: { type: object } }
+              toggled: { type: array, items: { type: object } }
               pr: { type: [integer, 'null'] }
               files: { type: array, items: { type: object } }
               patches: { type: string }
-            required: [coverage, ended, health, signals, window, excluded, pr, files, patches]
+            required: [coverage, ended, health, signals, window, excluded, release, env, items, toggled, pr, files, patches]
 
         - id: watcher
           command: watcher
@@ -119,7 +261,8 @@ nodes:
             type: object
             additionalProperties: false
             properties:
-              verdict: { type: string, enum: [clean, regression-in-this-pr, unclear, unsure] }
+              verdict: { type: string, enum: [clean, regression, unclear, unsure] }
+              culprit: { type: [string, 'null'] }
               coverage: { type: string, enum: [full, health-only] }
               reason: { type: string }
               evidence:
@@ -134,14 +277,15 @@ nodes:
                     note: { type: string }
                   required: [signal, before, after, note]
               confidence: { type: string, enum: [low, medium, high] }
-            required: [verdict, coverage, reason, evidence, confidence]
+            required: [verdict, culprit, coverage, reason, evidence, confidence]
 
         - id: act
           script: act
           runtime: bun
           depends_on: [signals, watcher]
           with:
-            pr: "$reconcile.output.pr"
+            release: "$cut.output.release"
+            env: "$promote.output.env"
             watcher: { from: "$watcher.output" }
             ended: "$signals.output.ended"
             coverage: "$signals.output.coverage"
@@ -151,10 +295,11 @@ nodes:
               result: { type: string, enum: [continue, done, rolled-back, unsure] }
               stop: { type: boolean }
               coverage: { type: string }
+              culprit: { type: [string, 'null'] }
               revert_pr: { type: [integer, 'null'] }
               fire: { type: string }
               reason: { type: string }
-            required: [result, stop, coverage, revert_pr, fire, reason]
+            required: [result, stop, coverage, culprit, revert_pr, fire, reason]
 
         - id: pause
           depends_on: [act]
@@ -165,9 +310,10 @@ nodes:
   - id: outcome
     script: outcome
     runtime: bun
-    depends_on: [reconcile, watch]
+    depends_on: [cut, promote, watch]
     with:
-      pr: "$reconcile.output.pr"
+      release: "$cut.output.release"
+      env: "$promote.output.env"
     output_format:
       type: object
       properties:
@@ -188,7 +334,7 @@ nodes:
         recommendation: { type: [object, 'null'] }
       required: [result, coverage, summary, question, options, recommendation]
 
-  # The Watcher is unsure: the Operator decides. The run pauses and gives its slot back.
+  # The Watcher is unsure, or named no culprit: the Operator decides. The run pauses and gives its slot back.
   - id: ask
     depends_on: [outcome]
     when: "$outcome.output.question != ''"
@@ -201,13 +347,15 @@ nodes:
       labels:
         gate: watch
         item: "$INPUTS.number"
+        release: "$cut.output.release"
 
   - id: answer
     script: answer
     runtime: bun
-    depends_on: [reconcile, ask]
+    depends_on: [cut, promote, ask]
     with:
-      pr: "$reconcile.output.pr"
+      release: "$cut.output.release"
+      env: "$promote.output.env"
       decision: "$ask.output.decision"
       text: "$ask.output.text"
       value: "$ask.output.value"

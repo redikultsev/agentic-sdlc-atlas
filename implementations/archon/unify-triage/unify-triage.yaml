@@ -2,6 +2,7 @@ name: unify-triage
 description: |
   Triage of one request (stage 1): trust check, Triaging, the Triage agent with raw
   evidence for every claim, then the Operator's Accept card in TriageReview. Accept
+  (or accept as urgent: front of every queue, a release right after the merge)
   starts the spec (M, L) or the first implementation round (S); for a human and won't do
   end here. An "other" answer is a ruling (a corrected size or risk) and triage runs
   again with it.

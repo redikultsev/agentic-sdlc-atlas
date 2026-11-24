@@ -1,0 +1,24 @@
+# The project declares two environments (a shared test with a gate before merge, production
+# after it), a release on schedule and toggles: the deploys line lists each with its steps.
+repo: { host: github.com, path: example/repo, source: inputs }
+labels: { ok: true, total: 26, tracker: code-host, lacks: [], ensured: [state:triaging], existing: [], failed: [] }
+access: { ok: true, host: github.com, login: acme-bot, expected_login: acme-bot, login_matches: true, repo_error: null, error: null }
+bindings: { ok: true, dir: /srv/bindings, declared: [unify-poll], found: [unify-poll], missing: [], problems: [] }
+codex: { configured: true, provider: codex, model: gpt-codex, credential: CODEX_API_KEY, notes: [] }
+tests: { ran: true, ok: true, command: bun test, guard: true, where: { git: /opt/guard/git, gh: /opt/guard/gh }, exit: 0, timed_out: false, refusals: [], tail: [], note: ran through the guard }
+deploys:
+  ok: true
+  base: main
+  error: null
+  legacy: false
+  environments:
+    - { name: test, kind: shared, stage: before-merge, steps: [deploy, version, smoke, "gate (alice)", rollback forward] }
+    - { name: production, kind: production, stage: after-merge, steps: [deploy, version, smoke, watch 30 min, rollback revert] }
+  trigger: schedule
+  toggles: ./deploy/toggle.sh
+report: { pack: unify-sdlc, ok: true, report: "stub: 2 environment(s); release trigger schedule; toggles set by ./deploy/toggle.sh" }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, bindings_dir: /srv/bindings }
+  expect: completed
+  authored: succeeded
+  reached: [repo, labels, access, bindings, codex, tests, deploys, report]

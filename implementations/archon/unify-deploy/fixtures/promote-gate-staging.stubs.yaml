@@ -1,0 +1,19 @@
+# Staging declares a person's gate: the release is deployed there and stops with a request; the answer promote starts the next run, which goes on to production.
+cut: { mode: release, release: "a1b2c3d4e5f6-0011aabb", items: ["#7"], pr: 12, legacy: false, summary: "stub: release of #7", question: "", options: [], recommendation: null }
+promote:
+  result: gate
+  env: staging
+  deployed_at: ""
+  window_minutes: 0
+  summary: "stub: release waits at the gate of staging"
+  question: "stub: Promote release from staging to production?"
+  options:
+    - { id: promote, label: Promote, does: "Deploys the release to production.", value: { effect: promote, env: staging } }
+    - { id: hold, label: Hold, does: "Stops the release at staging.", value: { effect: hold, env: staging } }
+  recommendation: { option: promote, why: "stub: checks passed on staging", confidence: medium }
+promote-ask: { decision: promote, text: "" }
+promote-answer: { effect: promote, summary: "stub: passed the gate of staging; unify-deploy: queued" }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", reason: merge, unify_merge_binding: /srv/bindings/unify-merge.json, unify_deploy_binding: /srv/bindings/unify-deploy.json }
+  expect: completed
+  reached: [cut, promote, promote-ask, promote-answer]

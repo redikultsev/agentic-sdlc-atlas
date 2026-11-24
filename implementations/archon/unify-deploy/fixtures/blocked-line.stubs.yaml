@@ -1,0 +1,19 @@
+# The release line is blocked after a rollback and the base holds no revert of the culprit: one request; the Operator waits.
+cut:
+  mode: blocked
+  release: ""
+  items: ["#7"]
+  pr: null
+  legacy: false
+  summary: "stub: the release line is blocked since release r1 was rolled back (culprit #8)"
+  question: "stub: The release line is blocked: #7 cannot go to production yet."
+  options:
+    - { id: wait, label: Wait, does: "Leaves the items in Releasing.", value: { effect: wait, items: ["#7"] } }
+    - { id: end-block, label: End the block, does: "Clears the release line now and starts the release.", value: { effect: end-block, items: ["#7"] } }
+  recommendation: { option: wait, why: "stub: the revert merges without a gate", confidence: high }
+line-ask: { decision: wait, text: "" }
+line-answer: { effect: wait, summary: "stub: the release line stays blocked" }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", reason: merge, unify_merge_binding: /srv/bindings/unify-merge.json, unify_deploy_binding: /srv/bindings/unify-deploy.json }
+  expect: completed
+  reached: [cut, line-ask, line-answer]

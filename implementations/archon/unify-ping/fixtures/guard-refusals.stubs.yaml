@@ -6,9 +6,10 @@ access: { ok: true, host: github.com, login: acme-bot, expected_login: "", login
 bindings: { ok: null, dir: "", declared: [unify-poll], found: [], missing: [], problems: ["bindings_dir is not set: the check did not run"] }
 codex: { configured: false, provider: null, model: null, credential: null, notes: ["no @review alias: the review node falls back to its tier"] }
 tests: { ran: true, ok: false, command: bun test, guard: true, where: { git: /opt/guard/git, gh: null }, exit: 1, timed_out: false, refusals: ["guard: refused git push in a test fixture"], tail: [], note: ran through the guard }
+deploys: { ok: true, base: main, error: null, legacy: true, environments: [{ name: production, kind: production, stage: after-merge, steps: [deploy, watch 30 min, rollback revert] }], trigger: merge, toggles: null }
 report: { pack: unify-sdlc, ok: false, report: "stub: the guard refused git push in the test suite" }
 fixture:
   inputs: {}
   expect: completed
   authored: failed
-  reached: [repo, labels, access, bindings, codex, tests, report]
+  reached: [repo, labels, access, bindings, codex, tests, deploys, report]

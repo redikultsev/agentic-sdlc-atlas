@@ -2,9 +2,11 @@ name: unify-plan
 description: |
   The plan stage of an approved spec (stage 3): Planning, codebase research for L items
   with every reference checked at the base commit, then up to three plans, each checked
-  by script (criteria covered, no cycle, files and a check command per slice), committed
-  as .pipeline/work/<n>/plan.md and put to the Operator at PlanReview. Approve creates the
-  slice items with blocked-by links and starts the first implementation round.
+  by script (criteria covered, no cycle, files and a check command per slice, a toggle
+  only when the project declares toggles), committed as .pipeline/work/<n>/plan.md and put
+  to the Operator at PlanReview. Approve creates the slice items with blocked-by links,
+  records the plan's toggle in the engine's work document and starts the first
+  implementation round.
 
   Use when: unify-spec fires it after the spec is approved.
   NOT for: implementing (unify-round).
@@ -121,7 +123,9 @@ nodes:
         criteria: { type: array, items: { type: string } }
         base_commit: { type: string }
         size: { type: string }
-      required: [context, spec, criteria, base_commit, size]
+        toggles: { type: string }
+        toggles_declared: { type: boolean }
+      required: [context, spec, criteria, base_commit, size, toggles, toggles_declared]
 
   # L items only: research first.
   - id: researcher
@@ -224,6 +228,7 @@ nodes:
             rulings: "$prev-ruling.output.rulings"
             correction: "$prev-ruling.output.correction"
             previous: "$LOOP_PREV.planner.output"
+            toggles: "$gather.output.toggles"
           output_format:
             type: object
             additionalProperties: false
@@ -244,7 +249,9 @@ nodes:
                     blocked_by: { type: array, items: { type: string } }
                     changed_lines: { type: integer }
                   required: [id, title, files, risks, check, criteria, blocked_by, changed_lines]
-            required: [summary, slices]
+              # The toggle the change ships behind (decision 61); null when none or when the project declares no toggles.
+              toggle: { type: [string, 'null'] }
+            required: [summary, slices, toggle]
 
         - id: check-plan
           script: check-plan
@@ -254,6 +261,7 @@ nodes:
           with:
             plan: "$planner.output"
             criteria: "$gather.output.criteria"
+            toggles_declared: "$gather.output.toggles_declared"
           output_format:
             type: object
             properties:
@@ -261,7 +269,8 @@ nodes:
               problems: { type: array, items: { type: string } }
               url: { type: string }
               slices: &slices { type: array, items: { type: object } }
-            required: [ok, problems, url, slices]
+              toggle: &toggle { type: [string, 'null'] }
+            required: [ok, problems, url, slices, toggle]
 
         # SPEC's "state PlanReview": the move and the request.
         - id: review
@@ -286,7 +295,8 @@ nodes:
               url: { type: string }
               slices: *slices
               problems: { type: array, items: { type: string } }
-            required: [ok, reason, question, options, recommendation, over, url, slices, problems]
+              toggle: *toggle
+            required: [ok, reason, question, options, recommendation, over, url, slices, problems, toggle]
 
         - id: plan-gate
           depends_on: [review]

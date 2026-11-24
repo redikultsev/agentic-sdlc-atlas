@@ -1,7 +1,6 @@
 # The Watcher is unsure: nothing moves, the Operator is asked, and answers roll-back.
-reconcile: { mode: watch, state: merge-review, pr: 12, reason: "stub: PR 12 merged" }
-deploy: { deployed: true, ok: true, at: "2026-11-20T10:00:00Z", hook: "./deploy.sh", note: deployed by the hook, window_minutes: 30 }
-state: { state: live }
+cut: { mode: release, release: "a1b2c3d4e5f6-0011aabb", items: ["#7"], pr: 12, legacy: true, summary: "stub: release of #7", question: "", options: [], recommendation: null }
+promote: { result: production, env: production, deployed_at: "2026-11-20T10:00:00Z", window_minutes: 30, summary: "stub: on production", question: "", options: [], recommendation: null }
 signals:
   coverage: full
   ended: false
@@ -9,23 +8,27 @@ signals:
   signals: []
   window: { deployed_at: "2026-11-20T10:00:00Z", now: "2026-11-20T10:31:00Z", ends_at: "2026-11-20T10:30:00Z", ended: false, elapsed_minutes: 31 }
   excluded: []
+  release: "a1b2c3d4e5f6-0011aabb"
+  env: production
+  items: [{ key: "#7", pr: 12, files: [{ path: src/orders.ts, status: modified }] }]
+  toggled: []
   pr: 12
   files: [{ path: src/orders.ts, status: modified }]
   patches: ""
-watcher: { verdict: unsure, coverage: full, reason: "stub: latency up 30% but a deploy of #9 is settling", evidence: [{ signal: latency, before: 120, after: 156, note: "#9 deployed at 10:05" }], confidence: low }
-act: { result: unsure, stop: true, coverage: full, revert_pr: null, fire: "", reason: "stub: unsure" }
+watcher: { verdict: unsure, culprit: null, coverage: full, reason: "stub: latency up 30% but a deploy of #9 is settling", evidence: [{ signal: latency, before: 120, after: 156, note: "#9 deployed at 10:05" }], confidence: low }
+act: { result: unsure, stop: true, coverage: full, culprit: null, revert_pr: null, fire: "", reason: "stub: unsure" }
 outcome:
   result: unsure
   coverage: full
-  summary: "stub: #7: asking the Operator"
-  question: "stub: Roll back PR #12 or keep it deployed?"
+  summary: "stub: release: asking the Operator"
+  question: "stub: Roll back #7 (PR #12) or keep it deployed?"
   options:
-    - { id: roll-back, label: Roll back, does: "Opens a revert of PR #12 and sends it to merge.", value: { effect: roll-back } }
+    - { id: roll-back, label: Roll back, does: "Reverts PR #12 and sends it to merge.", value: { effect: roll-back } }
     - { id: keep, label: Keep it, does: "Leaves PR #12 deployed and marks #7 Done.", value: { effect: done } }
-  recommendation: { option: keep, why: "stub: nothing pins it on this PR", confidence: low }
+  recommendation: { option: keep, why: "stub: nothing pins it on this release", confidence: low }
 ask: { decision: roll-back, text: "" }
 answer: { effect: roll-back, summary: "stub: #7 is RolledBack; revert #13" }
 fixture:
-  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", unify_merge_binding: /srv/bindings/unify-merge.json }
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", reason: merge, unify_merge_binding: /srv/bindings/unify-merge.json, unify_deploy_binding: /srv/bindings/unify-deploy.json }
   expect: completed
-  reached: [reconcile, deploy, state, signals, watcher, act, outcome, ask, answer]
+  reached: [cut, promote, signals, watcher, act, outcome, ask, answer]

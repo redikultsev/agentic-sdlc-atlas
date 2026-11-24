@@ -1,0 +1,11 @@
+# The project releases on a schedule (release.trigger: schedule) and the item is not
+# urgent: merged into Releasing, and no release run is started; the scheduled one takes it.
+reconcile: {"ok": true, "state": "verifying", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
+reconcile-ruling: {"go": true}
+rules: {"path": "r0", "r0": true, "reasons": [], "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "stale": [], "ask": false, "question": "", "options": [], "recommendation": null}
+ruling: {"decision": "merge", "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "operator": false, "revert": false}
+env: {"go": "land", "kind": "", "env": "", "service": "", "commit": "", "tree": "", "answerers": "", "remaining": 0, "start": [], "notes": ["stub: R0 or a revert: no pre-merge environment (decision 50)"], "ask": false, "question": "", "options": [], "recommendation": null}
+test-ruling: {"go": "land", "start": []}
+land: {"outcome": "merged", "head": "abc1234def5678", "detail": "stub: merged", "merge_commit": "fixturemerge", "attempts": 0, "ask": false, "question": "", "options": [], "recommendation": null, "start": []}
+next: {"did": "release trigger is schedule: the scheduled release takes it"}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7", "unify_merge_binding": "/bindings/unify-merge.yaml", "unify_deploy_binding": "/bindings/unify-deploy.yaml", "unify_round_binding": "/bindings/unify-round.yaml"}, "expect": "completed", "reached": ["reconcile", "rules", "ruling", "env", "test-ruling", "land", "next"]}

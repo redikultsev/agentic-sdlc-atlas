@@ -1,0 +1,15 @@
+# .pipeline/project.yaml names a production environment before merge: it does not parse,
+# the deploys line is red with the parser message and the report fails.
+repo: { host: github.com, path: example/repo, source: inputs }
+labels: { ok: true, total: 26, tracker: code-host, lacks: [], ensured: [state:triaging], existing: [], failed: [] }
+access: { ok: true, host: github.com, login: acme-bot, expected_login: acme-bot, login_matches: true, repo_error: null, error: null }
+bindings: { ok: true, dir: /srv/bindings, declared: [unify-poll], found: [unify-poll], missing: [], problems: [] }
+codex: { configured: true, provider: codex, model: gpt-codex, credential: CODEX_API_KEY, notes: [] }
+tests: { ran: true, ok: true, command: bun test, guard: true, where: { git: /opt/guard/git, gh: /opt/guard/gh }, exit: 0, timed_out: false, refusals: [], tail: [], note: ran through the guard }
+deploys: { ok: false, base: main, error: "project.yaml: production environment production must be after-merge", legacy: false, environments: [], trigger: "", toggles: null }
+report: { pack: unify-sdlc, ok: false, report: "stub: deploys: .pipeline/project.yaml on main does not parse" }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, bindings_dir: /srv/bindings }
+  expect: completed
+  authored: failed
+  reached: [repo, labels, access, bindings, codex, tests, deploys, report]

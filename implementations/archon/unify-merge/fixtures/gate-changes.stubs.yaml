@@ -7,4 +7,5 @@ ruling: {"decision": "changes", "pr": 11, "head": "abc1234def5678", "fingerprint
 next: {"did": "unify-round: queued"}
 merge-review: {"state": "merge-review"}
 merge-gate: {"decision": "changes", "text": "stub: name the flag --dry-run", "value": {"effect": "changes"}}
+test-ruling: {"go": "stop", "start": []}
 fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7"}, "expect": "completed", "reached": ["reconcile", "rules", "merge-review", "ruling", "next"]}

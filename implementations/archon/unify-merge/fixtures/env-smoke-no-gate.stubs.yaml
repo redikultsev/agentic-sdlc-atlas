@@ -1,0 +1,12 @@
+# The holder's candidate deploys to the environment, the version and the smoke check
+# pass, and the environment has no person's gate: approved by the smoke check, then land
+# merges (the trees are equal) and the holds pass to the next item, which is started.
+reconcile: {"ok": true, "state": "verifying", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
+reconcile-ruling: {"go": true}
+rules: {"path": "approved", "r0": false, "reasons": ["the Operator's merge holds at fixtureprint"], "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "stale": [], "ask": false, "question": "", "options": [], "recommendation": null}
+ruling: {"decision": "merge", "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "operator": true, "revert": false}
+env: {"go": "land", "kind": "", "env": "test", "service": "api", "commit": "cand1234cand5678", "tree": "tree1234", "answerers": "", "remaining": 0, "start": [], "notes": ["stub: smoke green on test/api: approved by the smoke check"], "ask": false, "question": "", "options": [], "recommendation": null}
+test-ruling: {"go": "land", "start": []}
+land: {"outcome": "merged", "head": "abc1234def5678", "detail": "stub: merged", "merge_commit": "fixturemerge", "attempts": 0, "ask": false, "question": "", "options": [], "recommendation": null, "start": ["#9"]}
+next: {"did": "unify-deploy: admitted; started unify-merge: queued"}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7", "unify_merge_binding": "/bindings/unify-merge.yaml", "unify_deploy_binding": "/bindings/unify-deploy.yaml", "unify_round_binding": "/bindings/unify-round.yaml"}, "expect": "completed", "reached": ["reconcile", "rules", "ruling", "env", "test-ruling", "land", "next"]}

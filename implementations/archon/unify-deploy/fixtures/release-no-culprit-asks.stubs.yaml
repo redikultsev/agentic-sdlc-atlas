@@ -1,0 +1,35 @@
+# A release of two items: a regression nobody can pin on one item. Production goes back to the previous release, the line is blocked, and the Operator is asked; the answer is investigate.
+cut: { mode: release, release: "a1b2c3d4e5f6-0011aabb", items: ["#7", "#8"], pr: null, legacy: false, summary: "stub: release of #7, #8", question: "", options: [], recommendation: null }
+promote: { result: production, env: production, deployed_at: "2026-11-20T10:00:00Z", window_minutes: 30, summary: "stub: on production", question: "", options: [], recommendation: null }
+signals:
+  coverage: full
+  ended: false
+  health: { deploy_ok: true }
+  signals: []
+  window: { deployed_at: "2026-11-20T10:00:00Z", now: "2026-11-20T10:31:00Z", ends_at: "2026-11-20T10:30:00Z", ended: false, elapsed_minutes: 31 }
+  excluded: []
+  release: "a1b2c3d4e5f6-0011aabb"
+  env: production
+  items: [{ key: "#7", pr: 12, files: [{ path: src/orders.ts, status: modified }] }, { key: "#8", pr: 14, files: [{ path: src/billing.ts, status: modified }] }]
+  toggled: []
+  pr: null
+  files: []
+  patches: ""
+watcher: { verdict: regression, culprit: null, coverage: full, reason: "stub: p95 latency 120 -> 300 ms; both items touch the request path", evidence: [{ signal: latency, before: 120, after: 300, note: "src/orders.ts and src/billing.ts" }], confidence: medium }
+act: { result: rolled-back, stop: true, coverage: full, culprit: null, revert_pr: null, fire: "", reason: "stub: previous release redeployed; no culprit" }
+outcome:
+  result: unsure
+  coverage: full
+  summary: "stub: rolled back; asking the Operator for the culprit"
+  question: "stub: which item of the release caused the regression?"
+  options:
+    - { id: revert-all, label: Revert all, does: "Reverts every PR of the release.", value: { effect: revert-all } }
+    - { id: name-culprit, label: Name the culprit, does: "The key in the text is reverted.", value: { effect: name-culprit } }
+    - { id: investigate, label: Investigate, does: "Files a work item; the items go back to Releasing.", value: { effect: investigate } }
+  recommendation: { option: investigate, why: "stub: nothing pins it on one item", confidence: low }
+ask: { decision: investigate, text: "" }
+answer: { effect: investigate, summary: "stub: #7 and #8 are back in Releasing; investigated in #16" }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", reason: merge, unify_merge_binding: /srv/bindings/unify-merge.json, unify_deploy_binding: /srv/bindings/unify-deploy.json }
+  expect: completed
+  reached: [cut, promote, signals, watcher, act, outcome, ask, answer]

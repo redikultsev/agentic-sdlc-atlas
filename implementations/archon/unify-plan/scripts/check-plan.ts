@@ -4,11 +4,12 @@
  * slice ids `S<k>` are unique; blocked-by names existing slices and the graph has no
  * cycle; every slice names its files and a check command whose program exists here (the
  * command may fail at the base; it must start). Size is files and changed lines, never
- * time. The plan is committed to the item branch as `.pipeline/work/<key>/plan.md`;
- * problems do not stop the commit, the card shows them on top.
+ * time. A `toggle` is named only when the project declares toggles (decision 61). The
+ * plan is committed to the item branch as `.pipeline/work/<key>/plan.md`; problems do not
+ * stop the commit, the card shows them on top.
  *
  * Inputs: repo_host, repo_path, number, base; bound plan (the planner's output), criteria
- * (the spec's ids). Emits `{ ok, problems, url, slices }`.
+ * (the spec's ids), toggles_declared (gather). Emits `{ ok, problems, url, slices, toggle }`.
  */
 
 import { artifactsDir, emit, input } from 'archon:script';
@@ -28,7 +29,13 @@ export interface Slice {
   changed_lines: number;
 }
 
-interface Plan { summary: string; slices: Slice[] }
+interface Plan { summary: string; slices: Slice[]; toggle?: string | null }
+
+/** The plan's toggle, trimmed; null when it names none. */
+export function toggleOf(plan: Plan): string | null {
+  const t = (plan.toggle ?? '').trim();
+  return t === '' ? null : t;
+}
 
 /** The slice ids on a cycle of the blocked-by graph, or empty when it has none. */
 export function cycle(slices: readonly Slice[]): string[] {
@@ -49,8 +56,11 @@ export function cycle(slices: readonly Slice[]): string[] {
   return slices.map(s => s.id).filter(id => !done.has(id));
 }
 
-export function planProblems(plan: Plan, criteria: readonly string[], starts: (program: string) => boolean): string[] {
+export function planProblems(plan: Plan, criteria: readonly string[], starts: (program: string) => boolean, togglesDeclared = false): string[] {
   const problems: string[] = [];
+  const toggle = toggleOf(plan);
+  if (toggle !== null && !togglesDeclared) problems.push(`the plan ships behind toggle '${toggle}', but the project declares no toggles in .pipeline/project.yaml`);
+  if (toggle !== null && !/^[A-Za-z0-9._-]+$/.test(toggle)) problems.push(`toggle '${toggle}' is not one word of letters, digits, dot, dash or underscore`);
   if (plan.slices.length === 0) problems.push('the plan has no slice');
   const ids = new Set<string>();
   for (const s of plan.slices) {
@@ -84,6 +94,7 @@ function render(key: ItemKey, plan: Plan, problems: readonly string[]): string {
     '',
     plan.summary,
     '',
+    ...(toggleOf(plan) === null ? [] : [`Ships behind toggle \`${toggleOf(plan)}\`: switching it off is the first rollback (decision 61).`, '']),
     problems.length === 0 ? 'Checks: every criterion covered, no cycle, every slice with files and a check command.' : `Checks found ${problems.length} problem(s):\n\n${problems.map(p => `- ${p}`).join('\n')}`,
     '',
     ...plan.slices.flatMap(s => [
@@ -107,10 +118,10 @@ async function main(): Promise<void> {
   const plan = JSON.parse(input('plan')) as Plan;
   const criteria = JSON.parse(input('criteria') || '[]') as string[];
   const starts = (program: string): boolean => program.includes('/') ? Bun.file(program).size > 0 : Bun.which(program) !== null;
-  const problems = planProblems(plan, criteria, starts);
+  const problems = planProblems(plan, criteria, starts, input('toggles_declared') === 'true');
   const path = `.pipeline/work/${keySlug(key)}/plan.md`;
   const { commit } = commitFiles(input('base') || 'main', itemBranch(key), [{ path, text: render(key, plan, problems) }], `pipeline: plan for ${key}`, artifactsDir());
-  emit({ ok: problems.length === 0, problems, url: `https://${repo.host}/${repo.path}/blob/${commit}/${path}`, slices: plan.slices });
+  emit({ ok: problems.length === 0, problems, url: `https://${repo.host}/${repo.path}/blob/${commit}/${path}`, slices: plan.slices, toggle: toggleOf(plan) });
 }
 
 await script('unify-plan check-plan', main);

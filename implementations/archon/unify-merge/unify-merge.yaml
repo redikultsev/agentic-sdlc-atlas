@@ -1,17 +1,33 @@
 name: unify-merge
 description: |
   The merge of one work item's PR (SPEC "Workflows", unify-merge). A revert the deploy
-  step opened (`revert-pr:<m>` in `work/<n>` flags) merges with no gate, still through
-  land's head, update and CI checks (decision 26). Otherwise R0 is decided by
-  facts read from the base (`.pipeline/automerge.yaml`, the guard's flags, the merge_lane
-  setting, never-zones, working hours, the revert kill switch); anything else waits at the
-  Merge gate with the head SHA on the card. Landing updates the PR on the latest base,
-  waits for CI, re-checks that every verdict holds at the diff fingerprint, merges pinned
-  to the head and reads it back. It fires deploy, or a round on "changes", a conflict or
-  red. Started through its binding, which sets `resource: merge` with capacity 1.
+  step opened (`revert-pr:<m>` in `work/<key>` flags) merges with no gate, still through
+  land's head, update and CI checks (decision 26). Otherwise R0 is decided by facts read
+  from the base (`.pipeline/automerge.yaml`, the guard's flags, the merge_lane setting,
+  never-zones, working hours, the revert kill switch); anything else waits at the Merge
+  gate with the head SHA on the card, unless the Operator's merge still holds at the diff
+  fingerprint (`approved`: a run started again asks no second gate).
+  After an Operator's merge, the environment pass (decisions 49–51, 53): the PR's services
+  give the pre-merge environments of `.pipeline/project.yaml`; for each without an
+  approval, a shared one is held per service (not the holder: queued in Verifying, the
+  run ends; urgent at the front), what it runs is checked (not ours or production's: a
+  request), the candidate (base + item branch) is deployed, its version read and smoke
+  checked. Red smoke or a conflict: a fix round, every hold of the item goes to the next
+  item in Verifying. A failed deploy: a request. Green with no gate: approved by the smoke
+  check; with a gate: TestReview, the environment's answerers approve, ask for changes (a
+  round, no round spent; every hold goes on, and the item comes back first on that
+  environment) or hold. Landing updates the PR on the latest base, waits for CI, re-checks every
+  verdict at the fingerprint, merges pinned to the head and reads it back; it leaves every
+  hold (the next holders are started) and compares each approval's tree with the merged
+  base: equal, Releasing; different, a request (accept, or back to the environment on the
+  merged base). Merged starts the release run on merge or for an urgent item
+  (`release.trigger`); a scheduled or Operator's release takes the rest. `batch: true` is
+  not built (one build, one item). Started through its binding, which sets
+  `resource: merge` with capacity 1.
 
-  Use when: unify-round fires it after a pass with no slices left, on one item.
-  NOT for: verifying a PR (unify-round) or deploying (unify-deploy).
+  Use when: unify-round fires it after a pass with no slices left, on one item; or it is
+  started again for an item whose environment hold came free.
+  NOT for: verifying a PR (unify-round) or releasing (unify-deploy).
 
 inputs:
   repo_host:
@@ -35,7 +51,7 @@ inputs:
       Absolute path of the binding file that starts unify-merge itself, for a new card
       after the head moved with the same diff. Empty: such a case starts a round instead.
 
-# Reads the forge and fetches refs; never edits the checkout.
+# Reads the forge, fetches refs, pushes candidate refs and runs environment recipes; never edits the checkout.
 worktree:
   enabled: false
 mutates_checkout: false
@@ -97,7 +113,7 @@ nodes:
     output_format:
       type: object
       properties:
-        path: { type: string, enum: [r0, gate, stale, revert] }
+        path: { type: string, enum: [r0, gate, stale, revert, approved] }
         r0: { type: boolean }
         reasons: { type: array, items: { type: string } }
         pr: { type: integer }
@@ -151,8 +167,10 @@ nodes:
         revert: { type: boolean }
       required: [decision, pr, head, fingerprint, operator, revert]
 
-  - id: land
-    script: land
+  # The environment pass (decisions 49–51): only after an Operator's merge, not R0 or a revert.
+  # Recipes run in the launch checkout; the candidate is cut with git merge-tree and pushed.
+  - id: env
+    script: env
     runtime: bun
     depends_on: [ruling]
     when: "$ruling.output.decision == 'merge'"
@@ -162,7 +180,75 @@ nodes:
     output_format:
       type: object
       properties:
-        outcome: { type: string, enum: [merged, conflict, red, moved, stale, new-card, stuck] }
+        go: { type: string, enum: [land, queued, ask, gate, round] }
+        kind: { type: string, enum: ['', env-ask, test-gate] }
+        env: { type: string }
+        service: { type: string }
+        commit: { type: string }
+        tree: { type: string }
+        answerers: { type: string }
+        remaining: { type: integer }
+        start: { type: array, items: { type: string } }
+        notes: { type: array, items: { type: string } }
+        ask: { type: boolean }
+        question: { type: string }
+        options: *options
+        recommendation: { type: [object, 'null'] }
+      required: [go, kind, env, service, commit, tree, answerers, remaining, start, notes, ask, question, options, recommendation]
+
+  # What a shared environment runs is not ours (wait or take), or a deploy failed (retry or hold).
+  - id: env-ask
+    depends_on: [env]
+    when: "$env.output.kind == 'env-ask'"
+    wait:
+      attention: "$env.output.question"
+      form: select
+      options: "$env.output.options"
+      other: true
+      recommendation: "$env.output.recommendation"
+      labels: { gate: env-ask, stage: merge, kind: env-ask, item: "$INPUTS.number", env: "$env.output.env", service: "$env.output.service" }
+
+  # TestReview (decision 50): asked of the environment's answerers, outside the waiting cap.
+  - id: test-gate
+    depends_on: [env, env-ask]
+    trigger_rule: none_failed_min_one_success
+    when: "$env.output.kind == 'test-gate'"
+    wait:
+      attention: "$env.output.question"
+      form: select
+      options: "$env.output.options"
+      other: true
+      recommendation: "$env.output.recommendation"
+      labels: { gate: test-gate, stage: merge, kind: test-gate, item: "$INPUTS.number", env: "$env.output.env", service: "$env.output.service", answerers: "$env.output.answerers" }
+
+  - id: test-ruling
+    script: test-ruling
+    runtime: bun
+    depends_on: [ruling, env, test-gate]
+    trigger_rule: none_failed_min_one_success
+    with:
+      ruling: { from: "$ruling.output" }
+      env: { from: "$env.output", if_skipped: null }
+      answer: { from: "$test-gate.output", if_skipped: null }
+    output_format:
+      type: object
+      properties:
+        go: { type: string, enum: [land, round, again, hold, stop] }
+        start: { type: array, items: { type: string } }
+      required: [go, start]
+
+  - id: land
+    script: land
+    runtime: bun
+    depends_on: [ruling, test-ruling]
+    when: "$test-ruling.output.go == 'land'"
+    timeout: 10800000
+    with:
+      ruling: { from: "$ruling.output" }
+    output_format:
+      type: object
+      properties:
+        outcome: { type: string, enum: [merged, conflict, red, moved, stale, new-card, stuck, tree] }
         head: { type: string }
         detail: { type: string }
         merge_commit: { type: [string, 'null'] }
@@ -171,11 +257,12 @@ nodes:
         question: { type: string }
         options: *options
         recommendation: { type: [object, 'null'] }
+        start: { type: array, items: { type: string } }
       required: [outcome, head, detail, merge_commit, attempts, ask, question, options, recommendation]
 
   - id: land-ask
     depends_on: [land]
-    when: "$land.output.ask == 'true'"
+    when: "$land.output.outcome == 'stuck'"
     wait:
       attention: "$land.output.question"
       form: select
@@ -184,15 +271,32 @@ nodes:
       recommendation: "$land.output.recommendation"
       labels: { gate: land-stuck, stage: merge, kind: land-stuck, item: "$INPUTS.number" }
 
+  # What merged differs from what an environment approved (decision 49): accept or back to the environment.
+  - id: tree-ask
+    depends_on: [land, land-ask]
+    trigger_rule: none_failed_min_one_success
+    when: "$land.output.outcome == 'tree'"
+    wait:
+      attention: "$land.output.question"
+      form: select
+      options: "$land.output.options"
+      other: true
+      recommendation: "$land.output.recommendation"
+      labels: { gate: tree-ask, stage: merge, kind: tree-ask, item: "$INPUTS.number" }
+
   - id: next
     script: next
     runtime: bun
-    depends_on: [ruling, land, land-ask]
+    depends_on: [ruling, env, env-ask, test-ruling, land, land-ask, tree-ask]
     trigger_rule: none_failed_min_one_success
     with:
       ruling: { from: "$ruling.output" }
+      env: { from: "$env.output", if_skipped: null }
+      env_answer: { from: "$env-ask.output", if_skipped: null }
+      tested: { from: "$test-ruling.output", if_skipped: null }
       land: { from: "$land.output", if_skipped: null }
       answer: { from: "$land-ask.output", if_skipped: null }
+      tree_answer: { from: "$tree-ask.output", if_skipped: null }
     output_format:
       type: object
       properties: { did: { type: string } }

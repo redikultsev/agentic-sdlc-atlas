@@ -8,7 +8,8 @@
  *
  * Inputs: repo_host, repo_path, number, implement_lane; bound round (prev-ruling), plan
  * (check-plan, null when no plan was written this round), research (check-refs).
- * Emits the card with `over`, `url`, `slices`, `problems`.
+ * Emits the card with `over`, `url`, `slices`, `problems`, `toggle` (the facts say "ships
+ * behind toggle X" when the plan names one, decision 61).
  */
 
 import { emit, input } from 'archon:script';
@@ -26,11 +27,12 @@ async function main(): Promise<void> {
   if (key === undefined) return;
   const manual = (input('implement_lane') || 'auto') === 'manual';
   const round = JSON.parse(input('round')) as { over: boolean; mismatch: string; redo: number };
-  const plan = nullableJson(input('plan')) as { url: string; slices: Slice[]; problems: string[] } | null;
+  const plan = nullableJson(input('plan')) as { url: string; slices: Slice[]; problems: string[]; toggle?: string | null } | null;
   const research = nullableJson(input('research')) as { problems: string[]; url: string } | null;
   const url = plan?.url ?? `https://${repo.host}/${repo.path}/tree/${itemBranch(key)}/.pipeline/work/${keySlug(key)}`;
   const problems = plan?.problems ?? [];
-  const extra = { over: round.over, url, slices: plan?.slices ?? [], problems };
+  const toggle = plan?.toggle ?? null;
+  const extra = { over: round.over, url, slices: plan?.slices ?? [], problems, toggle };
   const mismatch = round.mismatch !== '' ? round.mismatch : await tryMove(key, ['planning', 'plan-review'], 'plan-review');
   if (mismatch !== null && mismatch !== '') {
     emit({ ...stopCard(key, 'plan', mismatch), ...extra });
@@ -50,6 +52,7 @@ async function main(): Promise<void> {
   ];
   const facts = [
     `Plan: ${url}`,
+    ...(toggle === null ? [] : [`Ships behind toggle ${toggle}: switching it off is the first rollback (decision 61).`]),
     ...(research !== null && research.url !== '' ? [`Research (the agent's reading, references checked): ${research.url}`] : []),
     ...extra.slices.map(s => `${s.id} ${s.title}: ${s.files.length} file(s), ~${s.changed_lines} lines, covers ${s.criteria.join(', ')}, blocked by ${s.blocked_by.join(', ') || 'nothing'}`),
     ...(manual ? ['implement_lane is manual: nothing starts unless you choose "Approve and start implementing".'] : []),

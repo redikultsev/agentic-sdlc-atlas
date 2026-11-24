@@ -96,6 +96,8 @@ plugin({
           throw new Error(`refused: ${reason}`);
         },
         outcomes: () => ({ nodes: [] }),
+        items: () => ({ window: { since: '', until: '' }, items: [], next: null }),
+        item: () => null,
         trigger: { fire: () => ({ disposition: { status: 'admitted' } }) },
       },
     }));

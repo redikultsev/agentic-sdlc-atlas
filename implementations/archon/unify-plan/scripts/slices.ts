@@ -5,7 +5,7 @@
  * approve: one slice item per slice, created idempotently (the marker carries the item and
  * the slice id, so a retry finds the item it made), labelled `pipeline:slice`, linked as
  * a slice of the item and "blocked by" its blocker slices where the tracker has such links;
- * the slices recorded in `work/<key>`; the move PlanReview → Implementing; then
+ * the slices and the plan's toggle (`work.toggle`, decision 61) recorded in `work/<key>`; the move PlanReview → Implementing; then
  * unify-round, once per run.
  * stop: nothing.
  *
@@ -29,7 +29,7 @@ async function main(): Promise<void> {
   const { repo, key } = runInputs();
   if (key === undefined) return;
   const t = tracker();
-  const card = JSON.parse(input('card')) as { url: string; slices: Slice[] };
+  const card = JSON.parse(input('card')) as { url: string; slices: Slice[]; toggle?: string | null };
   const answer = lastAnswer('rounds', 'plan-gate');
   if (answer === null) throw new Error('the PlanReview gate has no recorded answer');
   const effect = chosenEffect(answer, 'redo');
@@ -67,7 +67,9 @@ async function main(): Promise<void> {
       if (blocker !== undefined) await t.blockedBy(child, blocker);
     }
   }
-  updateWork(key, doc => {
+  const toggle = card.toggle ?? null;
+  const written = updateWork(key, doc => {
+    doc.toggle = toggle;
     const before = new Map(doc.slices.map(s => [s.id, s]));
     doc.slices = card.slices.map(s => {
       const child = items.get(s.id);
@@ -80,6 +82,7 @@ async function main(): Promise<void> {
       };
     });
   });
+  if (written.toggle !== toggle) throw new Error(`${key}: the toggle did not read back`);
   const mismatch = await tryMove(key, ['plan-review'], 'implementing');
   if (mismatch !== null) throw new Error(mismatch);
   if (input('unify_round_binding') === '') throw new Error('unify_round_binding is empty');

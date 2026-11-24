@@ -1,7 +1,7 @@
 # L item: the Researcher reads first; one reference does not exist at the base and is struck.
 reconcile: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, state: spec-review }
 enter: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, go: true, ask: false }
-gather: { context: "stub: item #7", spec: "# Spec for #7\n### AC1. stub\n### AC2. stub", criteria: [AC1, AC2], base_commit: "0123456789abcdef0123456789abcdef01234567", size: L }
+gather: { context: "stub: item #7", spec: "# Spec for #7\n### AC1. stub\n### AC2. stub", criteria: [AC1, AC2], base_commit: "0123456789abcdef0123456789abcdef01234567", size: L, toggles: "stub: the project declares no toggles", toggles_declared: false }
 researcher:
   summary: "stub: the report module owns the query"
   modules:
@@ -11,6 +11,7 @@ check-refs: { ok: false, problems: ["stub: src/report/missing.ts does not exist 
 prev-ruling: { go: true, over: false, mismatch: "", redo: 0, correction: "", rulings: "" }
 planner:
   summary: "stub: two slices, the export endpoint first"
+  toggle: null
   slices:
     - { id: S1, title: "stub: export endpoint", files: [src/report/export.ts], risks: [], check: "bun test src/report", criteria: [AC1], blocked_by: [], changed_lines: 80 }
     - { id: S2, title: "stub: download button", files: [src/ui/report.tsx], risks: [], check: "bun test src/ui", criteria: [AC2], blocked_by: [S1], changed_lines: 40 }
@@ -18,6 +19,7 @@ check-plan:
   ok: true
   problems: []
   url: "https://github.com/example/repo/blob/abc1234/.pipeline/work/7/plan.md"
+  toggle: null
   slices:
     - { id: S1, title: "stub: export endpoint", files: [src/report/export.ts], risks: [], check: "bun test src/report", criteria: [AC1], blocked_by: [], changed_lines: 80 }
     - { id: S2, title: "stub: download button", files: [src/ui/report.tsx], risks: [], check: "bun test src/ui", criteria: [AC2], blocked_by: [S1], changed_lines: 40 }
@@ -29,6 +31,7 @@ review:
   recommendation: { option: approve, why: "stub", confidence: medium }
   over: false
   url: "https://github.com/example/repo/blob/abc1234/.pipeline/work/7/plan.md"
+  toggle: null
   slices:
     - { id: S1, title: "stub: export endpoint", files: [src/report/export.ts], risks: [], check: "bun test src/report", criteria: [AC1], blocked_by: [], changed_lines: 80 }
     - { id: S2, title: "stub: download button", files: [src/ui/report.tsx], risks: [], check: "bun test src/ui", criteria: [AC2], blocked_by: [S1], changed_lines: 40 }

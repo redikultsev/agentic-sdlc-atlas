@@ -3,7 +3,9 @@ description: |
   Install check for the unify-sdlc pack, run by hand. Ensures every state and
   pipeline label exists in the project's tracker, checks `gh api` access and the pipeline login,
   checks the binding files written by `archon pack bindings`, reports whether the AI
-  reviewer can run on Codex, and runs the project's test suite through the git and gh
+  reviewer can run on Codex, reads .pipeline/project.yaml (environments with their kind,
+  stage and declared steps, the release trigger, toggles; shape A when no environments
+  are declared; a parse error fails the check), and runs the project's test suite through the git and gh
   guard, reporting what the guard refused. Ends with one readable report.
 
   Use when: after installing or updating the pack, or after changing the guard, the token
@@ -68,11 +70,36 @@ nodes:
     script: tests
     runtime: bun
 
+  - id: deploys
+    script: deploys
+    runtime: bun
+    output_format:
+      type: object
+      properties:
+        ok: { type: boolean }
+        base: { type: string }
+        error: { type: [string, 'null'] }
+        legacy: { type: boolean }
+        environments:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              kind: { type: string }
+              stage: { type: string }
+              steps: { type: array, items: { type: string } }
+            required: [name, kind, stage, steps]
+        trigger: { type: string }
+        toggles: { type: [string, 'null'] }
+      required: [ok, base, error, legacy, environments, trigger, toggles]
+
   - id: report
     script: report
     runtime: bun
-    depends_on: [repo, labels, access, bindings, codex, tests]
+    depends_on: [repo, labels, access, bindings, codex, tests, deploys]
     with:
+      deploys: { from: "$deploys.output" }
       repo: { from: "$repo.output" }
       labels: { from: "$labels.output" }
       access: { from: "$access.output" }

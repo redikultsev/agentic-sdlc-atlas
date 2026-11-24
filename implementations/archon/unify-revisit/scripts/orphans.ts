@@ -1,19 +1,27 @@
 /**
  * Two checks on items the engine holds in an agent state (Triaging, Specifying, Planning,
- * Implementing, Verifying, Releasing, Live), the states where a run should be working the item:
+ * Implementing, Verifying, Releasing, Live), the states where a run should be working the
+ * item, and in TestReview (not an Operator state, decision 50: its run waits at the
+ * answerer's gate, so a paused run there is waiting, not stuck):
  *
  * 1. Orphans (a restart, a dead run, a fire that started nothing): no run of the item is
  *    pending, running or paused, no start of it is queued in the engine, `work/<key>` does
- *    not record its last fire as queued (a queued fire counts as live), and no question
- *    of it is open. Such an item gets one comment and the label `pipeline:needs-attention`:
- *    the pipeline never guesses which step to restart.
+ *    not record its last fire as queued (a queued fire counts as live), no question of it
+ *    is open, and it does not wait in the queue of a shared environment (a `queued:` flag:
+ *    waiting is a condition inside Verifying, decision 51, and no time limit counts). A
+ *    Live item counts as worked while a release run (engine key `release`) is live or
+ *    queued; a Releasing item is never an orphan: it waits for a release, and the hourly
+ *    release run cuts one (and resumes a release whose run died). Such an item gets one
+ *    comment and the label `pipeline:needs-attention`: the pipeline never guesses which
+ *    step to restart.
  * 2. Runs over the project's limits (`limits.sessionMinutes`, `limits.sessionUsd` in
  *    `.pipeline/project.yaml`; decision 29, enforced here until the sandbox does it per
  *    session): a running run is cancelled (`archon workflow cancel`), a paused one
  *    abandoned (`archon workflow abandon`), through the host CLI in ARCHON_CLI_COMMAND,
  *    and one failed round is counted in `work/<key>`, once per run. Not counted as over: a
  *    unify-deploy run (its watch window is a clock of its own), a run the Operator
- *    paused, and a run paused at a question or a provider usage limit. A run whose cost
+ *    paused, a run paused at a question or a provider usage limit, and a run of an item in
+ *    TestReview or queued for an environment (waiting for an answerer or a hold). A run whose cost
  *    the provider does not report is listed as cost unknown, not stopped.
  *
  * Bound inputs: the workflow's INPUTS_REPO_HOST and INPUTS_REPO_PATH; the pack setting
@@ -24,12 +32,18 @@ import { emit, input } from 'archon:script';
 import { script, tracker } from '../../.shared/connector.ts';
 import { type ItemKey, keySlug } from '../../.shared/item.ts';
 import { projectPolicy } from '../../.shared/policy.ts';
+import { RELEASE_RUN } from '../../.shared/releases.ts';
 import { runKey } from '../../.shared/repo.ts';
 import type { State } from '../../.shared/states.ts';
 import { readWork, updateWork } from '../../.shared/work.ts';
 import { engineItems, hostCommand, MARKS_REVISIT, message, workItems, type EngineItem } from './lib.ts';
 
-const AGENT_STATES: readonly State[] = ['triaging', 'specifying', 'planning', 'implementing', 'verifying', 'releasing', 'live'];
+const AGENT_STATES: readonly State[] = ['triaging', 'specifying', 'planning', 'implementing', 'verifying', 'test-review', 'releasing', 'live'];
+
+/** Waiting for a shared environment's hold (decision 51): `queued:<env>/<service>` in the item's flags. */
+export function waitsForHold(flags: readonly string[]): boolean {
+  return flags.some(flag => flag.startsWith('queued:'));
+}
 const LIVE_RUN = new Set(['pending', 'running', 'paused']);
 
 type Run = EngineItem['runs'][number];
@@ -56,8 +70,11 @@ async function main(): Promise<void> {
   const errors: string[] = [];
 
   const held = workItems();
+  const release = engine.get(RELEASE_RUN);
+  const releaseWorking = (release?.runs.some(run => LIVE_RUN.has(run.status)) ?? false) || (release?.queued.length ?? 0) > 0;
   for (const state of AGENT_STATES) {
-    for (const { key } of held.filter(item => item.state === state)) {
+    for (const { key, flags } of held.filter(item => item.state === state)) {
+      const waiting = state === 'test-review' || waitsForHold(flags);
       try {
         const entry = engine.get(runKey(key));
         const runs = entry?.runs ?? [];
@@ -65,7 +82,7 @@ async function main(): Promise<void> {
         // 2. Runs over the limits.
         for (const run of runs) {
           if (run.status !== 'running' && run.status !== 'paused') continue;
-          if (entry === undefined || exempt(run, entry) !== null) continue;
+          if (entry === undefined || waiting || exempt(run, entry) !== null) continue;
           const minutes = (now - Date.parse(run.startedAt)) / 60_000;
           const usd = run.spend.usd;
           if (usd === null && (run.spend.inputTokens ?? 0) + (run.spend.outputTokens ?? 0) > 0) costUnknown.push({ item: key, run: run.id });
@@ -92,10 +109,12 @@ async function main(): Promise<void> {
         }
 
         // 1. Orphans.
-        const live = runs.some(run => LIVE_RUN.has(run.status));
-        const queued = (entry?.queued.length ?? 0) > 0 || readWork(key).doc.lastFire?.disposition === 'queued';
+        // A Live item is watched by the release run, under the engine key `release`, not its own.
+        const live = runs.some(run => LIVE_RUN.has(run.status)) || (state === 'live' && releaseWorking);
+        const queued = (entry?.queued.length ?? 0) > 0 || readWork(key).doc.lastFire?.disposition === 'queued' || waitsForHold(flags);
         const asking = (entry?.questions.length ?? 0) > 0;
-        if (live || queued || asking) continue;
+        // Releasing waits for a release: the hourly release run cuts every merged item there.
+        if (live || queued || asking || state === 'releasing') continue;
         const view = await tracker().view(key);
         if (!view.open) continue;
         const flagged = view.labels.includes(MARKS_REVISIT.needsAttention);

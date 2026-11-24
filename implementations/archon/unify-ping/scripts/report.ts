@@ -4,8 +4,12 @@
  * test command) is named as such, never counted as passed. Codex is reported, not
  * counted: unify-round fails closed on it at run time.
  *
- * Bound inputs: INPUTS_REPO, INPUTS_LABELS, INPUTS_ACCESS, INPUTS_BINDINGS, INPUTS_CODEX
- * and INPUTS_TESTS, the outputs of the checks.
+ * The deploys line says how `.pipeline/project.yaml` reads: each environment with its
+ * kind, stage and declared steps, the release trigger and the toggles; shape A (no
+ * `environments`) passes and says so; a file that does not parse fails with its message.
+ *
+ * Bound inputs: INPUTS_REPO, INPUTS_LABELS, INPUTS_ACCESS, INPUTS_BINDINGS, INPUTS_CODEX,
+ * INPUTS_TESTS and INPUTS_DEPLOYS, the outputs of the checks.
  */
 
 import { emit, input, refuse } from 'archon:script';
@@ -30,6 +34,15 @@ function main(): void {
   const bindings = read('bindings', input('bindings'));
   const codex = read('codex', input('codex'));
   const tests = read('tests', input('tests'));
+  const deploys = read('deploys', input('deploys'));
+  const envs = (Array.isArray(deploys.environments) ? deploys.environments : []) as { name: string; kind: string; stage: string; steps: string[] }[];
+  const deployLines =
+    deploys.ok !== true
+      ? [`${mark(false)} deploys: .pipeline/project.yaml on ${String(deploys.base)} does not parse: ${String(deploys.error)}`]
+      : [
+          `${mark(true)} deploys: ${deploys.legacy === true ? 'shape A from deploy: (no environments declared)' : `${envs.length} environment(s)`}; release trigger ${String(deploys.trigger)}; toggles ${deploys.toggles === null ? 'none' : `set by ${String(deploys.toggles)}`}`,
+          ...envs.map(e => `       ${e.name}: ${e.kind}, ${e.stage}; ${e.steps.join(', ')}`),
+        ];
 
   const lines = [
     `unify-sdlc install check for ${String(repo.host)}/${String(repo.path)} (from ${String(repo.source)})`,
@@ -38,6 +51,7 @@ function main(): void {
     `${mark(access.ok)} gh api: ${access.login === null ? `no access (${String(access.error)})` : `acts as ${String(access.login)}`}${access.login_matches === false ? `, but pipeline_login is ${String(access.expected_login)}` : ''}${access.repo_error ? `; repository not readable: ${String(access.repo_error)}` : ''}`,
     `${mark(bindings.ok)} bindings: ${bindings.ok === null ? 'not checked' : `${list(bindings.found).length} of ${list(bindings.declared).length} found in ${String(bindings.dir)}`}`,
     `${mark(codex.configured)} codex review (reported only): ${codex.configured ? `@review on ${String(codex.model ?? 'codex')}` : list(codex.notes).join('; ')}`,
+    ...deployLines,
     `${mark(tests.ok)} test suite through the guard: ${tests.ran ? `exit ${String(tests.exit)}${tests.timed_out ? ' (timed out)' : ''}, ${list(tests.refusals).length} guard refusals, ${String(tests.note)}` : String(tests.note)}`,
   ];
   const fixes = [
@@ -46,9 +60,10 @@ function main(): void {
     ...list(bindings.missing).map(id => `binding file missing for ${id}: run archon pack bindings --out <dir>`),
     ...list(bindings.problems).map(p => `binding: ${p}`),
     ...list(tests.refusals).map(r => `guard refused: ${r}`),
+    ...(deploys.ok === false ? ['fix .pipeline/project.yaml on the base (its format is in decision 48)'] : []),
   ];
   if (fixes.length > 0) lines.push('', 'To fix:', ...fixes.map(f => `- ${f}`));
-  const counted = [labels.ok, access.ok, bindings.ok, tests.ok];
+  const counted = [labels.ok, access.ok, bindings.ok, tests.ok, deploys.ok];
   const ok = counted.every(value => value !== false);
   emit({ pack: 'unify-sdlc', ok, report: lines.join('\n') });
 }

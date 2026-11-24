@@ -1,7 +1,7 @@
 # After a third redo no fourth plan is written: approve as is or stop; the Operator stops.
 reconcile: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, state: spec-review }
 enter: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, go: true, ask: false }
-gather: { context: "stub: item #7", spec: "# Spec for #7\n### AC1. stub\n### AC2. stub", criteria: [AC1, AC2], base_commit: "0123456789abcdef0123456789abcdef01234567", size: M }
+gather: { context: "stub: item #7", spec: "# Spec for #7\n### AC1. stub\n### AC2. stub", criteria: [AC1, AC2], base_commit: "0123456789abcdef0123456789abcdef01234567", size: M, toggles: "stub: the project declares no toggles", toggles_declared: false }
 check-refs: { ok: true, problems: [], checked: 0, research: "", url: "" }
 prev-ruling: { go: false, over: true, mismatch: "", redo: 3, correction: "stub: still too coarse", rulings: "" }
 review:
@@ -14,6 +14,7 @@ review:
   recommendation: { option: stop, why: "stub", confidence: medium }
   over: true
   url: "https://github.com/example/repo/tree/pipeline/7/.pipeline/work/7"
+  toggle: null
   slices: []
   problems: []
 plan-gate: { decision: stop, text: "", value: { effect: stop } }

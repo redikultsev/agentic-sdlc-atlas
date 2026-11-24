@@ -1,10 +1,10 @@
 /**
- * The label and `work/<key>` disagree with a deploy (see reconcile): nothing deploys, and
+ * The label and `work/<key>` disagree with a deploy (see cut): nothing deploys, and
  * the item is put in front of the Operator in the tracker, a comment with the reason and
  * the label `pipeline:needs-attention`. The comment's marker makes a retry write it once.
  *
  * Bound inputs: the workflow's INPUTS_REPO_HOST, INPUTS_REPO_PATH, INPUTS_NUMBER;
- * INPUTS_REASON from reconcile.
+ * INPUTS_WHY from cut.
  */
 
 import { emit, input, runId } from 'archon:script';
@@ -16,7 +16,7 @@ const NEEDS_ATTENTION = 'pipeline:needs-attention';
 async function main(): Promise<void> {
   const { key } = runInputs();
   if (key === undefined) return;
-  const reason = input('reason').trim();
+  const reason = input('why').trim();
   await tracker().comment(
     key,
     `unify-deploy-stopped:${runId()}`,

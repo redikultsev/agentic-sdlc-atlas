@@ -1,0 +1,11 @@
+# #9 is Verifying with no live run, but its flags say queued:test/api: it waits for the
+# hold, not stuck. #12 is TestReview with its run paused at the answerer's gate: waiting,
+# not stuck, and no time limit counts. Nothing is flagged.
+blocked: { checked: 0, notified: [], errors: [] }
+orphans: { orphans: [], stopped: [], cost_unknown: [], errors: [] }
+stale: { checked: 2, failing: [], set_aside: [], restored: [], errors: [] }
+holds: { freed: [], left: [], started: [], unflagged: [], errors: [] }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo }
+  expect: completed
+  reached: [blocked, orphans, stale, holds]

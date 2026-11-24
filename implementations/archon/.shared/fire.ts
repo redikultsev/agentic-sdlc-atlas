@@ -19,7 +19,9 @@ export function fireNext(
   repo: Repo,
   item: ItemKey | number,
   deliveryId: string,
-  extra: Readonly<Record<string, string>> = {}
+  extra: Readonly<Record<string, string>> = {},
+  /** The engine key of the started run, when it is not the item's own: `release` for the release run, so releases never run in parallel. */
+  runItem?: string
 ): string {
   const key = asKey(item);
   const path = input(`${binding.replaceAll('-', '_')}_binding`);
@@ -27,7 +29,7 @@ export function fireNext(
   const fired = trigger.fire(
     path,
     { repo_host: repo.host, repo_path: repo.path, number: String(issueNumber(key) ?? key), ...extra },
-    { deliveryId, item: runKey(key) }
+    { deliveryId, item: runItem ?? runKey(key) }
   );
   const disposition = fired.disposition?.status ?? 'unknown';
   updateWork(key, doc => {

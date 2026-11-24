@@ -1,7 +1,6 @@
-# A clean window: the item goes Live, the Watcher reads clean numbers, the window ends, Done.
-reconcile: { mode: watch, state: merge-review, pr: 12, reason: "stub: PR 12 merged" }
-deploy: { deployed: true, ok: true, at: "2026-11-20T10:00:00Z", hook: "./deploy.sh", note: deployed by the hook, window_minutes: 30 }
-state: { state: live }
+# Shape A, one item: the release goes to production, the item goes Live, the Watcher reads clean numbers, the window ends, Done.
+cut: { mode: release, release: "a1b2c3d4e5f6-0011aabb", items: ["#7"], pr: 12, legacy: true, summary: "stub: release of #7", question: "", options: [], recommendation: null }
+promote: { result: production, env: production, deployed_at: "2026-11-20T10:00:00Z", window_minutes: 30, summary: "stub: on production", question: "", options: [], recommendation: null }
 signals:
   coverage: full
   ended: true
@@ -9,13 +8,17 @@ signals:
   signals: []
   window: { deployed_at: "2026-11-20T10:00:00Z", now: "2026-11-20T10:31:00Z", ends_at: "2026-11-20T10:30:00Z", ended: true, elapsed_minutes: 31 }
   excluded: []
+  release: "a1b2c3d4e5f6-0011aabb"
+  env: production
+  items: [{ key: "#7", pr: 12, files: [{ path: src/orders.ts, status: modified }] }]
+  toggled: []
   pr: 12
   files: [{ path: src/orders.ts, status: modified }]
   patches: ""
-watcher: { verdict: clean, coverage: full, reason: "stub: errors 0.2/min before and after", evidence: [{ signal: errors, before: 0.2, after: 0.2, note: flat }], confidence: high }
-act: { result: done, stop: true, coverage: full, revert_pr: null, fire: "", reason: "stub: clean" }
+watcher: { verdict: clean, culprit: null, coverage: full, reason: "stub: errors 0.2/min before and after", evidence: [{ signal: errors, before: 0.2, after: 0.2, note: flat }], confidence: high }
+act: { result: done, stop: true, coverage: full, culprit: null, revert_pr: null, fire: "", reason: "stub: clean" }
 outcome: { result: done, coverage: full, summary: "stub: #7 is Done", question: "", options: [], recommendation: null }
 fixture:
-  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", unify_merge_binding: /srv/bindings/unify-merge.json }
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7", reason: merge, unify_merge_binding: /srv/bindings/unify-merge.json, unify_deploy_binding: /srv/bindings/unify-deploy.json }
   expect: completed
-  reached: [reconcile, deploy, state, signals, watcher, act, outcome]
+  reached: [cut, promote, signals, watcher, act, outcome]

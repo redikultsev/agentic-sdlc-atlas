@@ -149,6 +149,12 @@ bindings:
       unify_merge_binding: { binding: unify-merge }
       unify_deploy_binding: { binding: unify-deploy }
 
+  # The release run. Callers fire it with the engine item `release` (fireNext's runItem),
+  # so releases never run in parallel; the hourly timer shares its resource for the same
+  # reason (a tick is about no item). A project with release.trigger schedule or operator
+  # gets its releases from the timer; with trigger merge a tick finds nothing waiting or
+  # takes the leftovers. A tick deploys nothing itself: it starts a release run (engine
+  # item `release`) for what it finds, also for a release whose run is gone.
   unify-deploy:
     workflow: unify-deploy
     resource: deploy
@@ -159,6 +165,20 @@ bindings:
       repo_host: { repo: host }
       repo_path: { repo: path }
       unify_merge_binding: { binding: unify-merge }
+      unify_deploy_binding: { binding: unify-deploy }
+
+  unify-deploy-schedule:
+    workflow: unify-deploy
+    resource: deploy
+    capacity: 1
+    overlap: skip
+    schedule: { interval_seconds: 3600 }
+    inputs:
+      repo_host: { repo: host }
+      repo_path: { repo: path }
+      reason: schedule
+      unify_merge_binding: { binding: unify-merge }
+      unify_deploy_binding: { binding: unify-deploy }
 
   unify-revisit:
     workflow: unify-revisit
@@ -168,6 +188,7 @@ bindings:
     inputs:
       repo_host: { repo: host }
       repo_path: { repo: path }
+      unify_merge_binding: { binding: unify-merge }
 
   unify-retro:
     workflow: unify-retro

@@ -6,4 +6,6 @@ rules: {"path": "r0", "r0": true, "reasons": [], "pr": 11, "head": "abc1234def56
 ruling: {"decision": "merge", "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "operator": false, "revert": false}
 land: {"outcome": "new-card", "head": "fff9999aaa0000", "detail": "stub: merged", "merge_commit": null, "attempts": 0, "ask": false, "question": "", "options": [], "recommendation": null}
 next: {"did": "unify-merge: queued"}
+env: {"go": "land", "kind": "", "env": "", "service": "", "commit": "", "tree": "", "answerers": "", "remaining": 0, "start": [], "notes": ["stub: no pre-merge environment"], "ask": false, "question": "", "options": [], "recommendation": null}
+test-ruling: {"go": "land", "start": []}
 fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7", "unify_merge_binding": "/bindings/unify-merge.yaml"}, "expect": "completed", "reached": ["reconcile", "reconcile-ruling", "rules", "ruling", "land", "next"]}

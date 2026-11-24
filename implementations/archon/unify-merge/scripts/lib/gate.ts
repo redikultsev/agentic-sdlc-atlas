@@ -4,6 +4,7 @@
  * R0 kill switch reads (decision 25), through the host's `gh`.
  */
 
+import { state } from 'archon:script';
 import { forge } from '../../../.shared/forge.ts';
 import { fingerprint } from '../../../.shared/fingerprint.ts';
 import { currentVerdicts } from '../../../.shared/work.ts';
@@ -51,11 +52,19 @@ function ghCount(query: string): number {
   return (JSON.parse(result.stdout.toString()) as { total_count: number }).total_count;
 }
 
-/** Merged PRs reverted over the window, as a share of merged PRs (titles starting "Revert"). */
+/**
+ * Rollbacks over the window as a share of merged PRs: merged reverts (titles starting
+ * "Revert") and every rollback by another method the release run recorded (a redeploy of
+ * the previous version, a toggle turned off), since decision 52 counts them all.
+ */
 export function revertRate(repo: Repo, days: number): { rate: number; reverts: number; merged: number } {
-  const since = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+  const from = Date.now() - days * 86_400_000;
+  const since = new Date(from).toISOString().slice(0, 10);
   const merged = ghCount(`repo:${repo.path} is:pr is:merged merged:>=${since}`);
-  const reverts = ghCount(`repo:${repo.path} is:pr is:merged merged:>=${since} Revert in:title`);
+  const recorded = ((state.get('watcher/rollbacks').value as { entries?: { at: string; method?: string }[] } | null)?.entries ?? []).filter(
+    e => (e.method ?? 'revert') !== 'revert' && Date.parse(e.at) >= from
+  ).length;
+  const reverts = ghCount(`repo:${repo.path} is:pr is:merged merged:>=${since} Revert in:title`) + recorded;
   return { rate: merged === 0 ? 0 : reverts / merged, reverts, merged };
 }
 

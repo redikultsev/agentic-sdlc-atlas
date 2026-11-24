@@ -1,0 +1,8 @@
+# The shared environment runs a version the pipeline did not put there and that is not
+# production's: the run pauses on a request (wait or take); nothing is deployed.
+reconcile: {"ok": true, "state": "verifying", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
+reconcile-ruling: {"go": true}
+rules: {"path": "approved", "r0": false, "reasons": ["the Operator's merge holds at fixtureprint"], "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "stale": [], "ask": false, "question": "", "options": [], "recommendation": null}
+ruling: {"decision": "merge", "pr": 11, "head": "abc1234def5678", "fingerprint": "fixtureprint", "operator": true, "revert": false}
+env: {"go": "ask", "kind": "env-ask", "env": "test", "service": "api", "commit": "", "tree": "", "answerers": "", "remaining": 0, "start": [], "notes": [], "ask": true, "question": "stub: #7: test/api runs 0ddba11, which the pipeline did not put there. Wait, or take the environment?", "options": [{"id": "wait", "label": "Wait", "does": "Ends this run.", "value": {"effect": "wait"}}, {"id": "take", "label": "Take it", "does": "Deploys over it.", "value": {"effect": "take"}}], "recommendation": {"option": "wait", "why": "stub", "confidence": "medium"}}
+fixture: {"inputs": {"repo_host": "github.com", "repo_path": "example/repo", "number": "7", "unify_merge_binding": "/bindings/unify-merge.yaml", "unify_deploy_binding": "/bindings/unify-deploy.yaml", "unify_round_binding": "/bindings/unify-round.yaml"}, "expect": "paused", "reached": ["reconcile", "rules", "ruling", "env"]}

@@ -3,8 +3,9 @@
  * never by reading the answer's words. The answer is read from the run's node outcomes:
  * the gate is the only sink of the review loop, so no later node can reference it.
  *
- *   accept     size and risk labels, the ruling (if any text), the move to Specifying (M, L)
- *              or Implementing (S), then the fire of unify-spec or unify-round
+ *   accept     size and risk labels, the ruling (if any text), `work.urgent` when the option
+ *              carries `value.urgent` (decision 53), the move to Specifying (M, L) or
+ *              Implementing (S), then the fire of unify-spec or unify-round
  *   for-human  the move to ForHuman and a comment saying why
  *   wont-do    the move to Cancelled, `pipeline:rejected`, a closing comment, closed not planned
  *   stop       nothing (the card was a stop request)
@@ -24,6 +25,7 @@ import { runInputs } from '../../.shared/repo.ts';
 import { recordRuling } from '../../.shared/rulings.ts';
 import { MARKS } from '../../.shared/states.ts';
 import { chosenEffect, lastAnswer, tryMove } from '../../.shared/stage.ts';
+import { updateWork } from '../../.shared/work.ts';
 
 async function main(): Promise<void> {
   const { repo, key } = runInputs();
@@ -43,6 +45,7 @@ async function main(): Promise<void> {
       const names = [`size:${card.size.toLowerCase()}`, `risk:${card.risk.toLowerCase()}`];
       for (const name of names) await t.ensureLabel(name, 'ededed', 'Set by pipeline triage at Accept');
       await t.label(key, { add: names });
+      if (answer.value?.urgent === true && !updateWork(key, d => { d.urgent = true; }).urgent) throw new Error(`${key}: urgent did not read back`);
       const small = card.size === 'S';
       const mismatch = await tryMove(key, ['triage-review'], small ? 'implementing' : 'specifying');
       if (mismatch !== null) throw new Error(mismatch);

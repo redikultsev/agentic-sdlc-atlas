@@ -9,7 +9,8 @@ orphans:
   cost_unknown: [{ item: 9, run: run-c }]
   errors: []
 stale: { checked: 3, failing: [], set_aside: [], restored: [], errors: [] }
+holds: { freed: [], left: [], started: [], unflagged: [], errors: [] }
 fixture:
   inputs: { repo_host: github.com, repo_path: example/repo }
   expect: completed
-  reached: [blocked, orphans, stale]
+  reached: [blocked, orphans, stale, holds]
