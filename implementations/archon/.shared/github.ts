@@ -1,11 +1,12 @@
 /**
- * What Archon's forge does not offer, through the GitHub API with the host's `gh`:
- * listing issues by what they lack, sub-issues, "blocked by" links, PR search, and
- * updating a PR branch. Works only where the container's `gh` is logged in or the run has
+ * What Archon's forge does not offer on the code host, through the GitHub API with the
+ * host's `gh`: PR search, updating a PR branch, and the login the pipeline acts as. Issue
+ * operations go through `connector.ts`. Works only where the container's `gh` is logged in or the run has
  * Archon's App token; unify-ping checks it before anything relies on it.
  */
 
-import type { IssueRef, Repo } from './repo.ts';
+import { issueNumber, type ItemKey } from './item.ts';
+import type { Repo } from './repo.ts';
 
 function gh(args: readonly string[], body?: unknown): unknown {
   const full = ['gh', 'api', ...args, ...(body === undefined ? [] : ['--input', '-'])];
@@ -23,54 +24,6 @@ function gh(args: readonly string[], body?: unknown): unknown {
   return text === '' ? null : (JSON.parse(text) as unknown);
 }
 
-interface GhIssue {
-  readonly number: number;
-  readonly id: number;
-  readonly title: string;
-  readonly labels: readonly { name: string }[];
-  readonly pull_request?: unknown;
-  readonly created_at: string;
-  readonly user: { login: string } | null;
-}
-
-/**
- * Open issues (not PRs), oldest first, every page. With `label`, only issues carrying it
- * (GitHub filters server-side), which keeps a busy repository to the chosen few.
- */
-export function openIssuesOldestFirst(repo: Repo, label = ''): GhIssue[] {
-  const filter = label === '' ? '' : `&labels=${encodeURIComponent(label)}`;
-  const all: GhIssue[] = [];
-  for (let page = 1; page <= 50; page++) {
-    const batch = gh([`repos/${repo.path}/issues?state=open&sort=created&direction=asc&per_page=100&page=${page}${filter}`]) as GhIssue[];
-    all.push(...batch);
-    if (batch.length < 100) break;
-  }
-  return all.filter(issue => issue.pull_request === undefined);
-}
-
-/** The REST id of an issue, which the sub-issue and dependency endpoints take. */
-export function issueId(ref: IssueRef): number {
-  return (gh([`repos/${ref.repo.path}/issues/${ref.number}`]) as GhIssue).id;
-}
-
-/** Make `child` a sub-issue of `parent`; adding one that is already there is not an error. */
-export function addSubIssue(parent: IssueRef, child: IssueRef): void {
-  try {
-    gh(['-X', 'POST', `repos/${parent.repo.path}/issues/${parent.number}/sub_issues`], { sub_issue_id: issueId(child) });
-  } catch (error) {
-    if (!/already|exists|422/i.test((error as Error).message)) throw error;
-  }
-}
-
-/** Record that `issue` is blocked by `blocker` (GitHub issue dependencies). */
-export function addBlockedBy(issue: IssueRef, blocker: IssueRef): void {
-  try {
-    gh(['-X', 'POST', `repos/${issue.repo.path}/issues/${issue.number}/dependencies/blocked_by`], { issue_id: issueId(blocker) });
-  } catch (error) {
-    if (!/already|exists|422/i.test((error as Error).message)) throw error;
-  }
-}
-
 export interface FoundPr {
   readonly number: number;
   readonly title: string;
@@ -79,9 +32,10 @@ export interface FoundPr {
   readonly url: string;
 }
 
-/** PRs that mention the issue number (body, title, closing keyword), open or merged. */
-export function prsMentioning(ref: IssueRef): FoundPr[] {
-  const q = encodeURIComponent(`repo:${ref.repo.path} is:pr ${ref.number} in:title,body`);
+/** PRs that mention the item's key (body, title, "Part of"), open or merged. */
+export function prsMentioning(repo: Repo, key: ItemKey): FoundPr[] {
+  const term = issueNumber(key) ?? key;
+  const q = encodeURIComponent(`repo:${repo.path} is:pr ${term} in:title,body`);
   const found = gh([`search/issues?q=${q}&per_page=30`]) as { items: { number: number; title: string; state: 'open' | 'closed'; html_url: string; pull_request?: { merged_at: string | null } }[] };
   return found.items.map(item => ({
     number: item.number,

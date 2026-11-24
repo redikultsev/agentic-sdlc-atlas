@@ -5,7 +5,7 @@ description: |
   computes before/after numbers for the project's signals (other deploys' minutes left
   out), the Watcher agent reads them, and a script acts. A regression in this PR is
   reverted at once (the revert goes to unify-merge and its deploy is not watched
-  again), then RolledBack with a report and a new issue with the evidence. A clean window
+  again), then RolledBack with a report and a new item with the evidence. A clean window
   is Done (health-only coverage noted). When unsure, the Operator decides.
 
   Use when: unify-merge fires it after a merge. NOT for: merging (unify-merge), or
@@ -20,7 +20,7 @@ inputs:
     description: The owner/name path of the repository.
   number:
     required: true
-    description: The work item's issue number.
+    description: "The item's key: an issue number or a tracker key such as PROJ-123."
   unify_merge_binding:
     default: ""
     description: The absolute path of the unify-merge fire-only binding file; a revert is sent to merge through it.
@@ -200,7 +200,7 @@ nodes:
       recommendation: "$outcome.output.recommendation"
       labels:
         gate: watch
-        item: "issue-$INPUTS.number"
+        item: "$INPUTS.number"
 
   - id: answer
     script: answer

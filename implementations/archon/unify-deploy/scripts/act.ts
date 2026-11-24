@@ -16,8 +16,9 @@
  * verdict; INPUTS_ENDED and INPUTS_COVERAGE from signals.
  */
 
-import { emit, input, refuse, runId } from 'archon:script';
-import { itemNumber, repoOf } from '../../.shared/repo.ts';
+import { emit, input, runId } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
+import { runInputs } from '../../.shared/repo.ts';
 import { revertAndMerge, unneededRollbacks, updateDeploy, type Coverage, type WatchResult } from './lib.ts';
 
 interface Verdict {
@@ -27,10 +28,9 @@ interface Verdict {
   evidence: { signal: string; before: number | null; after: number | null; note: string }[];
 }
 
-function main(): void {
-  const repo = repoOf(input('repo_host'), input('repo_path'));
-  const number = itemNumber(input('number'));
-  if (number === undefined) return;
+async function main(): Promise<void> {
+  const { repo, key } = runInputs();
+  if (key === undefined) return;
   const pr = Number(input('pr'));
   const watcher = JSON.parse(input('watcher')) as Verdict;
   const ended = input('ended').trim() === 'true';
@@ -53,7 +53,7 @@ function main(): void {
         break;
       }
       if (!Number.isInteger(pr) || pr <= 0) throw new Error('a regression was found but the run names no PR to revert');
-      const revert = revertAndMerge({ repo, number }, pr, [watcher.reason, ...evidence.map(e => `- ${e}`)].join('\n'));
+      const revert = revertAndMerge(repo, key, pr, [watcher.reason, ...evidence.map(e => `- ${e}`)].join('\n'));
       result = 'rolled-back';
       revertPr = revert.revertPr;
       fire = revert.fire;
@@ -72,15 +72,11 @@ function main(): void {
 
   const at = new Date().toISOString();
   const run = runId();
-  updateDeploy(number, run, record => {
-    if (record === null) throw new Error(`no deploy record for #${String(number)} in this run`);
+  updateDeploy(key, run, record => {
+    if (record === null) throw new Error(`no deploy record for ${key} in this run`);
     return { ...record, watch: { result, coverage, verdict: watcher.verdict, reason, evidence, revertPr, fire, at } };
   });
   emit({ result, stop: result !== 'continue', coverage, revert_pr: revertPr, fire: fire ?? '', reason });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-deploy act: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-deploy act', main);

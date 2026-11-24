@@ -7,7 +7,7 @@
 import { forge } from '../../../.shared/forge.ts';
 import { fingerprint } from '../../../.shared/fingerprint.ts';
 import { currentVerdicts } from '../../../.shared/work.ts';
-import type { IssueRef, Repo } from '../../../.shared/repo.ts';
+import type { Repo } from '../../../.shared/repo.ts';
 import type { ItemDoc } from './item.ts';
 import { fetchBranch } from './facts.ts';
 
@@ -52,10 +52,10 @@ function ghCount(query: string): number {
 }
 
 /** Merged PRs reverted over the window, as a share of merged PRs (titles starting "Revert"). */
-export function revertRate(ref: IssueRef, days: number): { rate: number; reverts: number; merged: number } {
+export function revertRate(repo: Repo, days: number): { rate: number; reverts: number; merged: number } {
   const since = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
-  const merged = ghCount(`repo:${ref.repo.path} is:pr is:merged merged:>=${since}`);
-  const reverts = ghCount(`repo:${ref.repo.path} is:pr is:merged merged:>=${since} Revert in:title`);
+  const merged = ghCount(`repo:${repo.path} is:pr is:merged merged:>=${since}`);
+  const reverts = ghCount(`repo:${repo.path} is:pr is:merged merged:>=${since} Revert in:title`);
   return { rate: merged === 0 ? 0 : reverts / merged, reverts, merged };
 }
 

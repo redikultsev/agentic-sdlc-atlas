@@ -8,20 +8,23 @@
  */
 
 import { emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
+import type { ItemKey } from '../../.shared/item.ts';
+import { runInputs } from '../../.shared/repo.ts';
 import { forge } from '../../.shared/forge.ts';
 import { updatePrBranch } from '../../.shared/github.ts';
 import { projectPolicy } from '../../.shared/policy.ts';
 import { moveState, readState } from '../../.shared/states.ts';
-import { bound, buildRequest, card, findingKey, NO_CARD, readItem, run, updateItem, type Card, type Finding } from './lib/item.ts';
-import { awaitChecks, baseName, itemRef } from './lib/facts.ts';
+import { bound, buildRequest, card, findingKey, NO_CARD, readItem, updateItem, type Card, type Finding } from './lib/item.ts';
+import { awaitChecks, baseName } from './lib/facts.ts';
 import { prAt, printAt, staleKinds } from './lib/gate.ts';
 
 const ATTEMPTS = 3;
 
-function stuckCard(number: number, head: string, detail: string): Card {
+function stuckCard(key: ItemKey, head: string, detail: string): Card {
   return card(buildRequest(
     {
-      decide: `#${number}: landing gave up after ${ATTEMPTS} branch updates. Try landing again, send it back to a round, or hold it?`,
+      decide: `${key}: landing gave up after ${ATTEMPTS} branch updates. Try landing again, send it back to a round, or hold it?`,
       why: 'the base keeps moving under the PR, and another automatic attempt would only repeat it.',
       notVerified: ['whether the base will settle soon'],
       facts: [detail, `head ${head}`],
@@ -35,31 +38,32 @@ function stuckCard(number: number, head: string, detail: string): Card {
   ));
 }
 
-run(() => {
-  const ref = itemRef(input('repo_host'), input('repo_path'), input('number'));
+async function main(): Promise<void> {
+  const { repo, key } = runInputs();
+  if (key === undefined) return;
   const base = baseName(input('base'));
   const ruled = bound<{ decision: string; pr: number; head: string; fingerprint: string; operator: boolean; revert: boolean }>(input('ruling'));
   if (ruled === null || ruled.decision !== 'merge') throw new Error('land runs only after a merge decision');
   const policy = projectPolicy(base);
-  const prRef = { repo: ref.repo, number: ruled.pr };
-  const result = (reported: string, head: string, reported_detail: string, merge: string | null = null, reportedFindings: Finding[] = []): void => {
+  const prRef = { repo, number: ruled.pr };
+  const result = async (reported: string, head: string, reported_detail: string, merge: string | null = null, reportedFindings: Finding[] = []): Promise<void> => {
     // A revert that cannot land goes to the Operator, never into an implementation round.
     const failedRevert = ruled.revert && reported !== 'merged';
     const outcome = failedRevert ? 'stuck' : reported;
     const detail = failedRevert ? `the revert PR #${prRef.number} did not land (${reported}): ${reported_detail}` : reported_detail;
     const findings = failedRevert ? [] : reportedFindings;
-    if (findings.length > 0) updateItem(ref.number, d => {
+    if (findings.length > 0) updateItem(key, d => {
       d.fix = { from: `merge ${outcome}`, findings };
     });
     // Merged: the item waits for the release that carries it (decision 48). A revert's item stays where it is.
     // A land re-run after the deploy already took the item finds it Live and leaves it.
-    if (outcome === 'merged' && !ruled.revert && readState(ref) !== 'live') moveState(ref, ['verifying', 'releasing'], 'releasing');
-    const asked: Card = outcome === 'stuck' ? stuckCard(ref.number, head, detail) : NO_CARD;
-    emit({ outcome, head, detail, merge_commit: merge, attempts: readItem(ref.number).landAttempts, ...asked });
+    if (outcome === 'merged' && !ruled.revert && (await readState(key)) !== 'live') await moveState(key, ['verifying', 'releasing'], 'releasing');
+    const asked: Card = outcome === 'stuck' ? stuckCard(key, head, detail) : NO_CARD;
+    emit({ outcome, head, detail, merge_commit: merge, attempts: readItem(key).landAttempts, ...asked });
   };
   const finding = (source: Finding['source'], text: string): Finding[] => [{ key: findingKey(source, text), source, text, repeated: false }];
 
-  let pr = prAt(ref.repo, prRef.number);
+  let pr = prAt(repo, prRef.number);
   if (pr.state === 'merged') return result('merged', pr.head, 'already merged');
   if (pr.head !== ruled.head && ruled.revert) return result('moved', pr.head, `the revert PR moved from ${ruled.head} to ${pr.head}`);
   if (pr.head !== ruled.head) {
@@ -78,7 +82,7 @@ run(() => {
     if (ci.moved) return result('moved', ci.revision, 'the head moved while CI ran', null, finding('conflict', `the head moved to ${ci.revision} during landing`));
     if (ci.timedOut) return result('red', pr.head, `CI did not finish at ${pr.head}`, null, finding('ci', `CI did not finish at ${pr.head} during landing`));
     if (ci.state === 'red') return result('red', pr.head, `red at ${pr.head}: ${ci.red.join(', ')}`, null, ci.red.map(id => finding('ci', `red on the latest ${base}: ${id}`)[0]));
-    const fresh = readItem(ref.number);
+    const fresh = readItem(key);
     // A revert carries no review verdicts (decision 26): CI and the head pin are its checks.
     const print = ruled.revert ? '' : printAt(base, pr.branch, pr.head);
     const stale = ruled.revert ? [] : staleKinds(fresh, print, ruled.operator);
@@ -87,25 +91,27 @@ run(() => {
     }
     if (state.behind > 0) {
       if (fresh.landAttempts >= ATTEMPTS) return result('stuck', pr.head, `${ATTEMPTS} updates and ${base} keeps moving`);
-      updateItem(ref.number, d => {
+      updateItem(key, d => {
         d.landAttempts += 1;
       });
-      updatePrBranch(ref.repo, prRef.number, pr.head);
+      updatePrBranch(repo, prRef.number, pr.head);
       const before = pr.head;
       for (let i = 0; i < 20 && pr.head === before; i++) {
         Bun.sleepSync(3_000);
-        pr = prAt(ref.repo, prRef.number);
+        pr = prAt(repo, prRef.number);
       }
       if (pr.head === before) throw new Error(`PR #${prRef.number} did not move after the branch update`);
       continue;
     }
     const merged = forge('pr.merge', { ref: prRef, method: 'squash', conditions: { head: pr.head } });
-    const after = prAt(ref.repo, prRef.number);
+    const after = prAt(repo, prRef.number);
     if (after.state !== 'merged') throw new Error(`PR #${prRef.number} reads ${after.state} after the merge`);
-    updateItem(ref.number, d => {
+    updateItem(key, d => {
       d.landAttempts = 0;
       if (ruled.revert) d.flags = d.flags.filter(f => f !== `revert-pr:${prRef.number}`);
     });
     return result('merged', pr.head, `merged at ${pr.head}`, merged.landed.commit);
   }
-});
+}
+
+await script('unify-merge land', main);

@@ -2,16 +2,18 @@
  * The Researcher's references, checked (SPEC "Task shape"): every file:line it cites must
  * exist at the base commit, and a quoted line must be there (within two lines). A claim
  * that fails is struck from what the Planner reads and listed for the Operator. The
- * result is committed to the item branch as `.pipeline/work/<n>/research.md`, marked as
+ * result is committed to the item branch as `.pipeline/work/<key>/research.md`, marked as
  * the agent's reading. An M item has no research: nothing to check.
  *
  * Inputs: repo_host, repo_path, number, base; bound research (null when skipped),
  * base_commit. Emits `{ ok, problems, checked, research, url }`.
  */
 
-import { artifactsDir, emit, input, refuse } from 'archon:script';
+import { artifactsDir, emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
 import { git } from '../../.shared/git.ts';
 import { nullableJson } from '../../.shared/inputs.ts';
+import { keySlug } from '../../.shared/item.ts';
 import { itemBranch, runInputs } from '../../.shared/repo.ts';
 import { commitFiles } from '../../.shared/stage.ts';
 
@@ -36,9 +38,9 @@ export function checkRef(commit: string, claim: Claim, read: (path: string) => s
   return null;
 }
 
-function main(): void {
-  const { repo, number } = runInputs();
-  if (number === undefined) return;
+async function main(): Promise<void> {
+  const { repo, key } = runInputs();
+  if (key === undefined) return;
   const research = nullableJson(input('research')) as Research | null;
   if (research === null) {
     emit({ ok: true, problems: [], checked: 0, research: '', url: '' });
@@ -62,7 +64,7 @@ function main(): void {
     return problem === null ? `- ${c.statement} (${c.file_line})` : `- ~~${c.statement} (${c.file_line})~~ refused: ${problem}`;
   };
   const md = [
-    `# Research for #${number} (the agent's reading)`,
+    `# Research for ${key} (the agent's reading)`,
     '',
     `References checked by script at ${commit}; refused claims are struck through.`,
     '',
@@ -76,13 +78,9 @@ function main(): void {
     ...research.invariants.map(mark),
     '',
   ].join('\n');
-  const path = `.pipeline/work/${number}/research.md`;
-  const { commit: head } = commitFiles(input('base') || 'main', itemBranch(number), [{ path, text: md }], `pipeline: research for #${number}`, artifactsDir());
+  const path = `.pipeline/work/${keySlug(key)}/research.md`;
+  const { commit: head } = commitFiles(input('base') || 'main', itemBranch(key), [{ path, text: md }], `pipeline: research for ${key}`, artifactsDir());
   emit({ ok: problems.length === 0, problems, checked, research: md, url: `https://${repo.host}/${repo.path}/blob/${head}/${path}` });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-plan check-refs: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-plan check-refs', main);

@@ -18,7 +18,7 @@ inputs:
     description: The owner/name path of that repository.
   number:
     required: true
-    description: The issue number of the item.
+    description: "The item's key: an issue number or a tracker key such as PROJ-123."
   unify_plan_binding:
     default: ""
     description: Absolute path of the unify-plan binding file; apply starts the plan stage through it.

@@ -5,13 +5,13 @@
  * Inputs: repo_host, repo_path. Emits `{ go, waiting, cap }`.
  */
 
-import { emit, input, refuse } from 'archon:script';
-import { repoOf } from '../../.shared/repo.ts';
+import { emit } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
 import { WAITING_CAP, waitingCount } from '../../.shared/request.ts';
 
-try {
-  const waiting = waitingCount(repoOf(input('repo_host'), input('repo_path')));
+async function main(): Promise<void> {
+  const waiting = waitingCount();
   emit({ go: waiting < WAITING_CAP, waiting, cap: WAITING_CAP });
-} catch (error) {
-  refuse(`unify-poll cap: ${error instanceof Error ? error.message : String(error)}`);
 }
+
+await script('unify-poll cap', main);

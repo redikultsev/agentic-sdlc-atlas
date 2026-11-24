@@ -4,7 +4,7 @@ description: |
   with every reference checked at the base commit, then up to three plans, each checked
   by script (criteria covered, no cycle, files and a check command per slice), committed
   as .pipeline/work/<n>/plan.md and put to the Operator at PlanReview. Approve creates the
-  slice sub-issues with blocked-by links and starts the first implementation round.
+  slice items with blocked-by links and starts the first implementation round.
 
   Use when: unify-spec fires it after the spec is approved.
   NOT for: implementing (unify-round).
@@ -18,7 +18,7 @@ inputs:
     description: The owner/name path of that repository.
   number:
     required: true
-    description: The issue number of the item.
+    description: "The item's key: an issue number or a tracker key such as PROJ-123."
   unify_round_binding:
     default: ""
     description: Absolute path of the unify-round binding file; slices starts the first round through it.

@@ -12,15 +12,15 @@
  * Emits a card with `go` and `ask`.
  */
 
-import { emit, input, refuse } from 'archon:script';
+import { emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
 import { nullableJson } from '../../.shared/inputs.ts';
 import { runInputs } from '../../.shared/repo.ts';
 import { type Card, clear, stopCard, tryMove } from '../../.shared/stage.ts';
 
-function main(): void {
-  const { repo, number } = runInputs();
-  if (number === undefined) return;
-  const ref = { repo, number };
+async function main(): Promise<void> {
+  const { key } = runInputs();
+  if (key === undefined) return;
   const reconciled = JSON.parse(input('reconcile')) as Card;
   const trust = nullableJson(input('trust')) as { proceed: boolean } | null;
   if (!reconciled.ok) {
@@ -31,12 +31,8 @@ function main(): void {
     emit({ ...clear(), go: false, ask: false });
     return;
   }
-  const mismatch = tryMove(ref, ['none', 'triaging'], 'triaging');
-  emit(mismatch === null ? { ...clear(), go: true, ask: false } : { ...stopCard(ref, 'triage', mismatch), go: false, ask: true });
+  const mismatch = await tryMove(key, ['none', 'triaging'], 'triaging');
+  emit(mismatch === null ? { ...clear(), go: true, ask: false } : { ...stopCard(key, 'triage', mismatch), go: false, ask: true });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-triage enter: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-triage enter', main);

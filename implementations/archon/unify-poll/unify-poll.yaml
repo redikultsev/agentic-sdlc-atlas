@@ -1,11 +1,11 @@
 name: unify-poll
 description: |
-  Intake for the agentic pipeline: every 300 seconds, the oldest open issue that is new
+  Intake for the agentic pipeline: every 300 seconds, the oldest open item that is new
   to the pipeline starts triage, unless three items already wait for the Operator.
-  Item-less: it reconciles nothing and writes nothing on the issue.
+  Item-less: it reconciles nothing and writes nothing on the item.
 
   Use when: the unify-poll schedule binding starts it.
-  NOT for: triaging an issue (unify-triage).
+  NOT for: triaging an item (unify-triage).
 
 inputs:
   repo_host:
@@ -30,7 +30,7 @@ nodes:
       type: object
       properties:
         found: { type: boolean }
-        number: { type: integer }
+        number: { type: string }
         delivery: { type: string }
         title: { type: string }
         passed: { type: integer }
@@ -62,6 +62,6 @@ nodes:
     output_format:
       type: object
       properties:
-        fired: { type: integer }
+        fired: { type: string }
         disposition: { type: string }
       required: [fired, disposition]

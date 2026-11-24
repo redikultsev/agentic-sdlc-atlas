@@ -8,35 +8,32 @@
  * Emits `{ effect, fired, summary }`.
  */
 
-import { emit, input, refuse, runId } from 'archon:script';
+import { emit, input, runId } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
 import { fireNext } from '../../.shared/fire.ts';
 import { runInputs } from '../../.shared/repo.ts';
 import { recordRuling } from '../../.shared/rulings.ts';
 import { chosenEffect, lastAnswer, tryMove } from '../../.shared/stage.ts';
 
-function main(): void {
-  const { repo, number } = runInputs();
-  if (number === undefined) return;
-  const ref = { repo, number };
+async function main(): Promise<void> {
+  const { repo, key } = runInputs();
+  if (key === undefined) return;
   const answer = lastAnswer('rounds', 'spec-gate');
   if (answer === null) throw new Error('the SpecReview gate has no recorded answer');
   const effect = chosenEffect(answer, 'clarify');
   if (effect === 'clarify') throw new Error('the loop ended on a clarify answer');
-  if (answer.text.trim() !== '') recordRuling(ref, { gate: 'spec-review', decision: answer.decision, text: answer.text, project: false });
+  if (answer.text.trim() !== '') await recordRuling(key, { gate: 'spec-review', decision: answer.decision, text: answer.text, project: false });
   let fired = '';
   if (effect === 'approve') {
-    const mismatch = tryMove(ref, ['spec-review'], 'planning');
+    const mismatch = await tryMove(key, ['spec-review'], 'planning');
     if (mismatch !== null) throw new Error(mismatch);
     if (input('unify_plan_binding') === '') throw new Error('unify_plan_binding is empty');
-    fired = fireNext('unify-plan', repo, number, `unify-plan:${repo.host}/${repo.path}#${number}:spec:${runId()}`);
+    const at = `${repo.host}/${repo.path}${key.startsWith('#') ? '' : ':'}${key}`;
+    fired = fireNext('unify-plan', repo, key, `unify-plan:${at}:spec:${runId()}`);
   } else if (effect !== 'stop') {
     throw new Error(`unknown effect '${effect}'`);
   }
-  emit({ effect, fired, summary: `#${number}: ${answer.decision} (${effect})${fired === '' ? '' : `; ${fired}`}` });
+  emit({ effect, fired, summary: `${key}: ${answer.decision} (${effect})${fired === '' ? '' : `; ${fired}`}` });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-spec apply: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-spec apply', main);

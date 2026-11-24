@@ -3,7 +3,7 @@ description: |
   The weekly Retro (decision 27), item-less. A script computes the seven metrics from the
   tracker and the engine's items; the Retro agent reads the week's cases and the checkout
   and proposes rule, check and instruction changes, each with its linked cases, the file
-  to change and the kind of change; a script files each as an issue labelled
+  to change and the kind of change; a script files each as an item labelled
   `pipeline:retro` (idempotent), and the Operator gets one decision request with the seven
   numbers.
 
@@ -75,7 +75,7 @@ nodes:
               kind: { type: string, enum: [check, instruction, remove-rule] }
               file: { type: string }
               change: { type: string }
-              cases: { type: array, items: { type: integer } }
+              cases: { type: array, items: { type: string } }
               why: { type: string }
             required: [title, kind, file, change, cases, why]
         summary: { type: string }
@@ -97,10 +97,9 @@ nodes:
           items:
             type: object
             properties:
-              number: { type: integer }
+              key: { type: string }
               title: { type: string }
-              created: { type: boolean }
-            required: [number, title, created]
+            required: [key, title]
         dropped:
           type: array
           items:
@@ -144,7 +143,7 @@ nodes:
             why: { type: string }
             confidence: { type: string, enum: [low, medium, high] }
           required: [option, why, confidence]
-        filed: { type: array, items: { type: integer } }
+        filed: { type: array, items: { type: string } }
       required: [question, options, recommendation, filed]
 
   - id: ask

@@ -11,7 +11,8 @@
  * node's output). Emits the card with `size`, `risk`, `outcome`, `verdict_reason`, `problems`.
  */
 
-import { emit, input, refuse } from 'archon:script';
+import { emit, input } from 'archon:script';
+import { script, tracker } from '../../.shared/connector.ts';
 import { runInputs } from '../../.shared/repo.ts';
 import { buildRequest, type Option } from '../../.shared/request.ts';
 import { stopCard, tryMove } from '../../.shared/stage.ts';
@@ -40,18 +41,17 @@ function evidenceOf(c: Claim): string {
   return parts.join('; ');
 }
 
-function main(): void {
-  const { repo, number } = runInputs();
-  if (number === undefined) return;
-  const ref = { repo, number };
+async function main(): Promise<void> {
+  const { key } = runInputs();
+  if (key === undefined) return;
   const lane = input('implement_lane') || 'auto';
   const evidence = JSON.parse(input('evidence')) as { ok: boolean; problems: string[]; verdict: Verdict };
   const v = evidence.verdict;
   const base = { size: v.size, risk: v.risk, outcome: v.outcome, verdict_reason: v.reason, problems: evidence.problems };
 
-  const mismatch = tryMove(ref, ['triaging', 'triage-review'], 'triage-review');
+  const mismatch = await tryMove(key, ['triaging', 'triage-review'], 'triage-review');
   if (mismatch !== null) {
-    emit({ ...base, ...stopCard(ref, 'triage', mismatch) });
+    emit({ ...base, ...stopCard(key, 'triage', mismatch) });
     return;
   }
 
@@ -67,12 +67,12 @@ function main(): void {
       effect: 'accept',
     },
     { id: 'for-human', label: 'For a human', does: 'Moves the item to ForHuman and comments why; the pipeline only tracks it.', effect: 'for-human' },
-    { id: 'wont-do', label: "Won't do", does: 'Labels it pipeline:rejected, comments the reason and closes the issue as not planned.', effect: 'wont-do' },
+    { id: 'wont-do', label: "Won't do", does: 'Labels it pipeline:rejected, comments the reason and closes the item as not planned.', effect: 'wont-do' },
   ];
   const recommended = v.outcome === 'accept' ? 'accept' : v.outcome;
   const request = buildRequest(
     {
-      decide: `#${number}: accept it as ${v.size} with risk ${v.risk}, hand it to a human, or close it? Triage proposes: ${v.outcome}. ${v.reason}`,
+      decide: `${key}: accept it as ${v.size} with risk ${v.risk}, hand it to a human, or close it? Triage proposes: ${v.outcome}. ${v.reason}`,
       why: 'every item passes your Accept before any spec or code is written (TriageReview).',
       notVerified: [
         ...evidence.problems.map(p => `refused: ${p}`),
@@ -87,7 +87,7 @@ function main(): void {
         ...v.duplicates.map(d => `${d.relation}: ${d.url} "${d.quote.slice(0, 200)}"`),
         ...v.assumptions.map(a => `Assumption: ${a.text} (source: ${a.source})`),
         `Data sources: ${v.data_sources.trim() === '' ? 'none named' : v.data_sources}`,
-        `https://${repo.host}/${repo.path}/issues/${number}`,
+        tracker().url(key),
       ],
     },
     options,
@@ -100,8 +100,4 @@ function main(): void {
   emit({ ...base, ok: true, reason: '', ...request });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-triage card: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-triage card', main);

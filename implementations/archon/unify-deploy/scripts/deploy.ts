@@ -14,19 +14,19 @@
  * pack setting INPUTS_BASE; INPUTS_MODE and INPUTS_PR from reconcile.
  */
 
-import { emit, input, refuse, runId } from 'archon:script';
-import { forge } from '../../.shared/forge.ts';
+import { emit, input, runId } from 'archon:script';
+import { script, tracker } from '../../.shared/connector.ts';
+import { keySlug } from '../../.shared/item.ts';
 import { projectPolicy } from '../../.shared/policy.ts';
-import { itemNumber, repoOf } from '../../.shared/repo.ts';
+import { runInputs } from '../../.shared/repo.ts';
 import { readDeploy, updateDeploy } from './lib.ts';
 
 const HOOK_TIMEOUT_MS = 60 * 60_000;
 const NEEDS_ATTENTION = 'pipeline:needs-attention';
 
-function main(): void {
-  const repo = repoOf(input('repo_host'), input('repo_path'));
-  const number = itemNumber(input('number'));
-  if (number === undefined) return;
+async function main(): Promise<void> {
+  const { key } = runInputs();
+  if (key === undefined) return;
   const base = input('base').trim() || 'main';
   const revert = input('mode').trim() === 'revert';
   const pr = Number(input('pr')) || null;
@@ -34,38 +34,37 @@ function main(): void {
   const policy = projectPolicy(base);
   const hook = policy.deploy.hook?.trim() || null;
 
-  const done = readDeploy(number, run).record;
+  const done = readDeploy(key, run).record;
   if (done !== null && done.endedAt !== null && done.ok) {
     emit({ deployed: done.hook !== null, ok: true, at: done.endedAt, hook: done.hook, note: 'already deployed by this run', window_minutes: policy.deploy.windowMinutes });
     return;
   }
 
   const startedAt = new Date().toISOString();
-  updateDeploy(number, run, () => ({ item: number, pr, runId: run, startedAt, endedAt: null, hook, ok: false, revert, watch: null }));
+  updateDeploy(key, run, () => ({ item: key, pr, runId: run, startedAt, endedAt: null, hook, ok: false, revert, watch: null }));
 
   if (hook === null) {
     const at = new Date().toISOString();
-    updateDeploy(number, run, record => ({ ...(record ?? { item: number, pr, runId: run, startedAt, hook, revert, watch: null }), endedAt: at, ok: true }));
+    updateDeploy(key, run, record => ({ ...(record ?? { item: key, pr, runId: run, startedAt, hook, revert, watch: null }), endedAt: at, ok: true }));
     emit({ deployed: false, ok: true, at, hook: null, note: 'no deploy hook: the merge is treated as deployed', window_minutes: policy.deploy.windowMinutes });
     return;
   }
 
   const result = Bun.spawnSync(['sh', '-c', hook], {
-    env: { ...process.env, PIPELINE_ITEM: String(number), PIPELINE_PR: pr === null ? '' : String(pr), PIPELINE_REVERT: revert ? 'true' : 'false' },
+    env: { ...process.env, PIPELINE_ITEM: keySlug(key), PIPELINE_PR: pr === null ? '' : String(pr), PIPELINE_REVERT: revert ? 'true' : 'false' },
     stdout: 'pipe',
     stderr: 'pipe',
     timeout: HOOK_TIMEOUT_MS,
   });
   const at = new Date().toISOString();
   const ok = result.exitCode === 0;
-  updateDeploy(number, run, record => ({ ...(record ?? { item: number, pr, runId: run, startedAt, hook, revert, watch: null }), endedAt: at, ok }));
+  updateDeploy(key, run, record => ({ ...(record ?? { item: key, pr, runId: run, startedAt, hook, revert, watch: null }), endedAt: at, ok }));
   if (!ok) {
     const tail = `${result.stdout.toString()}\n${result.stderr.toString()}`.trim().split('\n').slice(-20).join('\n');
-    const subject = { kind: 'issue' as const, ref: { repo, number } };
-    forge('workitem.comment.upsert', {
-      subject,
-      marker: `unify-deploy-failed:${run}`,
-      body: [
+    await tracker().comment(
+      key,
+      `unify-deploy-failed:${run}`,
+      [
         '**Deploy failed**',
         '',
         `Why you: the deploy hook exited ${String(result.exitCode)}${result.signalCode ? ` (${result.signalCode})` : ''}; the merged change is on ${base} but not deployed, and nothing retries it by itself.`,
@@ -73,17 +72,12 @@ function main(): void {
         '```',
         tail.replaceAll('```', "'''"),
         '```',
-      ].join('\n'),
-    });
-    forge('workitem.label.add', { subject, name: NEEDS_ATTENTION });
-    refuse(`unify-deploy deploy: the hook exited ${String(result.exitCode)}; reported on #${String(number)}`);
-    return;
+      ].join('\n')
+    );
+    await tracker().label(key, { add: [NEEDS_ATTENTION] });
+    throw new Error(`the hook exited ${String(result.exitCode)}; reported on ${key}`);
   }
   emit({ deployed: true, ok: true, at, hook, note: 'deployed by the hook', window_minutes: policy.deploy.windowMinutes });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-deploy deploy: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-deploy deploy', main);

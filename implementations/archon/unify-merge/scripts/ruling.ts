@@ -8,13 +8,15 @@
  */
 
 import { emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
+import { runInputs } from '../../.shared/repo.ts';
 import { recordRuling } from '../../.shared/rulings.ts';
 import { moveState } from '../../.shared/states.ts';
-import { answerOf, bound, findingKey, run, updateItem } from './lib/item.ts';
-import { itemRef } from './lib/facts.ts';
+import { answerOf, bound, findingKey, updateItem } from './lib/item.ts';
 
-run(() => {
-  const ref = itemRef(input('repo_host'), input('repo_path'), input('number'));
+async function main(): Promise<void> {
+  const { key } = runInputs();
+  if (key === undefined) return;
   const rules = bound<{ path: string; pr: number; head: string; fingerprint: string; stale: string[] }>(input('rules'));
   const answer = answerOf(input('answer'));
   if (rules === null) throw new Error('rules left no result');
@@ -23,26 +25,28 @@ run(() => {
   if (rules.path === 'r0' || rules.path === 'revert') return out('merge', false);
   if (rules.path === 'stale') return out('stale', false);
   if (answer === null) throw new Error('the gate was asked, and the run continued with no answer');
-  recordRuling(ref, { gate: 'merge-gate', decision: answer.decision, text: answer.text, project: false });
+  await recordRuling(key, { gate: 'merge-gate', decision: answer.decision, text: answer.text, project: false });
   const at = new Date().toISOString();
   if (answer.effect === 'merge') {
     const head = typeof answer.value.head === 'string' ? answer.value.head : '';
     if (head !== rules.head) throw new Error(`the answer names head ${head}, the card showed ${rules.head}`);
-    updateItem(ref.number, doc => {
+    updateItem(key, doc => {
       doc.verdicts = [...doc.verdicts, { kind: 'operator', verdict: 'merge', fingerprint: rules.fingerprint, head, at }];
       doc.landAttempts = 0;
     });
     // "merge" sends the item to the merge queue, which is part of Verifying (docs/states.md).
-    moveState(ref, ['merge-review', 'verifying'], 'verifying');
+    await moveState(key, ['merge-review', 'verifying'], 'verifying');
     return out('merge', true, head);
   }
   if (answer.effect === 'changes' || answer.effect === 'back-to-plan') {
     const text = answer.text.trim() === '' ? 'The Operator asked for changes without a comment; re-read the spec and the review threads.' : answer.text;
-    updateItem(ref.number, doc => {
+    updateItem(key, doc => {
       if (answer.effect === 'changes') doc.changes += 1;
       doc.fix = { from: 'merge gate "changes"', findings: [{ key: findingKey('operator', text), source: 'operator', text, repeated: false }] };
     });
     return out(answer.effect, true);
   }
   out('hold', true);
-});
+}
+
+await script('unify-merge ruling', main);

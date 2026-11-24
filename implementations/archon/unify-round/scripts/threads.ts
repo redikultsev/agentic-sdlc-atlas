@@ -5,17 +5,20 @@
  */
 
 import { emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
+import { runInputs } from '../../.shared/repo.ts';
 import { forge } from '../../.shared/forge.ts';
 import { trustedAuthors } from '../../.shared/policy.ts';
 import { isTrusted, untrusted } from '../../.shared/trust.ts';
-import { run } from './lib/item.ts';
-import { baseName, itemRef } from './lib/facts.ts';
 
-run(() => {
-  const ref = itemRef(input('repo_host'), input('repo_path'), input('number'));
+import { baseName } from './lib/facts.ts';
+
+async function main(): Promise<void> {
+  const { repo, key } = runInputs();
+  if (key === undefined) return;
   const trusted = [...trustedAuthors(baseName(input('base'))), input('pipeline_login').trim().toLowerCase()].filter(l => l !== '');
   const pr = Number(input('pr'));
-  const { threads } = forge('pr.threads', { ref: { repo: ref.repo, number: pr } });
+  const { threads } = forge('pr.threads', { ref: { repo, number: pr } });
   const open = threads.filter(t => !t.resolved).map(t => {
     const first = t.comments[0];
     const author = first?.author?.login ?? null;
@@ -35,4 +38,6 @@ run(() => {
     ? 'No open review threads.'
     : open.map(t => `Thread ${t.id} at ${t.path ?? '(no file)'}:${t.line ?? ''} (${t.trusted ? 'trusted author' : 'untrusted author'}${t.outdated ? ', outdated' : ''})\n${t.text}`).join('\n\n');
   emit({ count: open.length, untrusted: open.filter(t => !t.trusted).length, threads: open, text });
-});
+}
+
+await script('unify-round threads', main);

@@ -2,17 +2,22 @@
  * The repository and the work item a run is about.
  *
  * Archon gives a script neither: the repository comes from the pack settings
- * `repo_host` and `repo_path`, the item number from the run input `number`. Every
- * workflow declares both inputs, so every script reads them the same way.
+ * `repo_host` and `repo_path`, the item from the run input `number`, which holds the
+ * item's key (`12`, `#12` or `PROJ-123`; the name is from before keys). Every workflow
+ * declares both inputs, so every script reads them the same way. The repository is the
+ * code host's (PRs, checks, merges); the item is the tracker's, reached through
+ * `connector.ts`.
  */
 
 import { input, refuse } from 'archon:script';
+import { asKey, type ItemKey, issueNumber, keySlug, parseKey } from './item.ts';
 
 export interface Repo {
   readonly host: string;
   readonly path: string;
 }
 
+/** A numbered thing on the code host: a PR, or an issue where the tracker is the code host. */
 export interface IssueRef {
   readonly repo: Repo;
   readonly number: number;
@@ -23,29 +28,34 @@ export function repoOf(host: string | undefined, path: string | undefined): Repo
   return { host, path };
 }
 
-/** The item number bound to this node as `number`, or a refusal. */
-export function itemNumber(raw: string | undefined): number | undefined {
-  const value = Number((raw ?? '').trim());
-  if (!Number.isInteger(value) || value <= 0) {
-    refuse(`the run has no item number (got '${raw ?? ''}')`);
+/** The item key bound to this node as `number`, or a refusal. */
+export function itemOf(raw: string | undefined): ItemKey | undefined {
+  const key = parseKey(raw ?? '');
+  if (key === null) {
+    refuse(`the run has no item key (got '${raw ?? ''}')`);
     return undefined;
   }
-  return value;
+  return key;
 }
 
-/** The engine item key of an issue: every run for it carries this key. */
-export function itemKey(number: number): string {
-  return `issue-${number}`;
+/**
+ * The engine's key for the runs of an item: `issue-12` for `#12`, as before keys, so runs
+ * on the trial server keep their history; `item-PROJ-123` for a tracker key.
+ */
+export function runKey(item: ItemKey | number): string {
+  const key = asKey(item);
+  const number = issueNumber(key);
+  return number === null ? `item-${key}` : `issue-${number}`;
 }
 
 /** The branch that collects an item's change. */
-export function itemBranch(number: number): string {
-  return `pipeline/${number}`;
+export function itemBranch(item: ItemKey | number): string {
+  return `pipeline/${keySlug(asKey(item))}`;
 }
 
 /** Inputs every pack workflow declares, read once per script. */
-export function runInputs(): { readonly repo: Repo; readonly number: number | undefined } {
+export function runInputs(): { readonly repo: Repo; readonly key: ItemKey | undefined } {
   const repo = repoOf(input('repo_host'), input('repo_path'));
   const raw = input('number');
-  return { repo, number: raw === undefined || raw === '' ? undefined : itemNumber(raw) };
+  return { repo, key: raw === undefined || raw === '' ? undefined : itemOf(raw) };
 }

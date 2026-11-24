@@ -10,9 +10,9 @@
  * INPUTS_FILED and INPUTS_DROPPED from file; INPUTS_SUMMARY from the Retro agent.
  */
 
-import { emit, input, refuse, state } from 'archon:script';
+import { emit, input, state } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
 import { buildRequest } from '../../.shared/request.ts';
-import { message } from './lib.ts';
 
 interface Metrics {
   operator_minutes_per_item: number | null;
@@ -27,12 +27,12 @@ interface Metrics {
 const num = (value: number | null, unit = ''): string => (value === null ? 'n/a (nothing to count)' : `${String(value)}${unit}`);
 const pct = (value: number | null): string => (value === null ? 'n/a (nothing to count)' : `${String(Math.round(value * 100))}%`);
 
-function main(): void {
+async function main(): Promise<void> {
   const week = input('week').trim();
   const metrics = JSON.parse(input('metrics')) as Metrics;
   const counts = JSON.parse(input('counts')) as { items: number; done: number; merged: number; closed_unmerged: number };
   const notes = JSON.parse(input('notes') || '[]') as string[];
-  const filed = JSON.parse(input('filed') || '[]') as { number: number; title: string }[];
+  const filed = JSON.parse(input('filed') || '[]') as { key: string; title: string }[];
   const dropped = JSON.parse(input('dropped') || '[]') as { title: string; why: string }[];
   const retroSummary = input('summary').trim();
 
@@ -47,7 +47,7 @@ function main(): void {
     `Rollbacks: ${String(metrics.rollbacks)}`,
     `Cost per merged change: ${metrics.cost_per_merged_change === null ? 'n/a (nothing merged)' : `$${String(metrics.cost_per_merged_change)}`}`,
     `Recommendation followed, by request type: ${follow}`,
-    `Proposals filed for Triage: ${filed.length === 0 ? 'none' : filed.map(f => `#${String(f.number)} ${f.title}`).join('; ')}`,
+    `Proposals filed for Triage: ${filed.length === 0 ? 'none' : filed.map(f => `${f.key} ${f.title}`).join('; ')}`,
     ...(dropped.length === 0 ? [] : [`Dropped: ${dropped.map(d => `${d.title} (${d.why})`).join('; ')}`]),
     ...(retroSummary === '' ? [] : [`The Retro's reading: ${retroSummary}`]),
   ];
@@ -59,8 +59,8 @@ function main(): void {
       facts,
     },
     [
-      { id: 'noted', label: 'Send to Triage', does: 'Leaves the proposal issues as they are; intake picks them up for Triage.', effect: 'noted' },
-      { id: 'hold', label: 'Hold the proposals', does: 'Adds pipeline:needs-approval to this week\'s proposal issues, so none goes to Triage until you approve it.', effect: 'hold' },
+      { id: 'noted', label: 'Send to Triage', does: 'Leaves the proposal items as they are; intake picks them up for Triage.', effect: 'noted' },
+      { id: 'hold', label: 'Hold the proposals', does: 'Adds pipeline:needs-approval to this week\'s proposal items, so none goes to Triage until you approve it.', effect: 'hold' },
     ],
     { option: 'noted', why: 'Each proposal is judged at Triage anyway; holding only delays them.', confidence: 'medium' }
   );
@@ -70,11 +70,7 @@ function main(): void {
     const value = { week, metrics, counts, filed, dropped, notes, at: new Date().toISOString() };
     if (state.put(`retro/${week}`, value, { ifRevision: found.revision }).ok) break;
   }
-  emit({ ...request, filed: filed.map(f => f.number) });
+  emit({ ...request, filed: filed.map(f => f.key) });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-retro summary: ${message(error)}`);
-}
+await script('unify-retro summary', main);

@@ -9,7 +9,8 @@
  * Bound: verdict (the triage agent's output). Emits `{ ok, problems, verdict }`.
  */
 
-import { emit, input, refuse } from 'archon:script';
+import { emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
 
 interface Claim {
   kind: string;
@@ -58,14 +59,10 @@ export function problemsOf(v: Verdict): { problems: string[]; kept: Claim[] } {
   return { problems, kept };
 }
 
-function main(): void {
+async function main(): Promise<void> {
   const verdict = JSON.parse(input('verdict')) as Verdict;
   const { problems, kept } = problemsOf(verdict);
   emit({ ok: problems.length === 0, problems, verdict: { ...verdict, claims: kept } });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-triage evidence: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-triage evidence', main);

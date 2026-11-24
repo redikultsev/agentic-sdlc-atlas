@@ -7,26 +7,23 @@
  * round's answer, empty in the first round). Emits `{ correction }`.
  */
 
-import { emit, input, refuse } from 'archon:script';
+import { emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
 import { runInputs } from '../../.shared/repo.ts';
 import { recordRuling } from '../../.shared/rulings.ts';
 import { digest } from '../../.shared/trust.ts';
 
-function main(): void {
-  const { repo, number } = runInputs();
-  if (number === undefined) return;
+async function main(): Promise<void> {
+  const { key } = runInputs();
+  if (key === undefined) return;
   const decision = input('prev_decision').trim();
   const text = input('prev_text').trim();
   if (decision !== 'other' || text === '') {
     emit({ correction: '' });
     return;
   }
-  recordRuling({ repo, number }, { gate: `accept-${digest(text).slice(0, 8)}`, decision: 'other', text, project: false });
+  await recordRuling(key, { gate: `accept-${digest(text).slice(0, 8)}`, decision: 'other', text, project: false });
   emit({ correction: text });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-triage prev-ruling: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-triage prev-ruling', main);

@@ -4,17 +4,17 @@
  * rounds in front of the Operator: did the findings shrink, or was each round new?
  */
 
-import type { IssueRef } from '../../../.shared/repo.ts';
+import type { ItemKey } from '../../../.shared/item.ts';
 import { buildRequest, card, trend, type Card, type ItemDoc } from './item.ts';
 
 export const ROUND_CAP = 3;
 
-export function blockedCard(ref: IssueRef, why: string, doc: ItemDoc, extraFacts: readonly string[] = []): Card {
+export function blockedCard(key: ItemKey, why: string, doc: ItemDoc, extraFacts: readonly string[] = []): Card {
   const shape = trend(doc.history);
   const converging = /shrank/.test(shape);
   const request = buildRequest(
     {
-      decide: `#${ref.number} is Blocked: ${why}. One more round, back to the plan, for a human, or cancel?`,
+      decide: `${key} is Blocked: ${why}. One more round, back to the plan, for a human, or cancel?`,
       why: 'the limit of 3 fix rounds is hard, and a block verdict always comes to you (decisions 15, 22).',
       notVerified: ['whether another round would converge: the trend below is a count, not a judgement'],
       facts: [
@@ -29,7 +29,7 @@ export function blockedCard(ref: IssueRef, why: string, doc: ItemDoc, extraFacts
       { id: 'one-more', label: 'One more round', does: 'Allows exactly one more fix round; its failure comes back here.', effect: 'one-more' },
       { id: 'back-to-plan', label: 'Back to the plan', does: 'Moves the item to Planning and starts a new plan from the findings.', effect: 'back-to-plan' },
       { id: 'for-human', label: 'For a human', does: 'Moves the item to ForHuman; the pipeline only tracks it from here.', effect: 'for-human' },
-      { id: 'cancel', label: 'Cancel', does: 'Moves the item to Cancelled and closes the issue with the reason.', effect: 'cancel' },
+      { id: 'cancel', label: 'Cancel', does: 'Moves the item to Cancelled and closes the item with the reason.', effect: 'cancel' },
     ],
     converging
       ? { option: 'one-more', why: 'the findings shrank round by round, so one more round is likely to finish.', confidence: 'low' }

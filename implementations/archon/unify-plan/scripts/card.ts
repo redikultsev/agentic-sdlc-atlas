@@ -1,5 +1,5 @@
 /**
- * Move the item to PlanReview and build the plan request: approve (slice sub-issues with
+ * Move the item to PlanReview and build the plan request: approve (slice items with
  * their blocked-by links, Implementing, the first round starts), or redo through `other`
  * with what to change; when the plan check found problems, a declared `redo` option sends
  * them back as they are. With implement_lane manual the approve option is the explicit
@@ -11,35 +11,36 @@
  * Emits the card with `over`, `url`, `slices`, `problems`.
  */
 
-import { emit, input, refuse } from 'archon:script';
+import { emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
 import { nullableJson } from '../../.shared/inputs.ts';
+import { keySlug } from '../../.shared/item.ts';
 import { itemBranch, runInputs } from '../../.shared/repo.ts';
 import { buildRequest, type Option } from '../../.shared/request.ts';
 import { stopCard, tryMove } from '../../.shared/stage.ts';
 
 interface Slice { id: string; title: string; files: string[]; check: string; criteria: string[]; blocked_by: string[]; changed_lines: number; risks: string[] }
 
-function main(): void {
-  const { repo, number } = runInputs();
-  if (number === undefined) return;
-  const ref = { repo, number };
+async function main(): Promise<void> {
+  const { repo, key } = runInputs();
+  if (key === undefined) return;
   const manual = (input('implement_lane') || 'auto') === 'manual';
   const round = JSON.parse(input('round')) as { over: boolean; mismatch: string; redo: number };
   const plan = nullableJson(input('plan')) as { url: string; slices: Slice[]; problems: string[] } | null;
   const research = nullableJson(input('research')) as { problems: string[]; url: string } | null;
-  const url = plan?.url ?? `https://${repo.host}/${repo.path}/tree/${itemBranch(number)}/.pipeline/work/${number}`;
+  const url = plan?.url ?? `https://${repo.host}/${repo.path}/tree/${itemBranch(key)}/.pipeline/work/${keySlug(key)}`;
   const problems = plan?.problems ?? [];
   const extra = { over: round.over, url, slices: plan?.slices ?? [], problems };
-  const mismatch = round.mismatch !== '' ? round.mismatch : tryMove(ref, ['planning', 'plan-review'], 'plan-review');
+  const mismatch = round.mismatch !== '' ? round.mismatch : await tryMove(key, ['planning', 'plan-review'], 'plan-review');
   if (mismatch !== null && mismatch !== '') {
-    emit({ ...stopCard(ref, 'plan', mismatch), ...extra });
+    emit({ ...stopCard(key, 'plan', mismatch), ...extra });
     return;
   }
   const n = extra.slices.length;
   const approve: Option = {
     id: 'approve',
     label: manual ? 'Approve and start implementing' : 'Approve the plan',
-    does: `Creates ${n} slice sub-issue(s) with their blocked-by links, moves the item to Implementing and starts the first round.`,
+    does: `Creates ${n} slice item(s) with their blocked-by links, moves the item to Implementing and starts the first round.`,
     effect: 'approve',
   };
   const notVerified = [
@@ -56,7 +57,7 @@ function main(): void {
   let request;
   if (round.over) {
     request = buildRequest(
-      { decide: `#${number}: three redo rounds are used. Approve the last plan as it is, or stop and sort it out by hand?`, why: 'the plan stage writes at most three plans; another round is your call.', notVerified, facts },
+      { decide: `${key}: three redo rounds are used. Approve the last plan as it is, or stop and sort it out by hand?`, why: 'the plan stage writes at most three plans; another round is your call.', notVerified, facts },
       [{ ...approve, label: manual ? 'Approve the last plan and start implementing' : 'Approve the last plan as it is' }, { id: 'stop', label: 'Stop here', does: 'Ends this run; the item stays in PlanReview for you to handle by hand.', effect: 'stop' }],
       { option: 'stop', why: 'Three rounds did not converge; a conversation will be faster than a fourth plan.', confidence: 'medium' }
     );
@@ -64,7 +65,7 @@ function main(): void {
     const options: Option[] = [approve];
     if (problems.length > 0) options.push({ id: 'redo', label: 'Send the problems back', does: 'Runs the Planner again with the check\'s problems as the instruction; counts as one of three redo rounds.', effect: 'redo' });
     request = buildRequest(
-      { decide: `#${number}: approve this plan of ${n} slice(s), or answer "other" with what to redo (redo ${round.redo} of 3 used)?`, why: 'no code is written before you approve the plan (PlanReview).', notVerified, facts },
+      { decide: `${key}: approve this plan of ${n} slice(s), or answer "other" with what to redo (redo ${round.redo} of 3 used)?`, why: 'no code is written before you approve the plan (PlanReview).', notVerified, facts },
       options,
       problems.length > 0
         ? { option: 'redo', why: `The plan check found ${problems.length} problem(s).`, confidence: 'high' }
@@ -74,8 +75,4 @@ function main(): void {
   emit({ ok: true, reason: '', ...request, ...extra });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-plan card: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-plan card', main);

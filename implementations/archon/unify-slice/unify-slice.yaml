@@ -15,7 +15,7 @@ inputs:
   repo_path:
     description: The owner/name path of the item's repository.
   number:
-    description: The work item's issue number (the slice's parent).
+    description: "The item's key: an issue number or a tracker key such as PROJ-123."
   slice:
     required: true
     description: One slice from the round's frontier, as JSON.

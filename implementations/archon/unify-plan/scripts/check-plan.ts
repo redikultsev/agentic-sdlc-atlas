@@ -4,14 +4,16 @@
  * slice ids `S<k>` are unique; blocked-by names existing slices and the graph has no
  * cycle; every slice names its files and a check command whose program exists here (the
  * command may fail at the base; it must start). Size is files and changed lines, never
- * time. The plan is committed to the item branch as `.pipeline/work/<n>/plan.md`;
+ * time. The plan is committed to the item branch as `.pipeline/work/<key>/plan.md`;
  * problems do not stop the commit, the card shows them on top.
  *
  * Inputs: repo_host, repo_path, number, base; bound plan (the planner's output), criteria
  * (the spec's ids). Emits `{ ok, problems, url, slices }`.
  */
 
-import { artifactsDir, emit, input, refuse } from 'archon:script';
+import { artifactsDir, emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
+import { type ItemKey, keySlug } from '../../.shared/item.ts';
 import { itemBranch, runInputs } from '../../.shared/repo.ts';
 import { commitFiles } from '../../.shared/stage.ts';
 
@@ -76,9 +78,9 @@ export function planProblems(plan: Plan, criteria: readonly string[], starts: (p
   return problems;
 }
 
-function render(number: number, plan: Plan, problems: readonly string[]): string {
+function render(key: ItemKey, plan: Plan, problems: readonly string[]): string {
   return [
-    `# Plan for #${number}`,
+    `# Plan for ${key}`,
     '',
     plan.summary,
     '',
@@ -99,20 +101,16 @@ function render(number: number, plan: Plan, problems: readonly string[]): string
   ].join('\n');
 }
 
-function main(): void {
-  const { repo, number } = runInputs();
-  if (number === undefined) return;
+async function main(): Promise<void> {
+  const { repo, key } = runInputs();
+  if (key === undefined) return;
   const plan = JSON.parse(input('plan')) as Plan;
   const criteria = JSON.parse(input('criteria') || '[]') as string[];
   const starts = (program: string): boolean => program.includes('/') ? Bun.file(program).size > 0 : Bun.which(program) !== null;
   const problems = planProblems(plan, criteria, starts);
-  const path = `.pipeline/work/${number}/plan.md`;
-  const { commit } = commitFiles(input('base') || 'main', itemBranch(number), [{ path, text: render(number, plan, problems) }], `pipeline: plan for #${number}`, artifactsDir());
+  const path = `.pipeline/work/${keySlug(key)}/plan.md`;
+  const { commit } = commitFiles(input('base') || 'main', itemBranch(key), [{ path, text: render(key, plan, problems) }], `pipeline: plan for ${key}`, artifactsDir());
   emit({ ok: problems.length === 0, problems, url: `https://${repo.host}/${repo.path}/blob/${commit}/${path}`, slices: plan.slices });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-plan check-plan: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-plan check-plan', main);

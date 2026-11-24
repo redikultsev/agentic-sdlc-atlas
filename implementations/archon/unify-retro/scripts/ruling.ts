@@ -1,8 +1,8 @@
 /**
  * Apply the Operator's answer to the weekly summary, by the chosen option's
- * `value.effect`: `hold` labels this week's proposal issues `pipeline:needs-approval`;
+ * `value.effect`: `hold` labels this week's proposal items `pipeline:needs-approval`;
  * `noted` changes nothing. Any text, and an "other" answer, is a project ruling: appended
- * to the pinned "Pipeline rulings" issue when there is one (decision 44), and kept in the
+ * to the "Pipeline rulings" register item when there is one (decision 44), and kept in the
  * week's state document either way.
  *
  * Bound inputs: the workflow's INPUTS_REPO_HOST and INPUTS_REPO_PATH; INPUTS_WEEK and
@@ -10,17 +10,16 @@
  * wait.
  */
 
-import { emit, input, refuse, state } from 'archon:script';
-import { forge } from '../../.shared/forge.ts';
+import { emit, input, state } from 'archon:script';
+import { script, tracker } from '../../.shared/connector.ts';
 import { nullableJson, record } from '../../.shared/inputs.ts';
-import { repoOf } from '../../.shared/repo.ts';
+import type { ItemKey } from '../../.shared/item.ts';
+import { rulingsRegister } from '../../.shared/rulings.ts';
 import { MARKS } from '../../.shared/states.ts';
-import { message } from './lib.ts';
 
-function main(): void {
-  const repo = repoOf(input('repo_host'), input('repo_path'));
+async function main(): Promise<void> {
   const week = input('week').trim();
-  const filed = JSON.parse(input('filed') || '[]') as number[];
+  const filed = JSON.parse(input('filed') || '[]') as ItemKey[];
   const decision = input('decision').trim();
   const text = input('text').trim();
   const value = record(nullableJson(input('value')));
@@ -28,7 +27,7 @@ function main(): void {
   const done: string[] = [];
 
   if (effect === 'hold') {
-    for (const number of filed) forge('workitem.label.add', { subject: { kind: 'issue', ref: { repo, number } }, name: MARKS.needsApproval });
+    for (const key of filed) await tracker().label(key, { add: [MARKS.needsApproval] });
     done.push(`held ${String(filed.length)} proposals`);
   } else if (effect === 'noted' || effect === 'other') {
     done.push('proposals left for Triage');
@@ -37,16 +36,16 @@ function main(): void {
   }
 
   if (text !== '') {
-    const register = forge('workitem.list', { repo, label: MARKS.rulings }).items.find(item => item.kind === 'issue' && item.state === 'open');
-    if (register !== undefined) {
-      forge('workitem.comment.upsert', {
-        subject: { kind: 'issue', ref: register.ref },
-        marker: `pipeline-ruling:retro:${week}`,
-        body: `**Ruling** (${new Date().toISOString().slice(0, 10)}, weekly summary ${week}: ${decision})\n\n${text}`,
-      });
-      done.push(`ruling appended to #${String(register.ref.number)}`);
+    const register = await rulingsRegister();
+    if (register !== null) {
+      await tracker().comment(
+        register,
+        `pipeline-ruling:retro:${week}`,
+        `**Ruling** (${new Date().toISOString().slice(0, 10)}, weekly summary ${week}: ${decision})\n\n${text}`
+      );
+      done.push(`ruling appended to ${register}`);
     } else {
-      done.push('no rulings register issue yet: the ruling is kept in the week record only');
+      done.push('no rulings register item yet: the ruling is kept in the week record only');
     }
   }
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -57,8 +56,4 @@ function main(): void {
   emit({ effect, summary: done.join('; ') });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-retro ruling: ${message(error)}`);
-}
+await script('unify-retro ruling', main);

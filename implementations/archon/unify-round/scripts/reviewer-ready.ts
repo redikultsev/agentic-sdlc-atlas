@@ -8,12 +8,13 @@
  */
 
 import { existsSync, readFileSync } from 'node:fs';
+import { script } from '../../.shared/connector.ts';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { emit, input } from 'archon:script';
 import { git } from '../../.shared/git.ts';
 import { isObject } from '../../.shared/inputs.ts';
-import { buildRequest, card, NO_CARD, run } from './lib/item.ts';
+import { buildRequest, card, NO_CARD } from './lib/item.ts';
 import { updateWork } from '../../.shared/work.ts';
 import { runInputs } from '../../.shared/repo.ts';
 
@@ -47,7 +48,7 @@ function providerOf(ref: string, layers: readonly Config[]): { provider: string;
   return { provider: 'claude', via: `${ref} unset, built-in default` };
 }
 
-run(() => {
+async function main(): Promise<void> {
   const top = git('rev-parse', '--show-toplevel');
   const repoConfig = load(join(top.code === 0 ? top.stdout : process.cwd(), '.archon', 'config.yaml'));
   const homeConfig = load(join(process.env[HOME_KEY] ?? join(homedir(), '.archon'), 'config.yaml'));
@@ -58,9 +59,9 @@ run(() => {
   // Stopgap (pack setting review_family): a same-family review runs, flagged on the merge card.
   const allowSame = (input('review_family') ?? 'strict') === 'same-allowed';
   if (!ready && allowSame) {
-    const { number } = runInputs();
-    if (number !== undefined) {
-      updateWork(number, doc => {
+    const { key } = runInputs();
+    if (key !== undefined) {
+      updateWork(key, doc => {
         if (!doc.flags.includes('guard:review-same-family')) doc.flags.push('guard:review-same-family');
       });
     }
@@ -89,4 +90,6 @@ run(() => {
     { option: 'retry', why: 'answer this after the alias is set, and the next run reviews.', confidence: 'medium' }
   );
   emit({ ready: false, review: review.provider, implementer: implementer.provider, ...card(request) });
-});
+}
+
+await script('unify-round reviewer-ready', main);

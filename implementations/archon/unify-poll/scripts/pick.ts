@@ -1,54 +1,51 @@
 /**
- * The oldest open issue that is new to the pipeline. New means: no `state:*` label, not
- * rejected, not the rulings register, not a slice, and not waiting for approval unless the
- * Operator or a trusted author has since approved it. With the pack setting `intake_label`,
- * only issues carrying that label count at all. An issue this poll already started
- * triage for under the same delivery id is passed over, so one triage run that ended
- * without a label (refused, crashed) does not starve every issue behind it: revisit finds it.
+ * The oldest open item that is new to the pipeline. New means: the engine holds no state
+ * for it, no `state:*` label, not rejected, not the rulings register, not a slice, and not
+ * waiting for approval unless the Operator or a trusted author has since approved it. With
+ * the pack setting `intake_label`, only items carrying that label count at all. An item
+ * this poll already started triage for under the same delivery id is passed over, so one
+ * triage run that ended without a state (refused, crashed) does not starve every item
+ * behind it: revisit finds it.
  *
- * Inputs: repo_host, repo_path. Emits `{ found, number, delivery, title, passed }`.
+ * Inputs: repo_host, repo_path. Emits `{ found, number, delivery, title, passed }`;
+ * `number` is the item key as the workflow input `number` takes it.
  */
 
-import { emit, input, refuse } from 'archon:script';
-import { forge } from '../../.shared/forge.ts';
-import { openIssuesOldestFirst } from '../../.shared/github.ts';
+import { emit, input } from 'archon:script';
+import { script, tracker } from '../../.shared/connector.ts';
+import { issueNumber } from '../../.shared/item.ts';
 import { repoOf } from '../../.shared/repo.ts';
 import { MARKS } from '../../.shared/states.ts';
 import { digest } from '../../.shared/trust.ts';
 import { readWork } from '../../.shared/work.ts';
 
-/** Marks that say an issue is not a new request. */
+/** Marks that say an item is not a new request. */
 const NOT_NEW = [MARKS.rejected, MARKS.rulings, MARKS.slice] as const;
 
-function main(): void {
+async function main(): Promise<void> {
   const repo = repoOf(input('repo_host'), input('repo_path'));
   const only = (input('intake_label') ?? '').trim();
   let passed = 0;
-  for (const issue of openIssuesOldestFirst(repo, only)) {
-    const labels = issue.labels.map(l => l.name);
+  for (const item of await tracker().list(only || null)) {
+    const { key, labels } = item;
     if (only !== '' && !labels.includes(only)) continue;
     if (labels.some(l => l.startsWith('state:'))) continue;
     if (labels.some(l => (NOT_NEW as readonly string[]).includes(l))) continue;
     const approved = labels.includes(MARKS.approved);
     if (labels.includes(MARKS.needsApproval) && !approved) continue;
+    const { doc } = readWork(key);
+    if (doc.state !== null) continue;
     // An approval holds for one body text, so a new approval of an edited body is a new start.
-    let delivery = `unify-triage:${repo.host}/${repo.path}#${issue.number}`;
-    if (approved) {
-      const view = forge('workitem.view', { ref: { repo, number: issue.number } });
-      delivery += `:approved:${digest(view.body)}`;
-    }
-    if (readWork(issue.number).doc.flags.includes(`fired:${delivery}`)) {
+    let delivery = `unify-triage:${repo.host}/${repo.path}${issueNumber(key) === null ? ':' : ''}${key}`;
+    if (approved) delivery += `:approved:${digest((await tracker().view(key)).body)}`;
+    if (doc.flags.includes(`fired:${delivery}`)) {
       passed++;
       continue;
     }
-    emit({ found: true, number: issue.number, delivery, title: issue.title, passed });
+    emit({ found: true, number: String(issueNumber(key) ?? key), delivery, title: item.title, passed });
     return;
   }
-  emit({ found: false, number: 0, delivery: '', title: '', passed });
+  emit({ found: false, number: '', delivery: '', title: '', passed });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-poll pick: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-poll pick', main);

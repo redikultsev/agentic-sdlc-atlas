@@ -24,10 +24,11 @@
  * deploy nodes.
  */
 
-import { emit, input, refuse, runId } from 'archon:script';
+import { emit, input, runId } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
 import { forge } from '../../.shared/forge.ts';
 import { projectPolicy } from '../../.shared/policy.ts';
-import { itemNumber, repoOf } from '../../.shared/repo.ts';
+import { runInputs } from '../../.shared/repo.ts';
 import { untrusted } from '../../.shared/trust.ts';
 import { allDeploys } from './lib.ts';
 
@@ -86,10 +87,9 @@ function round(value: number | null): number | null {
   return value === null ? null : Math.round(value * 1000) / 1000;
 }
 
-function main(): void {
-  const repo = repoOf(input('repo_host'), input('repo_path'));
-  const number = itemNumber(input('number'));
-  if (number === undefined) return;
+async function main(): Promise<void> {
+  const { repo, key } = runInputs();
+  if (key === undefined) return;
   const base = input('base').trim() || 'main';
   const pr = Number(input('pr')) || null;
   const deployedAtText = input('deployed_at').trim();
@@ -173,8 +173,4 @@ function main(): void {
   });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-deploy signals: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-deploy signals', main);

@@ -2,15 +2,17 @@
  * Flags a diff that weakens the checks (decision 27, Task shape "Implementer"): deleted
  * test files, added skip or focus markers, a lowered numeric threshold, a change to check
  * configuration, or any path under the never-R0 list (`.shared/policy.ts` ALWAYS_NEVER).
- * Flags are written to `work/<n>` as `guard:*`; merge reads them first and never merges
+ * Flags are written to `work/<key>` as `guard:*`; merge reads them first and never merges
  * such a PR as R0.
  */
 
 import { emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
+import { runInputs } from '../../.shared/repo.ts';
 import { gitOrThrow } from '../../.shared/git.ts';
 import { ALWAYS_NEVER, globMatch } from '../../.shared/policy.ts';
-import { run, updateItem } from './lib/item.ts';
-import { baseName, changedFiles, fetchBranch, itemRef } from './lib/facts.ts';
+import { updateItem } from './lib/item.ts';
+import { baseName, changedFiles, fetchBranch } from './lib/facts.ts';
 
 const TEST_PATH = /(^|\/)(tests?|__tests__|spec)\/|[._-](test|spec)\.[a-z]+$|_test\.go$|^test_.*\.py$|\/test_[^/]*\.py$/i;
 const SKIP = /\b(it|test|describe)\.(skip|only)\(|\bx(it|describe|test)\(|@pytest\.mark\.skip|@unittest\.skip|\bt\.Skip\(|#\[ignore\]|@Disabled\b|\.skip\(\)|pending\(/;
@@ -21,8 +23,9 @@ const CHECK_CONFIG = [
 ];
 const THRESHOLD = /(threshold|coverage|min[_-]?\w*|fail[_-]?under|lines|branches|functions|statements)\W+(\d+(?:\.\d+)?)/i;
 
-run(() => {
-  const ref = itemRef(input('repo_host'), input('repo_path'), input('number'));
+async function main(): Promise<void> {
+  const { key } = runInputs();
+  if (key === undefined) return;
   const base = baseName(input('base'));
   const head = input('head').trim();
   fetchBranch(base);
@@ -54,8 +57,10 @@ run(() => {
     }
   }
   const unique = [...new Set(flags)];
-  updateItem(ref.number, doc => {
+  updateItem(key, doc => {
     doc.flags = [...doc.flags.filter(f => !f.startsWith('guard:')), ...unique];
   });
   emit({ flags: unique, head });
-});
+}
+
+await script('unify-round guard', main);

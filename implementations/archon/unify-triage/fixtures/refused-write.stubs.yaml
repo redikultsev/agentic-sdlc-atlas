@@ -1,0 +1,22 @@
+# The tracker refused a write (a required field). The next stage raises it as a difference with two answers; the Operator puts the tracker back and the run ends (decisions 45, 47).
+reconcile:
+  ok: false
+  reason: "stub: #7: the tracker refused 1 write(s): comment:note (Component is required)"
+  question: "stub: #7: the tracker shows a different state than the engine holds; which one is right?"
+  options: [{ id: tracker-back, label: "Put the tracker back to triage-review", does: "stub", value: { effect: keep-engine } }, { id: stop, label: "Leave it as it is", does: "stub", value: { effect: stop } }]
+  recommendation: { option: tracker-back, why: "stub", confidence: low }
+  state: unknown
+enter:
+  ok: false
+  reason: "stub: #7: the tracker refused 1 write(s): comment:note (Component is required)"
+  question: "stub: #7: the tracker shows a different state than the engine holds; which one is right?"
+  options: [{ id: tracker-back, label: "Put the tracker back to triage-review", does: "stub", value: { effect: keep-engine } }, { id: stop, label: "Leave it as it is", does: "stub", value: { effect: stop } }]
+  recommendation: { option: tracker-back, why: "stub", confidence: low }
+  go: false
+  ask: true
+stop: { decision: tracker-back, text: "", value: { effect: keep-engine } }
+sync: { state: triage-review }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7" }
+  expect: completed
+  reached: [reconcile, enter, stop, sync]

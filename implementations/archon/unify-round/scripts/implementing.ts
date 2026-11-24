@@ -5,26 +5,29 @@
  */
 
 import { emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
 import { forge } from '../../.shared/forge.ts';
-import { itemBranch } from '../../.shared/repo.ts';
+import { itemBranch, runInputs } from '../../.shared/repo.ts';
 import { moveState } from '../../.shared/states.ts';
-import { bound, run, updateItem } from './lib/item.ts';
-import { itemRef } from './lib/facts.ts';
+import { bound, updateItem } from './lib/item.ts';
 
-run(() => {
-  const ref = itemRef(input('repo_host'), input('repo_path'), input('number'));
+async function main(): Promise<void> {
+  const { repo, key } = runInputs();
+  if (key === undefined) return;
   const routed = bound<{ mode: string; pr: number | null }>(input('route'));
   if (routed === null) throw new Error('route-ruling left no result');
-  moveState(ref, ['triage-review', 'plan-review', 'implementing', 'verifying', 'merge-review', 'blocked'], 'implementing');
-  let branch = itemBranch(ref.number);
+  await moveState(key, ['triage-review', 'plan-review', 'implementing', 'verifying', 'merge-review', 'blocked'], 'implementing');
+  let branch = itemBranch(key);
   if (routed.mode === 'verify' && routed.pr !== null) {
-    const view = forge('pr.view', { selector: { kind: 'number', ref: { repo: ref.repo, number: routed.pr } } });
+    const view = forge('pr.view', { selector: { kind: 'number', ref: { repo, number: routed.pr } } });
     if (view === null || view.pr.state !== 'open') throw new Error(`PR #${routed.pr} is no longer open`);
     branch = view.pr.head;
   }
-  updateItem(ref.number, doc => {
+  updateItem(key, doc => {
     doc.branch = branch;
     if (routed.mode === 'verify' && routed.pr !== null) doc.pr = routed.pr;
   });
   emit({ ok: true, mode: routed.mode, branch });
-});
+}
+
+await script('unify-round implementing', main);

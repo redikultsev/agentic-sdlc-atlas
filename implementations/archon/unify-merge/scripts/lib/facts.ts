@@ -1,18 +1,13 @@
 /**
- * What the merge scripts share (a copy of unify-round/scripts/lib/facts.ts): the item reference from the values each script read,
- * git on the run's worktree, the PR of the item branch, and checks at a head.
- * Every value comes in as an argument: scripts read their inputs as literal `input()`.
+ * What the merge scripts share (a copy of unify-round/scripts/lib/facts.ts): git on the
+ * run's worktree, the PR of the item branch, and checks at a head. Every value comes in
+ * as an argument: scripts read their inputs as literal `input()`.
  */
 
 import { forge } from '../../../.shared/forge.ts';
 import { git, gitOrThrow } from '../../../.shared/git.ts';
-import { itemBranch, repoOf, type IssueRef, type Repo } from '../../../.shared/repo.ts';
-
-export function itemRef(host: string, path: string, raw: string): IssueRef {
-  const number = Number(raw.trim());
-  if (!Number.isInteger(number) || number <= 0) throw new Error(`the run has no item number (got '${raw}')`);
-  return { repo: repoOf(host, path), number };
-}
+import type { ItemKey } from '../../../.shared/item.ts';
+import { itemBranch, type IssueRef, type Repo } from '../../../.shared/repo.ts';
 
 export function baseName(raw: string): string {
   return raw.trim() === '' ? 'main' : raw.trim();
@@ -34,14 +29,14 @@ export function remoteHead(branch: string): string | null {
   return line ? line.split(/\s+/)[0] : null;
 }
 
-export function slugBranch(number: number, sliceId: string): string {
-  return `${itemBranch(number)}-slice-${sliceId.replace(/[^A-Za-z0-9._-]/g, '-')}`;
+export function slugBranch(key: ItemKey, sliceId: string): string {
+  return `${itemBranch(key)}-slice-${sliceId.replace(/[^A-Za-z0-9._-]/g, '-')}`;
 }
 
 /** The open PR whose head is the item branch, or null. */
-export function itemPr(repo: Repo, number: number, base: string): { number: number; head: string; draft: boolean; body: string; title: string } | null {
+export function itemPr(repo: Repo, key: ItemKey, base: string): { number: number; head: string; draft: boolean; body: string; title: string } | null {
   const view = forge('pr.view', {
-    selector: { kind: 'head', repo, headRepo: repo, head: itemBranch(number), base, state: 'open' },
+    selector: { kind: 'head', repo, headRepo: repo, head: itemBranch(key), base, state: 'open' },
   });
   if (view === null || view.pr.state !== 'open') return null;
   return { number: view.pr.number, head: view.pr.head_revision ?? '', draft: view.pr.is_draft, body: view.body, title: view.title };

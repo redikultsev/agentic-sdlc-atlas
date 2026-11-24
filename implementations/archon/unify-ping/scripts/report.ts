@@ -34,7 +34,7 @@ function main(): void {
   const lines = [
     `unify-sdlc install check for ${String(repo.host)}/${String(repo.path)} (from ${String(repo.source)})`,
     '',
-    `${mark(labels.ok)} labels: ${list(labels.created).length} created, ${list(labels.existing).length} already there, ${list(labels.failed).length} failed of ${String(labels.total)}`,
+    `${mark(labels.ok)} labels in ${String(labels.tracker)}: ${list(labels.ensured).length} ensured, ${list(labels.existing).length} left to the tracker, ${list(labels.failed).length} failed of ${String(labels.total)}${list(labels.lacks).length > 0 ? `; the tracker lacks ${list(labels.lacks).join(', ')} (skipped)` : ''}`,
     `${mark(access.ok)} gh api: ${access.login === null ? `no access (${String(access.error)})` : `acts as ${String(access.login)}`}${access.login_matches === false ? `, but pipeline_login is ${String(access.expected_login)}` : ''}${access.repo_error ? `; repository not readable: ${String(access.repo_error)}` : ''}`,
     `${mark(bindings.ok)} bindings: ${bindings.ok === null ? 'not checked' : `${list(bindings.found).length} of ${list(bindings.declared).length} found in ${String(bindings.dir)}`}`,
     `${mark(codex.configured)} codex review (reported only): ${codex.configured ? `@review on ${String(codex.model ?? 'codex')}` : list(codex.notes).join('; ')}`,

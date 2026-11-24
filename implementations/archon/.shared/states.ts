@@ -8,12 +8,13 @@
  * nothing is overwritten: the caller raises a difference to the Operator, who either
  * brings the tracker back to the engine or adopts the tracker's change.
  *
- * Labels change one at a time with label.add and label.remove, never labels.set, which
- * replaces the whole set and races people.
+ * Labels change one at a time through the connector, never as a whole set, which races
+ * people. While the tracker is down the engine goes on: a read returns the engine's state
+ * unchecked and the label write waits in the connector's queue (decision 47).
  */
 
-import { forge } from './forge.ts';
-import type { IssueRef } from './repo.ts';
+import { tracker, TrackerError } from './connector.ts';
+import type { ItemKey } from './item.ts';
 import { readWork, updateWork } from './work.ts';
 
 export const STATES = {
@@ -81,29 +82,33 @@ export function stateOf(labels: readonly string[]): { readonly state: From } | {
   return { state: found.length === 0 ? NONE : (LABEL_TO_STATE.get(found[0]) as State) };
 }
 
+const ALL_LABELS = Object.values(STATES).map(def => def.label as string);
+
 export class StateMismatch extends Error {}
 
 /** The tracker shows something other than what the engine holds (decision 45). */
 export class StateDifference extends StateMismatch {
   constructor(
-    readonly ref: IssueRef,
+    readonly key: ItemKey,
     /** What the engine holds. */
     readonly engine: From,
     /** What the tracker shows: a state, or `conflict` when it shows more than one. */
     readonly tracker: From | 'conflict',
-    readonly labels: readonly string[]
+    readonly labels: readonly string[],
+    /** Said instead of the default, for a write the tracker refused. */
+    message?: string
   ) {
     super(
-      tracker === 'conflict'
-        ? `#${ref.number}: the engine holds ${engine}; the tracker shows more than one state (${labels.join(', ')})`
-        : `#${ref.number}: the engine holds ${engine}; the tracker shows ${tracker}`
+      message ??
+      (tracker === 'conflict'
+        ? `${key}: the engine holds ${engine}; the tracker shows more than one state (${labels.join(', ')})`
+        : `${key}: the engine holds ${engine}; the tracker shows ${tracker}`)
     );
   }
 }
 
-function stateLabels(ref: IssueRef): string[] {
-  const view = forge('workitem.view', { ref });
-  return (view.labels ?? []).filter(label => LABEL_TO_STATE.has(label));
+async function stateLabels(key: ItemKey): Promise<string[]> {
+  return (await tracker().view(key)).labels.filter(label => LABEL_TO_STATE.has(label));
 }
 
 function trackerState(labels: readonly string[]): From | 'conflict' {
@@ -115,33 +120,43 @@ function trackerState(labels: readonly string[]): From | 'conflict' {
  * The engine's state of an item, after checking the tracker shows the same. An item the
  * pack worked before the engine held states has a document with no state: its label is
  * adopted once, since the label was the state then. A difference is thrown, never fixed.
+ * While the tracker is down the engine's state is returned unchecked (decision 47).
  */
-export function readState(ref: IssueRef): From {
-  const labels = stateLabels(ref);
-  const tracker = trackerState(labels);
-  const { doc, revision } = readWork(ref.number);
-  if (doc.state === null && revision > 0 && tracker !== 'conflict' && tracker !== NONE) {
-    updateWork(ref.number, d => {
-      if (d.state !== null) throw new StateMismatch(`${ref.number}: another run set the state while it was adopted`);
-      d.state = tracker;
+export async function readState(key: ItemKey): Promise<From> {
+  let labels: string[];
+  try {
+    // Writes queued while the tracker was down go first, or they would read as a difference.
+    await tracker().flush(key);
+    labels = await stateLabels(key);
+  } catch (error) {
+    const held = readWork(key).doc.state;
+    if (error instanceof TrackerError && error.kind === 'outage' && held !== null) return held as From;
+    throw error;
+  }
+  const shown = trackerState(labels);
+  const { doc, revision } = readWork(key);
+  if (doc.state === null && revision > 0 && shown !== 'conflict' && shown !== NONE) {
+    updateWork(key, d => {
+      if (d.state !== null) throw new StateMismatch(`${key}: another run set the state while it was adopted`);
+      d.state = shown;
       d.stateAt = { at: new Date().toISOString(), how: 'adopted' };
     });
-    return tracker;
+    return shown;
   }
   const engine = (doc.state ?? NONE) as From;
-  if (tracker !== engine) throw new StateDifference(ref, engine, tracker, labels);
+  if (shown !== engine) throw new StateDifference(key, engine, shown, labels);
   return engine;
 }
 
-/** Put the tracker's state labels right: exactly `state`, or none. Read back. */
-function showState(ref: IssueRef, state: From): void {
-  const subject = { kind: 'issue' as const, ref };
+/**
+ * Put the tracker's state labels right: exactly `state`, or none; the connector reads it
+ * back, or queues it while the tracker is down. A stale write is dropped: when the engine
+ * moved on since, the later move shows its own state (decision 47, rule 3).
+ */
+async function showState(key: ItemKey, state: From): Promise<void> {
+  if (((readWork(key).doc.state ?? NONE) as From) !== state) return;
   const want = state === NONE ? null : STATES[state].label;
-  const have = stateLabels(ref);
-  if (want !== null && !have.includes(want)) forge('workitem.label.add', { subject, name: want });
-  for (const label of have) if (label !== want) forge('workitem.label.remove', { subject, name: label });
-  const after = trackerState(stateLabels(ref));
-  if (after !== state) throw new Error(`#${ref.number}: the tracker shows ${after} after it was set to ${state}`);
+  await tracker().label(key, { add: want === null ? [] : [want], remove: ALL_LABELS.filter(l => l !== want) });
 }
 
 /**
@@ -149,19 +164,19 @@ function showState(ref: IssueRef, state: From): void {
  * state, or a difference with the tracker, is a mismatch the caller raises as a request
  * instead of overwriting. Idempotent: an item already in `to` is left as it is.
  */
-export function moveState(ref: IssueRef, expected: readonly From[], to: State): void {
-  const current = readState(ref);
+export async function moveState(key: ItemKey, expected: readonly From[], to: State): Promise<void> {
+  const current = await readState(key);
   if (current === to) return;
   if (!expected.includes(current)) {
-    throw new StateMismatch(`#${ref.number} is ${current}, expected ${expected.join(' or ')} before ${to}`);
+    throw new StateMismatch(`${key} is ${current}, expected ${expected.join(' or ')} before ${to}`);
   }
   if (!MOVES[current].includes(to)) throw new StateMismatch(`docs/states.md has no move ${current} → ${to}`);
-  updateWork(ref.number, doc => {
-    if ((doc.state ?? NONE) !== current) throw new StateMismatch(`#${ref.number} was moved to ${doc.state ?? NONE} by another run`);
+  updateWork(key, doc => {
+    if ((doc.state ?? NONE) !== current) throw new StateMismatch(`${key} was moved to ${doc.state ?? NONE} by another run`);
     doc.state = to;
     doc.stateAt = { at: new Date().toISOString(), how: 'move' };
   });
-  showState(ref, to);
+  await showState(key, to);
 }
 
 /**
@@ -169,20 +184,20 @@ export function moveState(ref: IssueRef, expected: readonly From[], to: State): 
  * what the engine holds; `tracker` adopts the state the tracker shows. Adopting needs one
  * state on the tracker. Either way the engine records that the Operator decided.
  */
-export function resolveDifference(ref: IssueRef, keep: 'engine' | 'tracker'): From {
-  const { doc } = readWork(ref.number);
+export async function resolveDifference(key: ItemKey, keep: 'engine' | 'tracker'): Promise<From> {
+  const { doc } = readWork(key);
   const engine = (doc.state ?? NONE) as From;
   if (keep === 'engine') {
-    showState(ref, engine);
+    await showState(key, engine);
     return engine;
   }
-  const tracker = trackerState(stateLabels(ref));
-  if (tracker === 'conflict') throw new StateMismatch(`#${ref.number}: the tracker shows more than one state; there is nothing single to adopt`);
-  updateWork(ref.number, d => {
-    d.state = tracker === NONE ? null : tracker;
+  const shown = trackerState(await stateLabels(key));
+  if (shown === 'conflict') throw new StateMismatch(`${key}: the tracker shows more than one state; there is nothing single to adopt`);
+  updateWork(key, d => {
+    d.state = shown === NONE ? null : shown;
     d.stateAt = { at: new Date().toISOString(), how: 'operator' };
   });
-  return tracker;
+  return shown;
 }
 
 /** Pipeline labels besides the states; all are ensured at install by unify-ping. */

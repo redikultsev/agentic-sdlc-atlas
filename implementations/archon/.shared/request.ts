@@ -6,13 +6,14 @@
  * to the Operator, what was not verified on top, then the facts. A malformed request
  * (a recommendation naming no option, repeated ids) throws before anyone sees it.
  *
- * The waiting cap (decision 9) counts items that have an open request: issues in an
- * Operator state.
+ * The waiting cap (decision 9) counts items that have an open request: items the engine
+ * holds in an Operator state.
  */
 
-import { forge } from './forge.ts';
-import type { Repo } from './repo.ts';
-import { MARKS, STATES } from './states.ts';
+import { state } from 'archon:script';
+import type { ItemKey } from './item.ts';
+import { type State, STATES } from './states.ts';
+import { docName, type WorkDoc } from './work.ts';
 
 export interface Option {
   readonly id: string;
@@ -64,21 +65,22 @@ export function buildRequest(
   };
 }
 
-const OPERATOR_LABELS = Object.values(STATES)
-  .filter(s => s.operator)
-  .map(s => s.label);
-
-/** Items with an open request to the Operator. */
-export function waitingCount(repo: Repo): number {
-  const numbers = new Set<number>();
-  for (const label of OPERATOR_LABELS) {
-    const listed = forge('workitem.list', { repo, label });
-    for (const item of listed.items) if (item.kind === 'issue' && item.state === 'open') numbers.add(item.ref.number);
-  }
-  // A set-aside item waits for nobody: it frees its place.
-  const aside = forge('workitem.list', { repo, label: MARKS.setAside });
-  for (const item of aside.items) numbers.delete(item.ref.number);
-  return numbers.size;
+/**
+ * Items with an open request to the Operator, from the engine's store (decision 45): an
+ * Operator state and not set aside (a set-aside item waits for nobody and frees its
+ * place). `own` leaves the asking item out.
+ */
+export function waitingCount(own: ItemKey | null = null): number {
+  const skip = own === null ? null : docName(own);
+  return state.listValues('work/').filter(found => {
+    if (found.name === skip) return false;
+    const doc = (found.value ?? {}) as Partial<WorkDoc>;
+    const held = doc.state as State | null | undefined;
+    return held != null && STATES[held]?.operator === true && !(doc.flags ?? []).includes(SET_ASIDE);
+  }).length;
 }
+
+/** The engine's flag for an item set aside by unify-revisit; the tracker shows it as a label. */
+export const SET_ASIDE = 'set-aside';
 
 export const WAITING_CAP = 3;

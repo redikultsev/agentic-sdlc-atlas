@@ -1,6 +1,6 @@
 /**
- * Check the Interviewer's spec and commit it to the item branch `pipeline/<n>` as
- * `.pipeline/work/<n>/spec.md` (decision 14), without touching the checkout. Checked:
+ * Check the Interviewer's spec and commit it to the item branch `pipeline/<key>` as
+ * `.pipeline/work/<key>/spec.md` (decision 14), without touching the checkout. Checked:
  * at least one criterion, ids `AC<k>` unique, every criterion with an example, a "Not in
  * scope" list, every assumption with its source. Problems do not stop the commit: the card
  * shows them on top and offers to send them back.
@@ -9,7 +9,9 @@
  * Emits `{ commit, branch, path, url, criteria, problems }`.
  */
 
-import { artifactsDir, emit, input, refuse } from 'archon:script';
+import { artifactsDir, emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
+import { type ItemKey, keySlug } from '../../.shared/item.ts';
 import { itemBranch, runInputs } from '../../.shared/repo.ts';
 import { updateWork } from '../../.shared/work.ts';
 import { commitFiles } from '../../.shared/stage.ts';
@@ -39,9 +41,9 @@ export function specProblems(spec: Spec): string[] {
   return problems;
 }
 
-export function render(number: number, spec: Spec): string {
+export function render(key: ItemKey, spec: Spec): string {
   const lines = [
-    `# Spec for #${number}: ${spec.title}`,
+    `# Spec for ${key}: ${spec.title}`,
     '',
     spec.summary,
     '',
@@ -69,20 +71,20 @@ export function render(number: number, spec: Spec): string {
     '',
     ...(spec.open_points.length === 0 ? ['- None.'] : spec.open_points.map(p => `- ${p}`)),
     '',
-    '_Written by the Interviewer agent; approved or clarified by the Operator at SpecReview. Rulings are comments on the issue._',
+    '_Written by the Interviewer agent; approved or clarified by the Operator at SpecReview. Rulings are comments on the item._',
   ];
   return lines.join('\n');
 }
 
-function main(): void {
-  const { repo, number } = runInputs();
-  if (number === undefined) return;
+async function main(): Promise<void> {
+  const { repo, key } = runInputs();
+  if (key === undefined) return;
   const base = input('base') || 'main';
   const spec = JSON.parse(input('spec')) as Spec;
-  const branch = itemBranch(number);
-  const path = `.pipeline/work/${number}/spec.md`;
-  const { commit } = commitFiles(base, branch, [{ path, text: render(number, spec) }], `pipeline: spec for #${number}`, artifactsDir());
-  updateWork(number, doc => {
+  const branch = itemBranch(key);
+  const path = `.pipeline/work/${keySlug(key)}/spec.md`;
+  const { commit } = commitFiles(base, branch, [{ path, text: render(key, spec) }], `pipeline: spec for ${key}`, artifactsDir());
+  updateWork(key, doc => {
     doc.branch = branch;
   });
   emit({
@@ -95,8 +97,4 @@ function main(): void {
   });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-spec commit-spec: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-spec commit-spec', main);

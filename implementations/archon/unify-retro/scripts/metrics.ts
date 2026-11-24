@@ -1,6 +1,6 @@
 /**
  * The seven numbers of the weekly summary (decisions 27 and 38), computed here from the
- * tracker, the engine's items (`items()`), the items' `work/<n>` documents and the deploy
+ * tracker, the engine's items (`items()`), the items' `work/<key>` documents and the deploy
  * records, never by the agent. Also the cases the Retro agent reads: one per item with a
  * correction or a failure in the window.
  *
@@ -11,7 +11,7 @@
  *  2. done_without_help: of items Done in the window, the share with no "changes",
  *     "clarify" or "redo", fewer than 3 rounds, no "other" answer and never flagged for
  *     attention or set aside.
- *  3. fix_rounds_to_green: mean failed rounds (`work/<n>.rounds`) of items merged.
+ *  3. fix_rounds_to_green: mean failed rounds (`work/<key>.rounds`) of items merged.
  *  4. prs_merged_share: of the pipeline's PRs that closed in the window, the share merged.
  *  5. rollbacks: deploys the Watcher rolled back in the window.
  *  6. cost_per_merged_change: the reported USD of every run started in the window over the
@@ -25,9 +25,11 @@
  * Bound inputs: the workflow's INPUTS_REPO_HOST, INPUTS_REPO_PATH and INPUTS_SINCE.
  */
 
-import { emit, input, refuse, state } from 'archon:script';
+import { emit, input, state } from 'archon:script';
+import { script, tracker } from '../../.shared/connector.ts';
 import { forge } from '../../.shared/forge.ts';
 import { isObject } from '../../.shared/inputs.ts';
+import { asKey, type ItemKey, parseKey } from '../../.shared/item.ts';
 import { repoOf } from '../../.shared/repo.ts';
 import { stateOf } from '../../.shared/states.ts';
 import { untrusted } from '../../.shared/trust.ts';
@@ -44,12 +46,19 @@ function windowStart(since: string, now: number): number {
   return at;
 }
 
+/** The item key of an engine run key (`issue-12`, `item-PROJ-1`), or null for another kind. */
+function itemOfRun(runKey: string): ItemKey | null {
+  const issue = /^issue-(\d+)$/.exec(runKey);
+  if (issue) return parseKey(issue[1]);
+  return runKey.startsWith('item-') ? parseKey(runKey.slice('item-'.length)) : null;
+}
+
 const mean = (values: readonly number[]): number | null => (values.length === 0 ? null : values.reduce((a, b) => a + b, 0) / values.length);
 const share = (part: number, whole: number): number | null => (whole === 0 ? null : part / whole);
 const round2 = (value: number | null): number | null => (value === null ? null : Math.round(value * 100) / 100);
 
 interface DeployWatch {
-  readonly item?: number;
+  readonly item?: ItemKey | number;
   readonly pr?: number | null;
   readonly watch?: { readonly result?: string; readonly at?: string; readonly reason?: string } | null;
 }
@@ -69,7 +78,7 @@ function followRates(since: string): { rates: { type: string; asked: number; ans
   return { rates, error: null };
 }
 
-function main(): void {
+async function main(): Promise<void> {
   const repo = repoOf(input('repo_host'), input('repo_path'));
   const since = input('since').trim() || '7d';
   const now = Date.now();
@@ -89,18 +98,17 @@ function main(): void {
   const cases: Record<string, unknown>[] = [];
 
   for (const entry of engine) {
-    const match = /^issue-(\d+)$/.exec(entry.item.key);
-    if (match === null) continue;
-    const number = Number(match[1]);
-    const work = readWork(number).doc;
+    const key = itemOfRun(entry.item.key);
+    if (key === null) continue;
+    const work = readWork(key).doc;
     let labels: readonly string[] = [];
     let title = '';
     try {
-      const view = forge('workitem.view', { ref: { repo, number } });
-      labels = view.labels ?? [];
+      const view = await tracker().view(key);
+      labels = view.labels;
       title = view.title;
     } catch (error) {
-      notes.push(`#${String(number)} not read: ${message(error)}`);
+      notes.push(`${key} not read: ${message(error)}`);
     }
     const found = stateOf(labels);
     const current = 'state' in found ? found.state : 'conflict';
@@ -149,8 +157,8 @@ function main(): void {
 
     if (helped || current === 'blocked' || current === 'rolled-back') {
       cases.push({
-        item: number,
-        title: title === '' ? '' : untrusted(`title of #${String(number)}`, title),
+        item: key,
+        title: title === '' ? '' : untrusted(`title of ${key}`, title),
         state: current,
         rounds: work.rounds,
         changes: work.changes,
@@ -171,7 +179,7 @@ function main(): void {
     .map(doc => doc.value as DeployWatch | null)
     .filter(record => record?.watch?.result === 'rolled-back' && inWindow(record.watch.at));
   for (const record of rollbacks) {
-    const item = record?.item;
+    const item = record?.item === undefined ? undefined : asKey(record.item);
     const known = cases.find(c => c.item === item);
     if (known !== undefined) known.rollback = record?.watch?.reason ?? '';
   }
@@ -200,8 +208,4 @@ function main(): void {
   });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-retro metrics: ${message(error)}`);
-}
+await script('unify-retro metrics', main);

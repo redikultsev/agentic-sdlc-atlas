@@ -6,20 +6,17 @@
  * Emits `{ text }`.
  */
 
-import { emit, input, refuse } from 'archon:script';
+import { emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
 import { runInputs } from '../../.shared/repo.ts';
 import { recordRuling } from '../../.shared/rulings.ts';
 
-function main(): void {
-  const { repo, number } = runInputs();
-  if (number === undefined) return;
+async function main(): Promise<void> {
+  const { key } = runInputs();
+  if (key === undefined) return;
   const text = input('text').trim();
-  if (text !== '') recordRuling({ repo, number }, { gate: 'questions', decision: 'answered', text, project: false });
+  if (text !== '') await recordRuling(key, { gate: 'questions', decision: 'answered', text, project: false });
   emit({ text });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-spec answers: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-spec answers', main);

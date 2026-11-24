@@ -2,7 +2,7 @@ name: unify-round
 description: |
   One implementation round of one work item (SPEC "Workflows", unify-round): checks
   that the item may start, that no other change already does it and that the base is
-  green, implements the ready slices as child runs, joins them into `pipeline/<n>`, opens
+  green, implements the ready slices as child runs, joins them into `pipeline/<key>`, opens
   or updates the draft PR, then verifies it: CI, the guard against weakened checks, open
   review threads, the AI reviewer of another model family, and acceptance when the item
   has criteria. The round is recorded with the diff fingerprint and classified; the last
@@ -10,7 +10,7 @@ description: |
   the answer resumes it.
 
   Use when: a fire from triage (S), plan, merge ("changes", a land conflict or red), or
-  this workflow itself starts it, on the item `issue-<n>`. Needs a git repository: the
+  this workflow itself starts it, on one item. Needs a git repository: the
   binding runs it in a worktree.
   NOT for: merging (unify-merge) or planning slices (unify-plan).
 
@@ -20,7 +20,7 @@ inputs:
   repo_path:
     description: The owner/name path of the item's repository.
   number:
-    description: The work item's issue number; the run is on the item `issue-<number>`.
+    description: "The item's key: an issue number or a tracker key such as PROJ-123."
   unify_round_binding:
     default: ""
     description: Absolute path of the binding file that starts unify-round (this workflow).
@@ -213,7 +213,7 @@ nodes:
             type: object
             properties:
               id: { type: string }
-              issue: { type: integer }
+              issue: { type: [integer, 'null'] }
               title: { type: string }
               brief: { type: string }
               branch: { type: string }

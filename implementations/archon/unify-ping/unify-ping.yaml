@@ -1,7 +1,7 @@
 name: unify-ping
 description: |
   Install check for the unify-sdlc pack, run by hand. Ensures every state and
-  pipeline label exists on the repository, checks `gh api` access and the pipeline login,
+  pipeline label exists in the project's tracker, checks `gh api` access and the pipeline login,
   checks the binding files written by `archon pack bindings`, reports whether the AI
   reviewer can run on Codex, and runs the project's test suite through the git and gh
   guard, reporting what the guard refused. Ends with one readable report.

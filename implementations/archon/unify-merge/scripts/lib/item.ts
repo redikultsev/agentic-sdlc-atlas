@@ -1,18 +1,17 @@
 /**
  * Helpers the item workflows of this group share: the start check (`reconcile`), the
- * extra facts this workflow keeps in `work/<n>` beside the shared fields, moves that need
+ * extra facts this workflow keeps in `work/<key>` beside the shared fields, moves that need
  * more than one step, and reading a wait's answer. The same file sits in
  * `unify-round/scripts/lib/item.ts`; it belongs in `.shared/` once the pack takes it.
  */
 
-import { refuse } from 'archon:script';
-import { forge } from '../../../.shared/forge.ts';
+import { tracker } from '../../../.shared/connector.ts';
 import { nullableJson, isObject } from '../../../.shared/inputs.ts';
-import type { IssueRef } from '../../../.shared/repo.ts';
+import type { ItemKey } from '../../../.shared/item.ts';
 import { buildRequest, type Option, type Request } from '../../../.shared/request.ts';
 import { MOVES, moveState, readState, StateDifference, StateMismatch, type From, type State } from '../../../.shared/states.ts';
 import { differenceCard } from '../../../.shared/stage.ts';
-import { readWork, updateWork, type WorkDoc } from '../../../.shared/work.ts';
+import { docName, readWork, updateWork, type WorkDoc } from '../../../.shared/work.ts';
 
 /** One finding the next round must address, with where it came from. */
 export interface Finding {
@@ -23,7 +22,7 @@ export interface Finding {
   readonly repeated: boolean;
 }
 
-/** Facts this group keeps in `work/<n>` beside the shared WorkDoc fields. */
+/** Facts this group keeps in `work/<key>` beside the shared WorkDoc fields. */
 export interface RoundFacts {
   /** What the next round fixes; null when the next round implements new slices. */
   fix: { readonly from: string; readonly findings: readonly Finding[] } | null;
@@ -47,21 +46,12 @@ export function withFacts(doc: WorkDoc): ItemDoc {
   });
 }
 
-export function readItem(number: number): ItemDoc {
-  return withFacts(readWork(number).doc);
+export function readItem(key: ItemKey): ItemDoc {
+  return withFacts(readWork(key).doc);
 }
 
-export function updateItem(number: number, change: (doc: ItemDoc) => void): ItemDoc {
-  return withFacts(updateWork(number, doc => change(withFacts(doc))));
-}
-
-/** Run a script body; any throw becomes the node's refusal with its message. */
-export function run(main: () => void): void {
-  try {
-    main();
-  } catch (error) {
-    refuse(error instanceof Error ? error.message : String(error));
-  }
+export function updateItem(key: ItemKey, change: (doc: ItemDoc) => void): ItemDoc {
+  return withFacts(updateWork(key, doc => change(withFacts(doc))));
 }
 
 /** The card fields a script hands to a `wait` node; empty when nothing is asked. */
@@ -114,19 +104,19 @@ export function bound<T>(raw: string | undefined): T | null {
  * difference with the tracker the Operator brings the tracker back or adopts its state
  * and the run ends (decision 45); otherwise the Operator continues from the state or stops.
  */
-export function reconcile(ref: IssueRef, workflow: string, starts: readonly From[], target: State, extra: readonly string[] = []): {
+export async function reconcile(key: ItemKey, workflow: string, starts: readonly From[], target: State, extra: readonly string[] = []): Promise<{
   readonly ok: boolean;
   readonly state: string;
   readonly problems: readonly string[];
   readonly card: Card;
-} {
+}> {
   const problems: string[] = [...extra];
   let state: From | 'conflict' = 'none';
   try {
-    state = readState(ref);
+    state = await readState(key);
   } catch (error) {
     if (error instanceof StateDifference) {
-      const asked = differenceCard(ref, workflow, error);
+      const asked = differenceCard(key, workflow, error);
       return { ok: false, state: 'difference', problems: [error.message, ...problems], card: card(asked) };
     }
     if (!(error instanceof StateMismatch)) throw error;
@@ -136,8 +126,8 @@ export function reconcile(ref: IssueRef, workflow: string, starts: readonly From
   if (state !== 'conflict' && !starts.includes(state)) {
     problems.push(`the item is ${state}; ${workflow} starts only from ${starts.join(', ')}`);
   }
-  const doc = readItem(ref.number);
-  if (doc.pr !== null && doc.branch === null) problems.push(`work/${ref.number} records PR #${doc.pr} but no branch`);
+  const doc = readItem(key);
+  if (doc.pr !== null && doc.branch === null) problems.push(`${docName(key)} records PR #${doc.pr} but no branch`);
   if (problems.length === 0) return { ok: true, state, problems, card: NO_CARD };
   const canProceed = state !== 'conflict' && pathTo(state, target) !== null;
   const options: Option[] = [
@@ -153,7 +143,7 @@ export function reconcile(ref: IssueRef, workflow: string, starts: readonly From
   }
   const request = buildRequest(
     {
-      decide: `#${ref.number}: the item is not where ${workflow} starts, or its record disagrees; continue or stop?`,
+      decide: `${key}: the item is not where ${workflow} starts, or its record disagrees; continue or stop?`,
       why: 'a run never overwrites a state it did not expect.',
       notVerified: ['who or what moved the item, and why'],
       facts: problems,
@@ -195,28 +185,27 @@ export function pathTo(from: From, to: State): State[] | null {
  * docs/states.md has no direct move (MergeReview to Planning goes through Implementing
  * and Blocked). Refuses from a state outside `expected`.
  */
-export function moveAlong(ref: IssueRef, expected: readonly From[], to: State): void {
-  const current = readState(ref);
+export async function moveAlong(key: ItemKey, expected: readonly From[], to: State): Promise<void> {
+  const current = await readState(key);
   if (current === to) return;
-  if (!expected.includes(current)) throw new StateMismatch(`#${ref.number} is ${current}, expected ${expected.join(' or ')} before ${to}`);
+  if (!expected.includes(current)) throw new StateMismatch(`${key} is ${current}, expected ${expected.join(' or ')} before ${to}`);
   const path = pathTo(current, to);
   if (path === null) throw new StateMismatch(`docs/states.md has no path ${current} → ${to}`);
   let at: From = current;
   for (const step of path) {
-    moveState(ref, [at], step);
+    await moveState(key, [at], step);
     at = step;
   }
 }
 
 /**
  * Tell the requester why the item left the pipeline (ForHuman, Cancelled); a cancelled
- * item's issue is also closed as not planned. ForHuman stays open: a human does it.
+ * item is also closed as not planned. ForHuman stays open: a human does it.
  */
-export function closeWithReason(ref: IssueRef, marker: string, reason: string, close = false): void {
-  forge('workitem.comment.upsert', { subject: { kind: 'issue', ref }, marker, body: reason });
+export async function closeWithReason(key: ItemKey, marker: string, reason: string, close = false): Promise<void> {
+  await tracker().comment(key, marker, reason);
   if (!close) return;
-  const view = forge('workitem.view', { ref });
-  if (view.state === 'open') forge('workitem.close', { ref, reason: 'not_planned' });
+  await tracker().close(key, 'not_planned');
 }
 
 /** A short stable key for a finding's text: same words, same key. */

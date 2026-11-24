@@ -1,21 +1,25 @@
 /**
  * Start check of a round: the label names a state a round may start from (TriageReview
  * for an accepted S item, PlanReview, Verifying after a fix, MergeReview after "changes",
- * Blocked after "one more round", Implementing after a restart) and `work/<n>` agrees.
+ * Blocked after "one more round", Implementing after a restart) and `work/<key>` agrees.
  * A mismatch is a request, never an overwrite.
  */
 
-import { emit, input } from 'archon:script';
-import { reconcile, run } from './lib/item.ts';
-import { itemRef } from './lib/facts.ts';
+import { emit } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
+import { runInputs } from '../../.shared/repo.ts';
+import { reconcile } from './lib/item.ts';
 
-run(() => {
-  const ref = itemRef(input('repo_host'), input('repo_path'), input('number'));
-  const result = reconcile(
-    ref,
+async function main(): Promise<void> {
+  const { key } = runInputs();
+  if (key === undefined) return;
+  const result = await reconcile(
+    key,
     'unify-round',
     ['triage-review', 'plan-review', 'implementing', 'verifying', 'merge-review', 'blocked'],
     'implementing'
   );
   emit({ ok: result.ok, state: result.state, problems: result.problems, ...result.card });
-});
+}
+
+await script('unify-round reconcile', main);

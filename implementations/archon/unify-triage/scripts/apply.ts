@@ -10,74 +10,68 @@
  *   stop       nothing (the card was a stop request)
  *
  * Triage files no discoveries (SPEC review #16). Every write checks first and reads back
- * through `.shared/states.ts`; the fire's delivery id is this run, so a retry starts one run.
+ * through the connector; the fire's delivery id is this run, so a retry starts one run.
  *
  * Inputs: repo_host, repo_path, number, unify_spec_binding, unify_round_binding
  * (read by fireNext); bound card (the review loop's output: the last card).
  * Emits `{ effect, fired, summary }`.
  */
 
-import { emit, input, refuse, runId } from 'archon:script';
-import { forge } from '../../.shared/forge.ts';
+import { emit, input, runId } from 'archon:script';
+import { script, tracker } from '../../.shared/connector.ts';
 import { fireNext } from '../../.shared/fire.ts';
 import { runInputs } from '../../.shared/repo.ts';
 import { recordRuling } from '../../.shared/rulings.ts';
 import { MARKS } from '../../.shared/states.ts';
 import { chosenEffect, lastAnswer, tryMove } from '../../.shared/stage.ts';
 
-function main(): void {
-  const { repo, number } = runInputs();
-  if (number === undefined) return;
-  const ref = { repo, number };
-  const subject = { kind: 'issue' as const, ref };
+async function main(): Promise<void> {
+  const { repo, key } = runInputs();
+  if (key === undefined) return;
+  const t = tracker();
   const card = JSON.parse(input('card')) as { ok: boolean; size: 'S' | 'M' | 'L'; risk: string; verdict_reason: string };
   const answer = lastAnswer('review', 'accept');
   if (answer === null) throw new Error('the Accept gate has no recorded answer');
   const effect = chosenEffect(answer, 'stop');
-  if (answer.text.trim() !== '') recordRuling(ref, { gate: 'accept', decision: answer.decision, text: answer.text, project: false });
+  if (answer.text.trim() !== '') await recordRuling(key, { gate: 'accept', decision: answer.decision, text: answer.text, project: false });
   const id = runId();
   let fired = '';
   switch (effect) {
     case 'stop':
       break;
     case 'accept': {
-      for (const name of [`size:${card.size.toLowerCase()}`, `risk:${card.risk.toLowerCase()}`]) {
-        forge('repo.label.ensure', { repo, name, color: 'ededed', description: 'Set by pipeline triage at Accept' });
-        forge('workitem.label.add', { subject, name });
-      }
+      const names = [`size:${card.size.toLowerCase()}`, `risk:${card.risk.toLowerCase()}`];
+      for (const name of names) await t.ensureLabel(name, 'ededed', 'Set by pipeline triage at Accept');
+      await t.label(key, { add: names });
       const small = card.size === 'S';
-      const mismatch = tryMove(ref, ['triage-review'], small ? 'implementing' : 'specifying');
+      const mismatch = await tryMove(key, ['triage-review'], small ? 'implementing' : 'specifying');
       if (mismatch !== null) throw new Error(mismatch);
       const next = small ? 'unify-round' : 'unify-spec';
       if (small && input('unify_round_binding') === '') throw new Error('unify_round_binding is empty');
       if (!small && input('unify_spec_binding') === '') throw new Error('unify_spec_binding is empty');
-      fired = fireNext(next, repo, number, `${next}:${repo.host}/${repo.path}#${number}:triage:${id}`);
+      const at = `${repo.host}/${repo.path}${key.startsWith('#') ? '' : ':'}${key}`;
+      fired = fireNext(next, repo, key, `${next}:${at}:triage:${id}`);
       break;
     }
     case 'for-human': {
-      const mismatch = tryMove(ref, ['triage-review'], 'for-human');
+      const mismatch = await tryMove(key, ['triage-review'], 'for-human');
       if (mismatch !== null) throw new Error(mismatch);
-      forge('workitem.comment.upsert', { subject, marker: `pipeline-for-human:${id}`, body: `This item is for a human; the pipeline only tracks it.\n\n${card.verdict_reason}` });
+      await t.comment(key, `pipeline-for-human:${id}`, `This item is for a human; the pipeline only tracks it.\n\n${card.verdict_reason}`);
       break;
     }
     case 'wont-do': {
-      const mismatch = tryMove(ref, ['triage-review'], 'cancelled');
+      const mismatch = await tryMove(key, ['triage-review'], 'cancelled');
       if (mismatch !== null) throw new Error(mismatch);
-      forge('workitem.label.add', { subject, name: MARKS.rejected });
+      await t.label(key, { add: [MARKS.rejected] });
       const words = answer.text.trim() === '' ? '' : `\n\n${answer.text.trim()}`;
-      forge('workitem.comment.upsert', { subject, marker: `pipeline-wont-do:${id}`, body: `Closed: this will not be done.\n\n${card.verdict_reason}${words}` });
-      const closed = forge('workitem.close', { ref, reason: 'not_planned' });
-      if (closed.workitem.state !== 'closed') throw new Error(`#${number} reads ${closed.workitem.state} after closing`);
+      await t.comment(key, `pipeline-wont-do:${id}`, `Closed: this will not be done.\n\n${card.verdict_reason}${words}`);
+      await t.close(key, 'not_planned');
       break;
     }
     default:
       throw new Error(`unknown effect '${effect}'`);
   }
-  emit({ effect, fired, summary: `#${number}: ${answer.decision} (${effect})${fired === '' ? '' : `; ${fired}`}` });
+  emit({ effect, fired, summary: `${key}: ${answer.decision} (${effect})${fired === '' ? '' : `; ${fired}`}` });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-triage apply: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-triage apply', main);

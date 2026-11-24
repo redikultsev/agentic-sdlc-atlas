@@ -6,20 +6,16 @@
  * Bound inputs: the workflow's INPUTS_REPO_HOST, INPUTS_REPO_PATH and INPUTS_NUMBER.
  */
 
-import { emit, input, refuse } from 'archon:script';
-import { itemNumber, repoOf } from '../../.shared/repo.ts';
+import { emit } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
+import { runInputs } from '../../.shared/repo.ts';
 import { moveState } from '../../.shared/states.ts';
 
-function main(): void {
-  const repo = repoOf(input('repo_host'), input('repo_path'));
-  const number = itemNumber(input('number'));
-  if (number === undefined) return;
-  moveState({ repo, number }, ['releasing'], 'live');
+async function main(): Promise<void> {
+  const { key } = runInputs();
+  if (key === undefined) return;
+  await moveState(key, ['releasing'], 'live');
   emit({ state: 'live' });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-deploy state: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-deploy state', main);

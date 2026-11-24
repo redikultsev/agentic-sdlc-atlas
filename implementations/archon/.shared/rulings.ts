@@ -1,14 +1,14 @@
 /**
  * The Operator's rulings (decision 32, registers per decision 44). A ruling is the text of
  * a gate answer, never a free comment: only the wait's own answer becomes one. It is
- * written as a comment on the item, dated, with the gate it answered; the marker makes the
- * write idempotent, so a retried node never writes it twice. A ruling marked as true for
- * the whole project is also appended to the pinned "Pipeline rulings" issue.
+ * written as a comment on the item, dated, with the gate it answered; the write key makes
+ * it idempotent, so a retried node never writes it twice. A ruling marked as true for the
+ * whole project is also appended to the "Pipeline rulings" register item.
  */
 
 import { runId } from 'archon:script';
-import { forge } from './forge.ts';
-import type { IssueRef, Repo } from './repo.ts';
+import { tracker } from './connector.ts';
+import type { ItemKey } from './item.ts';
 import { MARKS } from './states.ts';
 
 export interface Ruling {
@@ -18,35 +18,35 @@ export interface Ruling {
   readonly project: boolean;
 }
 
-export function recordRuling(ref: IssueRef, ruling: Ruling, at = new Date().toISOString()): void {
+export async function recordRuling(key: ItemKey, ruling: Ruling, at = new Date().toISOString()): Promise<void> {
   if (ruling.text.trim() === '') return;
   const marker = `pipeline-ruling:${runId()}:${ruling.gate}`;
-  const body = [
-    `**Ruling** (${at.slice(0, 10)}, ${ruling.gate}: ${ruling.decision})`,
-    '',
-    ruling.text.trim(),
-  ].join('\n');
-  forge('workitem.comment.upsert', { subject: { kind: 'issue', ref }, marker, body });
-  if (ruling.project) recordProjectRuling(ref.repo, ref.number, ruling, at, marker);
+  const body = [`**Ruling** (${at.slice(0, 10)}, ${ruling.gate}: ${ruling.decision})`, '', ruling.text.trim()].join('\n');
+  await tracker().comment(key, marker, body);
+  if (ruling.project) {
+    const register = await ensureRulingsRegister();
+    await tracker().comment(register, `${marker}:project`, `**Ruling** (${at.slice(0, 10)}, from ${key}, ${ruling.gate})\n\n${ruling.text.trim()}`);
+  }
 }
 
-function rulingsIssue(repo: Repo): number {
-  const listed = forge('workitem.list', { repo, label: MARKS.rulings });
-  const open = listed.items.filter(item => item.kind === 'issue' && item.state === 'open');
-  if (open.length > 0) return open[0].ref.number;
-  const created = forge('workitem.create', {
-    repo,
-    title: 'Pipeline rulings',
-    body: 'Answers the Operator gave that hold for the whole project. Agents read them before they ask. One comment per ruling; never edited.',
-    marker: 'pipeline-rulings-register',
-  });
-  const number = created.workitem.ref.number;
-  forge('workitem.label.add', { subject: { kind: 'issue', ref: { repo, number } }, name: MARKS.rulings });
-  return number;
+/** The open rulings register, or null when the project has none yet. */
+export async function rulingsRegister(): Promise<ItemKey | null> {
+  const t = tracker();
+  if (!t.has('list')) return null;
+  return (await t.list(MARKS.rulings))[0]?.key ?? null;
 }
 
-function recordProjectRuling(repo: Repo, from: number, ruling: Ruling, at: string, marker: string): void {
-  const number = rulingsIssue(repo);
-  const body = `**Ruling** (${at.slice(0, 10)}, from #${from}, ${ruling.gate})\n\n${ruling.text.trim()}`;
-  forge('workitem.comment.upsert', { subject: { kind: 'issue', ref: { repo, number } }, marker: `${marker}:project`, body });
+async function ensureRulingsRegister(): Promise<ItemKey> {
+  const found = await rulingsRegister();
+  if (found !== null) return found;
+  const t = tracker();
+  const key = await t.create(
+    'project',
+    'pipeline-rulings-register',
+    'Pipeline rulings',
+    'Answers the Operator gave that hold for the whole project. Agents read them before they ask. One comment per ruling; never edited.'
+  );
+  await t.ensureLabel(MARKS.rulings, 'ededed', 'The register of project rulings');
+  await t.label(key, { add: [MARKS.rulings] });
+  return key;
 }

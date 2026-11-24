@@ -4,25 +4,21 @@
  * reconcile. Emits a card with `go` and `ask`.
  */
 
-import { emit, input, refuse } from 'archon:script';
+import { emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
 import { runInputs } from '../../.shared/repo.ts';
 import { type Card, clear, stopCard, tryMove } from '../../.shared/stage.ts';
 
-function main(): void {
-  const { repo, number } = runInputs();
-  if (number === undefined) return;
-  const ref = { repo, number };
+async function main(): Promise<void> {
+  const { key } = runInputs();
+  if (key === undefined) return;
   const reconciled = JSON.parse(input('reconcile')) as Card;
   if (!reconciled.ok) {
     emit({ ...reconciled, go: false, ask: true });
     return;
   }
-  const mismatch = tryMove(ref, ['spec-review', 'planning'], 'planning');
-  emit(mismatch === null ? { ...clear(), go: true, ask: false } : { ...stopCard(ref, 'plan', mismatch), go: false, ask: true });
+  const mismatch = await tryMove(key, ['spec-review', 'planning'], 'planning');
+  emit(mismatch === null ? { ...clear(), go: true, ask: false } : { ...stopCard(key, 'plan', mismatch), go: false, ask: true });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-plan enter: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-plan enter', main);

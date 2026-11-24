@@ -10,23 +10,24 @@
  * Emits the card with `over`, `url`, `criteria`, `problems`.
  */
 
-import { emit, input, refuse } from 'archon:script';
+import { emit, input } from 'archon:script';
+import { script } from '../../.shared/connector.ts';
 import { nullableJson } from '../../.shared/inputs.ts';
+import { keySlug } from '../../.shared/item.ts';
 import { itemBranch, runInputs } from '../../.shared/repo.ts';
 import { buildRequest, type Option } from '../../.shared/request.ts';
 import { stopCard, tryMove } from '../../.shared/stage.ts';
 
-function main(): void {
-  const { repo, number } = runInputs();
-  if (number === undefined) return;
-  const ref = { repo, number };
+async function main(): Promise<void> {
+  const { repo, key } = runInputs();
+  if (key === undefined) return;
   const round = JSON.parse(input('round')) as { over: boolean; mismatch: string; clarify: number };
   const commit = nullableJson(input('commit')) as { url: string; criteria: string[]; problems: string[] } | null;
-  const url = commit?.url ?? `https://${repo.host}/${repo.path}/tree/${itemBranch(number)}/.pipeline/work/${number}`;
+  const url = commit?.url ?? `https://${repo.host}/${repo.path}/tree/${itemBranch(key)}/.pipeline/work/${keySlug(key)}`;
   const extra = { over: round.over, url, criteria: commit?.criteria ?? [], problems: commit?.problems ?? [] };
-  const mismatch = round.mismatch !== '' ? round.mismatch : tryMove(ref, ['specifying', 'spec-review'], 'spec-review');
+  const mismatch = round.mismatch !== '' ? round.mismatch : await tryMove(key, ['specifying', 'spec-review'], 'spec-review');
   if (mismatch !== null && mismatch !== '') {
-    emit({ ...stopCard(ref, 'spec', mismatch), ...extra });
+    emit({ ...stopCard(key, 'spec', mismatch), ...extra });
     return;
   }
   const approve: Option = { id: 'approve', label: 'Approve the spec', does: 'Moves the item to Planning and starts the plan stage.', effect: 'approve' };
@@ -34,7 +35,7 @@ function main(): void {
   if (round.over) {
     request = buildRequest(
       {
-        decide: `#${number}: three clarify rounds are used. Approve the last spec as it is, or stop and sort it out by hand?`,
+        decide: `${key}: three clarify rounds are used. Approve the last spec as it is, or stop and sort it out by hand?`,
         why: 'the spec stage writes at most three drafts; another round is your call, not the pipeline\'s.',
         notVerified: extra.problems.map(p => `check: ${p}`),
         facts: [`Last spec: ${url}`, `Clarify answers so far: ${round.clarify}.`, 'An "other" answer is recorded as a ruling and this request comes back.'],
@@ -52,7 +53,7 @@ function main(): void {
     }
     request = buildRequest(
       {
-        decide: `#${number}: approve this spec, or answer "other" with what to clarify (clarify ${round.clarify} of 3 used)?`,
+        decide: `${key}: approve this spec, or answer "other" with what to clarify (clarify ${round.clarify} of 3 used)?`,
         why: 'no plan or code is written before you approve the spec (SpecReview).',
         notVerified: [...extra.problems.map(p => `check: ${p}`), 'whether the criteria match what you want: the agent wrote them from the request and the code'],
         facts: [`Spec: ${url}`, `Criteria: ${extra.criteria.join(', ') || 'none'}.`],
@@ -66,8 +67,4 @@ function main(): void {
   emit({ ok: true, reason: '', ...request, ...extra });
 }
 
-try {
-  main();
-} catch (error) {
-  refuse(`unify-spec card: ${error instanceof Error ? error.message : String(error)}`);
-}
+await script('unify-spec card', main);

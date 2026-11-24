@@ -10,7 +10,7 @@ description: |
   to the head and reads it back. It fires deploy, or a round on "changes", a conflict or
   red. Started through its binding, which sets `resource: merge` with capacity 1.
 
-  Use when: unify-round fires it after a pass with no slices left, on the item `issue-<n>`.
+  Use when: unify-round fires it after a pass with no slices left, on one item.
   NOT for: verifying a PR (unify-round) or deploying (unify-deploy).
 
 inputs:
@@ -19,7 +19,7 @@ inputs:
   repo_path:
     description: The owner/name path of the item's repository.
   number:
-    description: The work item's issue number; the run is on the item `issue-<number>`.
+    description: "The item's key: an issue number or a tracker key such as PROJ-123."
   unify_round_binding:
     default: ""
     description: Absolute path of the binding file that starts unify-round.

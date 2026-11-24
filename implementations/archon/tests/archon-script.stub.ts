@@ -1,7 +1,8 @@
 /**
  * `bun test` preload: an in-memory `archon:script` for the pack's shared modules. It
  * keeps the parts the modules under test use: the state store with revisions and
- * conditional writes, and a tracker of issues with labels behind `forge`. Every call is
+ * conditional writes, and a few issues with labels behind `forge` (the tracker itself is
+ * faked one level up, as a connector adapter: `fake-tracker.ts`). Every call is
  * recorded, and a test can make the next write of a document lose a race or a label
  * write fail. Nothing here talks to an engine.
  */
@@ -51,6 +52,11 @@ const state = {
     fake.docs.set(name, { revision: current + 1, value: structuredClone(value) });
     return { ok: true, revision: { revision: current + 1 } };
   },
+  listValues(prefix = '') {
+    return [...fake.docs.entries()]
+      .filter(([name, doc]) => name.startsWith(prefix) && doc.value !== null)
+      .map(([name, doc]) => ({ name, revision: doc.revision, value: structuredClone(doc.value), lease: null }));
+  },
 };
 
 function forge(op: string, request: any): any {
@@ -84,6 +90,7 @@ plugin({
         forge,
         ForgeError,
         input: () => undefined,
+        runId: () => 'run-1',
         emit: () => {},
         refuse: (reason: string) => {
           throw new Error(`refused: ${reason}`);
