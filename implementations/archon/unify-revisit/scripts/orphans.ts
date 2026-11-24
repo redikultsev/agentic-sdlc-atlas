@@ -28,7 +28,7 @@ import { STATES, type State } from '../../.shared/states.ts';
 import { readWork, updateWork } from '../../.shared/work.ts';
 import { engineItems, hostCommand, MARKS_REVISIT, message, openWithLabel, type EngineItem } from './lib.ts';
 
-const AGENT_STATES: readonly State[] = ['triaging', 'specifying', 'planning', 'implementing', 'verifying', 'live'];
+const AGENT_STATES: readonly State[] = ['triaging', 'specifying', 'planning', 'implementing', 'verifying', 'releasing', 'live'];
 const LIVE_RUN = new Set(['pending', 'running', 'paused']);
 
 type Run = EngineItem['runs'][number];

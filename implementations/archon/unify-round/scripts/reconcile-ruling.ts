@@ -6,6 +6,7 @@
 import { emit, input } from 'archon:script';
 import { recordRuling } from '../../.shared/rulings.ts';
 import { answerOf, bound, reconcileGo, run } from './lib/item.ts';
+import { applyDifference } from '../../.shared/stage.ts';
 import { itemRef } from './lib/facts.ts';
 
 run(() => {
@@ -14,5 +15,6 @@ run(() => {
   const answer = answerOf(input('answer'));
   if (checked === null) throw new Error('reconcile left no result');
   if (answer !== null) recordRuling(ref, { gate: 'round-reconcile', decision: answer.decision, text: answer.text, project: false });
+  if (!checked.ok && answer !== null) applyDifference(ref, answer.effect);
   emit({ go: reconcileGo(checked.ok, answer) });
 });

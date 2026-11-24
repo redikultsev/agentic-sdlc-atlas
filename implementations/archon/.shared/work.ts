@@ -1,13 +1,13 @@
 /**
- * The item's document `work/<n>` in Archon's state store: facts tied to the item's
- * current state, never the state itself (that is the label). Conditional writes, so two
- * runs never overwrite each other; the document stays far under the 64 KiB cap.
- * Each workflow checks at its start that the label and this document agree (its own
- * `reconcile` script); there is no shared reconcile, because what counts as agreeing
- * differs per step.
+ * The item's document `work/<key>` in Archon's state store: the item's state, which is
+ * the truth the pipeline acts on (decision 45; `states.ts` moves it, the tracker's label
+ * only shows it), and the facts tied to it. Conditional writes, so two runs never
+ * overwrite each other; the document stays far under the 64 KiB cap. Each workflow checks
+ * at its start that the tracker and this document agree (its own `reconcile` script).
  */
 
 import { state } from 'archon:script';
+import { asKey, type ItemKey, keySlug } from './item.ts';
 
 export interface Verdict {
   readonly kind: 'ci' | 'review' | 'validator' | 'operator';
@@ -18,6 +18,10 @@ export interface Verdict {
 }
 
 export interface WorkDoc {
+  /** The item's state, one of `states.ts`; null until the engine first holds it (an item from before decision 45 is adopted from its label once). */
+  state: string | null;
+  /** When the state was last set, and how: a move, adopted from the tracker's label, or the Operator's answer to a difference. */
+  stateAt: { at: string; how: 'move' | 'adopted' | 'operator' } | null;
   /** Failed fix rounds in the current Implementing/Verifying stretch (decision 15). */
   rounds: number;
   /** "changes" answers at the merge gate (decision 24 keeps them out of `rounds`). */
@@ -47,6 +51,8 @@ export interface WorkDoc {
 
 export function emptyWork(): WorkDoc {
   return {
+    state: null,
+    stateAt: null,
     rounds: 0,
     changes: 0,
     clarify: 0,
@@ -66,13 +72,13 @@ export function emptyWork(): WorkDoc {
   };
 }
 
-export function docName(number: number): string {
-  return `work/${number}`;
+export function docName(item: ItemKey | number): string {
+  return `work/${keySlug(asKey(item))}`;
 }
 
-export function readWork(number: number): { readonly doc: WorkDoc; readonly revision: number } {
+export function readWork(item: ItemKey | number): { readonly doc: WorkDoc; readonly revision: number } {
   // A never-written document reads with a null value; a deleted one carries the revision a recreating put must name.
-  const found = state.get(docName(number));
+  const found = state.get(docName(item));
   if (found.value === null || found.value === undefined) return { doc: emptyWork(), revision: found.revision };
   return { doc: { ...emptyWork(), ...(found.value as Partial<WorkDoc>) }, revision: found.revision };
 }
@@ -81,14 +87,14 @@ export function readWork(number: number): { readonly doc: WorkDoc; readonly revi
  * Read, change and write back under the revision read; on a conflict read again and
  * retry, up to three times. `change` must be safe to run more than once.
  */
-export function updateWork(number: number, change: (doc: WorkDoc) => void): WorkDoc {
+export function updateWork(item: ItemKey | number, change: (doc: WorkDoc) => void): WorkDoc {
   for (let attempt = 0; attempt < 3; attempt++) {
-    const { doc, revision } = readWork(number);
+    const { doc, revision } = readWork(item);
     change(doc);
-    const result = state.put(docName(number), doc, { ifRevision: revision });
+    const result = state.put(docName(item), doc, { ifRevision: revision });
     if (result.ok) return doc;
   }
-  throw new Error(`work/${number} kept moving under three writes`);
+  throw new Error(`${docName(item)} kept moving under three writes`);
 }
 
 /** The verdicts recorded for the given fingerprint; older ones are stale (decision 33). */

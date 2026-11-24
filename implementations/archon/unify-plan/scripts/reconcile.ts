@@ -8,7 +8,7 @@
 
 import { emit, refuse } from 'archon:script';
 import { runInputs } from '../../.shared/repo.ts';
-import { clear, reconcile, stopCard } from '../../.shared/stage.ts';
+import { clear, differenceCard, reconcile, stopCard } from '../../.shared/stage.ts';
 
 function main(): void {
   const { repo, number } = runInputs();
@@ -16,7 +16,8 @@ function main(): void {
   const ref = { repo, number };
   const found = reconcile(ref, ['spec-review', 'planning']);
   if (found.reason !== null) {
-    emit({ ...stopCard(ref, 'plan', found.reason), state: found.state ?? 'unknown' });
+    const card = found.difference ? differenceCard(ref, 'plan', found.difference) : stopCard(ref, 'plan', found.reason);
+    emit({ ...card, state: found.state ?? 'unknown' });
     return;
   }
   emit({ ...clear(), state: found.state });

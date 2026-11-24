@@ -13,8 +13,8 @@ import { outcomes } from 'archon:script';
 import { forge } from './forge.ts';
 import { git, gitOrThrow } from './git.ts';
 import type { IssueRef, Repo } from './repo.ts';
-import { buildRequest, type Request } from './request.ts';
-import { type From, MARKS, moveState, readState, STATES, type State, StateMismatch } from './states.ts';
+import { buildRequest, type Option, type Request } from './request.ts';
+import { type From, MARKS, MOVES, moveState, NONE, readState, resolveDifference, STATES, type State, StateDifference, StateMismatch } from './states.ts';
 import { readWork } from './work.ts';
 import { isTrusted, untrusted } from './trust.ts';
 
@@ -52,17 +52,67 @@ export function stopCard(ref: IssueRef, stage: string, reason: string): Card {
 }
 
 /**
- * The item and its document agree, and its label is one this stage starts from. Returns
- * null when they do, the reason otherwise. A closed issue, two state labels, or a label
- * outside `entry` stops the run.
+ * A difference between the engine and the tracker (decision 45): one request, outside the
+ * waiting cap, with the three answers the model gives it. Bringing the tracker back or
+ * adopting its change ends this run all the same: the step starts again from a state both
+ * agree on (unify-revisit flags an agent state that nothing works).
  */
-export function reconcile(ref: IssueRef, entry: readonly From[]): { readonly state: From | null; readonly reason: string | null } {
+export function differenceCard(ref: IssueRef, stage: string, difference: StateDifference): Card {
+  const single = difference.tracker !== 'conflict';
+  const advanced = single && difference.tracker !== NONE && MOVES[difference.engine].includes(difference.tracker as State);
+  const options: Option[] = [
+    {
+      id: 'tracker-back',
+      label: `Put the tracker back to ${difference.engine}`,
+      does: `Sets the tracker's state label to ${difference.engine}, what the engine holds, and ends this run.`,
+      effect: 'keep-engine',
+    },
+  ];
+  if (single) {
+    options.push({
+      id: 'adopt',
+      label: `Adopt ${difference.tracker} from the tracker`,
+      does: `The engine takes ${difference.tracker}, as the tracker shows it, and ends this run.`,
+      effect: 'keep-tracker',
+    });
+  }
+  options.push({ id: 'stop', label: 'Leave it as it is', does: 'Ends this run and changes nothing; the difference stays until you answer it.', effect: 'stop' });
+  const request = buildRequest(
+    {
+      decide: `#${ref.number}: the tracker shows a different state than the engine holds; which one is right?`,
+      why: 'someone or something changed the item in the tracker, and only you know whether that was meant; the pipeline overwrites neither.',
+      notVerified: ['who changed the tracker, and why'],
+      facts: [difference.message, `https://${ref.repo.host}/${ref.repo.path}/issues/${ref.number}`, `stage: ${stage}`],
+    },
+    options,
+    advanced
+      ? { option: 'adopt', why: `${difference.engine} → ${difference.tracker} is a move the pipeline itself could make, so a person likely moved it on purpose.`, confidence: 'low' }
+      : { option: 'tracker-back', why: 'the tracker shows a state the pipeline cannot reach from where it is, so the change is more likely a slip.', confidence: 'low' }
+  );
+  return { ok: false, reason: difference.message, ...request };
+}
+
+/** Apply an answer to a difference card; true when the answer was one. */
+export function applyDifference(ref: IssueRef, effect: string | undefined): boolean {
+  if (effect === 'keep-engine') resolveDifference(ref, 'engine');
+  else if (effect === 'keep-tracker') resolveDifference(ref, 'tracker');
+  else return false;
+  return true;
+}
+
+/**
+ * The item and its document agree, and its state is one this stage starts from. Returns
+ * null when they do, the reason otherwise. A closed issue, a difference with the tracker
+ * (also given as `difference`, for its own request), or a state outside `entry` stops the run.
+ */
+export function reconcile(ref: IssueRef, entry: readonly From[]): { readonly state: From | null; readonly reason: string | null; readonly difference?: StateDifference } {
   const view = forge('workitem.view', { ref });
   if (view.state !== 'open') return { state: null, reason: `#${ref.number} is closed` };
   let current: From;
   try {
     current = readState(ref);
   } catch (error) {
+    if (error instanceof StateDifference) return { state: null, reason: error.message, difference: error };
     if (error instanceof StateMismatch) return { state: null, reason: error.message };
     throw error;
   }

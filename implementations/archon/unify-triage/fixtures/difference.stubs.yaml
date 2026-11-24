@@ -1,0 +1,22 @@
+# The tracker shows Cancelled while the engine holds TriageReview: the Operator puts the tracker back; the run ends.
+reconcile:
+  ok: false
+  reason: "stub: #7: the engine holds triage-review; the tracker shows cancelled"
+  question: "stub: #7: the tracker shows a different state than the engine holds; which one is right?"
+  options: [{ id: tracker-back, label: "Put the tracker back to triage-review", does: "stub", value: { effect: keep-engine } }, { id: adopt, label: "Adopt cancelled from the tracker", does: "stub", value: { effect: keep-tracker } }, { id: stop, label: "Leave it as it is", does: "stub", value: { effect: stop } }]
+  recommendation: { option: tracker-back, why: "stub", confidence: low }
+  state: unknown
+enter:
+  ok: false
+  reason: "stub: #7: the engine holds triage-review; the tracker shows cancelled"
+  question: "stub: #7: the tracker shows a different state than the engine holds; which one is right?"
+  options: [{ id: tracker-back, label: "Put the tracker back to triage-review", does: "stub", value: { effect: keep-engine } }, { id: adopt, label: "Adopt cancelled from the tracker", does: "stub", value: { effect: keep-tracker } }, { id: stop, label: "Leave it as it is", does: "stub", value: { effect: stop } }]
+  recommendation: { option: tracker-back, why: "stub", confidence: low }
+  go: false
+  ask: true
+stop: { decision: tracker-back, text: "", value: { effect: keep-engine } }
+sync: { state: triage-review }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7" }
+  expect: completed
+  reached: [reconcile, enter, stop, sync]

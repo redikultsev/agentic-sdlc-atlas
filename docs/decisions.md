@@ -74,7 +74,6 @@ Basis: research on how leading teams build agentic pipelines (`research/atlas/re
 - Which engine to build on: our own on top of an existing one, or an existing one only if it fits completely.
 - One work item with changes in several repositories.
 - Products that maintain several released versions and port fixes to each (decision 53).
-- The move Blocked → Planning ("back to the plan", decision 37) is in the pack's code and not in `docs/states.md`.
 - Branch model: the pipeline knows one base branch per repository; a separate release branch is the release recipe's business. Whether that holds for the second project is not checked.
 - Several people as the Operator (decision 50): whether the waiting cap is per pipeline or per person, and who may give a ruling for the whole project.
 - The five-question check (decision 18) has not been run again for the parts decisions 45–54 add.

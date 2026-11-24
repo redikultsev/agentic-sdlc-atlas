@@ -43,6 +43,7 @@ stateDiagram-v2
   Live --> RolledBack: rolled back, this item is the culprit
   Live --> Releasing: rolled back, another item is the culprit
   Blocked --> Implementing: Operator sorted it out
+  Blocked --> Planning: Operator, "back to the plan" (decision 37)
   Done --> [*]
   RolledBack --> [*]: new work item in Triaging
 ```

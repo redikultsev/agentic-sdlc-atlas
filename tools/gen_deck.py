@@ -116,6 +116,7 @@ EDGES = [
     ('MergeReview', 'Implementing', 'M920,92 V52 H665 V270', [(792, 45, M, 'changes · queue red', 0)]),
     ('TestReview', 'Implementing', 'M1080,92 V52 H665 V270', []),
     ('Blocked', 'Implementing', 'M755,148 L688,270', [(721, 209, M, 'sorted out', 1)]),
+    ('Blocked', 'Planning', 'M760,92 V76 H455 V270', [(600, 70, M, 'back to the plan', 0)]),
     ('Releasing', 'Live', 'M1233,300 H1265', [(1249, 264, M, 'released', 0)]),
     ('Live', 'Done', 'M1345,328 V420', [(1353, 368, S_, 'checks', 0), (1353, 385, S_, 'over', 0)]),
     ('Live', 'RolledBack', 'M1300,328 L1225,420', [(1262, 374, M, 'culprit', 1)]),

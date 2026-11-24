@@ -1,0 +1,22 @@
+# The tracker shows SpecReview while the engine holds Specifying: the Operator adopts the tracker's state; the run ends.
+reconcile:
+  ok: false
+  reason: "stub: #7: the engine holds specifying; the tracker shows spec-review"
+  question: "stub: #7: the tracker shows a different state than the engine holds; which one is right?"
+  options: [{ id: tracker-back, label: "Put the tracker back to specifying", does: "stub", value: { effect: keep-engine } }, { id: adopt, label: "Adopt spec-review from the tracker", does: "stub", value: { effect: keep-tracker } }, { id: stop, label: "Leave it as it is", does: "stub", value: { effect: stop } }]
+  recommendation: { option: adopt, why: "stub", confidence: low }
+  state: unknown
+enter:
+  ok: false
+  reason: "stub: #7: the engine holds specifying; the tracker shows spec-review"
+  question: "stub: #7: the tracker shows a different state than the engine holds; which one is right?"
+  options: [{ id: tracker-back, label: "Put the tracker back to specifying", does: "stub", value: { effect: keep-engine } }, { id: adopt, label: "Adopt spec-review from the tracker", does: "stub", value: { effect: keep-tracker } }, { id: stop, label: "Leave it as it is", does: "stub", value: { effect: stop } }]
+  recommendation: { option: adopt, why: "stub", confidence: low }
+  go: false
+  ask: true
+stop: { decision: adopt, text: "", value: { effect: keep-tracker } }
+sync: { state: spec-review }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, number: "7" }
+  expect: completed
+  reached: [reconcile, enter, stop, sync]

@@ -10,7 +10,8 @@ import { forge } from '../../../.shared/forge.ts';
 import { nullableJson, isObject } from '../../../.shared/inputs.ts';
 import type { IssueRef } from '../../../.shared/repo.ts';
 import { buildRequest, type Option, type Request } from '../../../.shared/request.ts';
-import { MOVES, moveState, readState, StateMismatch, type From, type State } from '../../../.shared/states.ts';
+import { MOVES, moveState, readState, StateDifference, StateMismatch, type From, type State } from '../../../.shared/states.ts';
+import { differenceCard } from '../../../.shared/stage.ts';
 import { readWork, updateWork, type WorkDoc } from '../../../.shared/work.ts';
 
 /** One finding the next round must address, with where it came from. */
@@ -107,10 +108,11 @@ export function bound<T>(raw: string | undefined): T | null {
 }
 
 /**
- * The start check every item run makes: the label names a state this workflow may start
- * from, and `work/<n>` does not contradict it (a PR recorded for an item with no branch,
- * or a branch recorded before any implementing). A mismatch is a request, never an
- * overwrite: the Operator either confirms the label or stops the run.
+ * The start check every item run makes: the engine holds a state this workflow may start
+ * from, the tracker shows the same, and `work/<key>` does not contradict it (a PR recorded
+ * for an item with no branch). A mismatch is a request, never an overwrite: for a
+ * difference with the tracker the Operator brings the tracker back or adopts its state
+ * and the run ends (decision 45); otherwise the Operator continues from the state or stops.
  */
 export function reconcile(ref: IssueRef, workflow: string, starts: readonly From[], target: State, extra: readonly string[] = []): {
   readonly ok: boolean;
@@ -123,12 +125,16 @@ export function reconcile(ref: IssueRef, workflow: string, starts: readonly From
   try {
     state = readState(ref);
   } catch (error) {
+    if (error instanceof StateDifference) {
+      const asked = differenceCard(ref, workflow, error);
+      return { ok: false, state: 'difference', problems: [error.message, ...problems], card: card(asked) };
+    }
     if (!(error instanceof StateMismatch)) throw error;
     state = 'conflict';
     problems.push(error.message);
   }
   if (state !== 'conflict' && !starts.includes(state)) {
-    problems.push(`the label says ${state}; ${workflow} starts only from ${starts.join(', ')}`);
+    problems.push(`the item is ${state}; ${workflow} starts only from ${starts.join(', ')}`);
   }
   const doc = readItem(ref.number);
   if (doc.pr !== null && doc.branch === null) problems.push(`work/${ref.number} records PR #${doc.pr} but no branch`);
@@ -141,19 +147,19 @@ export function reconcile(ref: IssueRef, workflow: string, starts: readonly From
     options.unshift({
       id: 'proceed',
       label: `Continue from ${state}`,
-      does: `Takes the label as the truth and runs ${workflow} from ${state}.`,
+      does: `Runs ${workflow} from ${state}, the state the engine holds.`,
       effect: 'proceed',
     });
   }
   const request = buildRequest(
     {
-      decide: `#${ref.number}: the item's label and its record disagree; continue ${workflow} or stop?`,
-      why: 'the label is the only state, and a run never overwrites a label it did not expect.',
-      notVerified: ['who changed the label, and why'],
+      decide: `#${ref.number}: the item is not where ${workflow} starts, or its record disagrees; continue or stop?`,
+      why: 'a run never overwrites a state it did not expect.',
+      notVerified: ['who or what moved the item, and why'],
       facts: problems,
     },
     options,
-    { option: 'stop', why: 'a label someone changed by hand usually means they want the item held.', confidence: 'medium' }
+    { option: 'stop', why: 'an item that is not where this step starts was usually moved on purpose.', confidence: 'medium' }
   );
   return { ok: false, state, problems, card: card(request) };
 }
@@ -161,6 +167,8 @@ export function reconcile(ref: IssueRef, workflow: string, starts: readonly From
 /** The reconcile answer: go on, or end the run where it stands. */
 export function reconcileGo(ok: boolean, answer: Answer | null): boolean {
   if (ok) return true;
+  // A difference with the tracker is answered and the run ends (decision 45).
+  if (answer !== null && (answer.effect === 'keep-engine' || answer.effect === 'keep-tracker')) return false;
   return answer !== null && answer.effect === 'proceed';
 }
 

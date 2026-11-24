@@ -11,6 +11,7 @@ import { emit, input } from 'archon:script';
 import { forge } from '../../.shared/forge.ts';
 import { updatePrBranch } from '../../.shared/github.ts';
 import { projectPolicy } from '../../.shared/policy.ts';
+import { moveState, readState } from '../../.shared/states.ts';
 import { bound, buildRequest, card, findingKey, NO_CARD, readItem, run, updateItem, type Card, type Finding } from './lib/item.ts';
 import { awaitChecks, baseName, itemRef } from './lib/facts.ts';
 import { prAt, printAt, staleKinds } from './lib/gate.ts';
@@ -50,6 +51,9 @@ run(() => {
     if (findings.length > 0) updateItem(ref.number, d => {
       d.fix = { from: `merge ${outcome}`, findings };
     });
+    // Merged: the item waits for the release that carries it (decision 48). A revert's item stays where it is.
+    // A land re-run after the deploy already took the item finds it Live and leaves it.
+    if (outcome === 'merged' && !ruled.revert && readState(ref) !== 'live') moveState(ref, ['verifying', 'releasing'], 'releasing');
     const asked: Card = outcome === 'stuck' ? stuckCard(ref.number, head, detail) : NO_CARD;
     emit({ outcome, head, detail, merge_commit: merge, attempts: readItem(ref.number).landAttempts, ...asked });
   };

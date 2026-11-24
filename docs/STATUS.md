@@ -97,9 +97,9 @@ Problems, in the order they are worked. Each one ends as decisions in `docs/deci
 
 17 states now: TestReview and Releasing are new (`docs/states.md`).
 
-**Next for the pack (step 1 done).** `implementations/archon/SPEC.md` describes the pack as built, before these decisions.
+**Next for the pack (steps 1–2 done).** `implementations/archon/SPEC.md` describes the pack as built, before these decisions.
 1. ~~Probe: can an Archon script call an MCP server directly?~~ Done 2026-11-24: not through the engine, so the pack has its own client, `.shared/mcp.ts`, run against a real Jira MCP server under Bun (`research/atlas/research/2026-11-mcp-from-script.md`).
-2. Item identity: a tracker-neutral key (`PROJ-123` or `#12`) instead of `{repo, number}`; the item's document (`work/<key>`) holds the state; `states.ts` moves it there and adds the two states.
+2. ~~Item identity and the state in the engine.~~ Done 2026-11-24: `work/<key>` holds the state, the label shows it, a difference is one request with three answers; keys `#12` or `PROJ-123` (`.shared/item.ts`); 17 states, merged work goes through Verifying and Releasing to Live; Blocked → Planning added to `docs/states.md`. Checked by 21 module tests under Bun with an in-memory `archon:script`, 87 stub fixtures through the Archon CLI, and a type check against Archon's script API. Left for step 3, since every call there changes anyway: the run input is still an issue number, scripts still pass `{repo, number}`, unify-revisit and the waiting cap still list items by label.
 3. `.shared/connector.ts`: the project map, the write rules of decision 47, the install check; it replaces the direct `forge('workitem.*')` and `gh api` calls in 36 files. Stub fixtures for a refused write, a difference with the tracker, an outage (decision 41). PR bodies say "Part of #n".
 4. `.pipeline/project.yaml`: `environments:` (kind, before or after merge, checks, gate and answerers, rollback, paths, insignificant paths, batch) and the release trigger, replacing `deploy.hook`; `unify-merge` gets the environment queue, the hold and TestReview; `unify-deploy` becomes release, deploy by recipe, the tree check and the rollback of decision 52.
 5. The setup agent as a workflow (`unify-setup`): compose the map, probe it on one test item.
@@ -118,7 +118,7 @@ Problems, in the order they are worked. Each one ends as decisions in `docs/deci
 
 Order for the pack, after the six steps above: the provenance record and red records (cheap, inside existing workflows); the findings buffer; a read-only surface of the pipeline state; caller identity on write routes; then the Supervisor and scouts.
 
-**Still open:** one work item across several repositories; the code-host seam for a host the engine does not speak; the move Blocked → Planning missing from `docs/states.md`; pre-existing edges in the model that show the rejected-requests register in the Specs store (decision 44 puts it elsewhere). On the deck, stage slides draw data flows to the stores, not the connector that carries them; the engine slide shows the connector.
+**Still open:** one work item across several repositories; the code-host seam for a host the engine does not speak; pre-existing edges in the model that show the rejected-requests register in the Specs store (decision 44 puts it elsewhere). On the deck, stage slides draw data flows to the stores, not the connector that carries them; the engine slide shows the connector.
 
 ## Next
 

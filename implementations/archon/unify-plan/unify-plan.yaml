@@ -90,6 +90,22 @@ nodes:
       other: true
       labels: { gate: stop, stage: plan, item: "$INPUTS.number" }
 
+  # The answer to a difference with the tracker (decision 45): put the tracker back, or
+  # adopt its state. The run ends either way.
+  - id: sync
+    script: sync
+    runtime: bun
+    timeout: 120000
+    depends_on: [stop]
+    when: "$stop.output.decision == 'tracker-back' || $stop.output.decision == 'adopt'"
+    with:
+      answer: { from: "$stop.output" }
+    output_format:
+      type: object
+      properties:
+        state: { type: string }
+      required: [state]
+
   - id: gather
     script: gather
     runtime: bun

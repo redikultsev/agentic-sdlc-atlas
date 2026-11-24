@@ -1,12 +1,20 @@
 /**
- * The 15 work item states of docs/states.md (decision 28), as `state:*` labels, and the
- * only moves between them. The label is the only state: this module moves it with
- * label.add and label.remove (never labels.set, which replaces the whole set and races
- * people), reads it back, and refuses a move from a label it did not expect.
+ * The 17 work item states of docs/states.md and the only moves between them.
+ *
+ * The engine holds the state (decision 45): it lives in the item's document `work/<key>`
+ * in Archon's store, and the tracker shows it as a `state:*` label. A move writes the
+ * document first, under the revision it read, so two runs never both move an item; then
+ * it puts the label right and reads it back. When the label and the document disagree,
+ * nothing is overwritten: the caller raises a difference to the Operator, who either
+ * brings the tracker back to the engine or adopts the tracker's change.
+ *
+ * Labels change one at a time with label.add and label.remove, never labels.set, which
+ * replaces the whole set and races people.
  */
 
 import { forge } from './forge.ts';
 import type { IssueRef } from './repo.ts';
+import { readWork, updateWork } from './work.ts';
 
 export const STATES = {
   triaging: { label: 'state:triaging', operator: false },
@@ -18,6 +26,10 @@ export const STATES = {
   implementing: { label: 'state:implementing', operator: false },
   verifying: { label: 'state:verifying', operator: false },
   'merge-review': { label: 'state:merge-review', operator: true },
+  /** Waits for a person on the environment's list, outside the Operator's cap (decision 50). */
+  'test-review': { label: 'state:test-review', operator: false },
+  /** Merged; waits for the release that carries it, or the release is deploying (decision 48). */
+  releasing: { label: 'state:releasing', operator: false },
   live: { label: 'state:live', operator: false },
   blocked: { label: 'state:blocked', operator: true },
   'for-human': { label: 'state:for-human', operator: false },
@@ -31,9 +43,11 @@ export const NONE = 'none' as const;
 export type From = State | typeof NONE;
 
 /**
- * Allowed moves, read off the two diagrams in docs/states.md. `none` is an issue with no
- * state label. The Operator can cancel in any state, and hand an item to a human at any
- * of their own gates (docs/states.md, text above the diagrams).
+ * Allowed moves, read off the two diagrams in docs/states.md (a test checks every arrow
+ * there is here). `none` is an item the engine holds no state for. Besides the arrows:
+ * the Operator can cancel in any state, and hand an item to a human at any of their own
+ * gates (docs/states.md, text above the diagrams); a slice that cannot be built goes from
+ * Implementing to Blocked.
  */
 export const MOVES: Readonly<Record<From, readonly State[]>> = {
   none: ['triaging'],
@@ -44,9 +58,11 @@ export const MOVES: Readonly<Record<From, readonly State[]>> = {
   planning: ['plan-review', 'cancelled'],
   'plan-review': ['planning', 'implementing', 'cancelled', 'for-human'],
   implementing: ['verifying', 'blocked', 'cancelled'],
-  verifying: ['implementing', 'blocked', 'merge-review', 'live', 'cancelled'],
-  'merge-review': ['implementing', 'live', 'cancelled', 'for-human'],
-  live: ['done', 'rolled-back', 'cancelled'],
+  verifying: ['implementing', 'blocked', 'merge-review', 'test-review', 'releasing', 'cancelled'],
+  'merge-review': ['implementing', 'verifying', 'cancelled', 'for-human'],
+  'test-review': ['implementing', 'releasing', 'cancelled', 'for-human'],
+  releasing: ['live', 'cancelled'],
+  live: ['done', 'rolled-back', 'releasing', 'cancelled'],
   blocked: ['implementing', 'planning', 'for-human', 'cancelled'],
   'for-human': [],
   done: [],
@@ -67,18 +83,71 @@ export function stateOf(labels: readonly string[]): { readonly state: From } | {
 
 export class StateMismatch extends Error {}
 
-export function readState(ref: IssueRef): From {
+/** The tracker shows something other than what the engine holds (decision 45). */
+export class StateDifference extends StateMismatch {
+  constructor(
+    readonly ref: IssueRef,
+    /** What the engine holds. */
+    readonly engine: From,
+    /** What the tracker shows: a state, or `conflict` when it shows more than one. */
+    readonly tracker: From | 'conflict',
+    readonly labels: readonly string[]
+  ) {
+    super(
+      tracker === 'conflict'
+        ? `#${ref.number}: the engine holds ${engine}; the tracker shows more than one state (${labels.join(', ')})`
+        : `#${ref.number}: the engine holds ${engine}; the tracker shows ${tracker}`
+    );
+  }
+}
+
+function stateLabels(ref: IssueRef): string[] {
   const view = forge('workitem.view', { ref });
-  const result = stateOf(view.labels ?? []);
-  if ('conflict' in result) throw new StateMismatch(`#${ref.number} has more than one state label: ${result.conflict.join(', ')}`);
-  return result.state;
+  return (view.labels ?? []).filter(label => LABEL_TO_STATE.has(label));
+}
+
+function trackerState(labels: readonly string[]): From | 'conflict' {
+  const found = stateOf(labels);
+  return 'conflict' in found ? 'conflict' : found.state;
+}
+
+/**
+ * The engine's state of an item, after checking the tracker shows the same. An item the
+ * pack worked before the engine held states has a document with no state: its label is
+ * adopted once, since the label was the state then. A difference is thrown, never fixed.
+ */
+export function readState(ref: IssueRef): From {
+  const labels = stateLabels(ref);
+  const tracker = trackerState(labels);
+  const { doc, revision } = readWork(ref.number);
+  if (doc.state === null && revision > 0 && tracker !== 'conflict' && tracker !== NONE) {
+    updateWork(ref.number, d => {
+      if (d.state !== null) throw new StateMismatch(`${ref.number}: another run set the state while it was adopted`);
+      d.state = tracker;
+      d.stateAt = { at: new Date().toISOString(), how: 'adopted' };
+    });
+    return tracker;
+  }
+  const engine = (doc.state ?? NONE) as From;
+  if (tracker !== engine) throw new StateDifference(ref, engine, tracker, labels);
+  return engine;
+}
+
+/** Put the tracker's state labels right: exactly `state`, or none. Read back. */
+function showState(ref: IssueRef, state: From): void {
+  const subject = { kind: 'issue' as const, ref };
+  const want = state === NONE ? null : STATES[state].label;
+  const have = stateLabels(ref);
+  if (want !== null && !have.includes(want)) forge('workitem.label.add', { subject, name: want });
+  for (const label of have) if (label !== want) forge('workitem.label.remove', { subject, name: label });
+  const after = trackerState(stateLabels(ref));
+  if (after !== state) throw new Error(`#${ref.number}: the tracker shows ${after} after it was set to ${state}`);
 }
 
 /**
  * Move an item to `to`. `expected` lists the states this step may start from; any other
- * current state (a person edited the label, or another run moved it) is a mismatch the
- * caller raises as a request instead of overwriting. Idempotent: an item already in `to`
- * is left as it is.
+ * state, or a difference with the tracker, is a mismatch the caller raises as a request
+ * instead of overwriting. Idempotent: an item already in `to` is left as it is.
  */
 export function moveState(ref: IssueRef, expected: readonly From[], to: State): void {
   const current = readState(ref);
@@ -87,11 +156,33 @@ export function moveState(ref: IssueRef, expected: readonly From[], to: State): 
     throw new StateMismatch(`#${ref.number} is ${current}, expected ${expected.join(' or ')} before ${to}`);
   }
   if (!MOVES[current].includes(to)) throw new StateMismatch(`docs/states.md has no move ${current} → ${to}`);
-  const subject = { kind: 'issue' as const, ref };
-  forge('workitem.label.add', { subject, name: STATES[to].label });
-  if (current !== NONE) forge('workitem.label.remove', { subject, name: STATES[current].label });
-  const after = readState(ref);
-  if (after !== to) throw new Error(`#${ref.number} reads ${after} after the move to ${to}`);
+  updateWork(ref.number, doc => {
+    if ((doc.state ?? NONE) !== current) throw new StateMismatch(`#${ref.number} was moved to ${doc.state ?? NONE} by another run`);
+    doc.state = to;
+    doc.stateAt = { at: new Date().toISOString(), how: 'move' };
+  });
+  showState(ref, to);
+}
+
+/**
+ * The Operator's answer to a difference (decision 45): `engine` puts the tracker back to
+ * what the engine holds; `tracker` adopts the state the tracker shows. Adopting needs one
+ * state on the tracker. Either way the engine records that the Operator decided.
+ */
+export function resolveDifference(ref: IssueRef, keep: 'engine' | 'tracker'): From {
+  const { doc } = readWork(ref.number);
+  const engine = (doc.state ?? NONE) as From;
+  if (keep === 'engine') {
+    showState(ref, engine);
+    return engine;
+  }
+  const tracker = trackerState(stateLabels(ref));
+  if (tracker === 'conflict') throw new StateMismatch(`#${ref.number}: the tracker shows more than one state; there is nothing single to adopt`);
+  updateWork(ref.number, d => {
+    d.state = tracker === NONE ? null : tracker;
+    d.stateAt = { at: new Date().toISOString(), how: 'operator' };
+  });
+  return tracker;
 }
 
 /** Pipeline labels besides the states; all are ensured at install by unify-ping. */

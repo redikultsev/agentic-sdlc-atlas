@@ -1,6 +1,7 @@
 /**
- * Apply the merge gate (or the R0 rules): `merge` carries the head SHA the card showed and
- * is recorded as the Operator's verdict at the diff fingerprint; `changes` is a ruling and
+ * Apply the merge gate (or the R0 rules): `merge` carries the head SHA the card showed, is
+ * recorded as the Operator's verdict at the diff fingerprint and moves the item back to
+ * Verifying, where the merge queue is; `changes` is a ruling and
  * the next round's fix, counted in `changes` and not in rounds (decision 24), at most 3
  * times, then the card offers back to the plan; `other` records the text and leaves the
  * state as it is.
@@ -8,6 +9,7 @@
 
 import { emit, input } from 'archon:script';
 import { recordRuling } from '../../.shared/rulings.ts';
+import { moveState } from '../../.shared/states.ts';
 import { answerOf, bound, findingKey, run, updateItem } from './lib/item.ts';
 import { itemRef } from './lib/facts.ts';
 
@@ -30,6 +32,8 @@ run(() => {
       doc.verdicts = [...doc.verdicts, { kind: 'operator', verdict: 'merge', fingerprint: rules.fingerprint, head, at }];
       doc.landAttempts = 0;
     });
+    // "merge" sends the item to the merge queue, which is part of Verifying (docs/states.md).
+    moveState(ref, ['merge-review', 'verifying'], 'verifying');
     return out('merge', true, head);
   }
   if (answer.effect === 'changes' || answer.effect === 'back-to-plan') {

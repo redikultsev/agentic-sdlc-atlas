@@ -1,9 +1,9 @@
 /**
- * Before anything deploys: do the item's label and its `work/<n>` document agree that a
- * merge of this item is what this run deploys?
+ * Before anything deploys: does the engine's state of the item (shown by its label) and
+ * its `work/<n>` document agree that a merge of this item is what this run deploys?
  *
- * - `watch`: the item is Verifying (R0 merged by the queue), MergeReview (the Operator's
- *   merge) or already Live (a restarted deploy run), and `work/<n>` names its PR.
+ * - `watch`: the item is Releasing (merged, waiting for its release) or already Live (a
+ *   restarted deploy run), and `work/<n>` names its PR.
  * - `revert`: `work/<n>` flags a revert this pipeline opened (`no-watch:<m>`) and that PR
  *   is merged: this run deploys the revert and watches nothing (decision 26).
  * - `stop`: anything else. Nothing deploys; `flag` raises it to the Operator.
@@ -39,8 +39,8 @@ function main(): void {
       return;
     }
   }
-  if (!['verifying', 'merge-review', 'live'].includes(current)) {
-    emit({ mode: 'stop', state: current, pr: work.pr, reason: `#${String(number)} is ${current}; a deploy starts only from Verifying, MergeReview or Live` });
+  if (!['releasing', 'live'].includes(current)) {
+    emit({ mode: 'stop', state: current, pr: work.pr, reason: `#${String(number)} is ${current}; a deploy starts only from Releasing or Live` });
     return;
   }
   if (work.pr === null) {
