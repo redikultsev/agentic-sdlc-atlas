@@ -9,7 +9,7 @@ views {
       **Colour:** purple = agent, green = script, red = the Operator decides, grey = store.
 
       **Size:** S = straight to code; M = spec and plan; L = plus codebase research.
-      **Risk:** R0 merges and deploys itself; R1 = the Operator checks the evidence; R2 = the Operator reads the code. Every merge deploys at once.
+      **Risk:** R0 merges itself; R1 = the Operator checks the evidence; R2 = the Operator reads the code. What is merged goes out as a release through the project's environments.
     '''
     include
       operator,
@@ -112,8 +112,8 @@ views {
 
   view platform {
     title '10. Cross-cutting parts'
-    description 'What every stage runs on: orchestrator, sandbox, decision requests, session traces.'
-    include engine.orchestrator, engine.sandbox, engine.cards, engine.traces, operator, engine.implement.implementer, engine.learn.retro
+    description 'What every stage runs on: orchestrator, pipeline state, project connector, sandbox, decision requests, session traces.'
+    include engine.orchestrator, engine.connector, engine.setup, pstate, engine.sandbox, engine.cards, engine.traces, operator, tracker, engine.implement.implementer, engine.learn.retro
     autoLayout LeftRight
   }
 

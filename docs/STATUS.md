@@ -67,6 +67,46 @@ Unify SDLC, the Archon implementation, is written: `implementations/archon/`, sp
 
 Before the first live run: the project's `.pipeline/` files (base, check, trusted authors, auto-merge rules) in the trial repository; the binding files (`archon pack bindings`) and the two timers; Codex credentials for the cross-family reviewer; the owner's call on a fine-grained token for the trial repository (SPEC "Known gaps"); `pipeline-ping` green on the server.
 
+## A second project: what does not fit yet (2026-11-24)
+
+The owner wants the same pipeline on a second, larger project, and the model to stay engine- and project-neutral while it adapts. The second project, described without names: about 60 service repositories on GitHub; work items in Jira with a fixed workflow; builds and deploys through a CI server (TeamCity) from git tags, a few services through helm; one shared test stand in Kubernetes; a human tester approves a change on the stand before it merges into `develop`; a release tag then goes to production; smoke test after each deploy; rollback deploys the previous tag. An upstream analysis pipeline there already turns production data into work items.
+
+Problems, in the order they are worked. Each one ends as decisions in `docs/decisions.md`, the model, and the pack.
+
+1. **Tracker seam.** The model already treats Work items as a store reached through an adapter (decision 5), but the pack writes GitHub Issues directly: about 85 calls in 36 files (state labels, marked comments, sub-issues, blocked-by, registers, trust). The second project's tracker is Jira while its code is on GitHub, so the tracker and the code host (forge) must be two seams, not one. Jira states are workflow statuses with required fields on transitions and no shortcuts. Research: `research/atlas/research/2026-11-tracker-seam.md`.
+2. **Deploy seam.** The model has one deploy shape: every merge deploys main to everyone, rollback is a revert PR (decisions 8, 26). The second project needs environments in a row (a shared pre-merge test stand, then production), a lock on the shared stand, a human tester gate before merge, release by tag, a CI-server or helm deploy, a smoke check per environment, rollback by redeploying the previous version, and a hotfix path when the stand runs something newer than production. Research: `research/atlas/research/2026-11-deploy-seam.md`.
+3. **Human roles.** The model has one human, the Operator. The second project adds a tester (gate on the test stand) and several people who may answer gates.
+4. **Many repositories.** One work item may need changes in two or three repositories; the pack assumes one repository per project.
+5. **Branch model.** Integration branch `develop` plus release branch `master`, tags `YYYYMMDD.N`; the pack assumes one base that deploys.
+6. **Upstream work items.** The existing analysis pipeline and its executor agents overlap stages 4–7 and Learn; they must feed Triage as a signal source, not run beside the engine.
+7. **Cross-family reviewer.** Whether code may go to a second model provider is a policy question per project; until then, `review_family: same-allowed`.
+8. **Where the engine runs.** It must reach the tracker, the CI server and the cluster inside a private network.
+9. **Toolchain per repository.** Heavy base checks and test data fetched separately (DVC) must run on the engine host.
+
+**Decided 2026-11-24 (decisions 45–54; revisions of 5, 8, 9, 16, 25, 26, 28, 29, 30, 32, 39, 44).** A first draft the same day (an agent acting on the project's tools through MCP, a second agent checking it, approvals bound to "the git tree", one gate for tester and code) was reviewed top-down and bottom-up by two independent critics and replaced: about 60 findings, the three that broke the logic were trust resting on a model that reads untrusted text, a tree check that no release with two items could pass, and no state between merge and release. The owner went through eleven points one by one. The model, the states, the glossary and the deck follow; **the pack does not follow yet.**
+
+- **State (45).** The engine holds the truth: state, rounds, verdicts, slices, approvals, holds, registers, the approved request text. The tracker shows it. Any difference is one request to the Operator per item, outside the waiting cap; no automatic rules until the follow rate shows which answers repeat.
+- **Tools (46, 47).** Engine code calls the project's MCP servers by a project map; long actions are recipe scripts in the project; a setup agent composes the map; no model takes part in a write or a read. Writes are idempotent by the engine's own record, read back by key, serialised per item; a tool failure is never a fix round; the pipeline has its own service account.
+- **Deploys (48).** Seven concepts; environments per service, of a kind (shared, ephemeral, production), with checks and a rollback; no environment at all is allowed. Release is its own step and state, Releasing.
+- **Approval on an environment (49).** Bound to the tree of the candidate (the base with the item merged in); a difference after the merge is a request that shows insignificant paths apart.
+- **Gates (50).** The Merge gate by risk first, then the environment, then TestReview only where a project declares a person's gate there; outside the cap. No tester: a green smoke check merges.
+- **Hold (51).** A record in the engine per environment and service, a queue, released on merge or on "changes"; a foreign build is a request; several items in one build is a project setting.
+- **Rollback of a release (52).** Previous version at once; the culprit is reverted and RolledBack, the rest return to Releasing; the line is blocked until the revert is in.
+- **Urgent (53).** A mark, not a path: first in every queue and a release right after the merge.
+- **Loss of the store (54).** Backup; else adoption from the labels with approvals absent and rounds used up.
+
+17 states now: TestReview and Releasing are new (`docs/states.md`).
+
+**Next for the pack (not started).** `implementations/archon/SPEC.md` describes the pack as built, before these decisions.
+1. Probe: can an Archon script call an MCP server directly? If not, a small MCP client in `.shared/`.
+2. Item identity: a tracker-neutral key (`PROJ-123` or `#12`) instead of `{repo, number}`; the item's document (`work/<key>`) holds the state; `states.ts` moves it there and adds the two states.
+3. `.shared/connector.ts`: the project map, the write rules of decision 47, the install check; it replaces the direct `forge('workitem.*')` and `gh api` calls in 36 files. Stub fixtures for a refused write, a difference with the tracker, an outage (decision 41). PR bodies say "Part of #n".
+4. `.pipeline/project.yaml`: `environments:` (kind, before or after merge, checks, gate and answerers, rollback, paths, insignificant paths, batch) and the release trigger, replacing `deploy.hook`; `unify-merge` gets the environment queue, the hold and TestReview; `unify-deploy` becomes release, deploy by recipe, the tree check and the rollback of decision 52.
+5. The setup agent as a workflow (`unify-setup`): compose the map, probe it on one test item.
+6. Probe the second project's Jira through its MCP server with a hand-written map: label, a transition with a required field, a comment, read back, the creator field.
+
+**Still open:** one work item across several repositories; the code-host seam for a host the engine does not speak; the move Blocked → Planning missing from `docs/states.md`; pre-existing edges in the model that show the rejected-requests register in the Specs store (decision 44 puts it elsewhere). On the deck, stage slides draw data flows to the stores, not the connector that carries them; the engine slide shows the connector.
+
 ## Next
 
 1. The owner chose Archon (2026-11-21). Archon 0.14.0 runs on the trial server: Postgres, login by allowed email, telemetry off, reachable only over the VPN. Next: the Claude and GitHub tokens, then one real issue from intake to a merged PR; the sandbox as a provider plugin comes after that.

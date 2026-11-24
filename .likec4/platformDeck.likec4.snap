@@ -48,63 +48,26 @@
       }
     ]
   },
-  "hash": "O7XQgbTtZPjD6qdtaoN9k1u89ho32vaU4yXcafiVVjk",
+  "hash": "_VHoA2FmJ0zmzs-LrgsyZJE70GmjmWg5vKglzglrfvc",
   "bounds": {
     "x": -140.0,
-    "y": -40,
+    "y": -120.0,
     "width": 1220.0,
-    "height": 775.0
+    "height": 1015.0
   },
   "nodes": [
-    {
-      "id": "tracker",
-      "parent": null,
-      "level": 0,
-      "children": [],
-      "inEdges": [],
-      "outEdges": [
-        "1s0qph8"
-      ],
-      "title": "Work items",
-      "modelRef": "tracker",
-      "shape": "storage",
-      "color": "storecolor",
-      "style": {
-        "opacity": 15,
-        "size": "sm",
-        "textSize": "xl"
-      },
-      "description": {
-        "txt": ""
-      },
-      "tags": [
-        "built"
-      ],
-      "notation": "Store",
-      "technology": "",
-      "kind": "store",
-      "isCustomized": true,
-      "x": -100.0,
-      "y": 0,
-      "width": 240,
-      "height": 135,
-      "labelBBox": {
-        "x": -52.0,
-        "y": -262,
-        "width": 144,
-        "height": 32
-      }
-    },
     {
       "id": "engine.orchestrator",
       "parent": null,
       "level": 0,
       "children": [],
       "inEdges": [
-        "1tk37k4",
-        "1s0qph8"
+        "17zwo8z",
+        "1tk37k4"
       ],
       "outEdges": [
+        "1w3c7on",
+        "vaazpf",
         "f9p7ux",
         "d9mjj7",
         "ftxree"
@@ -127,7 +90,7 @@
       "metadata": {
         "in": "Work items and their state, verdicts, the Operator's answers",
         "does": "Starts agent sessions, moves states, enforces limits",
-        "out": "Sessions, state labels, decision requests"
+        "out": "Sessions, states, writes through the connector, decision requests"
       },
       "notation": "Cross-cutting part",
       "technology": "",
@@ -138,9 +101,98 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 101.0,
-        "y": -62,
+        "x": 440.0,
+        "y": -121,
         "width": 160,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.connector",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "1w3c7on",
+        "1u0nc41"
+      ],
+      "outEdges": [
+        "prltjl"
+      ],
+      "title": "Project connector",
+      "modelRef": "engine.connector",
+      "shape": "rectangle",
+      "color": "sky",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "planned"
+      ],
+      "metadata": {
+        "in": "An operation from the Orchestrator or a stage; the project map",
+        "does": "Calls the project's tools through MCP, reads back, retries",
+        "out": "What was written and read; a refusal as a difference"
+      },
+      "notation": "Cross-cutting part",
+      "technology": "",
+      "kind": "platform",
+      "isCustomized": true,
+      "x": -100.0,
+      "y": 240.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -475.0,
+        "y": 272.0,
+        "width": 127,
+        "height": 66
+      }
+    },
+    {
+      "id": "pstate",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "vaazpf"
+      ],
+      "outEdges": [
+        "17zwo8z",
+        "hbyaax"
+      ],
+      "title": "Pipeline state",
+      "modelRef": "pstate",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "planned"
+      ],
+      "notation": "Store",
+      "technology": "",
+      "kind": "store",
+      "isCustomized": true,
+      "x": 400,
+      "y": -80.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": 2.0,
+        "y": -216.0,
+        "width": 172,
         "height": 32
       }
     },
@@ -182,8 +234,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 94.0,
-        "y": 49,
+        "x": 431.0,
+        "y": -321,
         "width": 115,
         "height": 32
       }
@@ -217,7 +269,7 @@
       "metadata": {
         "in": "A gate, a question, a report from any stage",
         "does": "Puts one decision in front of the Operator",
-        "out": "The Operator's answer, back to the Orchestrator"
+        "out": "The Operator's answer, recorded as a ruling"
       },
       "notation": "Cross-cutting part",
       "technology": "",
@@ -228,8 +280,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -305.0,
-        "y": 201.0,
+        "x": 32.0,
+        "y": -354.0,
         "width": 111,
         "height": 66
       }
@@ -274,9 +326,50 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": 57.0,
-        "y": -127.0,
+        "x": 394.0,
+        "y": -186.0,
         "width": 188,
+        "height": 32
+      }
+    },
+    {
+      "id": "tracker",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "prltjl"
+      ],
+      "outEdges": [
+        "1u0nc41"
+      ],
+      "title": "Work items",
+      "modelRef": "tracker",
+      "shape": "storage",
+      "color": "storecolor",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "built"
+      ],
+      "notation": "Store",
+      "technology": "",
+      "kind": "store",
+      "isCustomized": true,
+      "x": -100.0,
+      "y": 0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -977.0,
+        "y": 49,
+        "width": 144,
         "height": 32
       }
     },
@@ -289,7 +382,8 @@
         "9c97f1"
       ],
       "outEdges": [
-        "1tk37k4"
+        "1tk37k4",
+        "ys8zm5"
       ],
       "title": "Operator",
       "modelRef": "operator",
@@ -313,8 +407,8 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -1202.0,
-        "y": 302.0,
+        "x": -962.0,
+        "y": -246.0,
         "width": 115,
         "height": 32
       }
@@ -325,6 +419,7 @@
       "level": 0,
       "children": [],
       "inEdges": [
+        "hbyaax",
         "zos398"
       ],
       "outEdges": [],
@@ -357,14 +452,173 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -281.0,
-        "y": 113.0,
+        "x": -41.0,
+        "y": 54.0,
         "width": 72,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.setup",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "ys8zm5"
+      ],
+      "outEdges": [],
+      "title": "Setup agent",
+      "modelRef": "engine.setup",
+      "shape": "rectangle",
+      "color": "indigo",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "A project's MCP servers and repository",
+        "does": "Composes and probes the project map",
+        "out": "A map and recipes for the Operator to approve"
+      },
+      "notation": "Agent (LLM)",
+      "technology": "",
+      "kind": "agent",
+      "isCustomized": true,
+      "x": -100.0,
+      "y": 720.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -1387.0,
+        "y": -6.0,
+        "width": 155,
         "height": 32
       }
     }
   ],
   "edges": [
+    {
+      "id": "1w3c7on",
+      "source": "engine.orchestrator",
+      "target": "engine.connector",
+      "label": "shows the state",
+      "points": [
+        [
+          400,
+          238
+        ],
+        [
+          270,
+          238
+        ],
+        [
+          270,
+          308
+        ],
+        [
+          140,
+          308
+        ]
+      ],
+      "labelBBox": {
+        "x": 214,
+        "y": 242,
+        "width": 111,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1vrned4"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "vaazpf",
+      "source": "engine.orchestrator",
+      "target": "pstate",
+      "label": "state, rounds, verdicts",
+      "points": [
+        [
+          490,
+          200
+        ],
+        [
+          490,
+          128
+        ],
+        [
+          490,
+          128
+        ],
+        [
+          490,
+          55
+        ]
+      ],
+      "labelBBox": {
+        "x": 326,
+        "y": 115,
+        "width": 152,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "s85dbz"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "17zwo8z",
+      "source": "pstate",
+      "target": "engine.orchestrator",
+      "label": "frontier",
+      "points": [
+        [
+          550,
+          55
+        ],
+        [
+          550,
+          128
+        ],
+        [
+          550,
+          128
+        ],
+        [
+          550,
+          200
+        ]
+      ],
+      "labelBBox": {
+        "x": 479,
+        "y": 115,
+        "width": 59,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "gf4akz"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
+      "isLabelCustomized": true
+    },
     {
       "id": "f9p7ux",
       "source": "engine.orchestrator",
@@ -396,7 +650,7 @@
       },
       "parent": null,
       "relations": [
-        "1rqyo8x"
+        "1o788e0"
       ],
       "color": "gray",
       "line": "dashed",
@@ -434,7 +688,7 @@
       },
       "parent": null,
       "relations": [
-        "pp1dyh"
+        "1y80rtn"
       ],
       "color": "gray",
       "line": "dashed",
@@ -472,7 +726,7 @@
       },
       "parent": null,
       "relations": [
-        "yxpzve"
+        "72simj"
       ],
       "color": "gray",
       "line": "dashed",
@@ -510,7 +764,7 @@
       },
       "parent": null,
       "relations": [
-        "1l330g8"
+        "1hlw8m"
       ],
       "color": "gray",
       "line": "dashed",
@@ -548,7 +802,7 @@
       },
       "parent": null,
       "relations": [
-        "tocxfk"
+        "1r4vlmm"
       ],
       "color": "gray",
       "line": "dashed",
@@ -556,37 +810,152 @@
       "isLabelCustomized": true
     },
     {
-      "id": "1s0qph8",
-      "source": "tracker",
-      "target": "engine.orchestrator",
-      "label": "frontier",
+      "id": "ys8zm5",
+      "source": "operator",
+      "target": "engine.setup",
+      "label": "approves the map",
       "points": [
         [
-          140,
-          68
+          20,
+          615
         ],
         [
-          270,
-          68
+          20,
+          668
         ],
         [
-          270,
-          238
+          20,
+          668
         ],
         [
-          400,
-          238
+          20,
+          720
         ]
       ],
       "labelBBox": {
-        "x": 240,
-        "y": 122,
-        "width": 59,
+        "x": -117,
+        "y": 655,
+        "width": 125,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "yugnw5"
+        "ge4zx6"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "prltjl",
+      "source": "engine.connector",
+      "target": "tracker",
+      "label": "label, status, comments",
+      "points": [
+        [
+          -10,
+          240
+        ],
+        [
+          -10,
+          188
+        ],
+        [
+          -10,
+          188
+        ],
+        [
+          -10,
+          135
+        ]
+      ],
+      "labelBBox": {
+        "x": -185,
+        "y": 175,
+        "width": 163,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "15btdb"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1u0nc41",
+      "source": "tracker",
+      "target": "engine.connector",
+      "label": "requests, approvals, differences",
+      "points": [
+        [
+          50,
+          135
+        ],
+        [
+          50,
+          188
+        ],
+        [
+          50,
+          188
+        ],
+        [
+          50,
+          240
+        ]
+      ],
+      "labelBBox": {
+        "x": -175,
+        "y": 175,
+        "width": 213,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "m5l34"
+      ],
+      "color": "gray",
+      "line": "dotted",
+      "head": "normal",
+      "kind": "reads",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "hbyaax",
+      "source": "pstate",
+      "target": "engine.learn.retro",
+      "label": "Blocked, fix rounds",
+      "points": [
+        [
+          640,
+          -12
+        ],
+        [
+          720,
+          -12
+        ],
+        [
+          720,
+          628
+        ],
+        [
+          800,
+          628
+        ]
+      ],
+      "labelBBox": {
+        "x": 654,
+        "y": 277,
+        "width": 132,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "9xezo1"
       ],
       "color": "gray",
       "line": "dotted",
@@ -625,7 +994,7 @@
       },
       "parent": null,
       "relations": [
-        "1bwzvch"
+        "weftnw"
       ],
       "color": "gray",
       "line": "dashed",

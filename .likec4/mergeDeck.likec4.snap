@@ -57,12 +57,12 @@
       }
     ]
   },
-  "hash": "zTMrCJqLR8kglrLqvrsrFCfPtfl75P0TwF9IF9xHT9U",
+  "hash": "gEYVOm-NH-7OUhgaLh0ZSzEFUSrQZodZHFOlSX1dZEc",
   "bounds": {
     "x": -280.0,
     "y": -100,
     "width": 1610.0,
-    "height": 1135.0
+    "height": 1315.0
   },
   "nodes": [
     {
@@ -72,7 +72,8 @@
       "children": [],
       "inEdges": [],
       "outEdges": [
-        "15wm9oz"
+        "15wm9oz",
+        "1ak3ic6"
       ],
       "title": "Operator",
       "modelRef": "operator",
@@ -92,12 +93,12 @@
       "kind": "human",
       "isCustomized": true,
       "x": -240.0,
-      "y": 300.0,
+      "y": 390.0,
       "width": 250,
       "height": 135,
       "labelBBox": {
         "x": -606.0,
-        "y": -145.0,
+        "y": 439.0,
         "width": 115,
         "height": 32
       }
@@ -127,7 +128,7 @@
         "idea"
       ],
       "notation": "Store",
-      "technology": "files in the repo or the work item body",
+      "technology": "files in each repository",
       "kind": "store",
       "isCustomized": true,
       "x": 1040.0,
@@ -136,7 +137,7 @@
       "height": 135,
       "labelBBox": {
         "x": 1077.0,
-        "y": 32,
+        "y": -39,
         "width": 175,
         "height": 66
       }
@@ -174,7 +175,7 @@
       "height": 135,
       "labelBBox": {
         "x": -206.0,
-        "y": -136,
+        "y": -207,
         "width": 181,
         "height": 32
       }
@@ -186,15 +187,18 @@
       "children": [
         "engine.merge.r0check",
         "engine.merge.mergeGate",
+        "engine.merge.envGate",
         "engine.merge.land"
       ],
       "inEdges": [
         "15wm9oz",
+        "1ak3ic6",
         "1xcli77",
         "r3wvvu"
       ],
       "outEdges": [
         "1xfqtoc",
+        "k7lk9l",
         "1hqymem",
         "1jyputw",
         "ooqfow"
@@ -221,10 +225,10 @@
       "x": 268.0,
       "y": -60,
       "width": 514.0,
-      "height": 835,
+      "height": 1015.0,
       "labelBBox": {
         "x": -115.0,
-        "y": -153,
+        "y": -237,
         "width": 57,
         "height": 15
       }
@@ -272,7 +276,7 @@
       "height": 135,
       "labelBBox": {
         "x": 21.0,
-        "y": -153,
+        "y": -224,
         "width": 150,
         "height": 66
       }
@@ -287,6 +291,7 @@
         "nlkhcx"
       ],
       "outEdges": [
+        "136mapb",
         "1xmxqqq",
         "1xfqtoc"
       ],
@@ -308,21 +313,69 @@
       "metadata": {
         "in": "The PR: scope, explanation, evidence; for R2 the code",
         "does": "The Operator: merge or changes with a comment",
-        "out": "Merge: to the queue. Changes: back to the Implementer"
+        "out": "Merge: to the queue or the environment. Changes: back"
       },
       "notation": "Gate: the Operator decides",
       "technology": "Gate",
       "kind": "gate",
       "isCustomized": true,
       "x": 400,
-      "y": 300.0,
+      "y": 260.0,
       "width": 250,
       "height": 135,
       "labelBBox": {
         "x": -314.0,
-        "y": 71.0,
+        "y": -4.0,
         "width": 99,
         "height": 32
+      }
+    },
+    {
+      "id": "engine.merge.envGate",
+      "parent": "engine.merge",
+      "level": 1,
+      "children": [],
+      "inEdges": [
+        "1ak3ic6",
+        "136mapb"
+      ],
+      "outEdges": [
+        "1cl7lwn",
+        "k7lk9l"
+      ],
+      "title": "Approve on environment",
+      "modelRef": "engine.merge.envGate",
+      "shape": "rectangle",
+      "color": "red",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "idea"
+      ],
+      "metadata": {
+        "in": "The candidate running on the environment, the smoke result",
+        "does": "A person approves the change as it runs, or asks for changes",
+        "out": "Approved: to the queue. Changes: back to the Implementer"
+      },
+      "notation": "Gate: the Operator decides",
+      "technology": "Gate, only where declared",
+      "kind": "gate",
+      "isCustomized": true,
+      "x": 400,
+      "y": 520.0,
+      "width": 250,
+      "height": 135,
+      "labelBBox": {
+        "x": -821.0,
+        "y": 239.0,
+        "width": 158,
+        "height": 66
       }
     },
     {
@@ -332,7 +385,8 @@
       "children": [],
       "inEdges": [
         "i8hz9l",
-        "1xmxqqq"
+        "1xmxqqq",
+        "1cl7lwn"
       ],
       "outEdges": [
         "1hqymem",
@@ -356,7 +410,7 @@
       ],
       "metadata": {
         "in": "An approved PR",
-        "does": "Rebuilds on the latest main, runs the full CI",
+        "does": "Rebuilds on the latest base, runs the full CI",
         "out": "Merged commit; or ejected with the reason"
       },
       "notation": "Script or check (no LLM)",
@@ -364,12 +418,12 @@
       "kind": "script",
       "isCustomized": true,
       "x": 400,
-      "y": 600,
+      "y": 780.0,
       "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": -681.0,
-        "y": 386,
+        "x": -1246.0,
+        "y": 516.0,
         "width": 169,
         "height": 32
       }
@@ -403,12 +457,12 @@
       "kind": "store",
       "isCustomized": true,
       "x": 1040.0,
-      "y": 600,
+      "y": 780.0,
       "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": -458.0,
-        "y": 386,
+        "x": -1023.0,
+        "y": 701.0,
         "width": 166,
         "height": 32
       }
@@ -420,6 +474,7 @@
       "children": [],
       "inEdges": [
         "1xfqtoc",
+        "k7lk9l",
         "1jyputw"
       ],
       "outEdges": [],
@@ -442,12 +497,12 @@
       "isCustomized": true,
       "navigateTo": "implementDeck",
       "x": -240.0,
-      "y": 600,
+      "y": 780.0,
       "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": -1738.0,
-        "y": 571,
+        "x": -2303.0,
+        "y": 331.0,
         "width": 166,
         "height": 32
       }
@@ -480,12 +535,12 @@
       "isCustomized": true,
       "navigateTo": "deployDeck",
       "x": 400,
-      "y": 860.0,
+      "y": 1040.0,
       "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": -1076.0,
-        "y": 444.0,
+        "x": -1641.0,
+        "y": 759.0,
         "width": 122,
         "height": 66
       }
@@ -500,30 +555,68 @@
       "points": [
         [
           10,
-          368
+          428
         ],
         [
           205,
-          368
+          428
         ],
         [
           205,
-          338
+          298
         ],
         [
           400,
-          338
+          298
         ]
       ],
       "labelBBox": {
         "x": 174,
-        "y": 322,
+        "y": 332,
         "width": 61,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "gkbmhl"
+        "1efbgcv"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1ak3ic6",
+      "source": "operator",
+      "target": "engine.merge.envGate",
+      "label": "a listed person approves",
+      "points": [
+        [
+          10,
+          488
+        ],
+        [
+          205,
+          488
+        ],
+        [
+          205,
+          558
+        ],
+        [
+          400,
+          558
+        ]
+      ],
+      "labelBBox": {
+        "x": 122,
+        "y": 492,
+        "width": 166,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "50hptu"
       ],
       "color": "gray",
       "line": "dashed",
@@ -561,7 +654,7 @@
       },
       "parent": null,
       "relations": [
-        "qadbvx"
+        "1wu3nnf"
       ],
       "color": "gray",
       "line": "dotted",
@@ -600,7 +693,7 @@
       },
       "parent": null,
       "relations": [
-        "1nb51hx"
+        "vruytd"
       ],
       "color": "primary",
       "line": "dashed",
@@ -620,26 +713,26 @@
         ],
         [
           525,
-          218
+          198
         ],
         [
           525,
-          218
+          198
         ],
         [
           525,
-          300
+          260
         ]
       ],
       "labelBBox": {
         "x": 442,
-        "y": 205,
+        "y": 185,
         "width": 71,
         "height": 25
       },
       "parent": "engine.merge",
       "relations": [
-        "8pf37q"
+        "n3jbrc"
       ],
       "color": "gray",
       "line": "dashed",
@@ -662,22 +755,60 @@
         ],
         [
           730,
-          627
+          807
         ],
         [
           650,
-          627
+          807
         ]
       ],
       "labelBBox": {
         "x": 654,
-        "y": 355,
+        "y": 445,
         "width": 112,
         "height": 25
       },
       "parent": "engine.merge",
       "relations": [
-        "18ri59l"
+        "bmqggx"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "136mapb",
+      "source": "engine.merge.mergeGate",
+      "target": "engine.merge.envGate",
+      "label": "merge, environment declared",
+      "points": [
+        [
+          525,
+          395
+        ],
+        [
+          525,
+          458
+        ],
+        [
+          525,
+          458
+        ],
+        [
+          525,
+          520
+        ]
+      ],
+      "labelBBox": {
+        "x": 316,
+        "y": 445,
+        "width": 197,
+        "height": 25
+      },
+      "parent": "engine.merge",
+      "relations": [
+        "tqqhvo"
       ],
       "color": "gray",
       "line": "dashed",
@@ -691,31 +822,69 @@
       "label": "merge",
       "points": [
         [
-          525,
-          435
+          650,
+          368
         ],
         [
-          525,
-          518
+          730,
+          368
         ],
         [
-          525,
-          518
+          730,
+          807
         ],
         [
-          525,
-          600
+          650,
+          807
         ]
       ],
       "labelBBox": {
-        "x": 461,
-        "y": 505,
+        "x": 684,
+        "y": 575,
         "width": 52,
         "height": 25
       },
       "parent": "engine.merge",
       "relations": [
-        "4xu1ok"
+        "1d4jcnc"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "1cl7lwn",
+      "source": "engine.merge.envGate",
+      "target": "engine.merge.land",
+      "label": "approved",
+      "points": [
+        [
+          525,
+          655
+        ],
+        [
+          525,
+          718
+        ],
+        [
+          525,
+          718
+        ],
+        [
+          525,
+          780
+        ]
+      ],
+      "labelBBox": {
+        "x": 441,
+        "y": 705,
+        "width": 72,
+        "height": 25
+      },
+      "parent": "engine.merge",
+      "relations": [
+        "8uvh1f"
       ],
       "color": "gray",
       "line": "dashed",
@@ -730,30 +899,69 @@
       "points": [
         [
           400,
-          398
+          358
         ],
         [
           205,
-          398
+          358
         ],
         [
           205,
-          638
+          794
         ],
         [
           10,
-          638
+          794
         ]
       ],
       "labelBBox": {
         "x": 135,
-        "y": 487,
+        "y": 545,
         "width": 140,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1p3va87"
+        "1cs28sz"
+      ],
+      "color": "red",
+      "line": "dashed",
+      "head": "normal",
+      "kind": "verdict",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "k7lk9l",
+      "source": "engine.merge.envGate",
+      "target": "engine.implement",
+      "label": "changes + comment",
+      "points": [
+        [
+          400,
+          618
+        ],
+        [
+          205,
+          618
+        ],
+        [
+          205,
+          848
+        ],
+        [
+          10,
+          848
+        ]
+      ],
+      "labelBBox": {
+        "x": 135,
+        "y": 702,
+        "width": 140,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "n8l6ey"
       ],
       "color": "red",
       "line": "dashed",
@@ -769,30 +977,30 @@
       "points": [
         [
           650,
-          668
+          848
         ],
         [
           845,
-          668
+          848
         ],
         [
           845,
-          668
+          848
         ],
         [
           1040,
-          668
+          848
         ]
       ],
       "labelBBox": {
         "x": 819,
-        "y": 637,
+        "y": 817,
         "width": 52,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "1cykftz"
+        "9cvjcj"
       ],
       "color": "gray",
       "line": "dashed",
@@ -807,30 +1015,30 @@
       "points": [
         [
           400,
-          668
+          848
         ],
         [
           205,
-          668
+          848
         ],
         [
           205,
-          698
+          902
         ],
         [
           10,
-          698
+          902
         ]
       ],
       "labelBBox": {
         "x": 155,
-        "y": 652,
+        "y": 844,
         "width": 100,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "sidwby"
+        "1i4fakc"
       ],
       "color": "red",
       "line": "dashed",
@@ -846,30 +1054,30 @@
       "points": [
         [
           525,
-          735
+          915
         ],
         [
           525,
-          798
+          978
         ],
         [
           525,
-          798
+          978
         ],
         [
           525,
-          860
+          1040
         ]
       ],
       "labelBBox": {
         "x": 453,
-        "y": 785,
+        "y": 965,
         "width": 60,
         "height": 25
       },
       "parent": null,
       "relations": [
-        "i31tqi"
+        "ouix00"
       ],
       "color": "primary",
       "line": "dashed",

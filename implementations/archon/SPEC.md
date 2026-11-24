@@ -1,5 +1,7 @@
 # Pack spec: the pipeline on Archon
 
+> **Behind the model since 2026-11-24.** This file describes the pack as built. Decisions 45–54 (`../../docs/decisions.md`) change it and are not built: the state moves from the `state:*` label to the engine's store; tracker and deploy calls go through a project map over MCP; 17 states (TestReview, Releasing); environments replace the deploy hook; rollback is no longer only a revert. Where this file and the decisions disagree, the decisions hold. The order of the rework: `../../docs/STATUS.md`, "Next for the pack".
+
 What the pack contains, node by node, and why each node is an agent, a script or the Operator. Source of truth for behaviour: `../../model/engine.c4`, `../../docs/decisions.md`, `../../docs/states.md`. This file says how that behaviour is built on Archon (dev commit `f9d1d2b`). Order of work: `../../docs/build-plan.md`. Revised after the design review below.
 
 ## Shape in one screen

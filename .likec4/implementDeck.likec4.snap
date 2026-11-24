@@ -49,7 +49,7 @@
       }
     ]
   },
-  "hash": "bfPzZt9uQs-1DS1YVp--NnS9VSvQm8CWgfvFO24gTYI",
+  "hash": "5m8q8DDde6bKkCOGMy1alsuvneiHasFfPRJl-wsx1s0",
   "bounds": {
     "x": -40,
     "y": -40,
@@ -82,7 +82,7 @@
         "idea"
       ],
       "notation": "Store",
-      "technology": "files in the repo or the work item body",
+      "technology": "files in each repository",
       "kind": "store",
       "isCustomized": true,
       "x": 800,
@@ -124,7 +124,7 @@
       "metadata": {
         "in": "Work items and their state, verdicts, the Operator's answers",
         "does": "Starts agent sessions, moves states, enforces limits",
-        "out": "Sessions, state labels, decision requests"
+        "out": "Sessions, states, writes through the connector, decision requests"
       },
       "notation": "Cross-cutting part",
       "technology": "Orchestrator",
@@ -559,7 +559,7 @@
       },
       "parent": null,
       "relations": [
-        "1csm1gm"
+        "5g10fw"
       ],
       "color": "gray",
       "line": "dotted",
@@ -598,7 +598,7 @@
       },
       "parent": null,
       "relations": [
-        "1b47i5v"
+        "5edlaa"
       ],
       "color": "gray",
       "line": "dashed",
@@ -636,7 +636,7 @@
       },
       "parent": null,
       "relations": [
-        "17zkbrt"
+        "fxhocj"
       ],
       "color": "primary",
       "line": "dashed",
@@ -675,7 +675,7 @@
       },
       "parent": null,
       "relations": [
-        "1mpyema"
+        "6p1kd2"
       ],
       "color": "primary",
       "line": "dashed",
@@ -714,8 +714,8 @@
       },
       "parent": null,
       "relations": [
-        "1a4cra",
-        "objo4h"
+        "oe5m6b",
+        "1ino3lg"
       ],
       "color": "red",
       "line": "dashed",
@@ -754,7 +754,7 @@
       },
       "parent": null,
       "relations": [
-        "rih398"
+        "164m5uy"
       ],
       "color": "red",
       "line": "dashed",
@@ -793,8 +793,9 @@
       },
       "parent": null,
       "relations": [
-        "1p3va87",
-        "sidwby"
+        "1cs28sz",
+        "1i4fakc",
+        "n8l6ey"
       ],
       "color": "red",
       "line": "dashed",
@@ -833,7 +834,7 @@
       },
       "parent": null,
       "relations": [
-        "bawxyn"
+        "13icp6h"
       ],
       "color": "gray",
       "line": "dashed",
@@ -871,7 +872,7 @@
       },
       "parent": null,
       "relations": [
-        "1a9o3md"
+        "75jrfr"
       ],
       "color": "gray",
       "line": "dashed",
@@ -909,7 +910,7 @@
       },
       "parent": null,
       "relations": [
-        "uov12t"
+        "1ne8na9"
       ],
       "color": "primary",
       "line": "dashed",
@@ -948,7 +949,7 @@
       },
       "parent": null,
       "relations": [
-        "1rqyo8x"
+        "1o788e0"
       ],
       "color": "gray",
       "line": "dashed",
@@ -986,7 +987,7 @@
       },
       "parent": null,
       "relations": [
-        "1fxtz08"
+        "ngsnos"
       ],
       "color": "gray",
       "line": "dashed",
@@ -1024,7 +1025,7 @@
       },
       "parent": null,
       "relations": [
-        "1lnjnjf"
+        "3fxl4v"
       ],
       "color": "gray",
       "line": "dashed",

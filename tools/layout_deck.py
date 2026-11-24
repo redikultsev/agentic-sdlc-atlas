@@ -7,7 +7,7 @@ Usage: python3 tools/layout_deck.py <export.json>   (tools/build.sh runs it befo
 import json, pathlib, sys
 
 root = pathlib.Path(__file__).resolve().parent.parent
-model = json.loads(pathlib.Path(sys.argv[1]).read_text())
+model = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding='utf-8'))
 if isinstance(model, list):
     model = model[0]
 
@@ -38,10 +38,10 @@ LAYOUTS = {
         'engine.verify': (2, 1), 'docs': (2, 2), 'changes': (2, 3),
     },
     'mergeDeck': {
-        'engine.aiReview': (-0.6, 0), 'operator': (-0.6, 1.5), 'engine.implement': (-0.6, 3),
-        'engine.merge.r0check': (1, 0), 'engine.merge.mergeGate': (1, 1.5), 'engine.merge.land': (1, 3),
-        'engine.deploy': (1, 4.3),
-        'docs': (2.6, 0), 'changes': (2.6, 3),
+        'engine.aiReview': (-0.6, 0), 'operator': (-0.6, 1.95), 'engine.implement': (-0.6, 3.9),
+        'engine.merge.r0check': (1, 0), 'engine.merge.mergeGate': (1, 1.3), 'engine.merge.envGate': (1, 2.6), 'engine.merge.land': (1, 3.9),
+        'engine.deploy': (1, 5.2),
+        'docs': (2.6, 0), 'changes': (2.6, 3.9),
     },
     'deployDeck': {
         'engine.merge': (-0.4, 0), 'monitoring': (-0.4, 2.4), 'changes': (-0.4, 3.6),
@@ -51,11 +51,12 @@ LAYOUTS = {
     },
     'platformDeck': {
         'tracker': (-0.25, 0), 'operator': (-0.25, 2.4),
-        'engine.orchestrator': (1, 1), 'engine.cards': (1, 2.4),
+        'pstate': (1, -0.4), 'engine.orchestrator': (1, 1), 'engine.cards': (1, 2.4),
+        'engine.connector': (-0.25, 1.2), 'engine.setup': (-0.25, 3.6),
         'engine.sandbox': (2, 0), 'engine.traces': (2, 1.6), 'engine.learn.retro': (2, 2.8),
     },
     'learnDeck': {
-        'tracker': (-0.4, 0), 'changes': (-0.4, 1), 'releases': (-0.4, 2), 'engine.traces': (-0.4, 3), 'engine.deploy': (-0.4, 4),
+        'pstate': (-0.4, 0), 'changes': (-0.4, 1), 'releases': (-0.4, 2), 'engine.traces': (-0.4, 3), 'engine.deploy': (-0.4, 4),
         'engine.learn.retro': (1, 2),
         'operator': (2.4, 1.4), 'engine.intake': (2.4, 2.6),
     },
@@ -63,7 +64,7 @@ LAYOUTS = {
 
 # edges that skip a block in the same column: drawn as an arc around its right side
 BYPASS = {
-    'mergeDeck': {('engine.merge.r0check', 'engine.merge.land')},
+    'mergeDeck': {('engine.merge.r0check', 'engine.merge.land'), ('engine.merge.mergeGate', 'engine.merge.land')},
 }
 
 
@@ -156,7 +157,7 @@ def lay(view):
     view['bounds'] = {'x': min(xs) - 40, 'y': min(ys) - 40, 'width': max(xs) - min(xs) + 80, 'height': max(ys) - min(ys) + 80}
     view['_layout'] = 'manual'
     out = root / '.likec4' / f"{view['id']}.likec4.snap"
-    out.write_text(json.dumps(view, indent=2) + '\n')
+    out.write_text(json.dumps(view, indent=2) + '\n', encoding='utf-8')
     print('laid out', view['id'], view['bounds'])
 
 

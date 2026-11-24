@@ -57,7 +57,7 @@
       }
     ]
   },
-  "hash": "bRg4OYpJzX90hED-Eky5-aza8ki-3IZux_68mxeuoYY",
+  "hash": "p78x3Vt_DyftHiOKIbTp6owlMijzQb0pRAExvB4J8cA",
   "bounds": {
     "x": -200.0,
     "y": -40,
@@ -66,16 +66,16 @@
   },
   "nodes": [
     {
-      "id": "tracker",
+      "id": "pstate",
       "parent": null,
       "level": 0,
       "children": [],
       "inEdges": [],
       "outEdges": [
-        "1943u0m"
+        "hbyaax"
       ],
-      "title": "Work items",
-      "modelRef": "tracker",
+      "title": "Pipeline state",
+      "modelRef": "pstate",
       "shape": "storage",
       "color": "storecolor",
       "style": {
@@ -87,10 +87,10 @@
         "txt": ""
       },
       "tags": [
-        "built"
+        "planned"
       ],
       "notation": "Store",
-      "technology": "GitHub Issues \u00b7 Jira",
+      "technology": "The engine's own store",
       "kind": "store",
       "isCustomized": true,
       "x": -160.0,
@@ -98,9 +98,9 @@
       "width": 240,
       "height": 135,
       "labelBBox": {
-        "x": -112.0,
+        "x": -126.0,
         "y": 49,
-        "width": 144,
+        "width": 172,
         "height": 32
       }
     },
@@ -272,7 +272,7 @@
         "engine.learn.retro"
       ],
       "inEdges": [
-        "1943u0m",
+        "hbyaax",
         "1ckbw57",
         "wua6ac",
         "zos398",
@@ -318,7 +318,7 @@
       "level": 1,
       "children": [],
       "inEdges": [
-        "1943u0m",
+        "hbyaax",
         "1ckbw57",
         "wua6ac",
         "zos398",
@@ -441,8 +441,8 @@
   ],
   "edges": [
     {
-      "id": "1943u0m",
-      "source": "tracker",
+      "id": "hbyaax",
+      "source": "pstate",
       "target": "engine.learn.retro",
       "label": "Blocked, fix rounds",
       "points": [
@@ -471,7 +471,7 @@
       },
       "parent": null,
       "relations": [
-        "1b7insr"
+        "9xezo1"
       ],
       "color": "gray",
       "line": "dotted",
@@ -510,7 +510,7 @@
       },
       "parent": null,
       "relations": [
-        "1by9ggh"
+        "1c0myas"
       ],
       "color": "gray",
       "line": "dotted",
@@ -549,7 +549,7 @@
       },
       "parent": null,
       "relations": [
-        "snbjlr"
+        "6h0ld6"
       ],
       "color": "gray",
       "line": "dotted",
@@ -588,7 +588,7 @@
       },
       "parent": null,
       "relations": [
-        "1bwzvch"
+        "weftnw"
       ],
       "color": "gray",
       "line": "dashed",
@@ -626,7 +626,7 @@
       },
       "parent": null,
       "relations": [
-        "1u425q1"
+        "1w9nwzw"
       ],
       "color": "primary",
       "line": "dashed",
@@ -665,7 +665,7 @@
       },
       "parent": null,
       "relations": [
-        "17u3lie"
+        "m6r56b"
       ],
       "color": "gray",
       "line": "dashed",
@@ -703,7 +703,7 @@
       },
       "parent": null,
       "relations": [
-        "slrwgv"
+        "1jsvoui"
       ],
       "color": "primary",
       "line": "dashed",

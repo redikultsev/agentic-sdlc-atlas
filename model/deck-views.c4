@@ -100,6 +100,7 @@ views {
     title '8. Deploy & watch'
     include * with { description '' }
     include -> engine.deploy.* ->
+    exclude engine.connector
     style * { size small textSize xlarge }
     autoLayout LeftRight 40 50
   }
@@ -118,13 +119,16 @@ views {
     title 'Cross-cutting parts'
     include
       engine.orchestrator with { description '' technology '' },
+      engine.connector with { description '' technology '' },
+      engine.setup with { description '' technology '' },
+      pstate with { description '' technology '' },
       engine.sandbox with { description '' technology '' },
       engine.cards with { description '' technology '' },
       engine.traces with { description '' technology '' },
       operator with { description '' technology '' },
       tracker with { description '' technology '' },
       engine.learn.retro with { description '' technology '' }
-    exclude engine.implement.implementer, engine, engine.learn, tracker -> engine.learn.retro, engine.learn.retro -> operator
+    exclude engine.implement.implementer, engine, engine.learn, engine.learn.retro -> operator, engine.setup -> engine.connector
     style * { size small textSize xlarge }
     autoLayout LeftRight 40 50
   }

@@ -65,7 +65,7 @@
       }
     ]
   },
-  "hash": "_eEKuF0OAq16bpsPoAyJpwwB_FAotS-CmgyuugyburM",
+  "hash": "FCSt4U504VSHUjkKjNLMfGl14IuL_qbCapiA7nlO7E0",
   "bounds": {
     "x": -200.0,
     "y": -160.0,
@@ -300,7 +300,7 @@
         "1jitp22",
         "1cela21"
       ],
-      "title": "Deploy",
+      "title": "Release & deploy",
       "modelRef": "engine.deploy.deployer",
       "shape": "component",
       "color": "green",
@@ -313,15 +313,15 @@
         "txt": ""
       },
       "tags": [
-        "built"
+        "planned"
       ],
       "metadata": {
-        "in": "Merged main",
-        "does": "Deploys to everyone; rolls back on the Watcher's call",
-        "out": "Running version, a record in Deployments"
+        "in": "Merged changes, the project's environments",
+        "does": "Cuts releases, deploys by the recipe, rolls back",
+        "out": "Running version; release and deployment records"
       },
       "notation": "Script or check (no LLM)",
-      "technology": "Dokploy \u00b7 TeamCity",
+      "technology": "Engine code \u00b7 the project's deploy recipe",
       "kind": "script",
       "isCustomized": true,
       "x": 400,
@@ -329,10 +329,10 @@
       "width": 250,
       "height": 135,
       "labelBBox": {
-        "x": 35.0,
-        "y": -346,
-        "width": 91,
-        "height": 32
+        "x": 24.0,
+        "y": -363,
+        "width": 113,
+        "height": 66
       }
     },
     {
@@ -557,7 +557,7 @@
       },
       "parent": null,
       "relations": [
-        "vt8yb7"
+        "aw8ume"
       ],
       "color": "gray",
       "line": "dashed",
@@ -595,7 +595,7 @@
       },
       "parent": null,
       "relations": [
-        "nm2rez"
+        "79j65a"
       ],
       "color": "gray",
       "line": "dotted",
@@ -634,7 +634,7 @@
       },
       "parent": null,
       "relations": [
-        "i31tqi"
+        "ouix00"
       ],
       "color": "primary",
       "line": "dashed",
@@ -673,7 +673,7 @@
       },
       "parent": "engine.deploy",
       "relations": [
-        "7cbsa0"
+        "sk5zwn"
       ],
       "color": "gray",
       "line": "dashed",
@@ -711,7 +711,7 @@
       },
       "parent": null,
       "relations": [
-        "319jq4"
+        "11ip6a0"
       ],
       "color": "gray",
       "line": "dashed",
@@ -749,7 +749,7 @@
       },
       "parent": null,
       "relations": [
-        "1rv3gfi"
+        "1aa2pve"
       ],
       "color": "gray",
       "line": "dashed",
@@ -787,7 +787,7 @@
       },
       "parent": null,
       "relations": [
-        "x1w69o"
+        "1n07o21"
       ],
       "color": "gray",
       "line": "dashed",
@@ -825,7 +825,7 @@
       },
       "parent": null,
       "relations": [
-        "116lpoj"
+        "3flunq"
       ],
       "color": "primary",
       "line": "dashed",
@@ -864,7 +864,7 @@
       },
       "parent": null,
       "relations": [
-        "1u425q1"
+        "1w9nwzw"
       ],
       "color": "primary",
       "line": "dashed",

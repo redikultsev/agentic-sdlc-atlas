@@ -7,11 +7,11 @@ Sources: what Archon gives and where it falls short, `research/atlas/research/en
 ## Shape
 
 - **One pack, our own.** An Archon workflow pack (`kind: workflow-pack`) in `implementations/archon/`, installed with `archon plugin add redikultsev/agentic-sdlc-atlas/implementations/archon@unify-sdlc-vX.Y.Z` and run as `redikultsev/unify-sdlc:<workflow>`; a version is a git tag One workflow per stage, as in the model. Archon's bundled SDLC pack is not forked: its stages differ from ours (no spec or plan gates, agent-decided merge, review before CI). Its proven helpers are copied with the MIT notice where they fit: forge reads and writes with read-back, labels written as a delta, remote URL normalisation, typed node outputs.
-- **Agents judge, scripts act.** Every public write (labels, comments, pushes, merges) is a script node that acts on a typed agent verdict and reads the result back. Prompts never write to the tracker or git.
+- **Agents judge, scripts act.** Every public write (labels, comments, pushes, merges) is a script node that acts on a typed agent verdict and reads the result back. Prompts never write to the tracker or git. Revised 2026-11-24 (decisions 45–47): the engine holds the state; a project's own tools (tracker, CI server, deploys) are reached by engine code through the project's MCP servers and its map, with the write rules of decision 47; scripts keep the pipeline's rules and the code host (PRs, checks, merge).
 - **One policy module** (`.shared/policy.ts`) holds the cross-cutting rules every stage uses at its first and last node: state labels (decision 28), the shared round counter (15), verdicts tied to the diff fingerprint (33), rulings (32), decision requests (38), the waiting cap (9), session limits (29), manual switches (40).
 - **Gates are `wait: attention` nodes** with typed options. Archon's direction moves gates to item asks answered after the run; one workflow per stage keeps that later move local to each gate.
 - **Tests on stubs from the first commit** (decision 41): every transition in `docs/states.md` has a fixture run with stubbed agent verdicts.
-- **Trackers through MCP** (decision 5); GitHub Issues first because Archon's forge already speaks it.
+- **Trackers through MCP** (decision 5), called by engine code by the project map (decision 46); GitHub Issues first, Jira second.
 
 ## Order
 
@@ -20,6 +20,6 @@ The whole pipeline is built: all nine stages, the cross-cutting rules and the sa
 1. **Write the whole pack** with stub tests for every transition (decision 41): stages 1–9 as workflows, `policy.ts`, decision requests, state labels.
 2. **Live runs, shortest route first** on the trial repository (an active open-source project with a second developer; the owner's choice, 2026-11-22): an S item (Triage → Accept → Implementer → CI → AI review → Merge gate → merged). Then M and L through spec and plan with slices, then acceptance with evidence, merge by rules on the latest main, deploy and watch with rollback, the weekly Retro.
 3. **Sandbox in parallel:** provider plugin `claude-vm` / `codex-vm` (microVM, no GitHub token, egress allowlist, wall clock), push proxy, a separate merge credential. On before the pipeline touches any work repository.
-4. **Console patch** (pause and hold, a board of the 15 states, image evidence, asks), proposed upstream.
+4. **Console patch** (pause and hold, a board of the 17 states, image evidence, asks), proposed upstream.
 
 Until the sandbox lands, agents run in Archon worktrees on the host behind the git and gh merge guard already deployed in the trial, on the trial repository only. Its own red tests and a second developer merging every 20–40 minutes will mix with the pipeline's failures: each live run notes which is which in the trial log.

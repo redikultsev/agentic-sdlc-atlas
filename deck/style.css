@@ -83,3 +83,8 @@ details summary { cursor: pointer; color: #6b7280; font-size: 0.85rem; }
 .sl { margin-top: 10px; font-size: 15px; color: #334155; text-align: center; }
 .sl .dot { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin: 0 6px 0 20px; }
 .pk.k-platform { background: #0369a1; }
+.stg:has(.pcs.n6) { grid-template-columns: 1fr 1.3fr; }
+.pcs.n6 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pcs.n6 .pc { padding: 6px 12px; }
+.pcs.n6 .pc .pn { margin: 2px 0 0; font-size: 16px; }
+.pcs.n6 .eg3 { row-gap: 0; line-height: 1.2; margin-top: 2px; font-size: 12px; }

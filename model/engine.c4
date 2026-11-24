@@ -3,7 +3,7 @@ model {
   // ================= People and the outside world =================
   operator = human 'Operator' {
     technology 'Human'
-    description 'The person over the agents. Decides at the gates; everything is shown by the presentation rules (decision type sets the depth, a real before/after case, what was not verified on top).'
+    description 'The person over the agents; a project may name several, and lists who answers which gate. Decides at the gates; everything is shown by the presentation rules (decision type sets the depth, a real before/after case, what was not verified on top).'
   }
   prod = external 'Production' {
     technology 'Running services'
@@ -22,7 +22,12 @@ model {
   tracker = store 'Work items' {
     #built
     technology 'GitHub Issues · Jira'
-    description 'The hub of the pipeline. Every piece of work is a work item with a number, size (S/M/L), risk (R0/R1/R2) and state. Everything else links to its number. Each tracker plugs in through an adapter.'
+    description 'The hub of the pipeline for people. Every piece of work is a work item with a number, size (S/M/L) and risk (R0/R1/R2); everything else links to its number. It shows what the engine holds (decision 45): each item\'s state as a state:* label and, where the project\'s map has one, a workflow status; slices as sub-issues; rulings as comments. The engine takes three things from it: a new request, a trusted person\'s approval of an untrusted author\'s request, trusted authors\' comments. Engine code reads and writes it through the project map (decisions 46, 47); any other difference between it and the engine\'s record is a question to the Operator, never a move.'
+  }
+  pstate = store 'Pipeline state' {
+    #planned
+    technology 'The engine\'s own store'
+    description 'The truth the pipeline acts on (decision 45). Per work item: the state (one of the 17), fix rounds, verdicts with their diff fingerprints, slices and their blocked-by edges, approvals with the tree they are bound to, the request text as it was approved. Per project: holds on shared environments, releases with their items, deployment records with a reason, the registers of rejected requests and of rulings. Backed up; without a backup, items are adopted from their state labels after the Operator confirms, with approvals absent and fix rounds used up (decision 54).'
   }
   docs = store 'Specs, plans and decisions' {
     #idea
@@ -42,7 +47,7 @@ model {
   releases = store 'Deployments' {
     #built
     technology 'Dokploy · TeamCity'
-    description 'Which version runs where and how the rollout ended.'
+    description 'What the deploy tools themselves record: which version runs where. The pipeline reads the running version from the target; its own release and deployment records, with a reason, are in Pipeline state.'
   }
 
   engine = system 'Pipeline' {
@@ -65,11 +70,31 @@ model {
     orchestrator = platform 'Orchestrator' {
       #idea
       technology 'Orchestrator'
-      description 'Moves a work item only along the transitions in docs/states.md and sets its state label in the tracker. Starts every agent session: Triage, Interviewer, Researcher, Planner, Implementer, AI reviewer, Validator, Watcher, Retro; each session in its own sandbox. Code decides the next step from a JSON verdict, never from agent prose. Works the frontier: every slice sub-issue whose blockers are done gets a fresh Implementer session; slices with no shared files run in parallel. Merges slice branches into the work item branch; a conflict goes back to the Implementer. All fix rounds of a work item share one limit of 3 (failed CI, Validator, AI review); after that, or on a block verdict, it sets Blocked and asks the Operator; the request says whether the defects shrank round by round (one more round is likely to finish it) or were new each time (the plan is likely wrong), with a recommendation (decision 37). Every session has two time limits, a total one and one on silence (no output from the agent for a set time: it hung), and a cost limit (set in config, first values from the first measured work items); a session whose cost the provider does not report is stopped as over the limit, never counted as free (decision 29); a session that hits one is stopped and counts as a failed round. A session that ends without a valid verdict (crash, limit, malformed JSON) is never a pass: the work item does not move on (decision 36). Starts at most one session per work item and state (in Implement one per slice), so two runs never do the same work. Keeps at most 3 work items waiting for the Operator at once; while 3 wait, no new work item starts. The Operator can cancel a work item in any state; closing it (Cancelled, ForHuman) tells the requester why. The Operator can pause the pipeline: no new sessions start, running ones finish to their next state; resume starts them again. Two project settings, checked by code, turn stages to manual without pausing the rest: implement (auto: an accepted item starts by itself; manual: every Implementer start is a decision request) and merge (auto: R0 merges by the rules; manual: every PR goes to the Merge gate) (decision 40). When the cause of a Blocked item goes away (the item it waited on is done), its request to the Operator is updated to say so and offers to resume (decision 43). A failed read of the tracker or the forge (network, API limit) is a retry, never a verdict or Blocked; after two failures in a row the item is set aside and frees its place in the work in progress (decision 43). Every transition in docs/states.md and every rule above (limits, frontier, rounds, verdicts tied to the diff) has a test that runs with stub verdicts instead of agents; a change to the pipeline does not merge while they are red (decision 41). Engine chosen: Archon (trial).'
+      description 'Moves a work item only along the transitions in docs/states.md. Holds each item\'s state in Pipeline state and shows it in the tracker through the Project connector; a difference between the two is one decision request per item, outside the waiting cap (decision 45). Starts every agent session: Triage, Interviewer, Researcher, Planner, Implementer, AI reviewer, Validator, Watcher, Retro; each session in its own sandbox. Code decides the next step from a JSON verdict, never from agent prose. Works the frontier: every slice whose blockers are done gets a fresh Implementer session; slices with no shared files run in parallel. Merges slice branches into the work item branch; a conflict goes back to the Implementer. All fix rounds of a work item share one limit of 3 (failed CI, Validator, AI review); after that, or on a block verdict, it sets Blocked and asks the Operator; the request says whether the defects shrank round by round (one more round is likely to finish it) or were new each time (the plan is likely wrong), with a recommendation (decision 37). Every session has two time limits, a total one and one on silence (no output from the agent for a set time: it hung), and a cost limit (set in config, first values from the first measured work items); a session whose cost the provider does not report is stopped as over the limit, never counted as free (decision 29); a session that hits one is stopped and counts as a failed round. A session that ends without a valid verdict (crash, limit, malformed JSON) is never a pass: the work item does not move on (decision 36). Starts at most one session per work item and state (in Implement one per slice), so two runs never do the same work. Keeps at most 3 work items waiting for the Operator at once; while 3 wait, no new work item starts. The Operator can cancel a work item in any state; closing it (Cancelled, ForHuman) tells the requester why. The Operator can pause the pipeline: no new sessions start, running ones finish to their next state; resume starts them again. A pause also stops new promotions, never a rollback. Two project settings, checked by code, turn stages to manual without pausing the rest: implement (auto: an accepted item starts by itself; manual: every Implementer start is a decision request) and merge (auto: R0 merges by the rules; manual: every PR goes to the Merge gate) (decision 40). When the cause of a Blocked item goes away (the item it waited on is done), its request to the Operator is updated to say so and offers to resume (decision 43). A failed read of the tracker or the forge (network, API limit) is a retry, never a verdict or Blocked; after two failures in a row the item is set aside and frees its place in the work in progress (decision 43). Every transition in docs/states.md and every rule above (limits, frontier, rounds, verdicts tied to the diff) has a test that runs with stub verdicts instead of agents; a change to the pipeline does not merge while they are red (decision 41). Engine chosen: Archon (trial).'
       metadata {
         in 'Work items and their state, verdicts, the Operator\'s answers'
         does 'Starts agent sessions, moves states, enforces limits'
-        out 'Sessions, state labels, decision requests'
+        out 'Sessions, states, writes through the connector, decision requests'
+      }
+    }
+    connector = platform 'Project connector' {
+      #planned
+      technology 'Engine code · MCP · the project map'
+      description 'Engine code that reaches the project\'s own tools (the tracker, the CI server, deploys, monitoring reads) through the project\'s MCP servers by the project map: a file in .pipeline/ on the base branch that names the MCP tool and its arguments for each operation the pipeline needs; an action too long for the map is a recipe script in the project (decision 46). No model takes part. Every write: its key is saved before and the id of what was made after, so a retry never writes twice; it is read back directly by the item\'s key; writes for one item go one at a time and a stale one is dropped (decision 47). While a tool is down, writes queue and only the latest per item is written on recovery; a failed call is a retry, never a fix round. It uses the pipeline\'s own service account; production deploy rights exist only in the step that runs the deploy recipe. At install it checks the map: reading a request and its creator, commenting and setting a label are required; an optional operation the tracker lacks is skipped and reported. The code host (PRs, checks, merge) is reached through the engine\'s code-host seam, not the map.'
+      metadata {
+        in 'An operation from the Orchestrator or a stage; the project map'
+        does 'Calls the project\'s tools through MCP, reads back, retries'
+        out 'What was written and read; a refusal as a difference'
+      }
+    }
+    setup = agent 'Setup agent' {
+      #idea
+      technology 'Agent, read-only'
+      description 'Composes the project map when a project is connected: reads the project\'s MCP tools, the tracker\'s workflow and the deploy setup with read-only rights, writes the map and the recipes, probes them on one test item (set a label, move a status, comment, read back) and hands them to the Operator to approve. When the map stops working (a renamed status, a new required field) it proposes the fix; a change to the map or a recipe is R2 (decision 46).'
+      metadata {
+        in 'A project\'s MCP servers and repository'
+        does 'Composes and probes the project map'
+        out 'A map and recipes for the Operator to approve'
       }
     }
     sandbox = platform 'Sandbox' {
@@ -247,11 +272,11 @@ model {
     // ================= 7. Merge =================
     merge = phase '7. Merge' {
       technology 'Merge'
-      description 'A script checks the auto-merge rules: a match merges without the Operator (R0), anything else goes to the Operator\'s gate. Everything lands through a merge queue on the latest main.'
+      description 'The auto-merge rules merge R0 without the Operator; the rest goes to the Merge gate. Where a project has a pre-merge environment, the change runs there before it merges. Everything lands through a merge queue.'
       r0check = script 'Auto-merge rules' {
         #idea
         technology 'Rules file in the repo'
-        description 'Checks facts, not the agent\'s opinion: only allowed paths and change types (docs, tests, dev tools, patch updates), at most N changed lines, no new dependencies, never-zones untouched (migrations, auth, payments, CI config, agent instructions and rules files), all checks green, inside working hours. All true: R0, straight to the queue. Any false: the Operator\'s gate. Kill switch: when merged changes of one type are reverted more than 5% over 30 days, auto-merge for that type turns off until the Operator changes the rules. With the merge setting on manual nothing matches: every PR goes to the Operator\'s gate (decision 40).'
+        description 'Checks facts, not the agent\'s opinion: only allowed paths and change types (docs, tests, dev tools, patch updates), at most N changed lines, no new dependencies, never-zones untouched (migrations, auth, payments, CI config, agent instructions and rules files), all checks green, inside working hours. All true: R0, straight to the queue. Any false: the Operator\'s gate. Kill switch: when merged changes of one type are reverted or rolled back more than 5% over 30 days, auto-merge for that type turns off until the Operator changes the rules. With the merge setting on manual nothing matches: every PR goes to the Operator\'s gate (decision 40). R0 changes do not go to a pre-merge environment; they merge and wait in Releasing (decision 50).'
         metadata {
           in 'The PR that passed acceptance, the rules file'
           does 'Checks paths, size, dependencies, never-zones, time'
@@ -261,46 +286,58 @@ model {
       mergeGate = gate 'Merge?' {
         #idea
         technology 'Gate'
-        description 'The Operator sees first the scope (files outside the plan, new dependencies, size) and the open review threads, then the explanation and the evidence; for R2 also the code. "Merge" sends the PR to the queue; main deploys right after, so for R2 "merge" also means "deploy now" and the Operator picks the moment by pressing it; "changes" with a comment sends it back to the Implementer. Changes asked by the Operator do not count toward the 3 automatic fix rounds.'
+        description 'The Operator sees first the scope (files outside the plan, new dependencies, size) and the open review threads, then the explanation and the evidence; for R2 also the code. "Merge" sends the PR on: to the merge queue or, where the project has a pre-merge environment, first to that environment. In a project that releases on every merge, "merge" also means "deploy now" and the Operator picks the moment by pressing it. "Changes" with a comment sends it back to the Implementer. Changes asked by the Operator do not count toward the 3 automatic fix rounds.'
         metadata {
           in 'The PR: scope, explanation, evidence; for R2 the code'
           does 'The Operator: merge or changes with a comment'
-          out 'Merge: to the queue. Changes: back to the Implementer'
+          out 'Merge: to the queue or the environment. Changes: back'
+        }
+      }
+      envGate = gate 'Approve on environment' {
+        #idea
+        technology 'Gate, only where declared'
+        description 'Exists only where a project declares a person\'s gate on a pre-merge environment (decision 50). After the Merge gate the item queues for the environment and holds it for its service (decision 51); code deploys the candidate (the base branch with the item, or the items of one build, merged in) and runs the smoke check. Then a person on the environment\'s list of answerers approves or asks for changes; the first answer counts. The approval is bound to the candidate\'s git tree within the service\'s paths: after the merge, code compares the trees, and a difference is a request that lists the files, insignificant paths apart (decision 49). "Changes" spends no fix round and ends the hold; the fixed item returns to the front of the queue. Outside the waiting cap. No person\'s gate declared: a green smoke check merges.'
+        metadata {
+          in 'The candidate running on the environment, the smoke result'
+          does 'A person approves the change as it runs, or asks for changes'
+          out 'Approved: to the queue. Changes: back to the Implementer'
         }
       }
       land = script 'Merge queue' {
         #planned
         technology 'Merge queue'
-        description 'Tests the PR on top of the latest main and the PRs ahead of it with the full CI, then lands it. Approvals stay valid while the PR\'s own diff is unchanged, checked by code: before landing it compares the fingerprint of the PR\'s diff with the one every verdict was recorded on and refuses if any differs; only the stale checks run again (decision 33). A rebase onto a newer main that leaves the diff unchanged keeps the verdicts. A red build or a conflict ejects the PR back to the Implementer; after a conflict is resolved the diff changed, so checks, review and acceptance run again for what changed. The agent never merges.'
+        description 'Tests the PR on top of the latest base branch and the PRs ahead of it with the full CI, then lands it. Approvals stay valid while the PR\'s own diff is unchanged, checked by code: before landing it compares the fingerprint of the PR\'s diff with the one every verdict was recorded on and refuses if any differs; only the stale checks run again (decision 33). A rebase onto a newer base that leaves the diff unchanged keeps the verdicts. After an approval on a pre-merge environment it compares the merged tree with the approved one (decision 49). A red build or a conflict ejects the PR back to the Implementer; after a conflict is resolved the diff changed, so checks, review and acceptance run again for what changed. The agent never merges.'
         metadata {
           in 'An approved PR'
-          does 'Rebuilds on the latest main, runs the full CI'
+          does 'Rebuilds on the latest base, runs the full CI'
           out 'Merged commit; or ejected with the reason'
         }
       }
       r0check -> land 'R0: rules match'
       r0check -> mergeGate 'no match'
       mergeGate -> land 'merge'
+      mergeGate -> envGate 'merge, environment declared'
+      envGate -> land 'approved'
     }
 
     // ================= 8. Deploy & watch =================
     deploy = phase '8. Deploy & watch' {
       technology 'Release, deploy & watch'
-      description 'Every merge deploys main to all users at once. The Watcher watches the change and rolls it back by itself on a regression. No gate after merge: R2 was approved at the Merge gate.'
-      deployer = script 'Deploy' {
-        #built
-        technology 'Dokploy · TeamCity'
-        description 'Deploys main to all users at once as soon as a merge lands; deploys never run in parallel and do not wait for a watch window. Records the version and the outcome in Deployments. Rolls back on the Watcher\'s call: one PR by deploying main with that PR reverted (the revert needs no gate), or, when the culprit is unclear, to the last version before all open watch windows. Database migrations are never rolled back automatically: they ship expand–contract (add the new form, switch, remove the old in a later change), so rolling back the code is safe while the schema stays.'
+      description 'What is merged goes out as a release through the project\'s environments, each with its checks and its rollback (decision 48). Shape A: every merge is a release to everyone. Shape B: a pre-merge environment, then production.'
+      deployer = script 'Release & deploy' {
+        #planned
+        technology 'Engine code · the project\'s deploy recipe'
+        description 'Takes what is merged to production as a release: a record with its version and the items it carries (decision 48). What starts a release is the project\'s setting: every merge (the default), a schedule, or the Operator with one request for the whole release; an urgent item starts one as soon as it merges (decision 53). Runs the project\'s deploy recipe for each environment through the Project connector and reads the running version from the target itself, not from the CI server. Deploys to one environment never run in parallel; a shared pre-merge environment is held per service (decision 51). Records every deployment with its reason in Pipeline state. The checks after a deploy are the environment\'s: a smoke check, the Watcher\'s window, or both. So is the rollback: a revert of the culprit (shape A: main with that PR reverted, no gate; when the culprit is unclear, the last version before all open watch windows), the previous verified version, or forward only where nothing can be redeployed. A rolled-back release with several items: the culprit is reverted and RolledBack, the others return to Releasing, and the release line is blocked until the revert or the fix is in it (decision 52). A pause never stops a rollback. Database migrations are never rolled back automatically: they ship expand-contract (add the new form, switch, remove the old in a later change), so rolling back the code is safe while the schema stays. A project with no environment: a merge is Done.'
         metadata {
-          in 'Merged main'
-          does 'Deploys every merge to everyone; reverts one PR or rolls back'
-          out 'Running version, a record in Deployments'
+          in 'Merged changes, the project\'s environments'
+          does 'Cuts releases, deploys by the recipe, rolls back'
+          out 'Running version; release and deployment records'
         }
       }
       watcher = agent 'Watcher' {
         #idea
         technology 'Watch agent'
-        description 'One Watcher per deploy; it watches for the watch window (default 30 min, longer for R2; set in config), and windows of later deploys overlap. Read-only on production; its only action is a rollback. Knows what the PR changed and watches that first: errors and logs from the changed code, the endpoints and business numbers it touches (for example orders and their sums); then the overall error rate and latency. Compares with the same hours before the deploy. On a clear regression in what its PR changed it rolls back that PR at once through Deploy; a regression it cannot pin on one PR rolls back to the last version before all open windows, then reports to the Operator with evidence and sends a work item with the evidence to Triage. When unsure, asks the Operator. Every rollback is recorded; when more than 2 of its rollbacks in 30 days turn out unneeded, it asks the Operator before rolling back until the Operator resets the rule. Window over with no regression: the work item is Done, the outcome goes to Learn.'
+        description 'One of the checks an environment may declare (decision 48). One Watcher per deploy; it watches for the watch window (default 30 min, longer for R2; set in config), and windows of later deploys overlap. Read-only on production; its only action is a rollback. Knows what the PR changed and watches that first: errors and logs from the changed code, the endpoints and business numbers it touches (for example orders and their sums); then the overall error rate and latency. Compares with the same hours before the deploy. On a clear regression in what its PR changed it rolls back that PR at once through Deploy; a regression it cannot pin on one PR rolls back to the last version before all open windows, then reports to the Operator with evidence and sends a work item with the evidence to Triage. In a release with several items it names the culprit when it can (decision 52). When unsure, asks the Operator. Every rollback is recorded; when more than 2 of its rollbacks in 30 days turn out unneeded, it asks the Operator before rolling back until the Operator resets the rule. Window over with no regression: the work item is Done, the outcome goes to Learn.'
         metadata {
           in 'Deploy, the PR diff, errors, logs, metrics'
           does 'Watches what the PR changed, then the whole service'
@@ -367,11 +404,10 @@ model {
   engine.merge.land -> changes 'merge'
   engine.merge.land .handoff engine.deploy.deployer 'merged'
   engine.deploy.deployer -> releases 'version'
-  engine.deploy.deployer -> prod 'rollout'
   monitoring -> engine.deploy.watcher 'errors, logs, metrics'
   changes .reads engine.deploy.watcher 'what changed'
   engine.deploy.watcher .handoff engine.learn.retro 'rollout outcome'
-  tracker .reads engine.learn.retro 'Blocked, fix rounds'
+  pstate .reads engine.learn.retro 'Blocked, fix rounds'
   changes .reads engine.learn.retro 'Operator changes, findings, failures'
   releases .reads engine.learn.retro 'rollbacks'
   engine.learn.retro -> operator 'weekly summary'
@@ -390,13 +426,23 @@ model {
 
   // ================= Cross-cutting =================
   engine.orchestrator -> engine.implement.implementer 'a session per slice'
-  tracker .reads engine.orchestrator 'frontier'
+  pstate .reads engine.orchestrator 'frontier'
   engine.orchestrator -> engine.sandbox 'one per agent session'
   engine.implement.implementer -> engine.sandbox 'works inside'
   engine.orchestrator -> engine.cards 'asks the Operator'
   engine.cards -> operator 'decision request'
   operator -> engine.orchestrator 'pause / resume'
   engine.orchestrator -> engine.traces 'records every session'
+  engine.orchestrator -> pstate 'state, rounds, verdicts'
+  engine.orchestrator -> engine.connector 'shows the state'
+  engine.connector -> tracker 'label, status, comments'
+  tracker .reads engine.connector 'requests, approvals, differences'
+  engine.deploy.deployer -> engine.connector 'deploy recipe'
+  engine.setup -> engine.connector 'project map'
+  operator -> engine.setup 'approves the map'
+  operator -> engine.merge.envGate 'a listed person approves'
+  engine.merge.envGate .verdict engine.implement.implementer 'changes + comment'
+  engine.deploy.deployer -> prod 'rollout'
   engine.orchestrator -> docs 'the Operator\'s rulings'
   engine.traces -> engine.learn.retro 'session traces'
 }

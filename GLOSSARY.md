@@ -12,8 +12,8 @@ Terms used in this project. Stage names follow the convergent pipeline of leadin
 | 4 | Implement | The only agent that changes code writes it, slice by slice, unit tests first, in its sandbox | agent |
 | 5 | Checks & review | CI outside the sandbox, then one AI reviewer reads the code, re-checks its findings, gives a pass / fix / block verdict and explains the change | script + agent |
 | 6 | Acceptance | A separate Validator, blind to the reviewer's verdict, checks the acceptance criteria on the running app and records evidence | agent |
-| 7 | Merge | By risk: R0 merges itself, R1 the Operator on evidence, R2 the Operator reads the code | script + Operator |
-| 8 | Deploy & watch | Every merge deploys to everyone; the Watcher watches what the PR changed and rolls back on a regression | script + agent |
+| 7 | Merge | By risk: R0 merges itself, R1 the Operator on evidence, R2 the Operator reads the code; where a project has a pre-merge environment, the change runs there before it merges | script + Operator |
+| 8 | Deploy & watch | What is merged goes out as a release through the project's environments; each environment has its checks (a smoke check, the Watcher's window) and its rollback | script + agent |
 | 9 | Learn | Weekly: what repeated twice becomes a rule or check work item; rules that do not pay off are removed | agent |
 
 ## Size and risk
@@ -23,9 +23,9 @@ Terms used in this project. Stage names follow the convergent pipeline of leadin
 | **S** | Small. The agent reads the code and writes the change; nothing is approved separately |
 | **M** | A feature within one module. Spec and plan, the Operator approves |
 | **L** | Touches many modules. Plus a codebase research document from a separate pass |
-| **R0** | Reversible and does not leave the system (docs, tests). Merges and deploys itself |
+| **R0** | Reversible and does not leave the system (docs, tests). Merges itself and ships with the next release |
 | **R1** | Regular code behind checks. The Operator reads the report with evidence and says yes |
-| **R2** | Irreversible or leaves the system (migrations, infrastructure, money, secrets). The Operator reads the code; "merge" deploys at once |
+| **R2** | Irreversible or leaves the system (migrations, infrastructure, money, secrets). The Operator reads the code |
 
 The agent proposes size and risk at intake; the Operator may correct them.
 
@@ -33,7 +33,8 @@ The agent proposes size and risk at intake; the Operator may correct them.
 
 | Store | What it holds | Today |
 |---|---|---|
-| Work items | Number, size, risk, state. The pipeline hub | GitHub Issues · Jira |
+| Work items | Number, size, risk; shows each item's state, which the engine holds. The pipeline hub for people | GitHub Issues · Jira |
+| Pipeline state | Per work item: state, rounds, verdicts, slices, approvals, the approved request text; per project: holds, releases, deployment records, rejected requests, rulings. The truth the pipeline acts on | the engine's own store |
 | Specs, plans and decisions | Spec, plan, research document; decision records (ADR) | files in the repo or the work item body |
 | Pull requests | Code change, evidence, review findings, verdict, explanation | PR (GitHub) · MR |
 | Check results | Test and check output tied to the commit | CI |
@@ -75,9 +76,22 @@ The agent proposes size and risk at intake; the Operator may correct them.
 | **ADR** | Architecture decision record: what was chosen, why, what was rejected |
 | **Sandbox** | A disposable isolated machine per agent session (one per slice, one for the Validator): network closed by default, push only through a proxy to one branch, no merge rights |
 | **Orchestrator** | The program that moves a work item along its states, starts every agent session in its own sandbox and enforces the limits (3 fix rounds, time and cost per session, at most 3 items waiting for the Operator) |
+| **Project map** | A file in the project's repository that names, for each operation the pipeline needs on the project's tools, the MCP tool and its arguments. Engine code makes the calls; a new project is a new map |
+| **Recipe** | A script in the project's repository for an action too long for the map, such as a deploy through a CI server |
+| **Setup agent** | The agent that composes a project's map when the project is connected, read-only, and proposes a fix when the map stops working |
+| **Environment** | A place a version runs. Kinds: shared (one build at a time), ephemeral (one per change), production. A project lists its environments in order, per service |
+| **Version** | An immutable reference to what runs: a git tag or commit |
+| **Candidate** | What runs on a pre-merge environment: the base branch with the item, or the items of one build, merged in |
+| **Promotion** | Putting a version into an environment; leaves a deployment record with a reason (normal, rollback) |
+| **Release** | The step that takes what is merged to production, and its record: the version and the list of items it carries |
+| **Environment gate** | A person's approval of a candidate on a pre-merge environment, bound to the candidate's git tree; exists only where a project declares it |
+| **Hold** | An item's claim on a shared environment for one service, recorded in the engine; other items of that service queue behind it |
+| **Insignificant paths** | Paths a project lists (a changelog, a version file, docs) whose differences between the approved tree and the merged one are shown apart |
+| **Urgent** | The Operator's mark on a work item: first in every queue, and a release starts as soon as it merges |
 | **Decision requests** | The only channel through which the pipeline asks the Operator anything: gates, questions, reports, the weekly summary |
 | **Pause** | The Operator's switch that stops new agent sessions; running ones finish to their next state |
 | **Traces** | A record of every agent session: steps and tool calls, verdicts, time, cost, Operator time |
-| **Rollback** | Return to the previous version after a failed rollout. The Watcher does it by itself; database migrations are never rolled back, only fixed forward |
-| **Watch window** | How long the Watcher watches a fresh deploy before the work item is Done (30 min by default, longer for R2) |
+| **Rollback** | Taking a failed release back: by reverting the culprit, by deploying the previous verified version, or, where nothing can be redeployed, forward only. Engine code does it on the Watcher's call or a red smoke check; database migrations are never rolled back, only fixed forward |
+| **Watch window** | How long the Watcher watches a fresh deploy before the work item is Done (30 min by default, longer for R2); one of the checks an environment may declare |
+| **Smoke check** | A real input sent through the system right after a deploy and traced to its result; one of the checks an environment may declare |
 | **Atlas** | The knowledge base in `research/atlas/`: what the world knows about each stage (areas S0–S18, X1–X11) |
