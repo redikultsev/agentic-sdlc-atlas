@@ -97,8 +97,8 @@ Problems, in the order they are worked. Each one ends as decisions in `docs/deci
 
 17 states now: TestReview and Releasing are new (`docs/states.md`).
 
-**Next for the pack (not started).** `implementations/archon/SPEC.md` describes the pack as built, before these decisions.
-1. Probe: can an Archon script call an MCP server directly? If not, a small MCP client in `.shared/`.
+**Next for the pack (step 1 done).** `implementations/archon/SPEC.md` describes the pack as built, before these decisions.
+1. ~~Probe: can an Archon script call an MCP server directly?~~ Done 2026-11-24: not through the engine, so the pack has its own client, `.shared/mcp.ts`, run against a real Jira MCP server under Bun (`research/atlas/research/2026-11-mcp-from-script.md`).
 2. Item identity: a tracker-neutral key (`PROJ-123` or `#12`) instead of `{repo, number}`; the item's document (`work/<key>`) holds the state; `states.ts` moves it there and adds the two states.
 3. `.shared/connector.ts`: the project map, the write rules of decision 47, the install check; it replaces the direct `forge('workitem.*')` and `gh api` calls in 36 files. Stub fixtures for a refused write, a difference with the tracker, an outage (decision 41). PR bodies say "Part of #n".
 4. `.pipeline/project.yaml`: `environments:` (kind, before or after merge, checks, gate and answerers, rollback, paths, insignificant paths, batch) and the release trigger, replacing `deploy.hook`; `unify-merge` gets the environment queue, the hold and TestReview; `unify-deploy` becomes release, deploy by recipe, the tree check and the rollback of decision 52.
