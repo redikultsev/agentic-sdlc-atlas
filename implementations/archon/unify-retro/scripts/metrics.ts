@@ -22,6 +22,11 @@
  *
  * A number with nothing to divide is null, never zero.
  *
+ * Beside the seven, one table (decision 59): the items of the window that have a provenance
+ * record, grouped by the pack version and the Implementer's model that built them, with
+ * items merged in the window, "changes" at the gates and rollbacks. Items without a record
+ * (built before it existed) are counted in a note.
+ *
  * Bound inputs: the workflow's INPUTS_REPO_HOST, INPUTS_REPO_PATH and INPUTS_SINCE.
  */
 
@@ -34,6 +39,7 @@ import { repoOf } from '../../.shared/repo.ts';
 import { stateOf } from '../../.shared/states.ts';
 import { untrusted } from '../../.shared/trust.ts';
 import { readWork } from '../../.shared/work.ts';
+import { implementerLabel, packLabel, readProvenance } from '../../.shared/provenance.ts';
 import { engineItems, hostJson, message, weekId } from './lib.ts';
 
 const UNIT: Record<string, number> = { m: 60_000, h: 3_600_000, d: 86_400_000, w: 604_800_000 };
@@ -96,6 +102,8 @@ async function main(): Promise<void> {
   let prsMerged = 0;
   let prsClosed = 0;
   const cases: Record<string, unknown>[] = [];
+  const built: { item: ItemKey; pack: string; implementer: string; merged: boolean; changes: number; rolledBack: boolean }[] = [];
+  let noRecord = 0;
 
   for (const entry of engine) {
     const key = itemOfRun(entry.item.key);
@@ -135,11 +143,13 @@ async function main(): Promise<void> {
     }
 
     // 3, 4, 6. Merged PRs and rounds.
+    let mergedNow = false;
     if (work.pr !== null) {
       try {
         const view = forge('pr.view', { selector: { kind: 'number', ref: { repo, number: work.pr } } });
         const merged = view?.pr.state === 'merged';
         if (merged && inWindow(view.timestamps?.merged_at)) {
+          mergedNow = true;
           prsMerged += 1;
           roundsMerged.push(work.rounds);
         } else if (view?.pr.state === 'closed' && inWindow(view.timestamps?.closed_at)) {
@@ -149,6 +159,9 @@ async function main(): Promise<void> {
         notes.push(`PR #${String(work.pr)} not read: ${message(error)}`);
       }
     }
+    const provenance = readProvenance(key);
+    if (provenance === null) noRecord += 1;
+    else built.push({ item: key, pack: packLabel(provenance), implementer: implementerLabel(provenance), merged: mergedNow, changes: work.changes, rolledBack: current === 'rolled-back' });
     for (const run of entry.runs) {
       if (!inWindow(run.startedAt)) continue;
       if (run.spend.usd !== null) usd += run.spend.usd;
@@ -184,6 +197,20 @@ async function main(): Promise<void> {
     if (known !== undefined) known.rollback = record?.watch?.reason ?? '';
   }
 
+  // Outcomes by pack version and Implementer model (decision 59).
+  const rolledBackItems = new Set(rollbacks.map(r => (r?.item === undefined ? '' : asKey(r.item))));
+  const rows = new Map<string, { pack: string; implementer: string; items: number; merged: number; changes: number; rollbacks: number }>();
+  for (const b of built) {
+    const id = `${b.pack} ${b.implementer}`;
+    const row = rows.get(id) ?? { pack: b.pack, implementer: b.implementer, items: 0, merged: 0, changes: 0, rollbacks: 0 };
+    row.items += 1;
+    if (b.merged) row.merged += 1;
+    row.changes += b.changes;
+    if (b.rolledBack || rolledBackItems.has(b.item)) row.rollbacks += 1;
+    rows.set(id, row);
+  }
+  if (noRecord > 0) notes.push(`${String(noRecord)} items have no provenance record and are not in the table by version`);
+
   // 7. Follow rate.
   const follow = followRates(since);
   if (follow.error !== null) notes.push(`follow rate not read: ${follow.error}`);
@@ -204,6 +231,7 @@ async function main(): Promise<void> {
     },
     counts: { items: engine.length, done, merged: prsMerged, closed_unmerged: prsClosed, cost_unknown_runs: costUnknownRuns },
     cases,
+    versions: [...rows.values()],
     notes,
   });
 }

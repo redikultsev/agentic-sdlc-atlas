@@ -1,6 +1,6 @@
 /**
  * Commit what the Implementer left in the worktree, push the slice branch and read the
- * remote head back. The slice ends `pushed` or `failed(reason)`: an Implementer that
+ * remote head back, and pass on the new tests with their red records (decision 58). The slice ends `pushed` or `failed(reason)`: an Implementer that
  * stopped, or one that changed nothing, is a failed slice; a scope stop (decision 37)
  * fails with the reason `scope: …` so the round asks the Operator instead of retrying.
  */
@@ -8,6 +8,7 @@
 import { emit, input, refuse } from 'archon:script';
 import { git, gitOrThrow } from '../../.shared/git.ts';
 import { nullableJson, isObject } from '../../.shared/inputs.ts';
+import { readTests } from '../../.shared/red.ts';
 
 function remoteHead(branch: string): string | null {
   const listed = git('ls-remote', '--heads', 'origin', branch);
@@ -25,8 +26,10 @@ try {
   const stepsSkipped = Array.isArray(done.steps_skipped) ? done.steps_skipped.map(String) : [];
   const discoveries = Array.isArray(done.discoveries) ? done.discoveries : [];
   const summary = String(done.summary ?? '');
+  // Red records go on as the Implementer gave them, trimmed; a test with neither output nor reason says so (decision 58).
+  const tests = readTests(done.tests);
   const end = (status: 'pushed' | 'failed', reason: string, head: string | null): void =>
-    emit({ status, reason, branch, head, steps_skipped: stepsSkipped, discoveries, summary });
+    emit({ status, reason, branch, head, tests, steps_skipped: stepsSkipped, discoveries, summary });
 
   if (done.branch !== branch) {
     end('failed', `the Implementer reports branch ${String(done.branch)}, the slice is on ${branch}`, null);

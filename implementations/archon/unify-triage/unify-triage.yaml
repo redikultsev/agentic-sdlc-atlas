@@ -256,12 +256,13 @@ nodes:
               question: { type: string }
               options: *options
               recommendation: *recommendation
+              kind: { type: string }
               size: { type: string, enum: [S, M, L] }
               risk: { type: string }
               outcome: { type: string }
               verdict_reason: { type: string }
               problems: { type: array, items: { type: string } }
-            required: [ok, reason, question, options, recommendation, size, risk, outcome, verdict_reason, problems]
+            required: [ok, reason, question, options, recommendation, kind, size, risk, outcome, verdict_reason, problems]
 
         # The Accept gate: the body's only sink. The run pauses here and releases its slot.
         - id: accept

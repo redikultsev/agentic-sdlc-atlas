@@ -31,6 +31,7 @@ card:
     - { id: for-human, label: "For a human", does: "Moves the item to ForHuman.", value: { effect: for-human } }
     - { id: wont-do, label: "Won't do", does: "Closes it as not planned.", value: { effect: wont-do } }
   recommendation: { option: accept, why: "stub: verdict", confidence: medium }
+  kind: feature
   size: S
   risk: R1
   outcome: accept

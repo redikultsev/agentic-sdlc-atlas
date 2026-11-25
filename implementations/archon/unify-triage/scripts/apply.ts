@@ -3,8 +3,9 @@
  * never by reading the answer's words. The answer is read from the run's node outcomes:
  * the gate is the only sink of the review loop, so no later node can reference it.
  *
- *   accept     size and risk labels, the ruling (if any text), `work.urgent` when the option
- *              carries `value.urgent` (decision 53), the move to Specifying (M, L) or
+ *   accept     size and risk labels, the ruling (if any text), the verdict's kind in
+ *              `work.kind` (decision 58), `work.urgent` when the option carries
+ *              `value.urgent` (decision 53), the move to Specifying (M, L) or
  *              Implementing (S), then the fire of unify-spec or unify-round
  *   for-human  the move to ForHuman and a comment saying why
  *   wont-do    the move to Cancelled, `pipeline:rejected`, a closing comment, closed not planned
@@ -31,7 +32,7 @@ async function main(): Promise<void> {
   const { repo, key } = runInputs();
   if (key === undefined) return;
   const t = tracker();
-  const card = JSON.parse(input('card')) as { ok: boolean; size: 'S' | 'M' | 'L'; risk: string; verdict_reason: string };
+  const card = JSON.parse(input('card')) as { ok: boolean; kind?: string; size: 'S' | 'M' | 'L'; risk: string; verdict_reason: string };
   const answer = lastAnswer('review', 'accept');
   if (answer === null) throw new Error('the Accept gate has no recorded answer');
   const effect = chosenEffect(answer, 'stop');
@@ -45,7 +46,14 @@ async function main(): Promise<void> {
       const names = [`size:${card.size.toLowerCase()}`, `risk:${card.risk.toLowerCase()}`];
       for (const name of names) await t.ensureLabel(name, 'ededed', 'Set by pipeline triage at Accept');
       await t.label(key, { add: names });
-      if (answer.value?.urgent === true && !updateWork(key, d => { d.urgent = true; }).urgent) throw new Error(`${key}: urgent did not read back`);
+      // The kind goes with the item: the round enforces red before green for a bug (decision 58).
+      const kind = typeof card.kind === 'string' && card.kind !== '' ? card.kind : null;
+      const urgent = answer.value?.urgent === true;
+      const kept = updateWork(key, d => {
+        d.kind = kind;
+        if (urgent) d.urgent = true;
+      });
+      if (kept.kind !== kind || (urgent && !kept.urgent)) throw new Error(`${key}: kind or urgent did not read back`);
       const small = card.size === 'S';
       const mismatch = await tryMove(key, ['triage-review'], small ? 'implementing' : 'specifying');
       if (mismatch !== null) throw new Error(mismatch);

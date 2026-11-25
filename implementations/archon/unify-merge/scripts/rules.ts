@@ -9,6 +9,11 @@
  * queue, after TestReview, back to the environment after the merge) asks no second gate.
  * Otherwise R0 lands, and anything else goes to the Merge gate with the head SHA on the
  * card, flags first (decision 24).
+ *
+ * Before either, the item's provenance record (decision 59, `.shared/provenance.ts`) is
+ * built and stored in `provenance/<key>` when it changed, and its one line goes on the
+ * request and into the PR description. It is written here, not in `merge-review`, because
+ * the request text is built here and an R0 merge never reaches `merge-review`.
  */
 
 import { emit, input } from 'archon:script';
@@ -21,6 +26,7 @@ import { buildRequest, card, NO_CARD, readItem, type Option } from './lib/item.t
 import { baseName, prChecks } from './lib/facts.ts';
 import { inHours, prAt, printAt, revertRate, staleKinds } from './lib/gate.ts';
 import { RECHECK } from './lib/envs.ts';
+import { provenanceLine, refreshProvenance, showOnPr } from '../../.shared/provenance.ts';
 
 const MANIFESTS = /(^|\/)(package\.json|package-lock\.json|yarn\.lock|pnpm-lock\.yaml|bun\.lockb?|go\.mod|go\.sum|Cargo\.toml|Cargo\.lock|requirements[^/]*\.txt|pyproject\.toml|poetry\.lock|uv\.lock|Gemfile(\.lock)?|composer\.(json|lock)|pom\.xml|build\.gradle(\.kts)?)$/;
 const CHANGES_CAP = 3;
@@ -87,6 +93,9 @@ async function main(): Promise<void> {
   }
   const checks = prChecks({ repo, number: pr.number });
   if (checks.state !== 'green') notR0.push(`checks at the head are ${checks.state}`);
+  const record = refreshProvenance(key, doc, { head: pr.head, fingerprint: print, base: `origin/${base}` });
+  const provenance = provenanceLine(key, record);
+  showOnPr(repo, pr.number, provenance);
   if (notR0.length === 0) {
     emit({ path: 'r0', r0: true, reasons: [], pr: pr.number, head: pr.head, fingerprint: print, stale: [], ...NO_CARD });
     return;
@@ -118,6 +127,7 @@ async function main(): Promise<void> {
         `${paths.length} files, ${lines} changed lines${deps.length > 0 ? `, new or changed dependencies: ${deps.join(', ')}` : ''}`,
         `open review threads: ${openThreads}`,
         `"changes" used: ${doc.changes} of ${CHANGES_CAP}`,
+        provenance,
         ...(doc.review !== null && doc.review.fingerprint === print ? [doc.review.explanation] : ['no review explanation at this fingerprint']),
       ],
     },

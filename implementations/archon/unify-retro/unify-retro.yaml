@@ -48,8 +48,21 @@ nodes:
           required: [operator_minutes_per_item, done_without_help, fix_rounds_to_green, prs_merged_share, rollbacks, cost_per_merged_change, follow_rate]
         counts: { type: object }
         cases: { type: array, items: { type: object } }
+        # Outcomes by pack version and Implementer model, from the provenance records (decision 59).
+        versions:
+          type: array
+          items:
+            type: object
+            properties:
+              pack: { type: string }
+              implementer: { type: string }
+              items: { type: integer }
+              merged: { type: integer }
+              changes: { type: integer }
+              rollbacks: { type: integer }
+            required: [pack, implementer, items, merged, changes, rollbacks]
         notes: { type: array, items: { type: string } }
-      required: [week, window, numbers, counts, cases, notes]
+      required: [week, window, numbers, counts, cases, versions, notes]
 
   - id: retro
     command: retro
@@ -118,6 +131,7 @@ nodes:
       week: "$metrics.output.week"
       metrics: { from: "$metrics.output.numbers" }
       counts: { from: "$metrics.output.counts" }
+      versions: { from: "$metrics.output.versions" }
       notes: { from: "$metrics.output.notes" }
       filed: { from: "$file.output.filed" }
       dropped: { from: "$file.output.dropped" }

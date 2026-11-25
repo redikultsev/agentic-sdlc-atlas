@@ -47,6 +47,7 @@ async function main(): Promise<void> {
     untrusted('item body', item.body),
     ...(rulings.length > 0 ? ['Rulings of the Operator on this item, newest last (they override the request):', ...rulings] : []),
     `Spec and plan, when the item has them: ${workDir}/spec.md and ${workDir}/plan.md on the branch.`,
+    ...(doc.kind === 'bug' ? ['This item is a bug fix: one new test must reproduce the bug, and its red output from before the fix goes in `tests` (decision 58).'] : []),
   ];
   const task = (id: string, issue: number | null, title: string, brief: string[], fix: boolean): SliceTask => ({
     id,

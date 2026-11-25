@@ -5,8 +5,9 @@
  * validator session that crashed, hit a limit or returned no valid verdict is read from
  * the engine's node outcomes and counted as a failed round, never as a pass. CI red
  * beyond the base, a fix verdict, a failed criterion, a skipped required step, a failed
- * slice or a join conflict each spend a round; a usage limit, an unavailable reviewer and
- * remaining slices spend none. Every verdict is recorded with the diff fingerprint. A
+ * slice, a join conflict and a bug fix whose new tests have no red record (decision 58)
+ * each spend a round; a usage limit, an unavailable reviewer and remaining slices spend
+ * none. Every verdict is recorded with the diff fingerprint. A
  * finding that comes back after a fix is marked so the next round fixes its whole class.
  * Confirmed thread findings join the fix; not confirmed ones get a reply with the evidence;
  * findings outside the change are filed as discoveries, at most 3 per item.
@@ -19,6 +20,7 @@ import { isObject } from '../../.shared/inputs.ts';
 import { type ItemKey, keySlug } from '../../.shared/item.ts';
 import { type Repo, runInputs } from '../../.shared/repo.ts';
 import { MARKS } from '../../.shared/states.ts';
+import { missingRed } from '../../.shared/red.ts';
 import { untrusted } from '../../.shared/trust.ts';
 import type { Verdict } from '../../.shared/work.ts';
 import { answerOf, bound, findingKey, moveAlong, readItem, updateItem, NO_CARD, type Card, type Finding, type ItemDoc } from './lib/item.ts';
@@ -101,6 +103,11 @@ async function main(): Promise<void> {
     if (ci.state === 'red') for (const id of ci.red) findings.push({ key: findingKey('ci', id), source: 'ci', text: `check red at ${head.slice(0, 12)}: ${id}` });
     if (ci.state === 'timeout') findings.push({ key: findingKey('ci', 'timeout'), source: 'ci', text: `CI did not finish at ${head.slice(0, 12)}; a missing verdict is never a pass` });
     for (const step of joined?.steps_skipped ?? []) findings.push({ key: findingKey('steps', step), source: 'steps', text: `a required step was skipped: ${step}` });
+    // Decision 58, enforced here and not only in the prompts: a bug fix with no red record is a required fix,
+    // judged once every planned slice is in (a later slice may bring the test that reproduces the bug).
+    const held = readItem(key);
+    const noRed = held.slices.some(s => s.status !== 'merged') ? null : missingRed(held.kind, held.redRecords);
+    if (noRed !== null) findings.push({ key: findingKey('red', 'bug fix without a red record'), source: 'red', text: noRed });
 
     if (ci.state === 'green' || ci.state === 'none') {
       if (reviewer === null || !reviewer.ready) {

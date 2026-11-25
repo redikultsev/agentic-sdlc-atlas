@@ -49,7 +49,7 @@ async function main(): Promise<void> {
   const lane = input('implement_lane') || 'auto';
   const evidence = JSON.parse(input('evidence')) as { ok: boolean; problems: string[]; verdict: Verdict };
   const v = evidence.verdict;
-  const base = { size: v.size, risk: v.risk, outcome: v.outcome, verdict_reason: v.reason, problems: evidence.problems };
+  const base = { kind: v.kind, size: v.size, risk: v.risk, outcome: v.outcome, verdict_reason: v.reason, problems: evidence.problems };
 
   const mismatch = await tryMove(key, ['triaging', 'triage-review'], 'triage-review');
   if (mismatch !== null) {

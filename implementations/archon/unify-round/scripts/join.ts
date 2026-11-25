@@ -3,18 +3,24 @@
  * A failed slice is recorded and stays out (its dependents wait); passing branches are
  * kept and merged. A merge conflict aborts the merge and ends the round: `round` counts
  * it and the next round's fix slice resolves it.
+ *
+ * Each merged slice's new tests with their red records and its skipped steps go into
+ * `work/<key>` (decision 58, `.shared/red.ts`): a planned slice by its id, so its re-run
+ * replaces them; a fix slice by this run, so earlier rounds keep theirs. `tests` is the
+ * item's whole list after this join, for the PR description and the reviewer.
  */
 
-import { emit, input } from 'archon:script';
+import { emit, input, runId } from 'archon:script';
 import { script } from '../../.shared/connector.ts';
 import { runInputs } from '../../.shared/repo.ts';
 import { git, gitOrThrow } from '../../.shared/git.ts';
 import { isObject } from '../../.shared/inputs.ts';
-import { bound, updateItem } from './lib/item.ts';
+import { allTests, readTests, sliceKey, withSlice, type SliceRecord } from '../../.shared/red.ts';
+import { bound, readItem, updateItem } from './lib/item.ts';
 import { baseName, fetchBranch } from './lib/facts.ts';
 
 interface Task { id: string; issue: number | null; branch: string; item_branch: string; base: string; fix: boolean }
-interface SliceEnd { status: string; reason: string; branch: string; head: string | null; steps_skipped: string[]; discoveries: unknown[]; summary: string }
+interface SliceEnd { status: string; reason: string; branch: string; head: string | null; tests?: unknown; steps_skipped: string[]; discoveries: unknown[]; summary: string }
 
 async function main(): Promise<void> {
   const { key } = runInputs();
@@ -24,7 +30,7 @@ async function main(): Promise<void> {
   const ends = bound<unknown[]>(input('slices')) ?? [];
   if (plan === null) throw new Error('frontier left no result');
   if (plan.slices.length === 0) {
-    emit({ go: false, outcome: 'none', pushed: [], failed: [], steps_skipped: [], discoveries: [], summaries: [], head: null });
+    emit({ go: false, outcome: 'none', pushed: [], failed: [], steps_skipped: [], discoveries: [], summaries: [], head: null, tests: allTests(readItem(key).redRecords) });
     return;
   }
   const itemBranch = plan.slices[0].item_branch;
@@ -37,6 +43,8 @@ async function main(): Promise<void> {
   const stepsSkipped: string[] = [];
   const discoveries: unknown[] = [];
   const summaries: string[] = [];
+  const records: SliceRecord[] = [];
+  const at = new Date().toISOString();
   let conflict: string | null = null;
   plan.slices.forEach((task, index) => {
     const end = ends[index];
@@ -66,10 +74,12 @@ async function main(): Promise<void> {
     }
     pushed.push(task.id);
     summaries.push(`${task.id}: ${slice.summary}`);
+    records.push({ key: sliceKey(task.id, task.fix, runId()), slice: task.id, at, tests: readTests(slice.tests), skipped: slice.steps_skipped });
   });
 
-  updateItem(key, doc => {
+  const doc = updateItem(key, doc => {
     doc.branch = itemBranch;
+    for (const entry of records) doc.redRecords = withSlice(doc.redRecords, entry);
     for (const task of plan.slices) {
       if (task.fix) continue;
       const status = pushed.includes(task.id) ? 'merged' as const : 'failed' as const;
@@ -84,7 +94,7 @@ async function main(): Promise<void> {
   });
   const head = gitOrThrow('rev-parse', 'HEAD');
   const outcome = conflict !== null ? 'conflict' : pushed.length === 0 ? 'failed' : 'joined';
-  emit({ go: outcome === 'joined', outcome, pushed, failed, steps_skipped: stepsSkipped, discoveries, summaries, head });
+  emit({ go: outcome === 'joined', outcome, pushed, failed, steps_skipped: stepsSkipped, discoveries, summaries, head, tests: allTests(doc.redRecords) });
 }
 
 await script('unify-round join', main);

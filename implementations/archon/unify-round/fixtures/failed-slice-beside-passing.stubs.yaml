@@ -10,7 +10,7 @@ base-ruling: {"go": true}
 implementing: {"ok": true, "mode": "implement", "branch": "pipeline/7"}
 frontier: {"slices": [{"id": "item", "issue": 7, "title": "stub: add the import command", "brief": "stub brief", "branch": "pipeline/7-slice-item", "item_branch": "pipeline/7", "base": "main", "progress": ".pipeline/work/7/progress/item.md", "work_dir": ".pipeline/work/7", "fix": false}, {"id": "s2", "issue": 7, "title": "stub: add the import command", "brief": "stub brief", "branch": "pipeline/7-slice-s2", "item_branch": "pipeline/7", "base": "main", "progress": ".pipeline/work/7/progress/s2.md", "work_dir": ".pipeline/work/7", "fix": false}], "left": 1, "fix": false}
 slices: [{"status": "pushed", "reason": "", "branch": "pipeline/7-slice-item", "head": "fixtureslice", "steps_skipped": [], "discoveries": [], "summary": "stub: added the command"}, {"archon_failed": true, "error": "stub: the child run failed", "status": "failed"}]
-join: {"go": true, "outcome": "joined", "pushed": ["item"], "failed": [{"id": "s2", "reason": "stub: the slice run ended with no result"}], "steps_skipped": [], "discoveries": [], "summaries": ["item: stub"], "head": "fixturehead"}
+join: {"go": true, "outcome": "joined", "pushed": ["item"], "failed": [{"id": "s2", "reason": "stub: the slice run ended with no result"}], "steps_skipped": [], "discoveries": [], "summaries": ["item: stub"], "head": "fixturehead", "tests": []}
 push: {"branch": "pipeline/7", "head": "fixturehead"}
 publish: {"pr": 11, "head": "fixturehead"}
 verifying: {"go": true, "pr": 11, "head": "fixturehead", "branch": "pipeline/7", "fingerprint": "fixtureprint", "criteria": [], "has_criteria": false, "spec": ""}

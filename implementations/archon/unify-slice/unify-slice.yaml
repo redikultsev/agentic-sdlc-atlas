@@ -57,6 +57,19 @@ nodes:
       properties:
         status: { type: string, enum: [done, failed, scope] }
         branch: { type: string }
+        # Red before green (decision 58): each new test with its failing output before the code, or why it has none.
+        tests:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              name: { type: string }
+              file: { type: string }
+              command: { type: string }
+              red: { type: [string, 'null'] }
+              why_no_red: { type: [string, 'null'] }
+            required: [name, file, command, red, why_no_red]
         steps_skipped: { type: array, items: { type: string } }
         discoveries:
           type: array
@@ -71,7 +84,7 @@ nodes:
         scope_question: { type: [string, 'null'] }
         reason: { type: string }
         summary: { type: string }
-      required: [status, branch, steps_skipped, discoveries, scope_question, reason, summary]
+      required: [status, branch, tests, steps_skipped, discoveries, scope_question, reason, summary]
 
   - id: commit
     script: commit
@@ -87,7 +100,8 @@ nodes:
         reason: { type: string }
         branch: { type: string }
         head: { type: [string, 'null'] }
+        tests: { type: array, items: { type: object } }
         steps_skipped: { type: array, items: { type: string } }
         discoveries: { type: array, items: { type: object } }
         summary: { type: string }
-      required: [status, reason, branch, head, steps_skipped, discoveries, summary]
+      required: [status, reason, branch, head, tests, steps_skipped, discoveries, summary]

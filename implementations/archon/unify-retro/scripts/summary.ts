@@ -6,7 +6,10 @@
  * The choice: the proposals go to Triage as they are (`noted`), or they are held until the
  * Operator approves each (`hold`: the label `pipeline:needs-approval` keeps intake away).
  *
- * Bound inputs: INPUTS_WEEK, INPUTS_METRICS, INPUTS_COUNTS and INPUTS_NOTES from metrics;
+ * The table by pack version and Implementer model (decision 59) follows the seven, one
+ * line per row, and is kept in the week's record too.
+ *
+ * Bound inputs: INPUTS_WEEK, INPUTS_METRICS, INPUTS_COUNTS, INPUTS_VERSIONS and INPUTS_NOTES from metrics;
  * INPUTS_FILED and INPUTS_DROPPED from file; INPUTS_SUMMARY from the Retro agent.
  */
 
@@ -32,6 +35,7 @@ async function main(): Promise<void> {
   const metrics = JSON.parse(input('metrics')) as Metrics;
   const counts = JSON.parse(input('counts')) as { items: number; done: number; merged: number; closed_unmerged: number };
   const notes = JSON.parse(input('notes') || '[]') as string[];
+  const versions = JSON.parse(input('versions') || '[]') as { pack: string; implementer: string; items: number; merged: number; changes: number; rollbacks: number }[];
   const filed = JSON.parse(input('filed') || '[]') as { key: string; title: string }[];
   const dropped = JSON.parse(input('dropped') || '[]') as { title: string; why: string }[];
   const retroSummary = input('summary').trim();
@@ -47,6 +51,9 @@ async function main(): Promise<void> {
     `Rollbacks: ${String(metrics.rollbacks)}`,
     `Cost per merged change: ${metrics.cost_per_merged_change === null ? 'n/a (nothing merged)' : `$${String(metrics.cost_per_merged_change)}`}`,
     `Recommendation followed, by request type: ${follow}`,
+    ...(versions.length === 0
+      ? ['By pack version and Implementer model: no item of the week has a provenance record']
+      : ['By pack version and Implementer model (items · merged · "changes" · rollbacks):', ...versions.map(v => `pack ${v.pack}, Implementer ${v.implementer}: ${String(v.items)} · ${String(v.merged)} · ${String(v.changes)} · ${String(v.rollbacks)}`)]),
     `Proposals filed for Triage: ${filed.length === 0 ? 'none' : filed.map(f => `${f.key} ${f.title}`).join('; ')}`,
     ...(dropped.length === 0 ? [] : [`Dropped: ${dropped.map(d => `${d.title} (${d.why})`).join('; ')}`]),
     ...(retroSummary === '' ? [] : [`The Retro's reading: ${retroSummary}`]),
@@ -67,7 +74,7 @@ async function main(): Promise<void> {
 
   for (let attempt = 0; attempt < 3; attempt++) {
     const found = state.get(`retro/${week}`);
-    const value = { week, metrics, counts, filed, dropped, notes, at: new Date().toISOString() };
+    const value = { week, metrics, counts, versions, filed, dropped, notes, at: new Date().toISOString() };
     if (state.put(`retro/${week}`, value, { ifRevision: found.revision }).ok) break;
   }
   emit({ ...request, filed: filed.map(f => f.key) });

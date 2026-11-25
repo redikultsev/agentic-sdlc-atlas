@@ -8,6 +8,7 @@
 
 import { state } from 'archon:script';
 import { asKey, type ItemKey, keySlug } from './item.ts';
+import type { SliceRecord } from './red.ts';
 
 export interface Verdict {
   readonly kind: 'ci' | 'review' | 'validator' | 'operator';
@@ -55,6 +56,10 @@ export interface WorkDoc {
   approvals: { env: string; service: string; commit: string; tree: string; by: string; at: string }[];
   /** The release that carries the item, once one took it (decision 48). */
   release: string | null;
+  /** What Triage found the item to be (bug, feature, chore, question), set at Accept; null for an item accepted before it was kept. */
+  kind: string | null;
+  /** Each slice run's new tests with their red record, and its skipped steps (decision 58; `red.ts`). */
+  redRecords: SliceRecord[];
 }
 
 export function emptyWork(): WorkDoc {
@@ -81,6 +86,8 @@ export function emptyWork(): WorkDoc {
     toggle: null,
     approvals: [],
     release: null,
+    kind: null,
+    redRecords: [],
   };
 }
 

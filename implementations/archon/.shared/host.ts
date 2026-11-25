@@ -31,7 +31,7 @@ export function archonCommand(): readonly string[] {
 }
 
 /** The JSON object a host command prints; a failed command or any other output throws. */
-function hostJson(args: readonly string[]): Record<string, unknown> {
+export function hostJson(args: readonly string[]): Record<string, unknown> {
   const result = Bun.spawnSync([...archonCommand(), ...args], { env: process.env, stdout: 'pipe', stderr: 'pipe' });
   let value: unknown;
   try {

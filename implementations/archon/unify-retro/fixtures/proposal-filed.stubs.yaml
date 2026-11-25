@@ -14,6 +14,7 @@ metrics:
   cases:
     - { item: "#7", state: done, rounds: 2, changes: 1 }
     - { item: "#8", state: blocked, rounds: 3, changes: 0 }
+  versions: []
   notes: ["operator minutes are an upper bound: the engine does not expose when a wait opened"]
 retro:
   proposals:

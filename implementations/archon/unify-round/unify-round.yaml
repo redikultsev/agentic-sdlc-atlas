@@ -265,7 +265,9 @@ nodes:
         discoveries: { type: array, items: { type: object } }
         summaries: { type: array, items: { type: string } }
         head: { type: [string, 'null'] }
-      required: [go, outcome, pushed, failed, steps_skipped, discoveries, summaries, head]
+        # The item's new tests with their red records, every round so far (decision 58).
+        tests: { type: array, items: { type: object } }
+      required: [go, outcome, pushed, failed, steps_skipped, discoveries, summaries, head, tests]
 
   - id: push
     script: push
@@ -412,6 +414,8 @@ nodes:
       ci: { from: "$ci.output" }
       flags: { from: "$guard.output.flags" }
       threads: "$threads.output.text"
+      # Red records of the new tests (decision 58); null when this round found a PR instead of building one.
+      tests: { from: "$join.output.tests", if_skipped: null }
     output_format:
       type: object
       additionalProperties: false

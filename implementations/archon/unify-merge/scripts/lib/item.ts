@@ -16,7 +16,7 @@ import { docName, readWork, updateWork, type WorkDoc } from '../../../.shared/wo
 /** One finding the next round must address, with where it came from. */
 export interface Finding {
   readonly key: string;
-  readonly source: 'ci' | 'review' | 'validator' | 'operator' | 'thread' | 'conflict' | 'slice' | 'steps';
+  readonly source: 'ci' | 'review' | 'validator' | 'operator' | 'thread' | 'conflict' | 'slice' | 'steps' | 'red';
   readonly text: string;
   /** decision 36 (2): the same finding came back after a fix, so the whole class is fixed. */
   readonly repeated: boolean;

@@ -10,7 +10,7 @@ base-ruling: {"go": true}
 implementing: {"ok": true, "mode": "implement", "branch": "pipeline/7"}
 frontier: {"slices": [{"id": "item", "issue": 7, "title": "stub: add the import command", "brief": "stub brief", "branch": "pipeline/7-slice-item", "item_branch": "pipeline/7", "base": "main", "progress": ".pipeline/work/7/progress/item.md", "work_dir": ".pipeline/work/7", "fix": false}], "left": 0, "fix": false}
 slices: [{"status": "pushed", "reason": "", "branch": "pipeline/7-slice-item", "head": "fixtureslice", "steps_skipped": [], "discoveries": [], "summary": "stub: added the command"}]
-join: {"go": false, "outcome": "conflict", "pushed": [], "failed": [{"id": "item", "reason": "merge conflict with pipeline/7: CONFLICT (content)"}], "steps_skipped": [], "discoveries": [], "summaries": ["item: stub"], "head": "fixturehead"}
+join: {"go": false, "outcome": "conflict", "pushed": [], "failed": [{"id": "item", "reason": "merge conflict with pipeline/7: CONFLICT (content)"}], "steps_skipped": [], "discoveries": [], "summaries": ["item: stub"], "head": "fixturehead", "tests": []}
 verifying: {"go": false, "pr": 0, "head": "", "branch": "", "fingerprint": "", "criteria": [], "has_criteria": false, "spec": ""}
 round: {"outcome": "fix", "spent": true, "rounds": 1, "effect": "", "summary": "stub: fix", "ask": false, "question": "", "options": [], "recommendation": null}
 next: {"did": "unify-round: queued"}
