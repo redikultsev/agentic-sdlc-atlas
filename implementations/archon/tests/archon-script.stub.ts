@@ -52,6 +52,12 @@ const state = {
     fake.docs.set(name, { revision: current + 1, value: structuredClone(value) });
     return { ok: true, revision: { revision: current + 1 } };
   },
+  delete(name: string, options: { ifRevision?: number } = {}) {
+    const current = fake.docs.get(name)?.revision ?? 0;
+    if (options.ifRevision !== undefined && current !== options.ifRevision) return { ok: false, conflict: 'revision_moved' };
+    fake.docs.set(name, { revision: current + 1, value: null });
+    return { ok: true, revision: { revision: current + 1 } };
+  },
   listValues(prefix = '') {
     return [...fake.docs.entries()]
       .filter(([name, doc]) => name.startsWith(prefix) && doc.value !== null)

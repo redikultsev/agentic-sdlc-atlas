@@ -12,6 +12,7 @@ prev-ruling: { go: true, over: false, mismatch: "", redo: 0, correction: "", rul
 planner:
   summary: "stub: two slices, the export endpoint first"
   toggle: null
+  discoveries: []
   slices:
     - { id: S1, title: "stub: export endpoint", files: [src/report/export.ts], risks: [], check: "bun test src/report", criteria: [AC1], blocked_by: [], changed_lines: 80 }
     - { id: S2, title: "stub: download button", files: [src/ui/report.tsx], risks: [], check: "bun test src/ui", criteria: [AC2], blocked_by: [S1], changed_lines: 40 }

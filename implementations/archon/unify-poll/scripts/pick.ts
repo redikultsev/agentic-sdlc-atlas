@@ -5,7 +5,9 @@
  * the pack setting `intake_label`, only items carrying that label count at all. An item
  * this poll already started triage for under the same delivery id is passed over, so one
  * triage run that ended without a state (refused, crashed) does not starve every item
- * behind it: revisit finds it.
+ * behind it: revisit finds it. People's requests go first: a request the daily pass made from
+ * the findings buffer (`pipeline:discovery`) is taken only when no person's request is new
+ * (decision 60); an urgent finding is taken with people's requests, oldest first.
  *
  * Inputs: repo_host, repo_path. Emits `{ found, number, delivery, title, passed }`;
  * `number` is the item key as the workflow input `number` takes it.
@@ -13,6 +15,7 @@
 
 import { emit, input } from 'archon:script';
 import { script, tracker } from '../../.shared/connector.ts';
+import { peopleFirst } from '../../.shared/findings.ts';
 import { issueNumber } from '../../.shared/item.ts';
 import { repoOf } from '../../.shared/repo.ts';
 import { MARKS } from '../../.shared/states.ts';
@@ -26,7 +29,7 @@ async function main(): Promise<void> {
   const repo = repoOf(input('repo_host'), input('repo_path'));
   const only = (input('intake_label') ?? '').trim();
   let passed = 0;
-  for (const item of await tracker().list(only || null)) {
+  for (const item of peopleFirst(await tracker().list(only || null))) {
     const { key, labels } = item;
     if (only !== '' && !labels.includes(only)) continue;
     if (labels.some(l => l.startsWith('state:'))) continue;

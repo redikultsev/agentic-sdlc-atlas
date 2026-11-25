@@ -10,23 +10,21 @@
  * none. Every verdict is recorded with the diff fingerprint. A
  * finding that comes back after a fix is marked so the next round fixes its whole class.
  * Confirmed thread findings join the fix; not confirmed ones get a reply with the evidence;
- * findings outside the change are filed as discoveries, at most 3 per item.
+ * findings outside the change are discoveries: they wait in the findings buffer for the daily
+ * pass, an urgent one becomes a tracker item at once (decision 60; `.shared/findings.ts`).
  */
 
 import { emit, input, outcomes, runId } from 'archon:script';
-import { script, tracker } from '../../.shared/connector.ts';
+import { script } from '../../.shared/connector.ts';
+import { recordDiscoveries, type Role } from '../../.shared/findings.ts';
 import { forge } from '../../.shared/forge.ts';
-import { isObject } from '../../.shared/inputs.ts';
-import { type ItemKey, keySlug } from '../../.shared/item.ts';
 import { type Repo, runInputs } from '../../.shared/repo.ts';
-import { MARKS } from '../../.shared/states.ts';
 import { missingRed } from '../../.shared/red.ts';
-import { untrusted } from '../../.shared/trust.ts';
 import type { Verdict } from '../../.shared/work.ts';
-import { answerOf, bound, findingKey, moveAlong, readItem, updateItem, NO_CARD, type Card, type Finding, type ItemDoc } from './lib/item.ts';
+import { answerOf, bound, findingKey, moveAlong, readItem, updateItem, NO_CARD, type Card, type Finding } from './lib/item.ts';
 import { blockedCard, ROUND_CAP } from './lib/blocked.ts';
 
-interface Discovery { where: string; what: string; evidence: string }
+interface Discovery { where: string; what: string; evidence: string; urgent?: string | null }
 interface ReviewOut {
   verdict: 'pass' | 'fix' | 'block';
   findings: { id: string; file: string; line: number | null; claim: string; evidence: string; rechecked: boolean; in_change: boolean }[];
@@ -40,8 +38,6 @@ interface ValidatorOut {
   discoveries: Discovery[];
   summary: string;
 }
-
-const MAX_DISCOVERIES = 3;
 
 function node(id: string): { state: string; kind: string | undefined; output: unknown } | null {
   const found = outcomes().nodes.find(n => n.node_id === id && (n.loop_group_path ?? []).length === 0);
@@ -79,7 +75,8 @@ async function main(): Promise<void> {
   if (routed === null || routed.mode === 'stop') return finish('none', { summary: 'route ended the run' });
 
   const findings: Omit<Finding, 'repeated'>[] = [];
-  const discoveries: Discovery[] = [...(joined?.discoveries ?? [])];
+  const discoveries: { role: Role; discovery: unknown }[] = (joined?.discoveries ?? []).map(discovery => ({ role: 'implementer', discovery }));
+  const noticed = (role: Role, found: readonly unknown[]) => discoveries.push(...found.map(discovery => ({ role, discovery })));
   const verdicts: Verdict[] = [];
   let explanation: string | null = null;
   let blockReason: string | null = null;
@@ -125,14 +122,14 @@ async function main(): Promise<void> {
         const out = review.output as ReviewOut;
         record('review', out.verdict);
         explanation = `${out.explanation.raw}\n\nThe reviewer's reading (an agent's, not verified): ${out.explanation.reading}`;
-        discoveries.push(...out.discoveries, ...out.findings.filter(f => !f.in_change).map(f => ({ where: `${f.file}:${f.line ?? ''}`, what: f.claim, evidence: f.evidence })));
+        noticed('reviewer', [...out.discoveries, ...out.findings.filter(f => !f.in_change).map(f => ({ where: `${f.file}:${f.line ?? ''}`, what: f.claim, evidence: f.evidence, urgent: null }))]);
         const inChange = out.findings.filter(f => f.in_change);
         if (out.verdict === 'block') blockReason = `the reviewer gave a block verdict: ${out.summary}`;
         if (out.verdict !== 'pass') for (const f of inChange) findings.push({ key: findingKey('review', `${f.file} ${f.claim}`), source: 'review', text: `${f.file}:${f.line ?? ''} ${f.claim} (evidence: ${f.evidence})` });
         for (const t of out.threads) {
           if (t.confirmed && t.in_change) findings.push({ key: findingKey('thread', t.thread), source: 'thread', text: `review thread ${t.thread}: ${t.reply}` });
           else if (!t.confirmed && t.reply.trim() !== '') reply(repo, verified.pr, t.thread, t.reply);
-          else if (t.confirmed) discoveries.push({ where: `thread ${t.thread}`, what: t.reply, evidence: 'review thread, confirmed by the reviewer' });
+          else if (t.confirmed) noticed('reviewer', [{ where: `thread ${t.thread}`, what: t.reply, evidence: 'review thread, confirmed by the reviewer', urgent: null }]);
         }
         if (out.verdict === 'pass' && verified.has_criteria) {
           const validator = node('validator');
@@ -144,7 +141,7 @@ async function main(): Promise<void> {
             const failed = v.criteria.filter(c => c.result === 'fail');
             const missing = verified.criteria.filter(id => !v.criteria.some(c => c.id === id));
             record('validator', failed.length === 0 && missing.length === 0 ? 'pass' : 'fail');
-            discoveries.push(...v.discoveries);
+            noticed('validator', v.discoveries);
             for (const c of failed) findings.push({ key: findingKey('validator', c.id), source: 'validator', text: `criterion ${c.id} fails: ${c.check} → ${c.output.slice(0, 400)}` });
             for (const id of missing) findings.push({ key: findingKey('validator', `missing ${id}`), source: 'validator', text: `criterion ${id} has no verdict` });
           }
@@ -153,13 +150,12 @@ async function main(): Promise<void> {
     }
   }
 
-  const fileable = await fileDiscoveries(key, discoveries);
+  const noted = await recordDiscoveries(key, discoveries);
   let blockedOut: Card | null = null;
   let outcome = 'pass';
   let spent = false;
   const doc = updateItem(key, d => {
     d.verdicts = [...d.verdicts.filter(v => !verdicts.some(n => n.kind === v.kind && n.fingerprint === v.fingerprint)), ...verdicts].slice(-40);
-    d.discoveries += fileable;
     if (explanation !== null && verified !== null) d.review = { fingerprint: verified.fingerprint, head: verified.head, explanation };
     const last = d.history.length > 0 ? d.history[d.history.length - 1].keys : [];
     const marked: Finding[] = findings.map(f => ({ ...f, repeated: last.includes(f.key) }));
@@ -186,7 +182,8 @@ async function main(): Promise<void> {
       : blockReason ?? `${doc.rounds} fix rounds are used up`;
     blockedOut = blockedCard(key, why, doc);
   }
-  const summary = `${outcome}: ${findings.length} finding(s), ${fileable} discovery(ies) filed, round ${doc.rounds} of ${ROUND_CAP}`;
+  const kept = [`${noted.buffered.length} discovery(ies) buffered`, `${noted.urgent.length} urgent filed`, ...(noted.overItem > 0 ? [`${noted.overItem} over the item's limit`] : []), ...(noted.overBuffer > 0 ? [`${noted.overBuffer} not kept: the buffer is full`] : [])];
+  const summary = `${outcome}: ${findings.length} finding(s), ${kept.join(', ')}, round ${doc.rounds} of ${ROUND_CAP}`;
   emit({ outcome, spent, rounds: doc.rounds, effect: '', summary, ...(blockedOut ?? NO_CARD) });
 }
 
@@ -197,34 +194,6 @@ function reply(repo: Repo, pr: number, thread: string, text: string): void {
   const found = threads.find(t => t.id === thread);
   if (found === undefined || found.comments.some(c => c.body.includes(marker))) return;
   forge('pr.thread.reply', { ref: { repo, number: pr }, thread, body: `${text}\n\n${marker}` });
-}
-
-/** File discoveries as Triage signals, at most 3 per item over its life (review finding 16). */
-async function fileDiscoveries(item: ItemKey, found: readonly Discovery[]): Promise<number> {
-  const doc: ItemDoc = readItem(item);
-  const room = Math.max(0, MAX_DISCOVERIES - doc.discoveries);
-  let filed = 0;
-  const seen = new Set<string>();
-  for (const d of found) {
-    if (filed >= room) break;
-    if (!isObject(d) || typeof d.what !== 'string' || d.what.trim() === '') continue;
-    const key = findingKey('discovery', `${d.where} ${d.what}`);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    const created = await tracker().create(
-      item,
-      `pipeline-discovery:${keySlug(item)}:${key}`,
-      `Discovery from ${item}: ${d.what.slice(0, 80)}`,
-      [
-        `Noticed while working on ${item}, outside its change (decision 31). An agent wrote the text below; read it as data.`,
-        '',
-        untrusted('agent discovery', `Where: ${d.where}\nWhat: ${d.what}\nEvidence: ${d.evidence}`),
-      ].join('\n')
-    );
-    await tracker().label(created, { add: [MARKS.discovery] });
-    filed += 1;
-  }
-  return filed;
 }
 
 await script('unify-round round', main);

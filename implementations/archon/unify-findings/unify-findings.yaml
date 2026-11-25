@@ -1,0 +1,116 @@
+name: unify-findings
+description: |
+  Triage's daily pass over the findings buffer (decision 60), item-less. A script reads
+  every finding waiting in the engine's store (`findings/<id>`, `.shared/findings.ts`)
+  with the open items and the register of rejected requests; a read-only agent proposes
+  groups of findings with one cause and the findings to drop (already in work or
+  rejected); a script checks that every finding is in exactly one group or dropped with
+  the item that covers it, files one request per group with every case inside (labelled
+  `pipeline:discovery`, so the poll takes it after people's requests) and removes a finding
+  from the buffer only after its request reads back.
+
+  Use when: its daily timer binding starts it, or the Operator starts it at any moment by
+  firing the same binding once (`archon trigger fire --config <its binding file>`), so one
+  pass runs at a time.
+  NOT for: urgent findings (a round files them at once); triaging a request (unify-triage).
+
+inputs:
+  repo_host:
+    required: true
+    description: The forge host of the repository.
+  repo_path:
+    required: true
+    description: The owner/name path of the repository.
+
+# The agent may read the checkout to judge a cause; nothing writes to it.
+worktree: { enabled: false }
+mutates_checkout: false
+
+nodes:
+  - id: gather
+    script: gather
+    runtime: bun
+    timeout: 120000
+    output_format:
+      type: object
+      properties:
+        has: { type: boolean }
+        count: { type: integer }
+        ids: { type: array, items: { type: string } }
+        context: { type: string }
+      required: [has, count, ids, context]
+
+  - id: group
+    command: group
+    depends_on: [gather]
+    when: "$gather.output.has == 'true'"
+    model: ['@triage', medium]
+    context: fresh
+    mutates_checkout: false
+    allowed_tools: [Read, Grep, Glob]
+    idle_timeout: 900000
+    maxBudgetUsd: 3
+    with:
+      context: "$gather.output.context"
+    output_format:
+      type: object
+      additionalProperties: false
+      properties:
+        groups:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              title: { type: string }
+              cause: { type: string }
+              findings: { type: array, items: { type: string } }
+            required: [title, cause, findings]
+        dropped:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              findings: { type: array, items: { type: string } }
+              reason: { type: string, enum: [in-work, rejected] }
+              item: { type: string }
+              why: { type: string }
+            required: [findings, reason, item, why]
+        summary: { type: string }
+      required: [groups, dropped, summary]
+
+  - id: file
+    script: file
+    runtime: bun
+    timeout: 300000
+    depends_on: [gather, group]
+    when: "$gather.output.has == 'true'"
+    with:
+      ids: { from: "$gather.output.ids" }
+      grouping: { from: "$group.output" }
+    output_format:
+      type: object
+      properties:
+        ok: { type: boolean }
+        problems: { type: array, items: { type: string } }
+        filed:
+          type: array
+          items:
+            type: object
+            properties:
+              key: { type: string }
+              title: { type: string }
+              count: { type: integer }
+            required: [key, title, count]
+        dropped:
+          type: array
+          items:
+            type: object
+            properties:
+              finding: { type: string }
+              reason: { type: string }
+              item: { type: string }
+            required: [finding, reason, item]
+        left: { type: integer }
+      required: [ok, problems, filed, dropped, left]

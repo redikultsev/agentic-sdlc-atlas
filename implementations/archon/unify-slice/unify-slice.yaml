@@ -80,7 +80,9 @@ nodes:
               where: { type: string }
               what: { type: string }
               evidence: { type: string }
-            required: [where, what, evidence]
+              # Null, or why it cannot wait for the daily pass: a vulnerability, data loss or broken production (decision 60).
+              urgent: { type: [string, 'null'] }
+            required: [where, what, evidence, urgent]
         scope_question: { type: [string, 'null'] }
         reason: { type: string }
         summary: { type: string }

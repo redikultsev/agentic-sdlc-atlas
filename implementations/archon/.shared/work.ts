@@ -36,7 +36,10 @@ export interface WorkDoc {
   base: { commit: string; failing: string[] } | null;
   slices: { id: string; issue: number | null; status: 'open' | 'pushed' | 'failed' | 'merged'; branch: string | null; blockedBy: string[] }[];
   verdicts: Verdict[];
+  /** Discoveries this item recorded, urgent ones included (decisions 31, 60); the Retro counts them. */
   discoveries: number;
+  /** The ids of those findings (`findings.ts`), so a later round that reports one again records nothing. */
+  findings: string[];
   /** Where the last fire of the next step went: admitted, queued, skipped or unknown. */
   lastFire: { what: string; disposition: string; at: string } | null;
   flags: string[];
@@ -76,6 +79,7 @@ export function emptyWork(): WorkDoc {
     slices: [],
     verdicts: [],
     discoveries: 0,
+    findings: [],
     lastFire: null,
     flags: [],
     fix: null,

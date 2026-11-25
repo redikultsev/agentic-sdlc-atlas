@@ -202,6 +202,19 @@ bindings:
       repo_host: { repo: host }
       repo_path: { repo: path }
 
+  # Triage's daily pass over the findings buffer (decision 60). The Operator starts it at
+  # any moment by firing this binding once (`archon trigger fire --config <file>`); the
+  # shared resource and overlap: skip keep it to one pass at a time.
+  unify-findings:
+    workflow: unify-findings
+    resource: findings
+    capacity: 1
+    overlap: skip
+    schedule: { interval_seconds: 86400 }
+    inputs:
+      repo_host: { repo: host }
+      repo_path: { repo: path }
+
   unify-retro:
     workflow: unify-retro
     resource: retro

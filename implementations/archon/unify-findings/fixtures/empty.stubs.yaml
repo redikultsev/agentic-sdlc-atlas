@@ -1,0 +1,6 @@
+# Nothing waits in the findings buffer: the pass ends at gather, no agent runs and nothing is filed.
+gather: { has: false, count: 0, ids: [], context: "" }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo }
+  expect: completed
+  reached: [gather]

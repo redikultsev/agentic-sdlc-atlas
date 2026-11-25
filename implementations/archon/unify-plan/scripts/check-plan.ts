@@ -6,7 +6,8 @@
  * command may fail at the base; it must start). Size is files and changed lines, never
  * time. A `toggle` is named only when the project declares toggles (decision 61). The
  * plan is committed to the item branch as `.pipeline/work/<key>/plan.md`; problems do not
- * stop the commit, the card shows them on top.
+ * stop the commit, the card shows them on top. The Planner's discoveries go to the findings
+ * buffer, or to the tracker at once when urgent (decision 60).
  *
  * Inputs: repo_host, repo_path, number, base; bound plan (the planner's output), criteria
  * (the spec's ids), toggles_declared (gather). Emits `{ ok, problems, url, slices, toggle }`.
@@ -14,6 +15,7 @@
 
 import { artifactsDir, emit, input } from 'archon:script';
 import { script } from '../../.shared/connector.ts';
+import { recordDiscoveries } from '../../.shared/findings.ts';
 import { type ItemKey, keySlug } from '../../.shared/item.ts';
 import { itemBranch, runInputs } from '../../.shared/repo.ts';
 import { commitFiles } from '../../.shared/stage.ts';
@@ -29,7 +31,7 @@ export interface Slice {
   changed_lines: number;
 }
 
-interface Plan { summary: string; slices: Slice[]; toggle?: string | null }
+interface Plan { summary: string; slices: Slice[]; toggle?: string | null; discoveries?: unknown[] }
 
 /** The plan's toggle, trimmed; null when it names none. */
 export function toggleOf(plan: Plan): string | null {
@@ -121,6 +123,8 @@ async function main(): Promise<void> {
   const problems = planProblems(plan, criteria, starts, input('toggles_declared') === 'true');
   const path = `.pipeline/work/${keySlug(key)}/plan.md`;
   const { commit } = commitFiles(input('base') || 'main', itemBranch(key), [{ path, text: render(key, plan, problems) }], `pipeline: plan for ${key}`, artifactsDir());
+  // Problems outside the item wait in the findings buffer; a redo round reporting one again records nothing (decision 60).
+  await recordDiscoveries(key, (plan.discoveries ?? []).map(discovery => ({ role: 'planner' as const, discovery })));
   emit({ ok: problems.length === 0, problems, url: `https://${repo.host}/${repo.path}/blob/${commit}/${path}`, slices: plan.slices, toggle: toggleOf(plan) });
 }
 

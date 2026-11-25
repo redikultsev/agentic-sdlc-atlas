@@ -46,8 +46,9 @@ $INPUTS.toggles
 - Slices that touch the same files are ordered with `blocked_by`, never parallel.
 - Size is files and `changed_lines` (your estimate of lines changed). Never write time estimates.
 - `risks`: what could break, in words a reviewer can check.
+- A problem you notice outside this work item is not added to the plan: return it as a discovery with where, what and the evidence (decision 31). `urgent` is null, unless it cannot wait a day: a vulnerability, data loss or broken production; then one line naming which and why. Every other discovery waits in the findings buffer for Triage's daily pass (decision 60), so marking it urgent only puts it ahead of people's requests.
 - `toggle`: only when the project declares toggles (the fact above says so). Name one toggle (one word: letters, digits, `.`, `-`, `_`) when the change should ship switched off and be turned on later, so that switching it off is the first rollback; the slices then build the new path behind it. Otherwise `null`. A toggle named while the project declares none is a check problem.
 
 ## What to return
 
-The JSON your output schema asks for: `summary` (three sentences at most), `slices` (each `id`, `title`, `files`, `risks`, `check`, `criteria`, `blocked_by`, `changed_lines`) and `toggle` (a name or `null`).
+The JSON your output schema asks for: `summary` (three sentences at most), `slices` (each `id`, `title`, `files`, `risks`, `check`, `criteria`, `blocked_by`, `changed_lines`), `toggle` (a name or `null`) and `discoveries` (each `where`, `what`, `evidence`, `urgent`; an empty list when none).

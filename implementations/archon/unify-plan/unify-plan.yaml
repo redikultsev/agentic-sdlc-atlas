@@ -251,7 +251,19 @@ nodes:
                   required: [id, title, files, risks, check, criteria, blocked_by, changed_lines]
               # The toggle the change ships behind (decision 61); null when none or when the project declares no toggles.
               toggle: { type: [string, 'null'] }
-            required: [summary, slices, toggle]
+              # Problems noticed outside the work item (decision 31); check-plan records them (decision 60).
+              discoveries:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    where: { type: string }
+                    what: { type: string }
+                    evidence: { type: string }
+                    urgent: { type: [string, 'null'] }
+                  required: [where, what, evidence, urgent]
+            required: [summary, slices, toggle, discoveries]
 
         - id: check-plan
           script: check-plan

@@ -1,0 +1,22 @@
+# The agent leaves a finding out: the script refuses the grouping whole, files nothing, and
+# the buffer waits for the next pass.
+gather:
+  has: true
+  count: 2
+  ids: [a1b2c3d4e5f60718, b2c3d4e5f6071829]
+  context: "stub: the buffer, the open items and the register"
+group:
+  groups:
+    - { title: "Import: an empty file crashes the parser", cause: "stub: no length check", findings: [a1b2c3d4e5f60718] }
+  dropped: []
+  summary: "stub: one group"
+file:
+  ok: false
+  problems: ["b2c3d4e5f6071829 is in no group and not dropped"]
+  filed: []
+  dropped: []
+  left: 2
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo }
+  expect: completed
+  reached: [gather, group, file]

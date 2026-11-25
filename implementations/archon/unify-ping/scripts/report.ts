@@ -2,7 +2,8 @@
  * The readable install report: one line per check, then what to fix. `ok` is true only
  * when every check that ran passed; a check that did not run (no bindings directory, no
  * test command) is named as such, never counted as passed. Codex is reported, not
- * counted: unify-round fails closed on it at run time.
+ * counted: unify-round fails closed on it at run time. So is the number of findings waiting
+ * in the findings buffer for the daily pass (decision 60).
  *
  * The deploys line says how `.pipeline/project.yaml` reads: each environment with its
  * kind, stage and declared steps, the release trigger and the toggles; shape A (no
@@ -13,6 +14,7 @@
  */
 
 import { emit, input, refuse } from 'archon:script';
+import { buffered, MAX_BUFFER } from '../../.shared/findings.ts';
 
 type Json = Record<string, unknown>;
 
@@ -62,6 +64,9 @@ function main(): void {
     ...list(tests.refusals).map(r => `guard refused: ${r}`),
     ...(deploys.ok === false ? ['fix .pipeline/project.yaml on the base (its format is in decision 48)'] : []),
   ];
+  // Reported, not counted: what waits for the daily pass (decision 60).
+  const waiting = buffered().length;
+  lines.push(`${mark(null)} findings buffer (reported only): ${waiting} of at most ${MAX_BUFFER} waiting for the daily pass (unify-findings)`);
   if (fixes.length > 0) lines.push('', 'To fix:', ...fixes.map(f => `- ${f}`));
   const counted = [labels.ok, access.ok, bindings.ok, tests.ok, deploys.ok];
   const ok = counted.every(value => value !== false);

@@ -205,7 +205,10 @@ export const MARKS = {
   approved: 'pipeline:approved',
   needsApproval: 'pipeline:needs-approval',
   rejected: 'pipeline:rejected',
+  /** A request the daily pass made from the findings buffer (decision 60); the poll takes it after people's requests. */
   discovery: 'pipeline:discovery',
+  /** A finding an agent marked urgent, filed at once without the buffer (decision 60). */
+  urgentFinding: 'pipeline:urgent-finding',
   rulings: 'pipeline:rulings',
   slice: 'pipeline:slice',
   retro: 'pipeline:retro',
