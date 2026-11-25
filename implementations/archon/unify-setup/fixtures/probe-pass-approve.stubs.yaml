@@ -1,0 +1,56 @@
+# The first round: the map passes the check and the probe on the test item; the card
+# recommends approve; the Operator approves and the map's PR is opened.
+repo: { host: github.com, path: example/repo, source: inputs }
+tools:
+  server_name: mcp-atlassian
+  count: 3
+  shown: 3
+  catalog: "stub: <untrusted source=\"the project's MCP server, tool jira_get_issue\">name: jira_get_issue</untrusted>"
+  mode: compose
+  current: ""
+  problem: ""
+  test_item: PROJ-1
+round: { last: false, redo: 0, comment: "", previous: "" }
+compose:
+  map: |
+    server: { command: uvx, args: [mcp-atlassian], env: { JIRA_PERSONAL_TOKEN: "${JIRA_TOKEN}" } }
+    url: "https://jira.example.com/browse/{key}"
+    key: "^PROJ-[0-9]+$"
+    operations:
+      view: { tool: jira_get_issue, args: { issue_key: "{key}" }, read: { title: fields.summary, body: fields.description, labels: fields.labels, open: { path: fields.status.statusCategory.key, not: [done] }, creator: { id: fields.creator.accountId, login: fields.creator.name } } }
+      comments: { tool: jira_get_issue, args: { issue_key: "{key}", fields: comment }, read: { list: fields.comment.comments, id: id, body: body, author: author.name } }
+      comment: { tool: jira_add_comment, args: { issue_key: "{key}", comment: "{body}" }, read: { id: id } }
+      label.add: { tool: jira_update_issue, args: { issue_key: "{key}", additional_fields: { update: { labels: [{ add: "{label}" }] } } } }
+      label.remove: { tool: jira_update_issue, args: { issue_key: "{key}", additional_fields: { update: { labels: [{ remove: "{label}" }] } } } }
+  notes: "stub: no tool links issues as sub-tasks of a task, so slice and blocked-by are left out"
+  assumptions: ["stub: labels are free text in this Jira (the update tool's schema takes a string)"]
+check: { ok: true, problems: [], missing: [], lacks: [create, close, list, slice, blocked-by, blockers, label-set-by, comment-edit] }
+probe:
+  ok: true
+  lines:
+    - { op: view, result: passed, detail: "\"Probe item\", open, 0 label(s), created by operator" }
+    - { op: comments, result: passed, detail: "0 comment(s)" }
+    - { op: label.add, result: passed, detail: "pipeline:probe added and read back" }
+    - { op: label.remove, result: passed, detail: "pipeline:probe removed and read back" }
+    - { op: comment, result: passed, detail: "comment 10001 written and read back" }
+card:
+  ok: true
+  reason: ""
+  question: "stub: The map passed the probe on PROJ-1. Open its PR to main, compose again, or stop?"
+  options:
+    - { id: approve, label: "Open the map's PR", does: "stub", value: { effect: approve } }
+    - { id: redo, label: "Compose again", does: "stub", value: { effect: redo } }
+    - { id: stop, label: "Stop", does: "stub", value: { effect: stop } }
+  recommendation: { option: approve, why: "stub: every operation the probe ran passed", confidence: medium }
+  last: false
+  probe_ok: true
+setup-gate: { decision: approve, text: "", value: { effect: approve, map: "stub", lines: [], lacks: [] } }
+publish: { effect: approve, pr: 42, url: "https://github.com/example/repo/pull/42", branch: "pipeline/setup/run-1", commit: "abc1234", summary: "stub: PR #42 opened" }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, server: '{"command":"uvx","args":["mcp-atlassian"],"env":{"JIRA_PERSONAL_TOKEN":"${JIRA_TOKEN}"}}', test_item: PROJ-1 }
+  expect: completed
+  authored: approve
+  reached: [repo, tools, round, compose, check, probe, card, setup-gate, rounds, publish]
+  resolved-text-contains:
+    setup-gate: "The map passed the probe on PROJ-1"
+    compose: "jira_get_issue"

@@ -1,0 +1,44 @@
+# The composed map has no label.remove: the check fails it, nothing is probed, the card
+# offers redo or stop, and the Operator stops; nothing is committed.
+repo: { host: github.com, path: example/repo, source: inputs }
+tools:
+  server_name: mcp-atlassian
+  count: 3
+  shown: 3
+  catalog: "stub: <untrusted source=\"the project's MCP server, tool jira_get_issue\">name: jira_get_issue</untrusted>"
+  mode: compose
+  current: ""
+  problem: ""
+  test_item: PROJ-1
+round: { last: false, redo: 0, comment: "", previous: "" }
+compose:
+  map: |
+    server: { command: uvx, args: [mcp-atlassian], env: { JIRA_PERSONAL_TOKEN: "${JIRA_TOKEN}" } }
+    url: "https://jira.example.com/browse/{key}"
+    operations:
+      view: { tool: jira_get_issue, args: { issue_key: "{key}" }, read: { title: fields.summary } }
+      comments: { tool: jira_get_issue, args: { issue_key: "{key}" }, read: { list: fields.comment.comments } }
+      comment: { tool: jira_add_comment, args: { issue_key: "{key}", comment: "{body}" } }
+      label.add: { tool: jira_update_issue, args: { issue_key: "{key}", labels: ["{label}"] } }
+  notes: "stub: no tool removes a label"
+  assumptions: []
+check: { ok: false, problems: ["required operation(s) missing: label.remove"], missing: [label.remove], lacks: [create, close, list, slice, blocked-by, blockers, label-set-by, comment-edit] }
+card:
+  ok: true
+  reason: ""
+  question: "stub: The composed map failed the check: required operation(s) missing: label.remove. Compose again, or stop?"
+  options:
+    - { id: redo, label: "Compose again", does: "stub", value: { effect: redo } }
+    - { id: stop, label: "Stop", does: "stub", value: { effect: stop } }
+  recommendation: { option: redo, why: "stub: the check names what to fix", confidence: high }
+  last: false
+  probe_ok: false
+setup-gate: { decision: stop, text: "", value: { effect: stop } }
+publish: { effect: stop, pr: 0, url: "", branch: "", commit: "", summary: "stub: stopped; nothing committed" }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, server: '{"command":"uvx","args":["mcp-atlassian"],"env":{"JIRA_PERSONAL_TOKEN":"${JIRA_TOKEN}"}}', test_item: PROJ-1 }
+  expect: completed
+  authored: stop
+  reached: [repo, tools, round, compose, check, card, setup-gate, rounds, publish]
+  resolved-text-contains:
+    setup-gate: "failed the check"

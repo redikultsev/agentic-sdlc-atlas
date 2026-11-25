@@ -1,6 +1,6 @@
 # Pack spec: the pipeline on Archon
 
-> **Behind the model since 2026-11-24.** This file describes the pack as built. Decisions 45–54 (`../../docs/decisions.md`) change it; built so far: the MCP client (`.shared/mcp.ts`), the state held by the engine with the 17 states, item keys, the tracker connector with the project map and the write rules of decision 47 (`.shared/connector.ts`, `.shared/map.ts`), environments, holds, TestReview, releases, rollback of a release and toggles (decisions 48–53, 61; `.shared/environments.ts`, `holds.ts`, `releases.ts`, `candidate.ts`). Not built: the setup workflow that composes a map; one build for several items (`batch`). Where this file and the decisions disagree, the decisions hold. The order of the rework: `../../docs/STATUS.md`, "Next for the pack".
+> **Behind the model since 2026-11-24.** This file describes the pack as built. Decisions 45–54 (`../../docs/decisions.md`) change it; built so far: the MCP client (`.shared/mcp.ts`), the state held by the engine with the 17 states, item keys, the tracker connector with the project map and the write rules of decision 47 (`.shared/connector.ts`, `.shared/map.ts`), environments, holds, TestReview, releases, rollback of a release and toggles (decisions 48–53, 61; `.shared/environments.ts`, `holds.ts`, `releases.ts`, `candidate.ts`). the setup workflow that composes and probes a map (`unify-setup`, `.shared/probe.ts`). Not built: one build for several items (`batch`). Where this file and the decisions disagree, the decisions hold. The order of the rework: `../../docs/STATUS.md`, "Next for the pack".
 
 What the pack contains, node by node, and why each node is an agent, a script or the Operator. Source of truth for behaviour: `../../model/engine.c4`, `../../docs/decisions.md`, `../../docs/states.md`. This file says how that behaviour is built on Archon (dev commit `f9d1d2b`). Order of work: `../../docs/build-plan.md`. Revised after the design review below.
 
@@ -36,6 +36,7 @@ A = agent, S = script, W = wait, L = loop_group. Item runs start with `S reconci
 | `unify-revisit` | schedule every 900 s, `overlap: skip` | S `blocked` (blocker closed: update the request) · S `orphans` (a running-state label with no live run, no queued start and no open request: a request; a run past the total time or cost limit: `archon workflow cancel` or `abandon` through `ARCHON_CLI_COMMAND`, one round counted) · S `stale` | — |
 | `unify-retro` | schedule every 604800 s | S `metrics` · A `retro` · S `file` (proposals as issues) · S `summary` | — |
 | `unify-ping` | by hand | install check; guard against the project's test suite; `gh api` access; Codex credentials; bindings directory | — |
+| `unify-setup` | by hand (`--no-item --inputs`: server, test item, mode) | S `tools` (the MCP server's tools; fix mode: the current map) · L at most 4 rounds { S `round` · A `compose` (read-only) · S `check` (parse, required operations) · S `probe` (on the test item) · S `card` · W `setup-gate` (approve / redo with a comment / stop) } · S `publish` | approve: a PR with `.pipeline/tracker.yaml` for the Operator to merge (R2) |
 
 A usage limit is not a failure: Archon pauses the run at the provider's limit and resumes it at the reset, so no round is spent. Codex cost is estimated by `round` from the run's token usage.
 
@@ -47,6 +48,7 @@ A usage limit is not a failure: Archon pauses the run at the provider's limit an
 | `holds.ts` | the hold and queue of a shared environment per service, handed over at once to the first queued item in Verifying; an item sent back with changes is marked to return first; one delivery id per handover | 51, 53 |
 | `releases.ts` | release records, the previous verified version, the blocked line, the rollback plan, the runs under the key `release` (a release whose run died is resumed by the next one) | 48, 52, 61 |
 | `candidate.ts` | the candidate commit (base + item branches, `git merge-tree`), the restricted tree, the files that differ | 49 |
+| `probe.ts` | the probe of a map on one test item: each declared operation through the connector, passed, failed or not probed; nothing created or closed | 46 |
 | `connector.ts` | the one way to the tracker, by item key: read, comment, label, create, close, list, links; the write ledger, read-back, the outage queue, refusals; the code-host adapter; `script()` that runs a script's main and closes the connector | 45, 46, 47 |
 | `map.ts` | the project map `.pipeline/tracker.yaml`: format, install check, the MCP adapter | 46, 47 |
 | `states.ts` | the 17 states and the allowed moves; the engine's state in `work/<key>`, shown as a label through the connector; a difference with the tracker and its two answers | 28, 45 |
@@ -78,6 +80,7 @@ Aliases in `.archon/config.yaml`; every `model:` is a list of at least two entri
 | validator | `[@validator, large]` | criteria, the running app | per criterion: pass or fail, runnable check and output |
 | watcher | `[@watcher, medium]` | numbers from `signals`, the PR diff | clean / regression in this PR / unclear / unsure, coverage |
 | retro | `[@retro, large]` | traces, corrections, rounds, rollbacks | proposals with cases |
+| setup (compose) | `[@setup, large]`, read-only | the project's MCP tools as marked data, the map format, the current map and the problem (fix mode), the last probe and the Operator's comment | the map, notes, assumptions |
 
 ## Tests
 

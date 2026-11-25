@@ -17,6 +17,7 @@
     "unify-revisit": "unify-revisit/unify-revisit.yaml",
     "unify-retro": "unify-retro/unify-retro.yaml",
     "unify-ping": "unify-ping/unify-ping.yaml",
-    "unify-slice": "unify-slice/unify-slice.yaml"
+    "unify-slice": "unify-slice/unify-slice.yaml",
+    "unify-setup": "unify-setup/unify-setup.yaml"
   }
 }

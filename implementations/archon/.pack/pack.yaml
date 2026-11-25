@@ -190,6 +190,18 @@ bindings:
       repo_path: { repo: path }
       unify_merge_binding: { binding: unify-merge }
 
+  # Connecting the tracker (decision 46), started by hand and about no item: the Operator
+  # fires it with `--no-item --inputs <file>` naming server, test_item, and for a fix
+  # mode and problem. One setup at a time; a second fire while one waits is dropped.
+  unify-setup:
+    workflow: unify-setup
+    resource: setup
+    capacity: 1
+    overlap: skip
+    inputs:
+      repo_host: { repo: host }
+      repo_path: { repo: path }
+
   unify-retro:
     workflow: unify-retro
     resource: retro

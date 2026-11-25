@@ -1,0 +1,244 @@
+name: unify-setup
+description: |
+  Connects a project's tracker (decision 46), run by hand. Reads the tools of the project's
+  MCP server read-only, has the Setup agent compose the project map
+  (.pipeline/tracker.yaml: for each operation the pipeline needs, the tool, its arguments
+  and where each field of the answer is), checks it by script (it parses, names the
+  server passed, has the required view, comments, comment, label.add and label.remove),
+  probes it on one test item the Operator set aside (view, comments, a probe label added
+  and removed, a probe comment, and the optional reads it declares; nothing is created or
+  closed), and puts it to the Operator: approve opens a PR to the base with the map,
+  which is R2 and merged by the Operator; redo composes again with the probe result and
+  a comment (at most three redos); stop ends the run. In fix mode the agent starts from
+  the current map on the base and the failure the pipeline reported.
+
+  Use when: a project whose tracker is not the code host's issues is connected, or its
+  map stopped working (a renamed field, a new required argument): mode fix with the
+  failure text.
+  NOT for: a project whose tracker is the code host's issues (it needs no map); checking
+  an installed pack (unify-ping); working an item (every other unify-* workflow).
+
+inputs:
+  repo_host:
+    default: ""
+    description: The forge host of the repository; empty, with repo_path empty too, reads the checkout's origin remote.
+  repo_path:
+    default: ""
+    description: The owner/name path of the repository.
+  server:
+    required: true
+    description: >-
+      The project's MCP server as JSON, the shape .shared/map.ts describes:
+      {"command": ..., "args": [...], "env": {...}} or {"type": "http", "url": ..., "headers": {...}}.
+      A credential is named as an environment variable reference (dollar sign, name in
+      braces), never written; the run's environment supplies it.
+  test_item:
+    required: true
+    description: The key of an item the Operator set aside for the probe (such as PROJ-123); it gets a probe label (removed again) and a probe comment.
+  mode:
+    default: compose
+    description: "compose: a new map. fix: start from the current map on the base and the problem text."
+  problem:
+    default: ""
+    description: Fix mode only, the failure text the pipeline reported with the current map.
+
+returns: { node: publish, outcome: effect }
+
+# The agent reads the launch checkout; the map is committed to its branch by plumbing.
+worktree: { enabled: false }
+mutates_checkout: false
+
+nodes:
+  - id: repo
+    script: repo
+    runtime: bun
+    timeout: 60000
+    output_format:
+      type: object
+      properties:
+        host: { type: string }
+        path: { type: string }
+        source: { type: string }
+      required: [host, path, source]
+
+  - id: tools
+    script: tools
+    runtime: bun
+    timeout: 180000
+    output_format:
+      type: object
+      properties:
+        server_name: { type: string }
+        count: { type: integer }
+        shown: { type: integer }
+        catalog: { type: string }
+        mode: { type: string, enum: [compose, fix] }
+        current: { type: string }
+        problem: { type: string }
+        test_item: { type: string }
+      required: [server_name, count, shown, catalog, mode, current, problem, test_item]
+
+  # At most three redos. The setup gate is the body's only sink; redo or "other" (a
+  # comment) runs another round, anything else ends the loop. A redo answered on the last
+  # round ends it too, and publish commits nothing.
+  - id: rounds
+    depends_on: [repo, tools]
+    loop_group:
+      max_iterations: 4
+      on_exhausted: complete
+      until_bash: 'd=$setup-gate.output.decision; [ "$d" != other ] && [ "$d" != redo ]'
+      nodes:
+        - id: round
+          script: round
+          runtime: bun
+          timeout: 60000
+          with:
+            prev_decision: "$LOOP_PREV.setup-gate.output.decision"
+            prev_text: "$LOOP_PREV.setup-gate.output.text"
+            prev_map: "$LOOP_PREV.compose.output.map"
+            prev_check: "$LOOP_PREV.check.output"
+            prev_probe: "$LOOP_PREV.probe.output"
+          output_format:
+            type: object
+            properties:
+              last: { type: boolean }
+              redo: { type: integer }
+              comment: { type: string }
+              previous: { type: string }
+            required: [last, redo, comment, previous]
+
+        # Read-only: it reads the tools as marked data and the checkout; it writes nothing.
+        - id: compose
+          command: setup
+          depends_on: [round]
+          model: ['@setup', large]
+          context: fresh
+          idle_timeout: 900000
+          maxBudgetUsd: 5
+          allowed_tools: [Read, Grep, Glob]
+          with:
+            mode: "$tools.output.mode"
+            server: "$INPUTS.server"
+            test_item: "$tools.output.test_item"
+            catalog: "$tools.output.catalog"
+            current: "$tools.output.current"
+            problem: "$tools.output.problem"
+            previous: "$round.output.previous"
+            comment: "$round.output.comment"
+          output_format:
+            type: object
+            additionalProperties: false
+            properties:
+              map: { type: string }
+              notes: { type: string }
+              assumptions: { type: array, items: { type: string } }
+            required: [map, notes, assumptions]
+
+        - id: check
+          script: check
+          runtime: bun
+          timeout: 60000
+          depends_on: [compose]
+          with:
+            map: "$compose.output.map"
+            test_item: "$tools.output.test_item"
+          output_format:
+            type: object
+            properties:
+              ok: { type: boolean }
+              problems: { type: array, items: { type: string } }
+              missing: { type: array, items: { type: string } }
+              lacks: { type: array, items: { type: string } }
+            required: [ok, problems, missing, lacks]
+
+        - id: probe
+          script: probe
+          runtime: bun
+          timeout: 300000
+          depends_on: [check]
+          when: "$check.output.ok == 'true'"
+          with:
+            map: "$compose.output.map"
+            test_item: "$tools.output.test_item"
+          output_format:
+            type: object
+            properties:
+              ok: { type: boolean }
+              lines:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    op: { type: string }
+                    result: { type: string, enum: [passed, failed, not-probed] }
+                    detail: { type: string }
+                  required: [op, result, detail]
+            required: [ok, lines]
+
+        - id: card
+          script: card
+          runtime: bun
+          timeout: 60000
+          depends_on: [round, compose, check, probe]
+          trigger_rule: none_failed_min_one_success
+          with:
+            round: { from: "$round.output" }
+            compose: { from: "$compose.output" }
+            check: { from: "$check.output" }
+            probe: { from: "$probe.output", if_skipped: null }
+            test_item: "$tools.output.test_item"
+          output_format:
+            type: object
+            properties:
+              ok: { type: boolean }
+              reason: { type: string }
+              question: { type: string }
+              options:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string }
+                    label: { type: string }
+                    does: { type: string }
+                    value: { type: object }
+                  required: [id, label, does, value]
+              recommendation:
+                type: object
+                properties:
+                  option: { type: string }
+                  why: { type: string }
+                  confidence: { type: string, enum: [low, medium, high] }
+                required: [option, why, confidence]
+              last: { type: boolean }
+              probe_ok: { type: boolean }
+            required: [ok, reason, question, options, recommendation, last, probe_ok]
+
+        - id: setup-gate
+          depends_on: [card]
+          wait:
+            attention: "$card.output.question"
+            form: select
+            options: "$card.output.options"
+            recommendation: "$card.output.recommendation"
+            other: true
+            labels: { gate: setup, stage: setup }
+
+  - id: publish
+    script: publish
+    runtime: bun
+    timeout: 300000
+    depends_on: [rounds]
+    with:
+      host: "$repo.output.host"
+      path: "$repo.output.path"
+    output_format:
+      type: object
+      properties:
+        effect: { type: string, enum: [approve, stop] }
+        pr: { type: integer }
+        url: { type: string }
+        branch: { type: string }
+        commit: { type: string }
+        summary: { type: string }
+      required: [effect, pr, url, branch, commit, summary]
