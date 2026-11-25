@@ -2,6 +2,8 @@
 # node outcomes and counts it as a failed round, never a pass; the next round is
 # fired. A dry run cannot fail an agent node, so the review stub stands in and the
 # round stub carries the classification.
+skills-review: { text: "stub: the review role's skills", pack: [], project: null }
+skills-validator: { text: "stub: the validator role's skills", pack: [], project: null }
 reconcile: {"ok": true, "state": "triage-review", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
 reconcile-ruling: {"go": true}
 rounds: {"go": true, "at_cap": false, "rounds": 0, "ask": false, "question": "", "options": [], "recommendation": null}

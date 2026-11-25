@@ -32,6 +32,34 @@ inputs:
     description: Absolute path of the binding file that starts unify-merge.
 
 nodes:
+  # The review agent's skills: the pack's for its role and the project's .pipeline/skills file (decision 67).
+  - id: skills-review
+    script: skills
+    runtime: bun
+    timeout: 120000
+    with: { role: review }
+    output_format:
+      type: object
+      properties:
+        text: { type: string }
+        pack: { type: array, items: { type: string } }
+        project: { type: [string, 'null'] }
+      required: [text, pack, project]
+
+  # The validator agent's skills: the pack's for its role and the project's .pipeline/skills file (decision 67).
+  - id: skills-validator
+    script: skills
+    runtime: bun
+    timeout: 120000
+    with: { role: validator }
+    output_format:
+      type: object
+      properties:
+        text: { type: string }
+        pack: { type: array, items: { type: string } }
+        project: { type: [string, 'null'] }
+      required: [text, pack, project]
+
   # ---- start check -------------------------------------------------------------------
   - id: reconcile
     script: reconcile
@@ -400,12 +428,13 @@ nodes:
   # green (or check-less) CI only: red CI is already a fix round.
   - id: review
     command: review
-    depends_on: [verifying, ci, guard, threads, reviewer-ready]
+    depends_on: [verifying, ci, guard, threads, reviewer-ready, skills-review]
     when: "$reviewer-ready.output.ready == 'true' && $ci.output.state == 'green' || $reviewer-ready.output.ready == 'true' && $ci.output.state == 'none'"
     model: ['@review', large]
     idle_timeout: 900000
     mutates_checkout: false
     with:
+      skills: "$skills-review.output.text"
       number: "$INPUTS.number"
       pr: "$verifying.output.pr"
       head: "$verifying.output.head"
@@ -472,12 +501,13 @@ nodes:
   # a pass: review findings change code and would void a validation (decision 23).
   - id: validator
     command: validator
-    depends_on: [verifying, review]
+    depends_on: [verifying, review, skills-validator]
     when: "$review.output.verdict == 'pass' && $verifying.output.has_criteria == 'true'"
     model: ['@validator', large]
     idle_timeout: 900000
     maxBudgetUsd: 15
     with:
+      skills: "$skills-validator.output.text"
       number: "$INPUTS.number"
       pr: "$verifying.output.pr"
       head: "$verifying.output.head"

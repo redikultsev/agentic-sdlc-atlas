@@ -1,5 +1,6 @@
 # The Operator fires the binding naming the deps scout, which has 2 findings waiting for the
 # daily pass: it is at its limit, so no agent runs and nothing is written.
+skills-scout: { text: "stub: the scout role's skills", pack: [], project: null }
 pick:
   has: false
   scout: ""

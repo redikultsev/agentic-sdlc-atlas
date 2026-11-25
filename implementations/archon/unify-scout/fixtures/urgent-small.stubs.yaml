@@ -1,5 +1,6 @@
 # A scout with a budget of 1 USD looks under the smallest cap (look-small) and marks one
 # finding urgent: it is filed at once as a tracker item, not buffered.
+skills-scout: { text: "stub: the scout role's skills", pack: [], project: null }
 pick:
   has: true
   scout: auth

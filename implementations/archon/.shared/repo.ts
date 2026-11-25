@@ -11,6 +11,7 @@
 
 import { input, refuse } from 'archon:script';
 import { asKey, type ItemKey, keySlug, parseKey } from './item.ts';
+import { fromBase } from './policy.ts';
 
 export interface Repo {
   readonly host: string;
@@ -41,9 +42,27 @@ export function itemOf(raw: string | undefined): ItemKey | undefined {
 /** The engine's key for the runs of an item; it lives in `item.ts`, which the read server shares. */
 export { runKey } from './item.ts';
 
-/** The branch that collects an item's change. */
+let branchTemplate: string | null = null;
+
+/**
+ * The branch that collects an item's change: `pipeline/<key>` unless the project's
+ * `.pipeline/project.yaml` names its own convention as `branch`, a template with `{key}`
+ * (for example `fix/{key}`, so `fix/PROJ-123`). Read once per script from the base.
+ */
 export function itemBranch(item: ItemKey | number): string {
-  return `pipeline/${keySlug(asKey(item))}`;
+  if (branchTemplate === null) {
+    let template = 'pipeline/{key}';
+    try {
+      const text = fromBase(input('base') || 'main', '.pipeline/project.yaml');
+      const set = text === null ? undefined : (Bun.YAML.parse(text) as { branch?: unknown } | null)?.branch;
+      if (typeof set === 'string' && set.includes('{key}')) template = set.trim();
+    } catch {
+      // An unreadable project file is reported where its policy is read; the default name stands.
+    }
+    if (!/^[A-Za-z0-9._/{}-]+$/.test(template) || /(^\/|\/$|\.\.|\/\/)/.test(template)) throw new Error(`project.yaml: branch '${template}' is not a branch name template`);
+    branchTemplate = template;
+  }
+  return branchTemplate.replaceAll('{key}', keySlug(asKey(item)));
 }
 
 /** Inputs every pack workflow declares, read once per script. */

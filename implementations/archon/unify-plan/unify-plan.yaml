@@ -31,6 +31,34 @@ worktree: { enabled: false }
 mutates_checkout: false
 
 nodes:
+  # The researcher agent's skills: the pack's for its role and the project's .pipeline/skills file (decision 67).
+  - id: skills-researcher
+    script: skills
+    runtime: bun
+    timeout: 120000
+    with: { role: researcher }
+    output_format:
+      type: object
+      properties:
+        text: { type: string }
+        pack: { type: array, items: { type: string } }
+        project: { type: [string, 'null'] }
+      required: [text, pack, project]
+
+  # The planner agent's skills: the pack's for its role and the project's .pipeline/skills file (decision 67).
+  - id: skills-planner
+    script: skills
+    runtime: bun
+    timeout: 120000
+    with: { role: planner }
+    output_format:
+      type: object
+      properties:
+        text: { type: string }
+        pack: { type: array, items: { type: string } }
+        project: { type: [string, 'null'] }
+      required: [text, pack, project]
+
   - id: reconcile
     script: reconcile
     runtime: bun
@@ -130,13 +158,14 @@ nodes:
   # L items only: research first.
   - id: researcher
     command: researcher
-    depends_on: [gather]
+    depends_on: [gather, skills-researcher]
     when: "$gather.output.size == 'L'"
     model: ['@researcher', large]
     context: fresh
     idle_timeout: 900000
     maxBudgetUsd: 5
     with:
+      skills: "$skills-researcher.output.text"
       context: "$gather.output.context"
       spec: "$gather.output.spec"
       base_commit: "$gather.output.base_commit"
@@ -189,7 +218,7 @@ nodes:
   # At most three plans. The PlanReview gate is the body's only sink; "other" or the
   # declared redo runs another round, anything else ends the loop.
   - id: rounds
-    depends_on: [check-refs]
+    depends_on: [check-refs, skills-planner]
     loop_group:
       max_iterations: 4
       until_bash: 'd=$plan-gate.output.decision; [ "$d" != other ] && [ "$d" != redo ]'
@@ -222,6 +251,7 @@ nodes:
           idle_timeout: 900000
           maxBudgetUsd: 5
           with:
+            skills: "$skills-planner.output.text"
             context: "$gather.output.context"
             spec: "$gather.output.spec"
             research: "$check-refs.output.research"

@@ -1,5 +1,6 @@
 # The timer's tick: the one declared scout looked yesterday and is weekly, so nothing is due;
 # the run ends at pick, no agent runs and nothing is written.
+skills-scout: { text: "stub: the scout role's skills", pack: [], project: null }
 pick:
   has: false
   scout: ""

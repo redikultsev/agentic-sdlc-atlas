@@ -1,4 +1,5 @@
 # Won't do: Cancelled, pipeline:rejected, a closing comment, closed not planned.
+skills-triage: { text: "stub: the triage role's skills", pack: [], project: null }
 reconcile: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, state: none }
 trust: { proceed: true, author: "anna", reason: "stub: `anna` is a trusted author" }
 enter: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, go: true, ask: false }
@@ -17,6 +18,10 @@ triage:
   duplicates: []
   assumptions: [{ text: "stub: CSV only", source: "the request" }]
   data_sources: "none: the project declares no logs or alerts"
+  headline: "stub: what is wrong, in one sentence"
+  checks: ["stub: reproduced in 3 of 3 runs"]
+  not_checked: ["stub: I did not open the production logs"]
+  cause_chain: ["stub: input", "stub: what the code did", "stub: wrong output"]
 evidence:
   ok: true
   problems: []

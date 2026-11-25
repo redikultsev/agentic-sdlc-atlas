@@ -1,8 +1,9 @@
 /**
  * File the Retro's proposals as items labelled `pipeline:retro`, for Triage. A proposal
  * is filed only when it rests on at least two distinct cases the metrics named (a lesson
- * is what repeated twice, decision 27) and names a file; the others are dropped and
- * reported. The marker is the week and the proposal's title, so a retry or a second run
+ * is what repeated twice, decision 27), names a file and names its cost (decision 67); the
+ * others are dropped and reported. A pack-scope proposal changes the pipeline pack, not
+ * this repository, and its item says so. The marker is the week and the proposal's title, so a retry or a second run
  * in the same week files each proposal once.
  *
  * Bound inputs: the workflow's INPUTS_REPO_HOST and INPUTS_REPO_PATH; INPUTS_WEEK and
@@ -17,11 +18,13 @@ import { message } from './lib.ts';
 
 interface Proposal {
   title: string;
-  kind: 'check' | 'instruction' | 'remove-rule';
+  kind: 'check' | 'skill' | 'instruction' | 'remove-rule';
+  scope: 'pack' | 'project';
   file: string;
   change: string;
   cases: string[];
   why: string;
+  cost: string;
 }
 
 function slug(text: string): string {
@@ -45,18 +48,24 @@ async function main(): Promise<void> {
       dropped.push({ title: proposal.title, why: 'names no file or no title' });
       continue;
     }
+    if ((proposal.cost ?? '').trim() === '') {
+      dropped.push({ title: proposal.title, why: 'names no cost: every rule makes some work slower or some cases worse' });
+      continue;
+    }
     const body = [
       `**Retro proposal (${week})**: ${proposal.kind}`,
       '',
-      `File: \`${proposal.file}\``,
+      proposal.scope === 'pack' ? `File: \`${proposal.file}\` in the pipeline pack, not in this repository` : `File: \`${proposal.file}\``,
       '',
       proposal.change,
       '',
       `Why: ${proposal.why}`,
       '',
+      `Cost: ${proposal.cost}`,
+      '',
       `Cases: ${cases.join(', ')}`,
       '',
-      'Filed by the weekly Retro. Whether it is worth doing is decided at Triage; instruction and rules files never merge as R0, and a change that weakens a check is R2.',
+      'Filed by the weekly Retro. Whether it is worth doing is decided at Triage; instruction, skill and rules files never merge as R0, and a change that weakens a check is R2.',
     ].join('\n');
     try {
       const key = await tracker().create('project', `unify-retro:${week}:${slug(proposal.title)}`, proposal.title, body);

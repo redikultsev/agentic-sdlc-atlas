@@ -121,11 +121,25 @@ nodes:
             required: [name, every, budget, cap, paths, measure, waiting, last]
       required: [ok, base, error, scouts]
 
+  - id: skills
+    script: skills
+    runtime: bun
+    output_format:
+      type: object
+      properties:
+        ok: { type: boolean }
+        base: { type: string }
+        pack: { type: array, items: { type: string } }
+        missing: { type: array, items: { type: string } }
+        project: { type: array, items: { type: string } }
+      required: [ok, base, pack, missing, project]
+
   - id: report
     script: report
     runtime: bun
-    depends_on: [repo, labels, access, bindings, codex, tests, deploys, scouts]
+    depends_on: [repo, labels, access, bindings, codex, tests, deploys, scouts, skills]
     with:
+      skills: { from: "$skills.output" }
       deploys: { from: "$deploys.output" }
       scouts: { from: "$scouts.output" }
       repo: { from: "$repo.output" }

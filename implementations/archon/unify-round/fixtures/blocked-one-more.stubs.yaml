@@ -1,5 +1,7 @@
 # At 3 rounds the Operator answers "one more round": one round is allowed and the
 # round is fired again.
+skills-review: { text: "stub: the review role's skills", pack: [], project: null }
+skills-validator: { text: "stub: the validator role's skills", pack: [], project: null }
 reconcile: {"ok": true, "state": "triage-review", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
 reconcile-ruling: {"go": true}
 rounds: {"go": false, "at_cap": true, "rounds": 3, "ask": true, "question": "stub: #7 is Blocked: 3 fix rounds are used up. One more round, back to the plan, for a human, or cancel?", "options": [{"id": "one-more", "label": "One more round", "does": "Allows exactly one more fix round.", "value": {"effect": "one-more"}}, {"id": "back-to-plan", "label": "Back to the plan", "does": "Moves the item to Planning.", "value": {"effect": "back-to-plan"}}, {"id": "for-human", "label": "For a human", "does": "Moves the item to ForHuman.", "value": {"effect": "for-human"}}, {"id": "cancel", "label": "Cancel", "does": "Moves the item to Cancelled.", "value": {"effect": "cancel"}}], "recommendation": {"option": "back-to-plan", "why": "stub: recommended", "confidence": "medium"}}

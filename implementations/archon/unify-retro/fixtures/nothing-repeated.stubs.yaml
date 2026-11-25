@@ -1,4 +1,5 @@
 # Nothing repeated: no proposal is filed; the Operator holds nothing and writes a ruling instead (other).
+skills-retro: { text: "stub: the retro role's skills", pack: [], project: null }
 metrics:
   week: 2026-W47
   window: { since: "2026-11-16T00:00:00Z", until: "2026-11-23T00:00:00Z" }

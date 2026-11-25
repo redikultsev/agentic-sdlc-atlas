@@ -1,5 +1,6 @@
 # The agent leaves a finding out: the script refuses the grouping whole, files nothing, and
 # the buffer waits for the next pass.
+skills-group: { text: "stub: the group role's skills", pack: [], project: null }
 gather:
   has: true
   count: 2

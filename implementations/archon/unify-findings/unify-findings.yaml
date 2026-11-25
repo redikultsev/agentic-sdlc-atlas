@@ -27,6 +27,20 @@ worktree: { enabled: false }
 mutates_checkout: false
 
 nodes:
+  # The group agent's skills: the pack's for its role and the project's .pipeline/skills file (decision 67).
+  - id: skills-group
+    script: skills
+    runtime: bun
+    timeout: 120000
+    with: { role: group }
+    output_format:
+      type: object
+      properties:
+        text: { type: string }
+        pack: { type: array, items: { type: string } }
+        project: { type: [string, 'null'] }
+      required: [text, pack, project]
+
   - id: gather
     script: gather
     runtime: bun
@@ -42,7 +56,7 @@ nodes:
 
   - id: group
     command: group
-    depends_on: [gather]
+    depends_on: [gather, skills-group]
     when: "$gather.output.has == 'true'"
     model: ['@triage', medium]
     context: fresh
@@ -51,6 +65,7 @@ nodes:
     idle_timeout: 900000
     maxBudgetUsd: 3
     with:
+      skills: "$skills-group.output.text"
       context: "$gather.output.context"
     output_format:
       type: object

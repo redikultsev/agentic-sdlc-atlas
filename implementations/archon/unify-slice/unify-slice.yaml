@@ -23,6 +23,20 @@ inputs:
 returns: { node: commit, outcome: status }
 
 nodes:
+  # The implementer agent's skills: the pack's for its role and the project's .pipeline/skills file (decision 67).
+  - id: skills-implementer
+    script: skills
+    runtime: bun
+    timeout: 120000
+    with: { role: implementer }
+    output_format:
+      type: object
+      properties:
+        text: { type: string }
+        pack: { type: array, items: { type: string } }
+        project: { type: [string, 'null'] }
+      required: [text, pack, project]
+
   - id: prepare
     script: prepare
     runtime: bun
@@ -40,12 +54,13 @@ nodes:
 
   - id: implement
     command: implementer
-    depends_on: [prepare]
+    depends_on: [prepare, skills-implementer]
     model: ['@implementer', large]
     context: fresh
     idle_timeout: 1200000
     maxBudgetUsd: 20
     with:
+      skills: "$skills-implementer.output.text"
       number: "$INPUTS.number"
       branch: "$prepare.output.branch"
       progress: "$prepare.output.progress"

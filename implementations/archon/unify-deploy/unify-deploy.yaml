@@ -48,6 +48,20 @@ inputs:
 worktree: { enabled: false }
 
 nodes:
+  # The watcher agent's skills: the pack's for its role and the project's .pipeline/skills file (decision 67).
+  - id: skills-watcher
+    script: skills
+    runtime: bun
+    timeout: 120000
+    with: { role: watcher }
+    output_format:
+      type: object
+      properties:
+        text: { type: string }
+        pack: { type: array, items: { type: string } }
+        project: { type: [string, 'null'] }
+      required: [text, pack, project]
+
   - id: cut
     script: cut
     runtime: bun
@@ -214,7 +228,7 @@ nodes:
   # timed wait is the body's only terminal sink; it is skipped on the pass that ends the
   # watch, so the loop ends without waiting again.
   - id: watch
-    depends_on: [cut, promote, promote-ask]
+    depends_on: [cut, promote, promote-ask, skills-watcher]
     trigger_rule: none_failed_min_one_success
     when: "$cut.output.mode == 'release' && $promote.output.result == 'production'"
     loop_group:
@@ -256,6 +270,7 @@ nodes:
           idle_timeout: 600000
           maxBudgetUsd: 1
           with:
+            skills: "$skills-watcher.output.text"
             signals: { from: "$signals.output" }
           output_format:
             type: object

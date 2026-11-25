@@ -1,4 +1,5 @@
 # An author who is not trusted and no approval: pipeline:needs-approval, the run ends.
+skills-triage: { text: "stub: the triage role's skills", pack: [], project: null }
 reconcile: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, state: none }
 trust: { proceed: false, author: "visitor", reason: "stub: `visitor` is not a trusted author and nobody approved the request" }
 enter: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, go: false, ask: false }

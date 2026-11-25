@@ -1,5 +1,6 @@
 # The Implementer finished the slice: the script commits, pushes and reads the branch
 # back; the slice ends pushed.
+skills-implementer: { text: "stub: the implementer role's skills", pack: [], project: null }
 prepare: {"branch": "pipeline/7-slice-item", "start": "fixturestart", "continued": false, "progress": ".pipeline/work/7/progress/item.md", "has_progress": false, "brief": "stub brief", "id": "item"}
 implement: {"status": "done", "branch": "pipeline/7-slice-item", "tests": [{"name": "import rejects an empty file", "file": "test/import.test.ts", "command": "bun test test/import.test.ts -t empty", "red": "1 fail: expected ImportError, got undefined", "why_no_red": null}], "steps_skipped": [], "discoveries": [], "scope_question": null, "reason": "", "summary": "stub: added the import command with tests"}
 commit: {"status": "pushed", "reason": "", "branch": "pipeline/7-slice-item", "head": "fixtureslice", "tests": [{"name": "import rejects an empty file", "file": "test/import.test.ts", "command": "bun test test/import.test.ts -t empty", "red": "1 fail: expected ImportError, got undefined", "why_no_red": null}], "steps_skipped": [], "discoveries": [], "summary": "stub: added the import command with tests"}

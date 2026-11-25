@@ -1,4 +1,5 @@
 # The hourly run finds nothing in Releasing: it ends quietly.
+skills-watcher: { text: "stub: the watcher role's skills", pack: [], project: null }
 cut: { mode: none, release: "", items: [], pr: null, legacy: false, summary: "stub: nothing waits in Releasing", question: "", options: [], recommendation: null }
 fixture:
   inputs: { repo_host: github.com, repo_path: example/repo, number: "", reason: schedule, unify_merge_binding: /srv/bindings/unify-merge.json, unify_deploy_binding: /srv/bindings/unify-deploy.json }

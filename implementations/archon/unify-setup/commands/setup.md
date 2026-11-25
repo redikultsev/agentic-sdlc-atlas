@@ -80,7 +80,7 @@ In `args`, a string that is exactly `{name}` takes the value as it is (a list st
 | `blockers` | `{key}` | `list`, then per item `key` | revisit sees that a blocker was closed |
 | `label.set-by` | `{key}`, `{label}` | `login` of who last set the label | an approval label counts only with its setter (decision 39) |
 
-A label in this pipeline is free text such as `state:triaging` or `pipeline:probe`. If the tracker has no labels, map `label.add` and `label.remove` to the nearest thing that holds free tags and say so in `notes`. Never map an operation to a tool that does something else (for example a status transition for a label): leave it out and say why.
+A label in this pipeline is free text such as `state:triaging` or `pipeline:probe`. If the only tool that changes labels replaces the whole list (Jira's `update_issue` with a `labels` field, for example), map `label.add` and `label.remove` to it with `{labels}` where the list goes: the connector reads the item's labels first and puts the list after the change there, so the item's other labels stay; inside a string argument it is written as a JSON list, e.g. `fields: "{\"labels\": {labels}}"`. If the tracker has no labels, map `label.add` and `label.remove` to the nearest thing that holds free tags and say so in `notes`. Never map an operation to a tool that does something else (for example a status transition for a label): leave it out and say why.
 
 ## Rules
 

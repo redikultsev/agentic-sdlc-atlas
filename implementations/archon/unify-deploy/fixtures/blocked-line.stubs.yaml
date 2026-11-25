@@ -1,4 +1,5 @@
 # The release line is blocked after a rollback and the base holds no revert of the culprit: one request; the Operator waits.
+skills-watcher: { text: "stub: the watcher role's skills", pack: [], project: null }
 cut:
   mode: blocked
   release: ""

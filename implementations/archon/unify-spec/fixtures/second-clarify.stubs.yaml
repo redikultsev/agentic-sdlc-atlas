@@ -1,4 +1,6 @@
 # The round after a second clarify: counted (2 of 3), a new draft, back at SpecReview.
+skills-questions: { text: "stub: the questions role's skills", pack: [], project: null }
+skills-interviewer: { text: "stub: the interviewer role's skills", pack: [], project: null }
 reconcile: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, state: specifying }
 count: { under: true, waiting: 1, cap: 3 }
 enter: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, go: true, ask: false }

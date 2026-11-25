@@ -1,5 +1,7 @@
 # After configuring Codex the Operator answers "start the round again": the run ends
 # without a review and fires a new round; no round is spent.
+skills-review: { text: "stub: the review role's skills", pack: [], project: null }
+skills-validator: { text: "stub: the validator role's skills", pack: [], project: null }
 reconcile: {"ok": true, "state": "triage-review", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
 reconcile-ruling: {"go": true}
 rounds: {"go": true, "at_cap": false, "rounds": 0, "ask": false, "question": "", "options": [], "recommendation": null}

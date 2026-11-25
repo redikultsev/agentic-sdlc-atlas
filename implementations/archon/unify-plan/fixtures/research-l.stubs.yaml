@@ -1,4 +1,6 @@
 # L item: the Researcher reads first; one reference does not exist at the base and is struck.
+skills-researcher: { text: "stub: the researcher role's skills", pack: [], project: null }
+skills-planner: { text: "stub: the planner role's skills", pack: [], project: null }
 reconcile: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, state: spec-review }
 enter: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, go: true, ask: false }
 gather: { context: "stub: item #7", spec: "# Spec for #7\n### AC1. stub\n### AC2. stub", criteria: [AC1, AC2], base_commit: "0123456789abcdef0123456789abcdef01234567", size: L, toggles: "stub: the project declares no toggles", toggles_declared: false }

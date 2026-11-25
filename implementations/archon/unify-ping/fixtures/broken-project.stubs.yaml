@@ -9,6 +9,7 @@ tests: { ran: true, ok: true, command: bun test, guard: true, where: { git: /opt
 deploys: { ok: false, base: main, error: "project.yaml: production environment production must be after-merge", legacy: false, environments: [], trigger: "", toggles: null }
 scouts: { ok: true, base: main, error: null, scouts: [] }
 report: { pack: unify-sdlc, ok: false, report: "stub: deploys: .pipeline/project.yaml on main does not parse" }
+skills: { ok: true, base: main, pack: [unify-lessons, unify-reproduce, unify-root-cause], missing: [], project: [] }
 fixture:
   inputs: { repo_host: github.com, repo_path: example/repo, bindings_dir: /srv/bindings }
   expect: completed

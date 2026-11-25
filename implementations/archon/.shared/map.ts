@@ -18,6 +18,9 @@
  *     comments: { tool: ..., args: { ... }, read: { list: comments, id: id, body: body, author: author.name } }
  *     comment:  { tool: ..., args: { ..., body: "{body}" }, read: { id: id } }
  *     label.add / label.remove: { tool: ..., args: { ..., label: "{label}" } }
+ *       or, where the tracker's tool only replaces the whole list, `{labels}`: the item's
+ *       labels after the change, read first (a JSON list inside a string argument), e.g.
+ *       { tool: jira_update_issue, args: { issue_key: "{key}", fields: "{\"labels\": {labels}}" } }
  *     and optionally comment.edit ({id}), create ({title}, {body}; read: { key }),
  *     close / close.completed / close.not_planned, list / list.label ({label};
  *     read: { list, key, title, labels }), slice ({parent}, {child}),
@@ -46,6 +49,8 @@ export interface TrackerMap {
   readonly url: string;
   readonly key?: string;
   readonly refused?: readonly string[];
+  /** Seconds one tool call may take (default 120): a broker that starts a gateway per session is slow. */
+  readonly timeoutSeconds?: number;
   readonly operations: Readonly<Record<string, Operation>>;
 }
 
@@ -94,7 +99,12 @@ export function fill(value: unknown, vars: Readonly<Record<string, unknown>>): u
   if (typeof value === 'string') {
     const whole = /^\{([a-z_]+)\}$/.exec(value);
     if (whole && whole[1] in vars) return vars[whole[1]];
-    return value.replace(/\{([a-z_]+)\}/g, (all, name: string) => (name in vars ? String(vars[name]) : all));
+    // Inside a longer string a list or an object is written as JSON, so a JSON-string argument can carry it.
+    return value.replace(/\{([a-z_]+)\}/g, (all, name: string) => {
+      if (!(name in vars)) return all;
+      const v = vars[name];
+      return typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v);
+    });
   }
   if (Array.isArray(value)) return value.map(v => fill(v, vars));
   if (typeof value === 'object' && value !== null) return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, fill(v, vars)]));
@@ -121,7 +131,7 @@ function strings(value: unknown): string[] {
   return [];
 }
 
-export function mapAdapter(map: TrackerMap, open: (server: McpServer) => Promise<McpSession | { ok: false; kind: string; message: string }> = s => connect(s)): Adapter {
+export function mapAdapter(map: TrackerMap, open: (server: McpServer) => Promise<McpSession | { ok: false; kind: string; message: string }> = s => connect(s, { timeoutMs: (map.timeoutSeconds ?? 120) * 1000 })): Adapter {
   const { missing, lacks } = checkMap(map);
   if (missing.length > 0) throw new Error(`.pipeline/tracker.yaml lacks the required ${missing.join(', ')}`);
   const refusedText = (map.refused ?? DEFAULT_REFUSED).map(s => s.toLowerCase());
@@ -153,6 +163,18 @@ export function mapAdapter(map: TrackerMap, open: (server: McpServer) => Promise
     const where = read(op, 'list');
     const found = typeof where === 'string' ? at(data, where) : data;
     return Array.isArray(found) ? found : [];
+  };
+  /**
+   * For a tracker whose only label tool replaces the whole list (Jira's update_issue through
+   * mcp-atlassian): when a label operation's arguments name `{labels}`, the item's labels are
+   * read first and `{labels}` is the list after the change, so the item's other labels stay.
+   * A person changing labels in the same moment can lose that change; the read-back after the
+   * write shows it as a difference.
+   */
+  const whole = async (name: string, key: string, change: (labels: string[]) => string[]): Promise<Record<string, unknown>> => {
+    if (!JSON.stringify(map.operations[name]?.args ?? {}).includes('{labels}')) return {};
+    const { data, op } = await call('view', { key });
+    return { labels: change(strings(pick(data, op, 'labels'))) };
   };
 
   return {
@@ -200,10 +222,10 @@ export function mapAdapter(map: TrackerMap, open: (server: McpServer) => Promise
       await call('comment.edit', { key, id, body });
     },
     async addLabel(key, label) {
-      await call('label.add', { key, label });
+      await call('label.add', { key, label, ...(await whole('label.add', key, labels => [...labels.filter(l => l !== label), label])) });
     },
     async removeLabel(key, label) {
-      await call('label.remove', { key, label });
+      await call('label.remove', { key, label, ...(await whole('label.remove', key, labels => labels.filter(l => l !== label))) });
     },
     async create(_marker, title, body) {
       const { data, op } = await call('create', { title, body });

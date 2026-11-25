@@ -12,8 +12,11 @@
  * cost cap a look runs under when it differs, findings waiting and its last look; none
  * declared passes; a bad setting fails with its message.
  *
+ * The skills line names the pack skills the roles read and which roles have the project's
+ * own skill (decision 67); a pack skill missing from the pack fails it.
+ *
  * Bound inputs: INPUTS_REPO, INPUTS_LABELS, INPUTS_ACCESS, INPUTS_BINDINGS, INPUTS_CODEX,
- * INPUTS_TESTS, INPUTS_DEPLOYS and INPUTS_SCOUTS, the outputs of the checks.
+ * INPUTS_TESTS, INPUTS_DEPLOYS, INPUTS_SCOUTS and INPUTS_SKILLS, the outputs of the checks.
  */
 
 import { emit, input, refuse } from 'archon:script';
@@ -61,6 +64,7 @@ function main(): void {
           ),
         ];
 
+  const skills = read('skills', input('skills'));
   const lines = [
     `unify-sdlc install check for ${String(repo.host)}/${String(repo.path)} (from ${String(repo.source)})`,
     '',
@@ -70,6 +74,7 @@ function main(): void {
     `${mark(codex.configured)} codex review (reported only): ${codex.configured ? `@review on ${String(codex.model ?? 'codex')}` : list(codex.notes).join('; ')}`,
     ...deployLines,
     ...scoutLines,
+    `${mark(skills.ok)} skills: pack ${list(skills.pack).join(', ') || 'none'}${list(skills.missing).length > 0 ? `; missing from the pack: ${list(skills.missing).join(', ')}` : ''}; the project's own for ${list(skills.project).join(', ') || 'no role'} (.pipeline/skills/ on ${String(skills.base)})`,
     `${mark(tests.ok)} test suite through the guard: ${tests.ran ? `exit ${String(tests.exit)}${tests.timed_out ? ' (timed out)' : ''}, ${list(tests.refusals).length} guard refusals, ${String(tests.note)}` : String(tests.note)}`,
   ];
   const fixes = [
@@ -79,13 +84,14 @@ function main(): void {
     ...list(bindings.problems).map(p => `binding: ${p}`),
     ...list(tests.refusals).map(r => `guard refused: ${r}`),
     ...(deploys.ok === false ? ['fix .pipeline/project.yaml on the base (its format is in decision 48)'] : []),
+    ...list(skills.missing).map(name => `pack skill missing: add skills/${name}/SKILL.md to the pack, or reinstall the pack`),
     ...(scouts.ok === false ? ['fix the scouts section of .pipeline/project.yaml on the base (its format is in .shared/scouts.ts)'] : []),
   ];
   // Reported, not counted: what waits for the daily pass (decision 60).
   const waiting = buffered().length;
   lines.push(`${mark(null)} findings buffer (reported only): ${waiting} of at most ${MAX_BUFFER} waiting for the daily pass (unify-findings)`);
   if (fixes.length > 0) lines.push('', 'To fix:', ...fixes.map(f => `- ${f}`));
-  const counted = [labels.ok, access.ok, bindings.ok, tests.ok, deploys.ok, scouts.ok];
+  const counted = [labels.ok, access.ok, bindings.ok, tests.ok, deploys.ok, scouts.ok, skills.ok];
   const ok = counted.every(value => value !== false);
   emit({ pack: 'unify-sdlc', ok, report: lines.join('\n') });
 }

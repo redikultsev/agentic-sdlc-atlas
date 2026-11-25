@@ -1,4 +1,5 @@
 # Two cases share a lesson: one proposal is filed, the summary goes to the Operator, who sends it to Triage.
+skills-retro: { text: "stub: the retro role's skills", pack: [], project: null }
 metrics:
   week: 2026-W47
   window: { since: "2026-11-16T00:00:00Z", until: "2026-11-23T00:00:00Z" }
@@ -18,7 +19,7 @@ metrics:
   notes: ["operator minutes are an upper bound: the engine does not expose when a wait opened"]
 retro:
   proposals:
-    - { title: "Lint: forbid raw SQL in src/api", kind: check, file: .eslintrc.json, change: "stub: add a no-restricted-syntax rule", cases: ["#7", "#8"], why: "stub: both fix rounds were raw SQL" }
+    - { title: "Lint: forbid raw SQL in src/api", kind: check, scope: project, file: .eslintrc.json, change: "stub: add a no-restricted-syntax rule", cases: ["#7", "#8"], why: "stub: both fix rounds were raw SQL", cost: "stub: a query that needs raw SQL takes a disable comment" }
   summary: "stub: raw SQL twice"
 file: { filed: [{ key: "#21", title: "Lint: forbid raw SQL in src/api" }], dropped: [] }
 summary:

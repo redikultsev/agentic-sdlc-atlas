@@ -1,4 +1,5 @@
 # Shape A: the revert this pipeline opened has merged; its deploy runs with PIPELINE_REASON=rollback and nothing is watched (decision 26), no state moves. The items sent back to Releasing get one release run, started by deploy.
+skills-watcher: { text: "stub: the watcher role's skills", pack: [], project: null }
 cut: { mode: revert, release: "", items: ["#7"], pr: 13, legacy: true, summary: "stub: PR 13 is the revert", question: "", options: [], recommendation: null }
 deploy: { deployed: true, ok: true, at: "2026-11-20T10:40:00Z", hook: "./deploy.sh", note: "deployed by the hook; release: unify-deploy: admitted", window_minutes: 30 }
 fixture:

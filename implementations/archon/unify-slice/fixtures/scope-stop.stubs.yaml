@@ -1,5 +1,6 @@
 # The fix needs a cache the spec does not name (decision 37): the Implementer stops,
 # the slice fails with a scope reason, and the round asks the Operator.
+skills-implementer: { text: "stub: the implementer role's skills", pack: [], project: null }
 prepare: {"branch": "pipeline/7-slice-item", "start": "fixturestart", "continued": false, "progress": ".pipeline/work/7/progress/item.md", "has_progress": false, "brief": "stub brief", "id": "item"}
 implement: {"status": "scope", "branch": "pipeline/7-slice-item", "tests": [], "steps_skipped": [], "discoveries": [], "scope_question": "stub: a response cache is needed; dropping the live preview avoids it", "reason": "stub", "summary": "stub: added the import command with tests"}
 commit: {"status": "failed", "reason": "scope: stub: a response cache is needed", "branch": "pipeline/7-slice-item", "head": null, "tests": [], "steps_skipped": [], "discoveries": [], "summary": "stub: added the import command with tests"}

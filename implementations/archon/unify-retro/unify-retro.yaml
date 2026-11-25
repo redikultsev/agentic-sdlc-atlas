@@ -26,6 +26,20 @@ worktree: { enabled: false }
 mutates_checkout: false
 
 nodes:
+  # The retro agent's skills: the pack's for its role and the project's .pipeline/skills file (decision 67).
+  - id: skills-retro
+    script: skills
+    runtime: bun
+    timeout: 120000
+    with: { role: retro }
+    output_format:
+      type: object
+      properties:
+        text: { type: string }
+        pack: { type: array, items: { type: string } }
+        project: { type: [string, 'null'] }
+      required: [text, pack, project]
+
   - id: metrics
     script: metrics
     runtime: bun
@@ -66,13 +80,14 @@ nodes:
 
   - id: retro
     command: retro
-    depends_on: [metrics]
+    depends_on: [metrics, skills-retro]
     model: ['@retro', large]
     context: fresh
     mutates_checkout: false
     idle_timeout: 900000
     maxBudgetUsd: 5
     with:
+      skills: "$skills-retro.output.text"
       metrics: { from: "$metrics.output" }
     output_format:
       type: object
@@ -85,12 +100,14 @@ nodes:
             additionalProperties: false
             properties:
               title: { type: string }
-              kind: { type: string, enum: [check, instruction, remove-rule] }
+              kind: { type: string, enum: [check, skill, instruction, remove-rule] }
+              scope: { type: string, enum: [pack, project] }
               file: { type: string }
               change: { type: string }
               cases: { type: array, items: { type: string } }
               why: { type: string }
-            required: [title, kind, file, change, cases, why]
+              cost: { type: string }
+            required: [title, kind, scope, file, change, cases, why, cost]
         summary: { type: string }
       required: [proposals, summary]
 

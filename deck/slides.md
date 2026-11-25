@@ -254,7 +254,7 @@ layout: default
 <div class="stg">
 <div class="dg"><likec4-view view-id="learnDeck" color-scheme="light" browser="true" class="view-stage"></likec4-view><span class="hint">⤢ Click to explore</span></div>
 <div class="pcs n1">
-  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Retro</p><dl class="eg3"><dt>In</dt><dd>Corrections, Blocked items, rounds, findings, rollbacks, traces</dd><dt>Does</dt><dd>Finds what repeated twice; proposes adding or removing rules</dd><dt>Out</dt><dd>Rule and check work items to Triage; weekly summary</dd></dl></div>
+  <div class="pc"><div class="pc-top"><span class="pk k-agent">Agent</span><span class="ps">idea</span></div><p class="pn">Retro</p><dl class="eg3"><dt>In</dt><dd>Corrections, Blocked items, rounds, findings, rollbacks, traces</dd><dt>Does</dt><dd>Finds what repeated twice; proposes adding or removing rules, checks and skill lines, each with its cost</dd><dt>Out</dt><dd>Rule and check work items to Triage; weekly summary</dd></dl></div>
 </div>
 </div>
 

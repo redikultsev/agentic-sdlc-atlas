@@ -1,5 +1,7 @@
 # An S item, one implicit slice, CI green and the reviewer passes: the round
 # records the verdicts and fires unify-merge.
+skills-review: { text: "stub: the review role's skills", pack: [], project: null }
+skills-validator: { text: "stub: the validator role's skills", pack: [], project: null }
 reconcile: {"ok": true, "state": "triage-review", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
 reconcile-ruling: {"go": true}
 rounds: {"go": true, "at_cap": false, "rounds": 0, "ask": false, "question": "", "options": [], "recommendation": null}

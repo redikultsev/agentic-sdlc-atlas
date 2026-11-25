@@ -1,4 +1,5 @@
 # A release of two items: a regression nobody can pin on one item. Production goes back to the previous release, the line is blocked, and the Operator is asked; the answer is investigate.
+skills-watcher: { text: "stub: the watcher role's skills", pack: [], project: null }
 cut: { mode: release, release: "a1b2c3d4e5f6-0011aabb", items: ["#7", "#8"], pr: null, legacy: false, summary: "stub: release of #7, #8", question: "", options: [], recommendation: null }
 promote: { result: production, env: production, deployed_at: "2026-11-20T10:00:00Z", window_minutes: 30, summary: "stub: on production", question: "", options: [], recommendation: null }
 signals:

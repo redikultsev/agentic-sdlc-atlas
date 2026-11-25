@@ -1,4 +1,5 @@
 # The tracker shows Cancelled while the engine holds TriageReview: the Operator puts the tracker back; the run ends.
+skills-triage: { text: "stub: the triage role's skills", pack: [], project: null }
 reconcile:
   ok: false
   reason: "stub: #7: the engine holds triage-review; the tracker shows cancelled"

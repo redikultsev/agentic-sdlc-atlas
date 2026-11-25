@@ -1,5 +1,6 @@
 # A due scout with a budget of 3 USD looks under the 2 USD cap (look-medium): it returns two
 # findings; one is kept in the buffer, the other it proposed before and is passed over.
+skills-scout: { text: "stub: the scout role's skills", pack: [], project: null }
 pick:
   has: true
   scout: deps

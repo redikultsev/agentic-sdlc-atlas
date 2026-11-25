@@ -1,4 +1,5 @@
 # The issue is already in SpecReview: reconcile stops with a request instead of triaging over it.
+skills-triage: { text: "stub: the triage role's skills", pack: [], project: null }
 reconcile:
   ok: false
   reason: "stub: #7 is spec-review; this stage starts only from none or triaging"

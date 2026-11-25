@@ -24,6 +24,7 @@ scouts:
   scouts:
     - { name: deps, every: weekly, budget: 3, cap: 2, paths: [package.json, bun.lock], measure: 1, waiting: 1, last: "2026-11-24T09:00:00Z" }
 report: { pack: unify-sdlc, ok: true, report: "stub: 2 environment(s); release trigger schedule; toggles set by ./deploy/toggle.sh" }
+skills: { ok: true, base: main, pack: [unify-lessons, unify-reproduce, unify-root-cause], missing: [], project: [] }
 fixture:
   inputs: { repo_host: github.com, repo_path: example/repo, bindings_dir: /srv/bindings }
   expect: completed

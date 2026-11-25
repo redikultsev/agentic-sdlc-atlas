@@ -1,5 +1,7 @@
 # The review stopped at a provider usage limit: no round is spent and the round is
 # fired again (Archon itself pauses at the limit; this covers a limit failure).
+skills-review: { text: "stub: the review role's skills", pack: [], project: null }
+skills-validator: { text: "stub: the validator role's skills", pack: [], project: null }
 reconcile: {"ok": true, "state": "triage-review", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
 reconcile-ruling: {"go": true}
 rounds: {"go": true, "at_cap": false, "rounds": 0, "ask": false, "question": "", "options": [], "recommendation": null}

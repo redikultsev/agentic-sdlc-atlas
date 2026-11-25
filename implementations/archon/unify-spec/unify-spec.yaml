@@ -29,6 +29,34 @@ worktree: { enabled: false }
 mutates_checkout: false
 
 nodes:
+  # The questions agent's skills: the pack's for its role and the project's .pipeline/skills file (decision 67).
+  - id: skills-questions
+    script: skills
+    runtime: bun
+    timeout: 120000
+    with: { role: questions }
+    output_format:
+      type: object
+      properties:
+        text: { type: string }
+        pack: { type: array, items: { type: string } }
+        project: { type: [string, 'null'] }
+      required: [text, pack, project]
+
+  # The interviewer agent's skills: the pack's for its role and the project's .pipeline/skills file (decision 67).
+  - id: skills-interviewer
+    script: skills
+    runtime: bun
+    timeout: 120000
+    with: { role: interviewer }
+    output_format:
+      type: object
+      properties:
+        text: { type: string }
+        pack: { type: array, items: { type: string } }
+        project: { type: [string, 'null'] }
+      required: [text, pack, project]
+
   - id: reconcile
     script: reconcile
     runtime: bun
@@ -149,12 +177,13 @@ nodes:
 
   - id: questions
     command: questions
-    depends_on: [gather]
+    depends_on: [gather, skills-questions]
     model: ['@interviewer', large]
     context: fresh
     idle_timeout: 600000
     maxBudgetUsd: 3
     with:
+      skills: "$skills-questions.output.text"
       context: "$gather.output.context"
     output_format:
       type: object
@@ -201,7 +230,7 @@ nodes:
   # At most three drafts. The SpecReview gate is the body's only sink; "other" or the
   # declared clarify runs another round, anything else ends the loop.
   - id: rounds
-    depends_on: [answers]
+    depends_on: [answers, skills-interviewer]
     loop_group:
       max_iterations: 4
       until_bash: 'd=$spec-gate.output.decision; [ "$d" != other ] && [ "$d" != clarify ]'
@@ -234,6 +263,7 @@ nodes:
           idle_timeout: 900000
           maxBudgetUsd: 5
           with:
+            skills: "$skills-interviewer.output.text"
             context: "$gather.output.context"
             answers: "$answers.output.text"
             rulings: "$prev-ruling.output.rulings"

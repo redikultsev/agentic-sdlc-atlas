@@ -1,4 +1,5 @@
 # Edited after approval: the label is removed, a comment, pipeline:needs-approval; the run ends.
+skills-triage: { text: "stub: the triage role's skills", pack: [], project: null }
 reconcile: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, state: none }
 trust: { proceed: false, author: "visitor", reason: "stub: the body changed after approval (approved 0123456789abcdef, now fedcba9876543210)" }
 enter: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, go: false, ask: false }

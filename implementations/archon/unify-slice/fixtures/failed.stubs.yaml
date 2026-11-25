@@ -1,5 +1,6 @@
 # The Implementer could not finish (a test it cannot make pass): the slice ends
 # failed(reason); passing sibling branches are kept by the round.
+skills-implementer: { text: "stub: the implementer role's skills", pack: [], project: null }
 prepare: {"branch": "pipeline/7-slice-item", "start": "fixturestart", "continued": false, "progress": ".pipeline/work/7/progress/item.md", "has_progress": false, "brief": "stub brief", "id": "item"}
 implement: {"status": "failed", "branch": "pipeline/7-slice-item", "tests": [], "steps_skipped": ["integration tests: no database on this host"], "discoveries": [], "scope_question": null, "reason": "stub: the parser test still fails", "summary": "stub: added the import command with tests"}
 commit: {"status": "failed", "reason": "stub: the parser test still fails", "branch": "pipeline/7-slice-item", "head": null, "tests": [], "steps_skipped": ["integration tests: no database on this host"], "discoveries": [], "summary": "stub: added the import command with tests"}

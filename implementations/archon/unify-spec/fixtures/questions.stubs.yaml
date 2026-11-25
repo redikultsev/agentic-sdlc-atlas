@@ -1,4 +1,6 @@
 # Business questions: the run pauses for the Operator's answer before any draft.
+skills-questions: { text: "stub: the questions role's skills", pack: [], project: null }
+skills-interviewer: { text: "stub: the interviewer role's skills", pack: [], project: null }
 reconcile: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, state: specifying }
 count: { under: true, waiting: 1, cap: 3 }
 enter: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, go: true, ask: false }

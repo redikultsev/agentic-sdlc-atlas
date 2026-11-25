@@ -1,5 +1,6 @@
 # Three findings: two from different items share one cause and become one request seen twice;
 # the third is covered by an open item and is dropped as in work.
+skills-group: { text: "stub: the group role's skills", pack: [], project: null }
 gather:
   has: true
   count: 3

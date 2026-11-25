@@ -1,4 +1,5 @@
 # The run's item has a merged revert but its label disagrees with its record: nothing deploys, the item is flagged for the Operator.
+skills-watcher: { text: "stub: the watcher role's skills", pack: [], project: null }
 cut: { mode: stop, release: "", items: ["#7"], pr: 13, legacy: true, summary: "stub: #7: the engine holds rolled-back; the tracker shows implementing", question: "", options: [], recommendation: null }
 flag: { ok: false, summary: "stub: deploy not started" }
 fixture:

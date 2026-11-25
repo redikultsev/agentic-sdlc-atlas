@@ -1,4 +1,6 @@
 # The tracker shows SpecReview while the engine holds Specifying: the Operator adopts the tracker's state; the run ends.
+skills-questions: { text: "stub: the questions role's skills", pack: [], project: null }
+skills-interviewer: { text: "stub: the interviewer role's skills", pack: [], project: null }
 reconcile:
   ok: false
   reason: "stub: #7: the engine holds specifying; the tracker shows spec-review"

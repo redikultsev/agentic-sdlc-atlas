@@ -1,5 +1,7 @@
 # The Operator chooses to wait for the base: the run ends with nothing implemented and
 # nothing fired.
+skills-review: { text: "stub: the review role's skills", pack: [], project: null }
+skills-validator: { text: "stub: the validator role's skills", pack: [], project: null }
 reconcile: {"ok": true, "state": "triage-review", "problems": [], "ask": false, "question": "", "options": [], "recommendation": null}
 reconcile-ruling: {"go": true}
 rounds: {"go": true, "at_cap": false, "rounds": 0, "ask": false, "question": "", "options": [], "recommendation": null}

@@ -32,6 +32,20 @@ worktree: { enabled: false }
 mutates_checkout: false
 
 nodes:
+  # The triage agent's skills: the pack's for its role and the project's .pipeline/skills file (decision 67).
+  - id: skills-triage
+    script: skills
+    runtime: bun
+    timeout: 120000
+    with: { role: triage }
+    output_format:
+      type: object
+      properties:
+        text: { type: string }
+        pack: { type: array, items: { type: string } }
+        project: { type: [string, 'null'] }
+      required: [text, pack, project]
+
   - id: reconcile
     script: reconcile
     runtime: bun
@@ -141,7 +155,7 @@ nodes:
   # One round: the verdict, its evidence check, the card, the Operator's answer. "other"
   # (a corrected size or risk) runs another round with that text as a ruling.
   - id: review
-    depends_on: [enter, gather, stop]
+    depends_on: [enter, gather, stop, skills-triage]
     trigger_rule: none_failed_min_one_success
     when: "$enter.output.go == 'true'"
     loop_group:
@@ -169,6 +183,7 @@ nodes:
           idle_timeout: 600000
           maxBudgetUsd: 3
           with:
+            skills: "$skills-triage.output.text"
             context: "$gather.output.context"
             correction: "$prev-ruling.output.correction"
           output_format:
@@ -224,7 +239,11 @@ nodes:
                     source: { type: string }
                   required: [text, source]
               data_sources: { type: string }
-            required: [kind, size, risk, outcome, reason, confidence, claims, root_cause, duplicates, assumptions, data_sources]
+              headline: { type: string }
+              checks: { type: array, items: { type: string } }
+              not_checked: { type: array, items: { type: string } }
+              cause_chain: { type: array, items: { type: string } }
+            required: [kind, size, risk, outcome, reason, confidence, claims, root_cause, duplicates, assumptions, data_sources, headline, checks, not_checked, cause_chain]
 
         - id: evidence
           script: evidence

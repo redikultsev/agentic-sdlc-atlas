@@ -1,4 +1,5 @@
 # The Watcher is unsure: nothing moves, the Operator is asked, and answers roll-back.
+skills-watcher: { text: "stub: the watcher role's skills", pack: [], project: null }
 cut: { mode: release, release: "a1b2c3d4e5f6-0011aabb", items: ["#7"], pr: 12, legacy: true, summary: "stub: release of #7", question: "", options: [], recommendation: null }
 promote: { result: production, env: production, deployed_at: "2026-11-20T10:00:00Z", window_minutes: 30, summary: "stub: on production", question: "", options: [], recommendation: null }
 signals:

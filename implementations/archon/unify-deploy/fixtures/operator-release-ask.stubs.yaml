@@ -1,4 +1,5 @@
 # release.trigger: operator, nothing urgent: one request for the whole release; the Operator releases it, which starts the next release run.
+skills-watcher: { text: "stub: the watcher role's skills", pack: [], project: null }
 cut:
   mode: ask
   release: ""

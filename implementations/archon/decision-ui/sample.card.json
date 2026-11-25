@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "question": "PROJ-42: accept this bug as M, R1?",
+  "headline": "A cover note about tickets adds a false flight request next to the rail one",
+  "recommendation": {
+    "option": "accept",
+    "label": "Accept as M, R1",
+    "confidence": "medium",
+    "meaning": "the main claim has evidence; the gaps are listed",
+    "why": "Reproduced on the live model: each sheet of an attachment goes to its own model call with the same email body, so the call for the hotel sheet does not see the rail sheet and reads 'tickets' as a flight. Fix it at the input, not with a filter afterwards."
+  },
+  "checks": [
+    { "text": "Two-sheet file, note 'book tickets and a stay': false flight in 3 of 3 runs", "rate": { "hits": 3, "runs": 3 } },
+    { "text": "The ticket's own note: 1 of 3 runs", "rate": { "hits": 1, "runs": 3 } },
+    { "text": "Control, rail sheet only: 0 of 3 runs", "rate": { "hits": 0, "runs": 3 } }
+  ],
+  "notVerified": [
+    "I did not open the real cases from the ticket: the log viewer is not reachable from the sandbox.",
+    "I compared the two fixes by reading the code only; the effect of option 2 is a prediction.",
+    "I did not check mixed flight and rail files, where the flight from the body must stay."
+  ],
+  "cause": ["Hotel sheet + email body", "its own model call, no rail sheet", "'tickets' read as flight", "merge keeps the flight"],
+  "whyYou": "Every item passes your Accept before any spec or code is written. Size and risk are the agent's reading.",
+  "facts": [
+    "Kind: bug. Size M, risk R1.",
+    "Root cause at `app/detector.py:425-432`: the sheet loop passes the same body with only one sheet.",
+    "Reproduced: `uv run python repro.py` → flight from body in 3 of 3 runs.",
+    "Assumption: the test model stands in for the production model."
+  ],
+  "options": [
+    { "id": "accept", "label": "Accept as M, R1", "does": "Moves the item to Specifying and starts the spec stage (questions, then a spec for your review).", "recommended": true },
+    { "id": "accept-urgent", "label": "Accept as M, R1, urgent", "does": "The same, and the item goes to the front of every queue with a release right after its merge.", "recommended": false },
+    { "id": "for-human", "label": "For a human", "does": "Moves the item to ForHuman and comments why; the pipeline only tracks it.", "recommended": false },
+    { "id": "wont-do", "label": "Won't do", "does": "Labels it rejected, comments the reason and closes the item as not planned.", "recommended": false }
+  ],
+  "other": true
+}

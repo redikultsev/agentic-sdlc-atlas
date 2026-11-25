@@ -9,6 +9,7 @@ tests: { ran: true, ok: true, command: bun test, guard: true, where: { git: /opt
 deploys: { ok: true, base: main, error: null, legacy: true, environments: [{ name: production, kind: production, stage: after-merge, steps: [deploy, watch 30 min, rollback revert] }], trigger: merge, toggles: null }
 scouts: { ok: true, base: main, error: null, scouts: [] }
 report: { pack: unify-sdlc, ok: true, report: "stub: every check passed" }
+skills: { ok: true, base: main, pack: [unify-lessons, unify-reproduce, unify-root-cause], missing: [], project: [] }
 fixture:
   inputs: { repo_host: github.com, repo_path: example/repo, bindings_dir: /srv/bindings }
   expect: completed

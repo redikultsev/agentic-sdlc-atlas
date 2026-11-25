@@ -1,4 +1,6 @@
 # The item is in Planning already: reconcile stops with a request instead of specifying over it.
+skills-questions: { text: "stub: the questions role's skills", pack: [], project: null }
+skills-interviewer: { text: "stub: the interviewer role's skills", pack: [], project: null }
 reconcile:
   ok: false
   reason: "stub: #7 is planning; this stage starts only from triage-review or specifying"

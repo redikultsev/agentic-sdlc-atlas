@@ -34,6 +34,20 @@ worktree: { enabled: false }
 mutates_checkout: false
 
 nodes:
+  # The scout agent's skills: the pack's for its role and the project's .pipeline/skills file (decision 67).
+  - id: skills-scout
+    script: skills
+    runtime: bun
+    timeout: 120000
+    with: { role: scout }
+    output_format:
+      type: object
+      properties:
+        text: { type: string }
+        pack: { type: array, items: { type: string } }
+        project: { type: [string, 'null'] }
+      required: [text, pack, project]
+
   - id: pick
     script: pick
     runtime: bun
@@ -61,7 +75,7 @@ nodes:
   # fixed in the YAML, so the look runs on the largest cap not above the scout's budget.
   - id: look-small
     command: scout
-    depends_on: [pick]
+    depends_on: [pick, skills-scout]
     when: "$pick.output.tier == 'small'"
     model: ['@scout', medium]
     context: fresh
@@ -70,6 +84,7 @@ nodes:
     idle_timeout: 900000
     maxBudgetUsd: 1
     with:
+      skills: "$skills-scout.output.text"
       context: "$pick.output.context"
     output_format: &look
       type: object
@@ -93,7 +108,7 @@ nodes:
 
   - id: look-medium
     command: scout
-    depends_on: [pick]
+    depends_on: [pick, skills-scout]
     when: "$pick.output.tier == 'medium'"
     model: ['@scout', medium]
     context: fresh
@@ -102,12 +117,13 @@ nodes:
     idle_timeout: 900000
     maxBudgetUsd: 2
     with:
+      skills: "$skills-scout.output.text"
       context: "$pick.output.context"
     output_format: *look
 
   - id: look-large
     command: scout
-    depends_on: [pick]
+    depends_on: [pick, skills-scout]
     when: "$pick.output.tier == 'large'"
     model: ['@scout', medium]
     context: fresh
@@ -116,6 +132,7 @@ nodes:
     idle_timeout: 900000
     maxBudgetUsd: 5
     with:
+      skills: "$skills-scout.output.text"
       context: "$pick.output.context"
     output_format: *look
 

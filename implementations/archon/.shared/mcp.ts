@@ -6,8 +6,9 @@
  * A server is described the way MCP config files describe it (the same shape Archon's
  * agent nodes read), so one file can declare a project's servers for agents and for code:
  *   stdio: { command, args?, env? }      http: { type: 'http', url, headers? }
- * Values in `env` and `headers` may name an environment variable as `${NAME}`; it is read
- * from the script's own environment, so a token never sits in the project map.
+ * Values in `command`, `args`, `env`, `url` and `headers` may name an environment variable as
+ * `${NAME}`; it is read from the script's own environment, so neither a token nor a path of the
+ * machine that runs the engine sits in the project map.
  *
  * Every call returns a result or a typed failure and never throws: a failure is the
  * connector's to retry or report, never a fix round (decision 47).
@@ -156,7 +157,7 @@ function rpcReply(message: { result?: unknown; error?: { code?: number; message?
 function stdioChannel(server: Extract<McpServer, { command: string }>, timeoutMs: number): Channel | McpFailure {
   let child: ChildProcessWithoutNullStreams;
   try {
-    child = spawn(server.command, [...(server.args ?? [])], {
+    child = spawn(expand(server.command), (server.args ?? []).map(a => expand(a)), {
       env: { ...process.env, ...expandAll(server.env) },
       stdio: ['pipe', 'pipe', 'pipe'],
     });
@@ -253,7 +254,7 @@ function httpChannel(server: Extract<McpServer, { type: 'http' }>, timeoutMs: nu
   const post = async (body: unknown, expectReply: boolean): Promise<Reply> => {
     let res: Response;
     try {
-      res = await fetch(server.url, {
+      res = await fetch(expand(server.url), {
         method: 'POST',
         headers: {
           ...headers,
@@ -292,7 +293,7 @@ function httpChannel(server: Extract<McpServer, { type: 'http' }>, timeoutMs: nu
     async close() {
       if (!session) return;
       try {
-        await fetch(server.url, { method: 'DELETE', headers: { ...headers, 'mcp-session-id': session }, signal: AbortSignal.timeout(5_000) });
+        await fetch(expand(server.url), { method: 'DELETE', headers: { ...headers, 'mcp-session-id': session }, signal: AbortSignal.timeout(5_000) });
       } catch {
         // a server that cannot end the session lets it expire
       }

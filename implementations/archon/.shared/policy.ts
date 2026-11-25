@@ -8,6 +8,7 @@
  *   .pipeline/automerge.yaml  R0 rules: paths, change types, size, never-zones, hours (decision 25)
  */
 
+import { existsSync, readFileSync } from 'node:fs';
 import { git } from './git.ts';
 
 export interface ProjectPolicy {
@@ -29,8 +30,25 @@ export interface AutomergeRules {
 /** Paths a PR may never change on the R0 path, whatever the project's rules say. */
 export const ALWAYS_NEVER = ['.pipeline/**', '.archon/**', '.github/workflows/**', 'AGENTS.md', 'CLAUDE.md'] as const;
 
-/** A file from the base branch on the remote, or null when the base has none. */
+/**
+ * A file from the base branch on the remote, or null when the base has none.
+ *
+ * `PIPELINE_POLICY_DIR` in the engine's environment, when set, holds the `.pipeline/` files
+ * instead: for a trial on a repository where the pipeline's settings are not on the base
+ * yet. It is the Operator's folder on the engine's machine, so a PR still cannot change the
+ * policy it is judged by.
+ */
 export function fromBase(base: string, path: string): string | null {
+  const local = process.env.PIPELINE_POLICY_DIR;
+  if (local && path.startsWith('.pipeline/') && !path.includes('..')) {
+    const root = local.replace(/[\\/]+$/, '');
+    // One folder per repository (`<dir>/<owner>/<name>/.pipeline/`) when the engine serves several.
+    const origin = git('remote', 'get-url', 'origin').stdout.trim();
+    const repo = /[/:]([^/:]+\/[^/]+?)(?:\.git)?$/.exec(origin)?.[1] ?? '';
+    const own = repo !== '' && existsSync(`${root}/${repo}/.pipeline`) ? `${root}/${repo}` : root;
+    const file = `${own}/${path}`;
+    return existsSync(file) ? readFileSync(file, 'utf8') : null;
+  }
   git('fetch', '--quiet', 'origin', base);
   const shown = git('show', `origin/${base}:${path}`);
   return shown.code === 0 ? shown.stdout : null;

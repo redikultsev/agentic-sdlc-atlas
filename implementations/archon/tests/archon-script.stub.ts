@@ -19,7 +19,10 @@ export const fake = {
   racePut: new Map<string, () => void>(),
   /** Label operations that throw, by label name. */
   failLabel: new Set<string>(),
+  /** The run's artifacts directory; empty means the run has none. */
+  artifacts: '',
   reset() {
+    this.artifacts = '';
     this.docs.clear();
     this.issues.clear();
     this.calls.length = 0;
@@ -107,6 +110,7 @@ plugin({
         ForgeError,
         input: () => undefined,
         runId: () => 'run-1',
+        artifactsDir: () => fake.artifacts,
         emit: () => {},
         refuse: (reason: string) => {
           throw new Error(`refused: ${reason}`);

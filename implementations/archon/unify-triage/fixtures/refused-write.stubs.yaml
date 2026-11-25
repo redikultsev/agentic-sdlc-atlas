@@ -1,4 +1,5 @@
 # The tracker refused a write (a required field). The next stage raises it as a difference with two answers; the Operator puts the tracker back and the run ends (decisions 45, 47).
+skills-triage: { text: "stub: the triage role's skills", pack: [], project: null }
 reconcile:
   ok: false
   reason: "stub: #7: the tracker refused 1 write(s): comment:note (Component is required)"

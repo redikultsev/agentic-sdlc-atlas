@@ -161,6 +161,20 @@ operations:
     expect(fakeMcp.calls[0]).toEqual(['update_issue', { issue_key: 'PROJ-1', update: { labels: [{ add: 'state:planning' }] } }]);
   });
 
+  test('where the label tool only replaces the list, {labels} is the list after the change, read first', async () => {
+    const replacing = MAP.replace(/  label\.add: .*\n/, '  label.add: { tool: update_issue, args: { issue_key: "{key}", fields: "{\\"labels\\": {labels}}" } }\n').replace(
+      /  label\.remove: .*\n/,
+      '  label.remove: { tool: update_issue, args: { issue_key: "{key}", fields: "{\\"labels\\": {labels}}" } }\n'
+    );
+    const fakeMcp = session((tool: string) => (tool === 'get_issue' ? { fields: { summary: 'x', labels: ['ai-support', 'state:triaging'] } } : {}));
+    const adapter = mapAdapter(parseMap(replacing), fakeMcp.open);
+    await adapter.addLabel('PROJ-1', 'state:planning');
+    await adapter.removeLabel('PROJ-1', 'state:triaging');
+    const writes = fakeMcp.calls.filter(([tool]) => tool === 'update_issue');
+    expect(writes[0]).toEqual(['update_issue', { issue_key: 'PROJ-1', fields: '{"labels": ["ai-support","state:triaging","state:planning"]}' }]);
+    expect(writes[1]).toEqual(['update_issue', { issue_key: 'PROJ-1', fields: '{"labels": ["ai-support"]}' }]);
+  });
+
   test('a tool error is a refusal when its text says so, an outage otherwise', async () => {
     let message = 'Field "Component" is required';
     const adapter = mapAdapter(parseMap(MAP), session(() => new Error(message)).open);

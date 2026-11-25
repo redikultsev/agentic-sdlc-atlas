@@ -1,0 +1,165 @@
+<!doctype html>
+<!--
+  The decision card (decision 68): draws one DecisionCard (`.shared/card.ts`) and lets the
+  Operator answer on it. Engine-independent, no dependencies, no build step.
+
+  Where the card comes from, first match wins:
+    ?src=<url>                      a card JSON file (for example a run artifact `<case>.card.json`)
+    <script id="card" type="application/json">  a card embedded by the host
+    postMessage {type: "card", card}            a host page that frames this one
+  Where the answer goes:
+    ?answer=<url>                   POST {option, text} as JSON to the host's endpoint
+    postMessage {type: "decision", option, text} to the parent frame (a plugin canvas)
+    a "decision" event on window    for a host that loads this file itself
+  Agent text is shown as text, never as HTML.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decision</title>
+<style>
+  :root { --bg:#f7f6f3; --card:#fff; --ink:#1d1d1b; --soft:#5f5e5a; --mute:#8a8984; --line:#e3e1da; --accent:#185fa5; --accent-bg:#e6f1fb;
+          --warn:#854f0b; --warn-bg:#faeeda; --bad:#e24b4a; --good:#1d9e75; --empty:#d3d1c7; --chain:#eeedfe; --chain-ink:#3c3489; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#141413; --card:#1f1f1d; --ink:#f1efe8; --soft:#b4b2a9; --mute:#888780; --line:#33332f; --accent:#85b7eb; --accent-bg:#0c2f52;
+            --warn:#fac775; --warn-bg:#3d2a07; --empty:#444441; --chain:#26215c; --chain-ink:#cecbf6; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width:760px; margin:24px auto; padding:0 16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px 26px; }
+  h1 { font-size:22px; font-weight:600; margin:0 0 4px; line-height:1.35; }
+  .headline { color:var(--soft); margin:0 0 4px; }
+  section { border-top:1px solid var(--line); margin-top:18px; padding-top:14px; }
+  .label { font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:var(--mute); margin:0 0 8px; }
+  .rec { font-size:17px; margin:0; } .rec b { font-weight:600; }
+  .conf { display:inline-block; font-size:13px; padding:2px 10px; border-radius:999px; background:var(--accent-bg); color:var(--accent); margin-left:6px; }
+  .why { color:var(--soft); margin:6px 0 0; }
+  .checks { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px 16px; align-items:center; }
+  .dots { white-space:nowrap; font-variant-numeric:tabular-nums; color:var(--soft); font-size:14px; }
+  .dot { display:inline-block; width:12px; height:12px; border-radius:50%; margin-right:3px; vertical-align:-1px; background:var(--empty); }
+  .dot.hit { background:var(--bad); } .dots.clean .dot { background:var(--good); } .dots.clean .dot.miss { background:var(--good); }
+  .gaps { background:var(--warn-bg); color:var(--warn); border-radius:10px; padding:12px 16px; border-top:none; }
+  .gaps .label { color:var(--warn); } ul { margin:0; padding-left:20px; } li { margin:3px 0; }
+  .chain { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+  .step { background:var(--chain); color:var(--chain-ink); border-radius:8px; padding:6px 10px; font-size:14px; }
+  .arrow { color:var(--mute); margin-right:6px; } .link { display:inline-flex; align-items:center; white-space:nowrap; }
+  details { margin:4px 0; } summary { cursor:pointer; color:var(--soft); }
+  details ul { margin-top:6px; font-size:14px; }
+  .options { display:flex; flex-direction:column; gap:8px; }
+  .opt { display:flex; gap:12px; align-items:flex-start; text-align:left; width:100%; background:var(--card); color:var(--ink);
+         border:1px solid var(--line); border-radius:10px; padding:10px 14px; font:inherit; cursor:pointer; }
+  .opt:hover { border-color:var(--mute); } .opt.recommended { border:2px solid var(--accent); }
+  .opt .name { font-weight:600; min-width:0; } .opt .does { color:var(--soft); font-size:14px; }
+  .tag { font-size:12px; color:var(--accent); }
+  textarea { width:100%; min-height:64px; font:inherit; padding:8px 10px; border:1px solid var(--line); border-radius:10px; background:var(--card); color:var(--ink); }
+  .row { display:flex; gap:8px; align-items:center; margin-top:8px; }
+  button.other { font:inherit; padding:6px 14px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; }
+  .error { color:var(--bad); font-size:13px; } .done { color:var(--good); font-weight:600; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size:.92em; background:var(--bg); padding:0 4px; border-radius:4px; }
+</style>
+</head>
+<body>
+<main><div class="card" id="root"><p class="label">Loading the decision…</p></div></main>
+<script>
+(function () {
+  const params = new URLSearchParams(location.search);
+  const root = document.getElementById('root');
+
+  function el(tag, props, children) {
+    const node = document.createElement(tag);
+    for (const [k, v] of Object.entries(props || {})) {
+      if (k === 'class') node.className = v; else if (k === 'text') node.textContent = v; else node.setAttribute(k, v);
+    }
+    for (const c of children || []) if (c) node.append(c);
+    return node;
+  }
+  // Agent text as text; only `code` spans get a style. Nothing is parsed as HTML.
+  function rich(text) {
+    const span = document.createElement('span');
+    String(text).split(/(`[^`]+`)/).forEach(part => {
+      span.append(part.startsWith('`') && part.endsWith('`') && part.length > 2 ? el('code', { text: part.slice(1, -1) }) : document.createTextNode(part));
+    });
+    return span;
+  }
+  function section(label, body, cls) { return el('section', cls ? { class: cls } : {}, [el('p', { class: 'label', text: label }), body]); }
+  function list(items) { return el('ul', {}, items.map(i => el('li', {}, [rich(i)]))); }
+  function dots(rate, clean) {
+    const wrap = el('span', { class: 'dots' + (clean ? ' clean' : '') });
+    for (let i = 0; i < rate.runs; i++) wrap.append(el('span', { class: 'dot ' + (i < rate.hits ? 'hit' : 'miss') }));
+    wrap.append(document.createTextNode(` ${rate.hits} of ${rate.runs}`));
+    return wrap;
+  }
+
+  function answer(option, text) {
+    const detail = { option, text: text || '' };
+    window.dispatchEvent(new CustomEvent('decision', { detail }));
+    if (window.parent !== window) window.parent.postMessage({ type: 'decision', ...detail }, '*');
+    const url = params.get('answer');
+    const finish = msg => { root.querySelector('#status').replaceChildren(el('span', { class: msg.ok ? 'done' : 'error', text: msg.text })); };
+    if (!url) return finish({ ok: true, text: `Answer sent: ${option}` });
+    fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(detail), credentials: 'include' })
+      .then(r => finish(r.ok ? { ok: true, text: `Answer recorded: ${option}` } : { ok: false, text: `The engine refused the answer (${r.status}).` }))
+      .catch(() => finish({ ok: false, text: 'The answer did not reach the engine; try again.' }));
+  }
+
+  function render(card) {
+    if (!card || card.version !== 1) { root.replaceChildren(el('p', { class: 'error', text: 'This is not a decision card this page can read.' })); return; }
+    const parts = [el('h1', {}, [rich(card.question)])];
+    if (card.headline) parts.push(el('p', { class: 'headline' }, [rich(card.headline)]));
+
+    const rec = card.recommendation;
+    parts.push(section('Recommended', el('div', {}, [
+      el('p', { class: 'rec' }, [el('b', { text: rec.label }), el('span', { class: 'conf', text: `confidence ${rec.confidence}` })]),
+      el('p', { class: 'why', text: `${rec.meaning[0].toUpperCase()}${rec.meaning.slice(1)}.` }),
+      rec.why ? el('p', {}, [rich(rec.why)]) : null,
+    ])));
+
+    if (card.checks.length) {
+      const grid = el('div', { class: 'checks' });
+      for (const c of card.checks) grid.append(el('span', {}, [rich(c.text)]), c.rate ? dots(c.rate, c.rate.hits === 0) : el('span'));
+      parts.push(section('Check it yourself', grid));
+    }
+    if (card.notVerified.length) parts.push(section('Not verified', list(card.notVerified), 'gaps'));
+    if (card.cause.length) {
+      const chain = el('div', { class: 'chain' });
+      // The arrow travels with the step after it, so a wrapped line never ends on an arrow.
+      card.cause.forEach((s, i) => chain.append(el('span', { class: 'link' }, [i ? el('span', { class: 'arrow', text: '→' }) : null, el('span', { class: 'step' }, [rich(s)])])));
+      parts.push(section('The cause', chain));
+    }
+    const folded = [];
+    if (card.facts.length) folded.push(el('details', {}, [el('summary', { text: `Evidence and facts (${card.facts.length})` }), list(card.facts)]));
+    folded.push(el('details', {}, [el('summary', { text: 'Why this came to you' }), el('p', {}, [rich(card.whyYou)])]));
+    parts.push(el('section', {}, folded));
+
+    const opts = el('div', { class: 'options' });
+    for (const o of card.options) {
+      const b = el('button', { class: 'opt' + (o.recommended ? ' recommended' : ''), type: 'button' }, [
+        el('div', {}, [el('div', { class: 'name', text: o.label }), el('div', { class: 'does', text: o.does })]),
+        o.recommended ? el('span', { class: 'tag', text: 'recommended' }) : null,
+      ]);
+      b.addEventListener('click', () => answer(o.id, ''));
+      opts.append(b);
+    }
+    const other = el('textarea', { placeholder: 'Something else: your words are recorded as a ruling' });
+    const otherBtn = el('button', { class: 'other', type: 'button', text: 'Send other' });
+    const status = el('span', { id: 'status' });
+    otherBtn.addEventListener('click', () => {
+      if (!other.value.trim()) { status.replaceChildren(el('span', { class: 'error', text: 'Write what to do instead first.' })); return; }
+      answer('other', other.value.trim());
+    });
+    other.addEventListener('input', () => status.replaceChildren());
+    parts.push(section('Your decision', el('div', {}, [opts, el('div', { style: 'margin-top:12px' }, [other]), el('div', { class: 'row' }, [otherBtn, status])])));
+    root.replaceChildren(...parts);
+  }
+
+  window.addEventListener('message', e => { if (e.data && e.data.type === 'card') render(e.data.card); });
+  const src = params.get('src');
+  const embedded = document.getElementById('card');
+  if (src) fetch(src, { credentials: 'include' }).then(r => r.json()).then(render).catch(() => render(null));
+  else if (embedded) render(JSON.parse(embedded.textContent));
+})();
+</script>
+</body>
+</html>

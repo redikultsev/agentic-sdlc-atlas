@@ -1,4 +1,6 @@
 # Three other items wait for the Operator: the stage holds (a five-minute wait) before Specifying.
+skills-questions: { text: "stub: the questions role's skills", pack: [], project: null }
+skills-interviewer: { text: "stub: the interviewer role's skills", pack: [], project: null }
 reconcile: { ok: true, reason: "", question: "", options: [], recommendation: { option: "", why: "", confidence: low }, state: specifying }
 count: { under: false, waiting: 3, cap: 3 }
 fixture:

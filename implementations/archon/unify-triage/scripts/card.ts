@@ -32,6 +32,10 @@ interface Verdict {
   duplicates: { url: string; quote: string; relation: string }[];
   assumptions: { text: string; source: string }[];
   data_sources: string;
+  headline?: string;
+  checks?: string[];
+  not_checked?: string[];
+  cause_chain?: string[];
 }
 
 function evidenceOf(c: Claim): string {
@@ -81,15 +85,21 @@ async function main(): Promise<void> {
   const recommended = v.outcome === 'accept' ? 'accept' : v.outcome;
   const request = buildRequest(
     {
-      decide: `${key}: accept it as ${v.size} with risk ${v.risk}, hand it to a human, or close it? Triage proposes: ${v.outcome}. ${v.reason}`,
-      why: 'every item passes your Accept before any spec or code is written (TriageReview).',
+      decide: `${key}: accept this ${v.kind} as ${v.size}, ${v.risk}?`,
+      headline: v.headline?.trim() || undefined,
+      why: 'every item passes your Accept before any spec or code is written. Size and risk are the agent\'s reading: answer "other" with yours and triage runs again with your words as a ruling.',
+      check: v.checks ?? [],
       notVerified: [
-        ...evidence.problems.map(p => `refused: ${p}`),
-        ...(v.data_sources.trim() === '' ? ['which logs or alerts exist for this project'] : []),
-        'size and risk are the agent\'s reading; answer "other" with the right ones and triage runs again with your words as a ruling',
+        ...evidence.problems.map(p => `A claim was refused for missing evidence: ${p}`),
+        // An agent that lists no gap still made assumptions; they are what was not verified.
+        ...((v.not_checked ?? []).length > 0 ? v.not_checked! : v.assumptions.map(a => `Assumed: ${a.text}`)),
+        ...(v.data_sources.trim() === '' ? ['No logs or alerts were named for this project.'] : []),
       ],
+      cause: v.cause_chain ?? [],
+      case: `triage-${key}`,
       facts: [
         `Kind: ${v.kind}. Size ${v.size} (files and changed lines, no time estimate), risk ${v.risk}.`,
+        `Triage proposes: ${v.outcome}. ${v.reason}`,
         ...(manualStart ? ['implement_lane is manual: nothing starts unless you choose "Accept … and start implementing".'] : []),
         'Urgent (decision 53): the item goes to the front of every queue and a release is cut right after its merge; choose it only when waiting costs more than the jump.',
         ...v.claims.map(c => `${c.kind}: ${c.statement} — ${evidenceOf(c)}`),
@@ -103,7 +113,7 @@ async function main(): Promise<void> {
     options,
     {
       option: recommended,
-      why: evidence.ok ? `Triage's verdict: ${v.reason}` : `Triage's verdict, but ${evidence.problems.length} claim(s) were refused for missing evidence: ${v.reason}`,
+      why: evidence.ok ? v.reason : `${evidence.problems.length} claim(s) were refused for missing evidence. ${v.reason}`,
       confidence: evidence.ok ? v.confidence : 'low',
     }
   );

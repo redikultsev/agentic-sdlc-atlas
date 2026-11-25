@@ -1,4 +1,6 @@
 # The item is in Implementing already: reconcile stops with a request instead of planning over it.
+skills-researcher: { text: "stub: the researcher role's skills", pack: [], project: null }
+skills-planner: { text: "stub: the planner role's skills", pack: [], project: null }
 reconcile:
   ok: false
   reason: "stub: #7 is implementing; this stage starts only from spec-review or planning"

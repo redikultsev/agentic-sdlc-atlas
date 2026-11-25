@@ -1,4 +1,6 @@
 # The tracker shows Blocked while the engine holds Planning: the Operator puts the tracker back; the run ends.
+skills-researcher: { text: "stub: the researcher role's skills", pack: [], project: null }
+skills-planner: { text: "stub: the planner role's skills", pack: [], project: null }
 reconcile:
   ok: false
   reason: "stub: #7: the engine holds planning; the tracker shows blocked"
