@@ -26,7 +26,7 @@
 
 import { input, refuse, state } from 'archon:script';
 import { forge, ForgeError } from './forge.ts';
-import { type ItemKey, issueKey, issueNumber, keySlug } from './item.ts';
+import { type ItemKey, issueKey, issueNumber, keySlug, stateSlug } from './item.ts';
 import { mapAdapter, parseMap } from './map.ts';
 import { fromBase } from './policy.ts';
 import { repoOf, type Repo } from './repo.ts';
@@ -118,7 +118,7 @@ export interface Ledger {
 
 /** `ledger/<item>`, or `ledger/project` for writes that belong to no item (a register). */
 export function ledgerName(scope: ItemKey | 'project'): string {
-  return `ledger/${scope === 'project' ? 'project' : keySlug(scope)}`;
+  return `ledger/${scope === 'project' ? 'project' : stateSlug(scope)}`;
 }
 
 export function readLedger(scope: ItemKey | 'project'): Ledger {

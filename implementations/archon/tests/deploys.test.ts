@@ -26,6 +26,12 @@ describe('environments', () => {
     expect(parseDeploys({ environments: [] }).environments).toEqual([]);
   });
 
+  test('a name the engine\'s store would refuse is refused when the settings are read', () => {
+    expect(() => parseDeploys({ environments: [{ name: 'Staging' }] })).toThrow(/environment name 'Staging'/);
+    expect(() => parseDeploys({ services: [{ name: 'web api', paths: ['web/**'] }], environments: [] })).toThrow(/service name 'web api'/);
+    expect(parseDeploys({ services: [{ name: 'web-api', paths: ['web/**'] }], environments: [{ name: 'staging.eu' }] }).environments[0]?.name).toBe('staging.eu');
+  });
+
   test('shape B: a shared pre-merge environment with a gate, then production', () => {
     const d = parseDeploys({
       services: [{ name: 'api', paths: ['api/**'] }, { name: 'web', paths: ['web/**'] }],

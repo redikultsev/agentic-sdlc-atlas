@@ -10,7 +10,7 @@ export const WORK = {
   'work/12': { state: 'implementing', rounds: 1, flags: [], urgent: false, verdicts: [], slices: [] },
   'work/13': { state: 'merge-review', rounds: 0, flags: [], urgent: true, verdicts: [], slices: [] },
   'work/14': { state: 'merge-review', rounds: 0, flags: ['set-aside'], urgent: false, verdicts: [], slices: [] },
-  'work/PROJ-7': { state: 'releasing', rounds: 0, flags: [], urgent: false, verdicts: [], slices: [] },
+  'work/proj-7': { state: 'releasing', rounds: 0, flags: [], urgent: false, verdicts: [], slices: [] },
 } as const;
 
 export const PROVENANCE = { item: '#12', pack: ['sha256:aaaa'], roles: { implementer: { models: ['model-i'], sessions: 2, seconds: 600, usd: 1.5, costNotReported: 0 } } };

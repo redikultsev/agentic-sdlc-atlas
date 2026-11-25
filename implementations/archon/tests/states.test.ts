@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { fake } from './archon-script.stub.ts';
 import { fakeTracker } from './fake-tracker.ts';
 import { useTracker } from '../.shared/connector.ts';
-import { issueKey, issueNumber, keySlug, parseKey } from '../.shared/item.ts';
+import { issueKey, issueNumber, keyOfStateSlug, keySlug, parseKey } from '../.shared/item.ts';
 import { MOVES, moveState, NONE, readState, resolveDifference, STATES, StateDifference, StateMismatch, type From } from '../.shared/states.ts';
 import { differenceCard, applyDifference } from '../.shared/stage.ts';
 import { docName, readWork } from '../.shared/work.ts';
@@ -37,7 +37,10 @@ describe('item keys', () => {
   test('a key names the same document an issue number did', async () => {
     expect(docName(12)).toBe('work/12');
     expect(docName(issueKey(12))).toBe('work/12');
-    expect(docName('PROJ-123')).toBe('work/PROJ-123');
+    expect(docName('PROJ-123')).toBe('work/proj-123');
+    expect(keyOfStateSlug('proj-123')).toBe('PROJ-123');
+    expect(keyOfStateSlug('12')).toBe('#12');
+    expect(keyOfStateSlug('../x')).toBeNull();
     expect(() => keySlug('../x')).toThrow();
   });
 });

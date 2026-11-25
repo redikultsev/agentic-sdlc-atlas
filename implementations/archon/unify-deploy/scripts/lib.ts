@@ -24,7 +24,7 @@ import { deployAndCheck, type Deploys, type Environment, environmentsFor, runRec
 import { forge } from '../../.shared/forge.ts';
 import { fireNext } from '../../.shared/fire.ts';
 import { git, gitOrThrow } from '../../.shared/git.ts';
-import { asKey, type ItemKey, keySlug, parseKey } from '../../.shared/item.ts';
+import { asKey, type ItemKey, keySlug, parseKey, stateSlug } from '../../.shared/item.ts';
 import { previousVerified, readRelease, type Release, type RollbackPlan, rollbackPlan, setEnvStatus, updateLine } from '../../.shared/releases.ts';
 import type { Repo } from '../../.shared/repo.ts';
 import { moveState } from '../../.shared/states.ts';
@@ -81,7 +81,7 @@ export interface DeployRecord {
 
 /** The record subject of an item's own deploy (a revert). */
 export function itemSubject(key: ItemKey): string {
-  return keySlug(key);
+  return stateSlug(key);
 }
 
 /** The record subject of a release's deploy to one environment. */

@@ -135,7 +135,7 @@ describe('tools against fake seams', () => {
     expect(r.isError).toBe(false);
     expect((r.structuredContent as any).work.state).toBe('releasing');
     expect((r.structuredContent as any).engine).toBeNull();
-    expect(argvs).toContainEqual(['state', 'get', 'work/PROJ-7', '--project', 'acme/shop']);
+    expect(argvs).toContainEqual(['state', 'get', 'work/proj-7', '--project', 'acme/shop']);
     expect(urls[0]).toContain('key=item-PROJ-7');
   });
 

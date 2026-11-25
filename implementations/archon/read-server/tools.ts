@@ -5,6 +5,7 @@
  * the parts it could, so one outage does not hide the rest.
  */
 
+import { keyOfStateSlug } from '../.shared/item.ts';
 import { checkKey, checkProject, checkRunId, names, ReadError, type Reader, type StateDoc } from './sources.ts';
 
 export interface ToolOutput {
@@ -57,10 +58,10 @@ async function part<T>(read: () => Promise<T>): Promise<T | { error: string }> {
 
 const failed = (v: unknown): v is { error: string } => isObject(v) && typeof v.error === 'string' && Object.keys(v).length === 1;
 
-/** `work/12` → `#12`; `work/PROJ-1` → `PROJ-1`. */
+/** `work/12` → `#12`; `work/proj-1` → `PROJ-1`; a name that is no key stays as it is. */
 function keyOfDoc(name: string): string {
   const slug = name.slice(name.indexOf('/') + 1);
-  return /^[0-9]+$/.test(slug) ? `#${slug}` : slug;
+  return keyOfStateSlug(slug) ?? slug;
 }
 
 // --- shaping the pack's documents --------------------------------------------------------

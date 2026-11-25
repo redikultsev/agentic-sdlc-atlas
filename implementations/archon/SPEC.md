@@ -53,7 +53,7 @@ A usage limit is not a failure: Archon pauses the run at the provider's limit an
 | `connector.ts` | the one way to the tracker, by item key: read, comment, label, create, close, list, links; the write ledger, read-back, the outage queue, refusals; the code-host adapter; `script()` that runs a script's main and closes the connector | 45, 46, 47 |
 | `map.ts` | the project map `.pipeline/tracker.yaml`: format, install check, the MCP adapter | 46, 47 |
 | `states.ts` | the 17 states and the allowed moves; the engine's state in `work/<key>`, shown as a label through the connector; a difference with the tracker and its two answers | 28, 45 |
-| `item.ts` | item keys: `#12` or `PROJ-123`, the document and slug each names, the engine key of an item's runs (`runKey`); no `archon:script`, so the read server shares it | 45, 63 |
+| `item.ts` | item keys: `#12` or `PROJ-123`, the slug each names (`keySlug` for branches and paths, `stateSlug` in lower case for state document names: `work/proj-123`), the engine key of an item's runs (`runKey`); no `archon:script`, so the read server shares it | 45, 63 |
 | `mcp.ts` | a small MCP client: stdio and streamable HTTP, typed failures | 46, 47 |
 | `work.ts` | the `work/<key>` document with the state, conditional writes; the item's kind and red records | 15, 33, 45, 58 |
 | `red.ts` | red records: reading the Implementer's `tests`, keeping them per slice run in `work/<key>`, the PR section, the bug rule | 58 |

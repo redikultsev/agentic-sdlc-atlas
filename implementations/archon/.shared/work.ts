@@ -7,7 +7,7 @@
  */
 
 import { state } from 'archon:script';
-import { asKey, type ItemKey, keySlug } from './item.ts';
+import { asKey, type ItemKey, keySlug, stateSlug } from './item.ts';
 import type { SliceRecord } from './red.ts';
 
 export interface Verdict {
@@ -96,7 +96,7 @@ export function emptyWork(): WorkDoc {
 }
 
 export function docName(item: ItemKey | number): string {
-  return `work/${keySlug(asKey(item))}`;
+  return `work/${stateSlug(asKey(item))}`;
 }
 
 export function readWork(item: ItemKey | number): { readonly doc: WorkDoc; readonly revision: number } {

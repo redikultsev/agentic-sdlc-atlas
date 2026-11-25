@@ -74,9 +74,20 @@ type Raw = Partial<{
   deploy: { hook?: string | null; windowMinutes?: number; signals?: string[] };
 }>;
 
+/**
+ * Environment and service names become parts of state document names (`holds/<env>/<service>`,
+ * deploy records), and Archon's store accepts only `[a-z0-9._-]` there: a name it would
+ * refuse is refused here, when the settings are read, not at the first hold.
+ */
+const NAME = /^[a-z0-9._-]{1,60}$/;
+function checkName(what: string, name: string): string {
+  if (!NAME.test(name)) throw new Error(`project.yaml: ${what} name '${name}' must be lower case letters, digits, '.', '_' or '-' (at most 60)`);
+  return name;
+}
+
 export function parseDeploys(raw: Raw | null): Deploys {
   const r = raw ?? {};
-  const services = Array.isArray(r.services) && r.services.length > 0 ? r.services.map(s => ({ name: String(s.name), paths: [...(s.paths ?? [])] })) : [ALL];
+  const services = Array.isArray(r.services) && r.services.length > 0 ? r.services.map(s => ({ name: checkName('service', String(s.name)), paths: [...(s.paths ?? [])] })) : [ALL];
   const trigger = (r.release?.trigger ?? 'merge') as Deploys['release']['trigger'];
   if (!['merge', 'schedule', 'operator'].includes(trigger)) throw new Error(`project.yaml: release.trigger '${trigger}' is not merge, schedule or operator`);
   const common = {
@@ -109,7 +120,7 @@ export function parseDeploys(raw: Raw | null): Deploys {
   }
   const names = new Set(services.map(s => s.name));
   const environments = r.environments.map((e, i): Environment => {
-    const name = String(e.name ?? `environment-${i + 1}`);
+    const name = checkName('environment', String(e.name ?? `environment-${i + 1}`));
     const kind = (e.kind ?? 'shared') as Kind;
     if (!['shared', 'ephemeral', 'production'].includes(kind)) throw new Error(`project.yaml: environment ${name} has kind '${kind}'`);
     const stage = (e.stage ?? (kind === 'production' ? 'after-merge' : 'before-merge')) as Environment['stage'];

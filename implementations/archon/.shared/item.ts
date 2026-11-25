@@ -41,6 +41,21 @@ export function keySlug(key: ItemKey): string {
   return key;
 }
 
+/**
+ * The key as a segment of a state document name: `keySlug` in lower case (`12`,
+ * `proj-123`). Archon's store accepts only `[a-z0-9._-]` in a name; a tracker key is upper
+ * case by its own pattern, so lower case loses nothing and `keyOfStateSlug` turns it back.
+ * Branches, markers and paths keep `keySlug`.
+ */
+export function stateSlug(key: ItemKey): string {
+  return keySlug(key).toLowerCase();
+}
+
+/** The key a state document name segment stands for (`12` → `#12`, `proj-123` → `PROJ-123`), or null. */
+export function keyOfStateSlug(slug: string): ItemKey | null {
+  return parseKey(slug.toUpperCase());
+}
+
 /** Accepts a key or, from callers not moved to keys yet, an issue number. */
 export function asKey(item: ItemKey | number): ItemKey {
   return typeof item === 'number' ? issueKey(item) : item;

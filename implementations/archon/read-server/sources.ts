@@ -16,12 +16,12 @@
  *   `GET /api/runs/attention` (what waits for a person), both scoped by `project`.
  *
  * Names: an item key is parsed by the pack's own `item.ts`, so `#12` reads `work/12` and
- * `PROJ-123` reads `work/PROJ-123`; any other shape is refused. Prefixes come from a fixed
+ * `PROJ-123` reads `work/proj-123` (state names are lower case); any other shape is refused. Prefixes come from a fixed
  * list. The documents are the ones the pack writes: `work.ts`, `provenance.ts`, `holds.ts`,
  * `releases.ts`, `findings.ts`, `unify-deploy/scripts/lib.ts` (`release-gates/<id>`).
  */
 
-import { keySlug, parseKey, runKey } from '../.shared/item.ts';
+import { parseKey, runKey, stateSlug } from '../.shared/item.ts';
 
 /** A refusal or failure the caller sees as the tool's error text. Never carries a credential. */
 export class ReadError extends Error {}
@@ -57,7 +57,7 @@ export type Family = 'work' | 'provenance';
 
 /** Document names of the pack's state, built here and nowhere else. */
 export const names = {
-  item: (family: Family, key: string) => `${family}/${keySlug(checkKey(key))}`,
+  item: (family: Family, key: string) => `${family}/${stateSlug(checkKey(key))}`,
   line: 'releases-line',
 } as const;
 
@@ -65,7 +65,7 @@ export const names = {
 export const PREFIXES = ['work/', 'holds/', 'releases/', 'release-gates/', 'findings/'] as const;
 export type Prefix = (typeof PREFIXES)[number];
 
-const SLUG = /^(?:[1-9][0-9]*|[A-Z][A-Z0-9_]*-[1-9][0-9]*)$/;
+const SLUG = /^(?:[1-9][0-9]*|[a-z][a-z0-9_]*-[1-9][0-9]*)$/;
 
 function allowedName(name: string): boolean {
   if (name === names.line) return true;

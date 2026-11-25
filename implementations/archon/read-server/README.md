@@ -19,7 +19,7 @@ Every tool takes `project` (a project key such as `owner/repo`, a codebase name 
 
 ## What it calls, and nothing else
 
-- Archon's CLI with a fixed argv and no shell: `state get <name> --project <p>`, `state list --prefix <prefix> --values --project <p>`, `workflow get <run-id> --json --verbose`. Names are built by the server: an item key is parsed by `../.shared/item.ts` (`#12` → `work/12`, `PROJ-123` → `work/PROJ-123`), prefixes come from a fixed list (`work/`, `holds/`, `releases/`, `release-gates/`, `findings/`). `--project` is always passed: without it the CLI resolves the project from the working directory and may register it. A read that comes back in install scope is refused.
+- Archon's CLI with a fixed argv and no shell: `state get <name> --project <p>`, `state list --prefix <prefix> --values --project <p>`, `workflow get <run-id> --json --verbose`. Names are built by the server: an item key is parsed by `../.shared/item.ts` (`#12` → `work/12`, `PROJ-123` → `work/proj-123`, since state names are lower case), prefixes come from a fixed list (`work/`, `holds/`, `releases/`, `release-gates/`, `findings/`). `--project` is always passed: without it the CLI resolves the project from the working directory and may register it. A read that comes back in install scope is refused.
 - Archon's HTTP server, GET only, no redirects followed: `/api/items?project=&key=` and `/api/runs/attention?project=`.
 - Both seams check every argv and every route against the allowlist before they run. No tool takes a path, a command, a prefix or a document name. A bad argument, a refused read, a failed read, a timeout or an output over the cap is a tool error with a message; the server keeps running.
 

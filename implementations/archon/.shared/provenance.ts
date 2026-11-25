@@ -32,7 +32,7 @@ import { forge } from './forge.ts';
 import { git } from './git.ts';
 import { hostJson } from './host.ts';
 import { isObject } from './inputs.ts';
-import { type ItemKey, keySlug } from './item.ts';
+import { type ItemKey, keySlug, stateSlug } from './item.ts';
 import { allTests } from './red.ts';
 import type { Repo } from './repo.ts';
 import { currentVerdicts, type WorkDoc } from './work.ts';
@@ -102,7 +102,7 @@ export const engine = {
 const ROLE: Readonly<Record<string, string>> = { implement: 'implementer', review: 'reviewer' };
 
 export function docName(key: ItemKey): string {
-  return `provenance/${keySlug(key)}`;
+  return `provenance/${stateSlug(key)}`;
 }
 
 /** The command that prints the whole record: the pointer next to the one line. */

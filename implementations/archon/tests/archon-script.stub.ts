@@ -36,12 +36,21 @@ export const fake = {
 
 class ForgeError extends Error {}
 
+// Archon's own rule for a state document name (`stateDocumentNameSchema` in
+// packages/workflows/src/state-document-store.ts): the real store refuses any other name.
+const NAME = /^[a-z0-9._-]+(?:\/[a-z0-9._-]+)*$/;
+function checkName(name: string): void {
+  if (name.length > 200 || !NAME.test(name)) throw new Error(`state document name refused by the engine: ${name}`);
+}
+
 const state = {
   get(name: string) {
+    checkName(name);
     const doc = fake.docs.get(name);
     return { name, revision: doc?.revision ?? 0, value: doc?.value ?? null, lease: null };
   },
   put(name: string, value: unknown, options: { ifRevision: number }) {
+    checkName(name);
     const race = fake.racePut.get(name);
     if (race) {
       fake.racePut.delete(name);
@@ -53,6 +62,7 @@ const state = {
     return { ok: true, revision: { revision: current + 1 } };
   },
   delete(name: string, options: { ifRevision?: number } = {}) {
+    checkName(name);
     const current = fake.docs.get(name)?.revision ?? 0;
     if (options.ifRevision !== undefined && current !== options.ifRevision) return { ok: false, conflict: 'revision_moved' };
     fake.docs.set(name, { revision: current + 1, value: null });

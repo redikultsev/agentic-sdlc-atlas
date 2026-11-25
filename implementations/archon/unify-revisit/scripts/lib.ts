@@ -6,7 +6,7 @@
 
 import { items, type ItemWindow, state } from 'archon:script';
 import { archonCommand } from '../../.shared/host.ts';
-import { type ItemKey, parseKey } from '../../.shared/item.ts';
+import { type ItemKey, keyOfStateSlug, parseKey } from '../../.shared/item.ts';
 import { STATES, type State } from '../../.shared/states.ts';
 import type { WorkDoc } from '../../.shared/work.ts';
 
@@ -41,7 +41,7 @@ export interface HeldItem {
 export function workItems(): HeldItem[] {
   const held: HeldItem[] = [];
   for (const found of state.listValues('work/')) {
-    const key = parseKey(found.name.slice('work/'.length));
+    const key = keyOfStateSlug(found.name.slice('work/'.length));
     if (key === null) continue;
     const doc = (found.value ?? {}) as Partial<WorkDoc>;
     const known = typeof doc.state === 'string' && doc.state in STATES ? (doc.state as State) : null;
