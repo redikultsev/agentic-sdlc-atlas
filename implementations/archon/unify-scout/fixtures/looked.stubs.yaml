@@ -1,0 +1,27 @@
+# A due scout with a budget of 3 USD looks under the 2 USD cap (look-medium): it returns two
+# findings; one is kept in the buffer, the other it proposed before and is passed over.
+pick:
+  has: true
+  scout: deps
+  tier: medium
+  cap: 2
+  reason: the deps scout is due
+  passed: []
+  context: "stub: the area, the measurements and the memory"
+look-medium:
+  findings:
+    - { where: package.json:14, what: "stub: the parser library is three majors behind", evidence: "stub: npm outdated: 2.1.0 -> 5.0.3", urgent: null }
+    - { where: package.json:9, what: "stub: the date library is unmaintained", evidence: "stub: last release 2023", urgent: null }
+  looked: "stub: package.json and the lock file against npm outdated"
+  summary: "stub: two old dependencies"
+record:
+  scout: deps
+  kept: [{ id: d1e2f3a4b5c60718, where: package.json:14, what: "stub: the parser library is three majors behind", key: null }]
+  repeated: 1
+  over_limit: 0
+  over_buffer: 0
+  summary: "stub: The deps scout proposed 2: 1 kept; 1 proposed before."
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo }
+  expect: completed
+  reached: [pick, look-medium, record]

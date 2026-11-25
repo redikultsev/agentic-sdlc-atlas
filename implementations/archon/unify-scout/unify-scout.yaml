@@ -1,0 +1,152 @@
+name: unify-scout
+description: |
+  One scout's look (decision 55), item-less. A script reads the scouts the project declares
+  in `.pipeline/project.yaml` on the base (`.shared/scouts.ts`), takes one that is due and
+  has fewer than 2 findings waiting in the findings buffer, marks the look begun in its
+  memory (`scouts/<name>`), runs the measure commands the project declared for it, and
+  gives the agent the area, the measurements and the scout's memory. A read-only agent
+  looks over the area under the engine's cost cap that fits the scout's budget and returns
+  findings with evidence. A script keeps them in the findings buffer with the scout as
+  their source, at most up to the limit (an urgent one is filed at once), and writes what
+  the look did into the scout's memory. Nothing else is written: no code, no tracker item
+  but an urgent one.
+
+  Use when: its hourly timer binding starts it (each tick takes at most one due scout), or
+  the Operator fires the same binding once with `--no-item --inputs <file>` naming
+  `scout` to look with that scout now (its schedule is ignored, its limit is not).
+  NOT for: the pipeline itself (the Retro, unify-retro); triaging what it finds (the daily
+  pass, unify-findings).
+
+inputs:
+  repo_host:
+    required: true
+    description: The forge host of the repository.
+  repo_path:
+    required: true
+    description: The owner/name path of the repository.
+  scout:
+    default: ""
+    description: A declared scout's name to look with now; empty takes the due scout that has waited longest.
+
+# The agent reads the checkout; nothing writes to it. The measure commands are the
+# Operator's, read from the base like check.command.
+worktree: { enabled: false }
+mutates_checkout: false
+
+nodes:
+  - id: pick
+    script: pick
+    runtime: bun
+    timeout: 1000000
+    output_format:
+      type: object
+      properties:
+        has: { type: boolean }
+        scout: { type: string }
+        tier: { type: string }
+        cap: { type: number }
+        reason: { type: string }
+        passed:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              why: { type: string }
+            required: [name, why]
+        context: { type: string }
+      required: [has, scout, tier, cap, reason, passed, context]
+
+  # One agent node per cost cap (`CAPS` in .shared/scouts.ts): Archon's maxBudgetUsd is
+  # fixed in the YAML, so the look runs on the largest cap not above the scout's budget.
+  - id: look-small
+    command: scout
+    depends_on: [pick]
+    when: "$pick.output.tier == 'small'"
+    model: ['@scout', medium]
+    context: fresh
+    mutates_checkout: false
+    allowed_tools: [Read, Grep, Glob]
+    idle_timeout: 900000
+    maxBudgetUsd: 1
+    with:
+      context: "$pick.output.context"
+    output_format: &look
+      type: object
+      additionalProperties: false
+      properties:
+        findings:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              where: { type: string }
+              what: { type: string }
+              evidence: { type: string }
+              # Null, or why it cannot wait for the daily pass: a vulnerability, data loss or broken production (decision 60).
+              urgent: { type: [string, 'null'] }
+            required: [where, what, evidence, urgent]
+        looked: { type: string }
+        summary: { type: string }
+      required: [findings, looked, summary]
+
+  - id: look-medium
+    command: scout
+    depends_on: [pick]
+    when: "$pick.output.tier == 'medium'"
+    model: ['@scout', medium]
+    context: fresh
+    mutates_checkout: false
+    allowed_tools: [Read, Grep, Glob]
+    idle_timeout: 900000
+    maxBudgetUsd: 2
+    with:
+      context: "$pick.output.context"
+    output_format: *look
+
+  - id: look-large
+    command: scout
+    depends_on: [pick]
+    when: "$pick.output.tier == 'large'"
+    model: ['@scout', medium]
+    context: fresh
+    mutates_checkout: false
+    allowed_tools: [Read, Grep, Glob]
+    idle_timeout: 900000
+    maxBudgetUsd: 5
+    with:
+      context: "$pick.output.context"
+    output_format: *look
+
+  - id: record
+    script: record
+    runtime: bun
+    timeout: 300000
+    depends_on: [pick, look-small, look-medium, look-large]
+    trigger_rule: none_failed_min_one_success
+    when: "$pick.output.has == 'true'"
+    with:
+      scout: "$pick.output.scout"
+      small: { from: "$look-small.output", if_skipped: null }
+      medium: { from: "$look-medium.output", if_skipped: null }
+      large: { from: "$look-large.output", if_skipped: null }
+    output_format:
+      type: object
+      properties:
+        scout: { type: string }
+        kept:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              where: { type: string }
+              what: { type: string }
+              key: { type: [string, 'null'] }
+            required: [id, where, what, key]
+        repeated: { type: integer }
+        over_limit: { type: integer }
+        over_buffer: { type: integer }
+        summary: { type: string }
+      required: [scout, kept, repeated, over_limit, over_buffer, summary]

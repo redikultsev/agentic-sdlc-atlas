@@ -13,7 +13,7 @@ Every tool takes `project` (a project key such as `owner/repo`, a codebase name 
 | `overview` | `work/`, `holds/`, `releases/`, `findings/`, `releases-line`; the attention queue | items by state (set aside, urgent), what waits for a person, holds held and queued, the release line, the latest release, the findings buffer size |
 | `item` | `work/<key>`, `provenance/<key>`; Archon's item read | one item: the engine's document, its provenance record, its runs with spend, queued starts, open questions, answers and rulings, links, the install hold |
 | `holds_and_releases` | `holds/`, `releases-line`, `releases/`, `release-gates/` | every hold with holder, queue, returning items and build; the line; releases newest first with each environment's status and gates (`limit`, default 10) |
-| `findings` | `findings/` | the buffer oldest first, counts per item and role (`limit`, default 30) |
+| `findings` | `findings/` | the buffer oldest first, counts per item, role and scout (`limit`, default 30) |
 | `run` | `archon workflow get <run-id> --json --verbose` | one run: status, outcome, pack digest, per node the state, kind, requested and resolved model, cost (null when not reported, never zero), duration, fan-out children |
 | `attention` | `GET /api/runs/attention` | what waits for a person, by kind; answers are given in the console, never here |
 

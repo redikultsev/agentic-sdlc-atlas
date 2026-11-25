@@ -8,9 +8,12 @@
  * The deploys line says how `.pipeline/project.yaml` reads: each environment with its
  * kind, stage and declared steps, the release trigger and the toggles; shape A (no
  * `environments`) passes and says so; a file that does not parse fails with its message.
+ * The scouts line lists each declared scout (decision 55) with its schedule, budget, the
+ * cost cap a look runs under when it differs, findings waiting and its last look; none
+ * declared passes; a bad setting fails with its message.
  *
  * Bound inputs: INPUTS_REPO, INPUTS_LABELS, INPUTS_ACCESS, INPUTS_BINDINGS, INPUTS_CODEX,
- * INPUTS_TESTS and INPUTS_DEPLOYS, the outputs of the checks.
+ * INPUTS_TESTS, INPUTS_DEPLOYS and INPUTS_SCOUTS, the outputs of the checks.
  */
 
 import { emit, input, refuse } from 'archon:script';
@@ -45,6 +48,18 @@ function main(): void {
           `${mark(true)} deploys: ${deploys.legacy === true ? 'shape A from deploy: (no environments declared)' : `${envs.length} environment(s)`}; release trigger ${String(deploys.trigger)}; toggles ${deploys.toggles === null ? 'none' : `set by ${String(deploys.toggles)}`}`,
           ...envs.map(e => `       ${e.name}: ${e.kind}, ${e.stage}; ${e.steps.join(', ')}`),
         ];
+  const scouts = read('scouts', input('scouts'));
+  const declared = (Array.isArray(scouts.scouts) ? scouts.scouts : []) as { name: string; every: string; budget: number; cap: number; paths: string[]; measure: number; waiting: number; last: string | null }[];
+  const scoutLines =
+    scouts.ok !== true
+      ? [`${mark(false)} scouts: .pipeline/project.yaml on ${String(scouts.base)}: ${String(scouts.error)}`]
+      : [
+          `${mark(true)} scouts: ${declared.length === 0 ? 'none declared (unify-scout does nothing)' : `${declared.length} declared, at most one look per hourly tick`}`,
+          ...declared.map(
+            s =>
+              `       ${s.name}: ${s.every}, budget ${s.budget} USD${s.cap === s.budget ? '' : ` (a look runs under the ${s.cap} USD cap)`}; ${s.paths.join(', ')}${s.measure > 0 ? `; ${s.measure} measure command(s)` : ''}; ${s.waiting} finding(s) waiting; last look ${s.last ?? 'never'}`
+          ),
+        ];
 
   const lines = [
     `unify-sdlc install check for ${String(repo.host)}/${String(repo.path)} (from ${String(repo.source)})`,
@@ -54,6 +69,7 @@ function main(): void {
     `${mark(bindings.ok)} bindings: ${bindings.ok === null ? 'not checked' : `${list(bindings.found).length} of ${list(bindings.declared).length} found in ${String(bindings.dir)}`}`,
     `${mark(codex.configured)} codex review (reported only): ${codex.configured ? `@review on ${String(codex.model ?? 'codex')}` : list(codex.notes).join('; ')}`,
     ...deployLines,
+    ...scoutLines,
     `${mark(tests.ok)} test suite through the guard: ${tests.ran ? `exit ${String(tests.exit)}${tests.timed_out ? ' (timed out)' : ''}, ${list(tests.refusals).length} guard refusals, ${String(tests.note)}` : String(tests.note)}`,
   ];
   const fixes = [
@@ -63,12 +79,13 @@ function main(): void {
     ...list(bindings.problems).map(p => `binding: ${p}`),
     ...list(tests.refusals).map(r => `guard refused: ${r}`),
     ...(deploys.ok === false ? ['fix .pipeline/project.yaml on the base (its format is in decision 48)'] : []),
+    ...(scouts.ok === false ? ['fix the scouts section of .pipeline/project.yaml on the base (its format is in .shared/scouts.ts)'] : []),
   ];
   // Reported, not counted: what waits for the daily pass (decision 60).
   const waiting = buffered().length;
   lines.push(`${mark(null)} findings buffer (reported only): ${waiting} of at most ${MAX_BUFFER} waiting for the daily pass (unify-findings)`);
   if (fixes.length > 0) lines.push('', 'To fix:', ...fixes.map(f => `- ${f}`));
-  const counted = [labels.ok, access.ok, bindings.ok, tests.ok, deploys.ok];
+  const counted = [labels.ok, access.ok, bindings.ok, tests.ok, deploys.ok, scouts.ok];
   const ok = counted.every(value => value !== false);
   emit({ pack: 'unify-sdlc', ok, report: lines.join('\n') });
 }

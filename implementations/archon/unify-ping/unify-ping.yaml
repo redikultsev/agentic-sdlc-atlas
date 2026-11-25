@@ -5,7 +5,9 @@ description: |
   checks the binding files written by `archon pack bindings`, reports whether the AI
   reviewer can run on Codex, reads .pipeline/project.yaml (environments with their kind,
   stage and declared steps, the release trigger, toggles; shape A when no environments
-  are declared; a parse error fails the check), and runs the project's test suite through the git and gh
+  are declared; a parse error fails the check), reads the scouts it declares
+  (each with its schedule, budget and cost cap, paths, findings waiting; a bad setting fails
+  the check), and runs the project's test suite through the git and gh
   guard, reporting what the guard refused. Ends with one readable report.
 
   Use when: after installing or updating the pack, or after changing the guard, the token
@@ -94,12 +96,38 @@ nodes:
         toggles: { type: [string, 'null'] }
       required: [ok, base, error, legacy, environments, trigger, toggles]
 
+  - id: scouts
+    script: scouts
+    runtime: bun
+    output_format:
+      type: object
+      properties:
+        ok: { type: boolean }
+        base: { type: string }
+        error: { type: [string, 'null'] }
+        scouts:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              every: { type: string }
+              budget: { type: number }
+              cap: { type: number }
+              paths: { type: array, items: { type: string } }
+              measure: { type: integer }
+              waiting: { type: integer }
+              last: { type: [string, 'null'] }
+            required: [name, every, budget, cap, paths, measure, waiting, last]
+      required: [ok, base, error, scouts]
+
   - id: report
     script: report
     runtime: bun
-    depends_on: [repo, labels, access, bindings, codex, tests, deploys]
+    depends_on: [repo, labels, access, bindings, codex, tests, deploys, scouts]
     with:
       deploys: { from: "$deploys.output" }
+      scouts: { from: "$scouts.output" }
       repo: { from: "$repo.output" }
       labels: { from: "$labels.output" }
       access: { from: "$access.output" }

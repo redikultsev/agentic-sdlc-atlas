@@ -1,5 +1,6 @@
 # The project declares two environments (a shared test with a gate before merge, production
 # after it), a release on schedule and toggles: the deploys line lists each with its steps.
+# One scout is declared, its budget above the cap its look runs under.
 repo: { host: github.com, path: example/repo, source: inputs }
 labels: { ok: true, total: 26, tracker: code-host, lacks: [], ensured: [state:triaging], existing: [], failed: [] }
 access: { ok: true, host: github.com, login: acme-bot, expected_login: acme-bot, login_matches: true, repo_error: null, error: null }
@@ -16,9 +17,15 @@ deploys:
     - { name: production, kind: production, stage: after-merge, steps: [deploy, version, smoke, watch 30 min, rollback revert] }
   trigger: schedule
   toggles: ./deploy/toggle.sh
+scouts:
+  ok: true
+  base: main
+  error: null
+  scouts:
+    - { name: deps, every: weekly, budget: 3, cap: 2, paths: [package.json, bun.lock], measure: 1, waiting: 1, last: "2026-11-24T09:00:00Z" }
 report: { pack: unify-sdlc, ok: true, report: "stub: 2 environment(s); release trigger schedule; toggles set by ./deploy/toggle.sh" }
 fixture:
   inputs: { repo_host: github.com, repo_path: example/repo, bindings_dir: /srv/bindings }
   expect: completed
   authored: succeeded
-  reached: [repo, labels, access, bindings, codex, tests, deploys, report]
+  reached: [repo, labels, access, bindings, codex, tests, deploys, scouts, report]

@@ -223,3 +223,17 @@ bindings:
     inputs:
       repo_host: { repo: host }
       repo_path: { repo: path }
+
+  # Scouts (decision 55): each tick takes at most one due scout declared in
+  # .pipeline/project.yaml, so the hourly interval is how soon a due scout looks. The
+  # Operator looks with one scout now by firing this binding once with `--no-item --inputs
+  # <file>` naming `scout`; the shared resource and overlap: skip keep it to one look at a time.
+  unify-scout:
+    workflow: unify-scout
+    resource: scout
+    capacity: 1
+    overlap: skip
+    schedule: { interval_seconds: 3600 }
+    inputs:
+      repo_host: { repo: host }
+      repo_path: { repo: path }

@@ -7,9 +7,10 @@ bindings: { ok: true, dir: /srv/bindings, declared: [unify-poll], found: [unify-
 codex: { configured: true, provider: codex, model: gpt-codex, credential: CODEX_API_KEY, notes: [] }
 tests: { ran: true, ok: true, command: bun test, guard: true, where: { git: /opt/guard/git, gh: /opt/guard/gh }, exit: 0, timed_out: false, refusals: [], tail: [], note: ran through the guard }
 deploys: { ok: false, base: main, error: "project.yaml: production environment production must be after-merge", legacy: false, environments: [], trigger: "", toggles: null }
+scouts: { ok: true, base: main, error: null, scouts: [] }
 report: { pack: unify-sdlc, ok: false, report: "stub: deploys: .pipeline/project.yaml on main does not parse" }
 fixture:
   inputs: { repo_host: github.com, repo_path: example/repo, bindings_dir: /srv/bindings }
   expect: completed
   authored: failed
-  reached: [repo, labels, access, bindings, codex, tests, deploys, report]
+  reached: [repo, labels, access, bindings, codex, tests, deploys, scouts, report]

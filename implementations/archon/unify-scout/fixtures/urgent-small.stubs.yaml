@@ -1,0 +1,26 @@
+# A scout with a budget of 1 USD looks under the smallest cap (look-small) and marks one
+# finding urgent: it is filed at once as a tracker item, not buffered.
+pick:
+  has: true
+  scout: auth
+  tier: small
+  cap: 1
+  reason: the auth scout is due
+  passed: []
+  context: "stub: the area and the memory"
+look-small:
+  findings:
+    - { where: src/auth/session.ts:41, what: "stub: the session token is compared with ==", evidence: "stub: lines 40-42", urgent: "stub: a timing attack on session tokens" }
+  looked: "stub: src/auth"
+  summary: "stub: one urgent finding"
+record:
+  scout: auth
+  kept: [{ id: e1f2a3b4c5d60718, where: src/auth/session.ts:41, what: "stub: the session token is compared with ==", key: "#40" }]
+  repeated: 0
+  over_limit: 0
+  over_buffer: 0
+  summary: "stub: The auth scout proposed 1: 1 kept (#40 filed at once as urgent)."
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo }
+  expect: completed
+  reached: [pick, look-small, record]

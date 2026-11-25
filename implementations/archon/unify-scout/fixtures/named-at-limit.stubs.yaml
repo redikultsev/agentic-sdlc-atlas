@@ -1,0 +1,14 @@
+# The Operator fires the binding naming the deps scout, which has 2 findings waiting for the
+# daily pass: it is at its limit, so no agent runs and nothing is written.
+pick:
+  has: false
+  scout: ""
+  tier: ""
+  cap: 0
+  reason: "the deps scout is at its limit: 2 findings wait for the daily pass"
+  passed: [{ name: deps, why: "at its limit: 2 findings wait for the daily pass" }]
+  context: ""
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, scout: deps }
+  expect: completed
+  reached: [pick]

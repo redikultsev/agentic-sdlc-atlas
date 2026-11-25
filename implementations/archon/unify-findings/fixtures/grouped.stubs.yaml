@@ -14,7 +14,7 @@ group:
 file:
   ok: true
   problems: []
-  filed: [{ key: "#31", title: "Import: an empty file crashes the parser (seen 2 times)", count: 2 }]
+  filed: [{ key: "#31", title: "Import: an empty file crashes the parser (seen 2 times)", count: 2, findings: [a1b2c3d4e5f60718, b2c3d4e5f6071829] }]
   dropped: [{ finding: c3d4e5f60718293a, reason: in-work, item: "#12" }]
   left: 0
 fixture:

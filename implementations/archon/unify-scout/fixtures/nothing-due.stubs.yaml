@@ -1,0 +1,14 @@
+# The timer's tick: the one declared scout looked yesterday and is weekly, so nothing is due;
+# the run ends at pick, no agent runs and nothing is written.
+pick:
+  has: false
+  scout: ""
+  tier: ""
+  cap: 0
+  reason: no scout is due and under its limit
+  passed: [{ name: deps, why: "not due: looked 2026-11-24T09:00:00Z, every weekly" }]
+  context: ""
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo }
+  expect: completed
+  reached: [pick]

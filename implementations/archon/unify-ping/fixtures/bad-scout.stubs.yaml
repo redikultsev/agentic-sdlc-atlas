@@ -1,0 +1,16 @@
+# .pipeline/project.yaml names a scout in upper case, which the engine's store would refuse
+# in its memory's name: the scouts line is red with the reason and the report fails.
+repo: { host: github.com, path: example/repo, source: inputs }
+labels: { ok: true, total: 26, tracker: code-host, lacks: [], ensured: [state:triaging], existing: [], failed: [] }
+access: { ok: true, host: github.com, login: acme-bot, expected_login: acme-bot, login_matches: true, repo_error: null, error: null }
+bindings: { ok: true, dir: /srv/bindings, declared: [unify-poll], found: [unify-poll], missing: [], problems: [] }
+codex: { configured: true, provider: codex, model: gpt-codex, credential: CODEX_API_KEY, notes: [] }
+tests: { ran: true, ok: true, command: bun test, guard: true, where: { git: /opt/guard/git, gh: /opt/guard/gh }, exit: 0, timed_out: false, refusals: [], tail: [], note: ran through the guard }
+deploys: { ok: true, base: main, error: null, legacy: true, environments: [{ name: production, kind: production, stage: after-merge, steps: [deploy, watch 30 min, rollback revert] }], trigger: merge, toggles: null }
+scouts: { ok: false, base: main, error: "project.yaml: scout name 'Deps' must be lower case letters, digits, '.', '_' or '-' (at most 40, starting with a letter or digit)", scouts: [] }
+report: { pack: unify-sdlc, ok: false, report: "stub: scouts: .pipeline/project.yaml on main: scout name 'Deps' must be lower case" }
+fixture:
+  inputs: { repo_host: github.com, repo_path: example/repo, bindings_dir: /srv/bindings }
+  expect: completed
+  authored: failed
+  reached: [repo, labels, access, bindings, codex, tests, deploys, scouts, report]
