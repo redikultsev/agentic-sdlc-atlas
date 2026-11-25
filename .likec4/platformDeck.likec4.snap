@@ -48,12 +48,12 @@
       }
     ]
   },
-  "hash": "CQUDgiDqmobk5PhnlJFOqh42mxDbM9IMaBfs6dptUrI",
+  "hash": "jmTYApLA1E9vP6Hg0zVd5DJBZtm-l2QdACOdSFXsde4",
   "bounds": {
     "x": -140.0,
     "y": -120.0,
     "width": 1220.0,
-    "height": 1015.0
+    "height": 1255.0
   },
   "nodes": [
     {
@@ -66,6 +66,7 @@
       ],
       "outEdges": [
         "d7lkt0",
+        "12ao5b1",
         "fz6ef1"
       ],
       "title": "Supervisor",
@@ -84,7 +85,7 @@
         "idea"
       ],
       "metadata": {
-        "in": "The Operator's messages; Pipeline state",
+        "in": "The Operator's messages; the read surface; its memory in Pipeline state",
         "does": "Answers, runs reversible commands, prepares what needs a signature",
         "out": "Answers, commands to the Orchestrator, prepared decision requests"
       },
@@ -98,7 +99,7 @@
       "height": 135,
       "labelBBox": {
         "x": -49.0,
-        "y": 459.0,
+        "y": 361.0,
         "width": 138,
         "height": 32
       }
@@ -150,7 +151,7 @@
       "height": 135,
       "labelBBox": {
         "x": 12.0,
-        "y": -132,
+        "y": -332,
         "width": 160,
         "height": 32
       }
@@ -197,9 +198,9 @@
       "height": 135,
       "labelBBox": {
         "x": -903.0,
-        "y": -108.0,
+        "y": -864.0,
         "width": 127,
-        "height": 65
+        "height": 66
       }
     },
     {
@@ -239,7 +240,7 @@
       "height": 135,
       "labelBBox": {
         "x": -426.0,
-        "y": -967.0,
+        "y": -982.0,
         "width": 172,
         "height": 32
       }
@@ -283,7 +284,7 @@
       "height": 135,
       "labelBBox": {
         "x": 3.0,
-        "y": -702,
+        "y": -717,
         "width": 115,
         "height": 32
       }
@@ -330,9 +331,9 @@
       "height": 135,
       "labelBBox": {
         "x": -396.0,
-        "y": 443.0,
+        "y": 344.0,
         "width": 111,
-        "height": 65
+        "height": 66
       }
     },
     {
@@ -376,7 +377,7 @@
       "height": 135,
       "labelBBox": {
         "x": -34.0,
-        "y": -197.0,
+        "y": -212.0,
         "width": 188,
         "height": 32
       }
@@ -417,7 +418,7 @@
       "height": 135,
       "labelBBox": {
         "x": -1405.0,
-        "y": -312,
+        "y": -1087,
         "width": 144,
         "height": 32
       }
@@ -433,7 +434,8 @@
       "outEdges": [
         "1tk37k4",
         "ys8zm5",
-        "1zj7iy"
+        "1zj7iy",
+        "fbczm5"
       ],
       "title": "Operator",
       "modelRef": "operator",
@@ -458,7 +460,7 @@
       "height": 135,
       "labelBBox": {
         "x": -1390.0,
-        "y": 699.0,
+        "y": 521.0,
         "width": 115,
         "height": 32
       }
@@ -503,7 +505,7 @@
       "height": 135,
       "labelBBox": {
         "x": -469.0,
-        "y": 43.0,
+        "y": 28.0,
         "width": 72,
         "height": 32
       }
@@ -547,8 +549,53 @@
       "height": 135,
       "labelBBox": {
         "x": -1315.0,
-        "y": 699.0,
+        "y": 521.0,
         "width": 155,
+        "height": 32
+      }
+    },
+    {
+      "id": "engine.readSurface",
+      "parent": null,
+      "level": 0,
+      "children": [],
+      "inEdges": [
+        "12ao5b1",
+        "fbczm5"
+      ],
+      "outEdges": [],
+      "title": "Read surface",
+      "modelRef": "engine.readSurface",
+      "shape": "rectangle",
+      "color": "sky",
+      "style": {
+        "opacity": 15,
+        "size": "sm",
+        "textSize": "xl"
+      },
+      "description": {
+        "txt": ""
+      },
+      "tags": [
+        "planned"
+      ],
+      "metadata": {
+        "in": "A question naming a project; Pipeline state and the engine's run records",
+        "does": "Reads through listed routes and commands only; changes nothing",
+        "out": "Answers as JSON and a short text"
+      },
+      "notation": "Cross-cutting part",
+      "technology": "",
+      "kind": "platform",
+      "isCustomized": true,
+      "x": 400,
+      "y": 960.0,
+      "width": 240,
+      "height": 135,
+      "labelBBox": {
+        "x": -1323.0,
+        "y": 1009.0,
+        "width": 171,
         "height": 32
       }
     }
@@ -600,11 +647,11 @@
       "points": [
         [
           140,
-          518
+          494
         ],
         [
           270,
-          518
+          494
         ],
         [
           270,
@@ -617,13 +664,51 @@
       ],
       "labelBBox": {
         "x": 196,
-        "y": 362,
+        "y": 350,
         "width": 148,
         "height": 25
       },
       "parent": null,
       "relations": [
         "10mj9ca"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "12ao5b1",
+      "source": "engine.supervisor",
+      "target": "engine.readSurface",
+      "label": "reads",
+      "points": [
+        [
+          140,
+          602
+        ],
+        [
+          270,
+          602
+        ],
+        [
+          270,
+          998
+        ],
+        [
+          400,
+          998
+        ]
+      ],
+      "labelBBox": {
+        "x": 246,
+        "y": 769,
+        "width": 48,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "1kfu27d"
       ],
       "color": "gray",
       "line": "dashed",
@@ -791,11 +876,11 @@
       "points": [
         [
           140,
-          578
+          548
         ],
         [
           270,
-          578
+          548
         ],
         [
           270,
@@ -808,7 +893,7 @@
       ],
       "labelBBox": {
         "x": 206,
-        "y": 517,
+        "y": 502,
         "width": 127,
         "height": 25
       },
@@ -875,16 +960,16 @@
         ],
         [
           270,
-          788
+          770
         ],
         [
           140,
-          788
+          770
         ]
       ],
       "labelBBox": {
         "x": 212,
-        "y": 652,
+        "y": 643,
         "width": 116,
         "height": 25
       },
@@ -943,11 +1028,11 @@
       "points": [
         [
           140,
-          842
+          806
         ],
         [
           270,
-          842
+          806
         ],
         [
           270,
@@ -960,7 +1045,7 @@
       ],
       "labelBBox": {
         "x": 208,
-        "y": 784,
+        "y": 766,
         "width": 125,
         "height": 25
       },
@@ -1005,6 +1090,44 @@
       "parent": null,
       "relations": [
         "a090q3"
+      ],
+      "color": "gray",
+      "line": "dashed",
+      "head": "normal",
+      "isLabelCustomized": true
+    },
+    {
+      "id": "fbczm5",
+      "source": "operator",
+      "target": "engine.readSurface",
+      "label": "asks",
+      "points": [
+        [
+          140,
+          842
+        ],
+        [
+          270,
+          842
+        ],
+        [
+          270,
+          1058
+        ],
+        [
+          400,
+          1058
+        ]
+      ],
+      "labelBBox": {
+        "x": 250,
+        "y": 919,
+        "width": 41,
+        "height": 25
+      },
+      "parent": null,
+      "relations": [
+        "xl4pmg"
       ],
       "color": "gray",
       "line": "dashed",

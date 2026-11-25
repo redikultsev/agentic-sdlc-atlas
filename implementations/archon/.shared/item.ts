@@ -45,3 +45,13 @@ export function keySlug(key: ItemKey): string {
 export function asKey(item: ItemKey | number): ItemKey {
   return typeof item === 'number' ? issueKey(item) : item;
 }
+
+/**
+ * The engine's key for the runs of an item: `issue-12` for `#12`, as before keys, so runs
+ * on the trial server keep their history; `item-PROJ-123` for a tracker key.
+ */
+export function runKey(item: ItemKey | number): string {
+  const key = asKey(item);
+  const number = issueNumber(key);
+  return number === null ? `item-${key}` : `issue-${number}`;
+}

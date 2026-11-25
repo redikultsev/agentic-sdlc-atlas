@@ -53,6 +53,7 @@ LAYOUTS = {
         'tracker': (-0.25, 0), 'engine.connector': (-0.25, 1.2), 'engine.supervisor': (-0.25, 2.4), 'operator': (-0.25, 3.6),
         'pstate': (1, -0.4), 'engine.orchestrator': (1, 1), 'engine.cards': (1, 2.4), 'engine.setup': (1, 3.6),
         'engine.sandbox': (2, 0), 'engine.traces': (2, 1.6), 'engine.learn.retro': (2, 2.8),
+        'engine.readSurface': (1, 4.8),
     },
     'learnDeck': {
         'pstate': (-0.4, 0), 'changes': (-0.4, 1), 'releases': (-0.4, 2), 'engine.traces': (-0.4, 3), 'engine.deploy': (-0.4, 4),

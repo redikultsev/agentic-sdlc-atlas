@@ -10,7 +10,7 @@
  */
 
 import { input, refuse } from 'archon:script';
-import { asKey, type ItemKey, issueNumber, keySlug, parseKey } from './item.ts';
+import { asKey, type ItemKey, keySlug, parseKey } from './item.ts';
 
 export interface Repo {
   readonly host: string;
@@ -38,15 +38,8 @@ export function itemOf(raw: string | undefined): ItemKey | undefined {
   return key;
 }
 
-/**
- * The engine's key for the runs of an item: `issue-12` for `#12`, as before keys, so runs
- * on the trial server keep their history; `item-PROJ-123` for a tracker key.
- */
-export function runKey(item: ItemKey | number): string {
-  const key = asKey(item);
-  const number = issueNumber(key);
-  return number === null ? `item-${key}` : `issue-${number}`;
-}
+/** The engine's key for the runs of an item; it lives in `item.ts`, which the read server shares. */
+export { runKey } from './item.ts';
 
 /** The branch that collects an item's change. */
 export function itemBranch(item: ItemKey | number): string {

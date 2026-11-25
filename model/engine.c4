@@ -100,11 +100,21 @@ model {
     supervisor = agent 'Supervisor' {
       #idea
       technology 'Chat agent, one for all projects'
-      description 'The Operator\'s single interface to the pipeline: one long-lived chat agent for all projects (decision 62). Engine code, not its prompt, sorts every call. Free, no confirmation: every read (items, states, queues, holds, releases, cost, provenance, traces) and every reversible command (file a request, mark urgent, pause and resume, start the pass over the findings buffer, reorder a queue). The Operator\'s signature: gate answers, starting a release, adopting a difference with the tracker, cancelling an item with work done, anything in bulk; it prepares these, explains and recommends, and the answer is a control the engine draws that reaches the engine past the model. Never through it: the pipeline\'s rules, the trusted list, the project map, its own permissions and caps; they change by a pull request, and it may file the request. Holds no credentials, only the engine\'s entry points. Every changing call names the project and the item and the engine echoes them back; questions across projects are read-only. Reads only the engine\'s approved copy of request text, as data. A standing instruction becomes a rule file it drafts from the follow rate and the Operator ratifies; never a remembered preference. A budget and a context limit per session; its memory is in Pipeline state and a fresh session re-reads it. Every action is logged against the Operator\'s message that caused it. Not built before the engine\'s write routes check who calls.'
+      description 'The Operator\'s single interface to the pipeline: one long-lived chat agent for all projects (decision 62). Engine code, not its prompt, sorts every call. Free, no confirmation: every read (items, states, queues, holds, releases, cost, provenance, traces), all through the read surface (decision 63), and every reversible command (file a request, mark urgent, pause and resume, start the pass over the findings buffer, reorder a queue). The Operator\'s signature: gate answers, starting a release, adopting a difference with the tracker, cancelling an item with work done, anything in bulk; it prepares these, explains and recommends, and the answer is a control the engine draws that reaches the engine past the model. Never through it: the pipeline\'s rules, the trusted list, the project map, its own permissions and caps; they change by a pull request, and it may file the request. Holds no credentials, only the engine\'s entry points. Every changing call names the project and the item and the engine echoes them back; questions across projects are read-only. Reads only the engine\'s approved copy of request text, as data. A standing instruction becomes a rule file it drafts from the follow rate and the Operator ratifies; never a remembered preference. A budget and a context limit per session; its memory is in Pipeline state and a fresh session re-reads it. Every action is logged against the Operator\'s message that caused it. Not built before the engine\'s write routes check who calls.'
       metadata {
-        in 'The Operator\'s messages; Pipeline state'
+        in 'The Operator; the read surface; its memory'
         does 'Answers, runs reversible commands, prepares what needs a signature'
         out 'Answers, commands to the Orchestrator, prepared decision requests'
+      }
+    }
+    readSurface = platform 'Read surface' {
+      #planned
+      technology 'MCP server, read tools only'
+      description 'How the Operator and the Supervisor read the pipeline\'s state without starting a run (decision 63). Read tools, each naming its project: an overview of a project (items by state, what waits for a person, holds, the release line, the findings buffer), one item (its state document, its provenance record, the engine\'s runs, open questions and answers), holds and releases, the findings buffer, one run (nodes, the resolved model and cost per node), the attention queue. It depends on the engine\'s read routes and an allowlist of the engine\'s command-line reads with a fixed argument list and no shell. Guarantees: no write route, no generic passthrough, no tool that takes a path, a command or a document name; every name is built from an item key or a fixed prefix; each call has a deadline and an output cap, and a refused or failed read is the tool\'s error, never a crash. Limits: until the engine has an HTTP read of its state and a read-only role (asked upstream), its command-line reads run as the local operator and the allowlist is the only fence, so it runs where its user cannot reach a shell. Read-only across projects.'
+      metadata {
+        in 'A question naming a project; Pipeline state and the engine\'s run records'
+        does 'Reads through listed routes and commands only; changes nothing'
+        out 'Answers as JSON and a short text'
       }
     }
     sandbox = platform 'Sandbox' {
@@ -469,5 +479,8 @@ model {
   operator -> engine.supervisor 'asks, commands'
   engine.supervisor -> engine.orchestrator 'reversible commands'
   engine.supervisor -> engine.cards 'prepares requests'
-  pstate .reads engine.supervisor 'status, memory'
+  pstate .reads engine.supervisor 'memory'
+  pstate .reads engine.readSurface 'items, holds, releases, findings'
+  operator -> engine.readSurface 'asks'
+  engine.supervisor -> engine.readSurface 'reads'
 }
