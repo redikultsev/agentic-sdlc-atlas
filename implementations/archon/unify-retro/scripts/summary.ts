@@ -6,6 +6,8 @@
  * The choice: the proposals go to Triage as they are (`noted`), or they are held until the
  * Operator approves each (`hold`: the label `pipeline:needs-approval` keeps intake away).
  *
+ * Gate answers given through a chat tool (decision 65) follow the seven when there were any.
+ *
  * The table by pack version and Implementer model (decision 59) follows the seven, one
  * line per row, and is kept in the week's record too.
  *
@@ -33,7 +35,7 @@ const pct = (value: number | null): string => (value === null ? 'n/a (nothing to
 async function main(): Promise<void> {
   const week = input('week').trim();
   const metrics = JSON.parse(input('metrics')) as Metrics;
-  const counts = JSON.parse(input('counts')) as { items: number; done: number; merged: number; closed_unmerged: number };
+  const counts = JSON.parse(input('counts')) as { items: number; done: number; merged: number; closed_unmerged: number; chat_tool_answers?: number; chat_tool_items?: string[] };
   const notes = JSON.parse(input('notes') || '[]') as string[];
   const versions = JSON.parse(input('versions') || '[]') as { pack: string; implementer: string; items: number; merged: number; changes: number; rollbacks: number }[];
   const filed = JSON.parse(input('filed') || '[]') as { key: string; title: string }[];
@@ -51,6 +53,9 @@ async function main(): Promise<void> {
     `Rollbacks: ${String(metrics.rollbacks)}`,
     `Cost per merged change: ${metrics.cost_per_merged_change === null ? 'n/a (nothing merged)' : `$${String(metrics.cost_per_merged_change)}`}`,
     `Recommendation followed, by request type: ${follow}`,
+    ...((counts.chat_tool_answers ?? 0) === 0
+      ? []
+      : [`Gate answers given through a chat tool, not the console: ${String(counts.chat_tool_answers)} (${(counts.chat_tool_items ?? []).join(', ')})`]),
     ...(versions.length === 0
       ? ['By pack version and Implementer model: no item of the week has a provenance record']
       : ['By pack version and Implementer model (items · merged · "changes" · rollbacks):', ...versions.map(v => `pack ${v.pack}, Implementer ${v.implementer}: ${String(v.items)} · ${String(v.merged)} · ${String(v.changes)} · ${String(v.rollbacks)}`)]),

@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash",
+      "PowerShell",
+      "Monitor",
+      "Read",
+      "Glob",
+      "Grep",
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "NotebookEdit",
+      "WebFetch",
+      "WebSearch",
+      "Agent",
+      "Task",
+      "Skill",
+      "EnterWorktree",
+      "ExitWorktree",
+      "mcp__archon__attention",
+      "mcp__archon__manage_run",
+      "mcp__archon__invoke_workflow",
+      "mcp__archon__register_project"
+    ]
+  }
+}

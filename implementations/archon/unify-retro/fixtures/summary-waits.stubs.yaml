@@ -10,7 +10,7 @@ metrics:
     rollbacks: 1
     cost_per_merged_change: 3.1
     follow_rate: [{ type: merge, asked: 4, answered: 4, followed: 3, rate: 0.75 }]
-  counts: { items: 6, done: 2, merged: 3, closed_unmerged: 1, cost_unknown_runs: 0 }
+  counts: { items: 6, done: 2, merged: 3, closed_unmerged: 1, cost_unknown_runs: 0, chat_tool_answers: 1, chat_tool_items: ["#8"] }
   cases:
     - { item: "#7", state: done, rounds: 2, changes: 1 }
     - { item: "#8", state: blocked, rounds: 3, changes: 0 }

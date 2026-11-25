@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "pipeline-read": {
+      "command": "bun",
+      "args": ["<pack>/read-server/server.ts"],
+      "env": {
+        "ARCHON_READ_URL": "http://127.0.0.1:3090",
+        "ARCHON_READ_USER": "${ARCHON_READ_USER}"
+      }
+    },
+    "pipeline-request": {
+      "command": "bun",
+      "args": ["<pack>/request-server/server.ts"],
+      "env": {
+        "REQUEST_GITHUB_TOKEN": "${REQUEST_GITHUB_TOKEN}",
+        "REQUEST_PROJECTS": "${REQUEST_PROJECTS}",
+        "REQUEST_DAILY_CAP": "${REQUEST_DAILY_CAP:-10}"
+      }
+    }
+  }
+}

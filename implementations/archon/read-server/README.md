@@ -1,8 +1,8 @@
 # Pipeline state, read-only: an MCP server
 
-A small MCP server that answers questions about the pipeline's state in Archon and can change nothing (decision 63 in `../../../docs/decisions.md`; element "Read surface" in `../../../model/engine.c4`). For the Operator now, for the Supervisor (decision 62) later. It is not a workflow and does not ship as part of the pack's runs; it lives next to the pack because it reads the documents the pack writes.
+A small MCP server that answers questions about the pipeline's state in Archon and can change nothing (decision 63 in `../../../docs/decisions.md`; element "Read surface" in `../../../model/engine.c4`). For the Operator and for the Supervisor (decisions 62, 65), whose folder registers it for Archon's chat (`../supervisor/`). It is not a workflow and does not ship as part of the pack's runs; it lives next to the pack because it reads the documents the pack writes.
 
-TypeScript run by Bun, stdio transport, no dependencies: the protocol subset is `initialize`, `notifications/initialized`, `ping`, `tools/list`, `tools/call` and JSON-RPC errors, the other side of the pack's own client (`../.shared/mcp.ts`).
+TypeScript run by Bun, stdio transport, no dependencies: the protocol subset is `initialize`, `notifications/initialized`, `ping`, `tools/list`, `tools/call` and JSON-RPC errors, the other side of the pack's own client (`../.shared/mcp.ts`). The protocol code is `../.shared/mcp-serve.ts`, shared with the request server (`../request-server/`, decision 66), which holds the Supervisor's one write tool; this server has none.
 
 ## Tools
 

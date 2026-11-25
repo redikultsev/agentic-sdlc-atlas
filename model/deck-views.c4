@@ -130,7 +130,7 @@ views {
       operator with { description '' technology '' },
       tracker with { description '' technology '' },
       engine.learn.retro with { description '' technology '' }
-    exclude engine.implement.implementer, engine, engine.learn, engine.learn.retro -> operator, engine.setup -> engine.connector, pstate -> engine.supervisor, pstate -> engine.readSurface
+    exclude engine.implement.implementer, engine, engine.learn, engine.learn.retro -> operator, engine.setup -> engine.connector, pstate -> engine.supervisor, pstate -> engine.readSurface, engine.supervisor -> tracker
     style * { size small textSize xlarge }
     autoLayout LeftRight 40 50
   }

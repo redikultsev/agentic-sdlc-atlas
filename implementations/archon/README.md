@@ -4,7 +4,7 @@ The pipeline described in `../../model/`, `../../docs/decisions.md` and `../../d
 
 Install on an Archon server: `archon plugin add redikultsev/agentic-sdlc-atlas/implementations/archon@unify-sdlc-vX.Y.Z`; update with `archon plugin update`. Workflows run as `redikultsev/unify-sdlc:<workflow>`. Check: `archon workflow run redikultsev/unify-sdlc:unify-ping`.
 
-`read-server/` is not part of the workflows: a read-only MCP server over the pipeline's state for the Operator and, later, the Supervisor (decision 63); how to run it is in its own README.
+`read-server/` is not part of the workflows: a read-only MCP server over the pipeline's state for the Operator and the Supervisor (decision 63); how to run it is in its own README. `request-server/` is not either: the MCP server with one tool through which the Supervisor files a request as an issue (decision 66). `supervisor/` holds the files of the Supervisor's folder (decision 65).
 
 Tests, from this folder, with Bun and an Archon checkout at the pinned commit (`deploy/compose.yml`):
 

@@ -22,6 +22,10 @@
  *
  * A number with nothing to divide is null, never zero.
  *
+ * Beside the seven, the gate answers given through a chat tool (decision 65): answers whose
+ * recorded surface is Archon's `attention` or `manage_run` chat tool, not the console, with
+ * their items. Archon's chat acts as the Operator, so this is how such an answer shows.
+ *
  * Beside the seven, one table (decision 59): the items of the window that have a provenance
  * record, grouped by the pack version and the Implementer's model that built them, with
  * items merged in the window, "changes" at the gates and rollbacks. Items without a record
@@ -40,7 +44,7 @@ import { stateOf } from '../../.shared/states.ts';
 import { untrusted } from '../../.shared/trust.ts';
 import { readWork } from '../../.shared/work.ts';
 import { implementerLabel, packLabel, readProvenance } from '../../.shared/provenance.ts';
-import { engineItems, hostJson, message, weekId } from './lib.ts';
+import { chatToolAnswers, engineItems, hostJson, message, weekId } from './lib.ts';
 
 const UNIT: Record<string, number> = { m: 60_000, h: 3_600_000, d: 86_400_000, w: 604_800_000 };
 
@@ -104,6 +108,8 @@ async function main(): Promise<void> {
   const cases: Record<string, unknown>[] = [];
   const built: { item: ItemKey; pack: string; implementer: string; merged: boolean; changes: number; rolledBack: boolean }[] = [];
   let noRecord = 0;
+  let chatAnswers = 0;
+  const chatItems: ItemKey[] = [];
 
   for (const entry of engine) {
     const key = itemOfRun(entry.item.key);
@@ -133,6 +139,11 @@ async function main(): Promise<void> {
       if (runId !== null) lastByRun.set(runId, Date.parse(answer.at));
     }
     if (answers.length > 0) operatorMinutes.push(minutes);
+    const viaChat = chatToolAnswers(answers);
+    if (viaChat.length > 0) {
+      chatAnswers += viaChat.length;
+      chatItems.push(key);
+    }
     const otherAnswers = answers.filter(a => (a.kind === 'attention' && a.answer !== null && 'decision' in a.answer && a.answer.decision === 'other') || (a.kind === 'gate' && a.decision === 'other'));
 
     // 2. Done without help.
@@ -229,7 +240,7 @@ async function main(): Promise<void> {
       cost_per_merged_change: prsMerged === 0 ? null : round2(usd / prsMerged),
       follow_rate: follow.rates,
     },
-    counts: { items: engine.length, done, merged: prsMerged, closed_unmerged: prsClosed, cost_unknown_runs: costUnknownRuns },
+    counts: { items: engine.length, done, merged: prsMerged, closed_unmerged: prsClosed, cost_unknown_runs: costUnknownRuns, chat_tool_answers: chatAnswers, chat_tool_items: chatItems },
     cases,
     versions: [...rows.values()],
     notes,
