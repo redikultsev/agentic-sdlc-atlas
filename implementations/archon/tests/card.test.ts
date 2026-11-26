@@ -25,7 +25,7 @@ afterEach(() => rmSync(dir, { recursive: true, force: true }));
 
 describe('rates', () => {
   test('the first count in a check, in English or Russian, within 20 runs', () => {
-    expect(rateOf('flight in 3 of 3 runs')).toEqual({ hits: 3, runs: 3 });
+    expect(rateOf('refund in 3 of 3 runs')).toEqual({ hits: 3, runs: 3 });
     expect(rateOf('в 2 из 3 прогонов')).toEqual({ hits: 2, runs: 3 });
     expect(rateOf('0/3 runs')).toEqual({ hits: 0, runs: 3 });
     expect(rateOf('5 of 3')).toBeNull();

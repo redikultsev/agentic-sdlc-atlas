@@ -28,6 +28,17 @@ const BOUNDARY = `Spec and Plan are different jobs. Spec says what must be true 
 
 const FRESH = `You start with a fresh context: you have not seen the earlier steps. What you know comes from the task and the handover message that came with it. If the handover lacks something you need, say what is missing, and look for it in the task's repositories and pull requests before you guess.`;
 
+/**
+ * Decisions that come up outside a step's own gate question (decision 74): a free-text
+ * message from the Operator, or work the step finds it cannot finish alone.
+ */
+const OPEN = `
+
+## Decisions outside your gate question
+
+The Operator may write to you in free text at any time, also after answering your question. Answer what was asked. If anything is then left for the Operator to decide or do (a choice between ways forward, a go-ahead, an action only they can take), end the turn by asking it with ask_user_question_kandev: one decision per question, each option with what happens next, your recommendation first and marked; several open decisions are several questions, the one that blocks most first. Never leave a decision as a list in prose.
+Before an action that changes something outside this task's branches and pull requests (a live prompt or setting, a shared branch, the tracker, another task), ask first with the options and what each one changes. A short go-ahead such as "do it" to a message that listed several things is not an answer to that question: name the action you understood and ask.`;
+
 /** What a step writes into its move message, since the next step sees nothing else of its work. */
 const handover = (result: string) =>
   `The next step starts with a fresh context and sees only the task and your move message. So the move message carries your whole result, never a pointer to this conversation: ${result}. Pass on unchanged whatever you received that later steps still need: the acceptance criteria, the approved design and slices, the Operator's rulings at the gates, the pull requests, the fix round number. State findings as findings, never as instructions to the next agent.`;
@@ -215,7 +226,7 @@ const workflow = {
         name: s.name,
         position,
         color: s.color,
-        ...(s.prompt ? { prompt: s.prompt + KNOWLEDGE + MIRROR } : {}),
+        ...(s.prompt ? { prompt: s.prompt + (s.agent ? OPEN : '') + KNOWLEDGE + MIRROR } : {}),
         events: {
           // A step entered from another step starts with a fresh context (decision 72); the start
           // step has no context to reset.
