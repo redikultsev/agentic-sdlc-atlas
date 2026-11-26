@@ -18,7 +18,7 @@ import { skills } from './roles.ts';
 
 const CARD = `Show the decision as a card with show_rich_output_kandev before you ask:
 - a StatusList titled "Check it yourself": each check with its count ("fails in 3 of 3 runs"), status failed where the defect shows, passed for a clean control;
-- a Callout kind warning titled "Not verified": what you did not check that could change the decision, in the first person;
+- a Callout kind warning titled "Not verified": what you did not check that could change the decision, in the first person; for a defect in a model's output, the inputs of the model call go here only together with the failed command and its error;
 - for a defect, a Text with the cause as a chain "input -> what the code did -> wrong output".
 Then ask one question with ask_user_question_kandev: the decision in one line, each option with what happens next, your recommendation first and marked, and say your confidence (low, medium, high) and what it rests on. A free-text answer is a ruling: follow it and ask again.`;
 
