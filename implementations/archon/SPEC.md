@@ -170,7 +170,7 @@ Every agent node gets its own prompt (its command) and its role's skills. A scri
 
 | Pack skill | What it holds | Roles |
 |---|---|---|
-| `unify-root-cause` | the cause as a chain from input to wrong output, tested against every case; for a model's output, what the model was given first; a change downstream of the cause only with why the cause cannot be changed, which correct cases it touches and when it goes; the team's notes read first; "unclear" over a guess | triage, findings pass, researcher, planner, implementer, review |
+| `unify-root-cause` | the cause as a chain from input to wrong output, tested against every case; for a model's output, what the model was given first; for a model's output the stages in order and the earliest one that went wrong; whether the wrong state should exist at all (if not, anything that removes it later hides the defect); the fix at the cause named first with its cost, a later-stage change only beside it as a stopgap the Operator chooses, with why, which correct cases it touches and when it goes; the team's notes as evidence to check, not the answer; "unclear" over a guess | triage, findings pass, researcher, planner, implementer, review |
 | `unify-reproduce` | the real entry point and the smallest input, the command and its output, a control case, at least 3 runs and a rate for behaviour that varies, differences from the real case as assumptions, a local way before "not checked" | triage, implementer, validator, scout |
 | `unify-lessons` | where a lesson lives (pack skill, project skill, check, `AGENTS.md`), the universality test for a pack rule, its cost, the smallest change, the Operator approves every one | retro |
 
