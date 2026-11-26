@@ -1,30 +1,30 @@
 {
   "version": 1,
   "question": "PROJ-42: accept this bug as M, R1?",
-  "headline": "A cover note about tickets adds a false flight request next to the rail one",
+  "headline": "A cover message about an invoice adds a false refund request next to the delivery one",
   "recommendation": {
     "option": "accept",
     "label": "Accept as M, R1",
     "confidence": "medium",
     "meaning": "the main claim has evidence; the gaps are listed",
-    "why": "Reproduced on the live model: each sheet of an attachment goes to its own model call with the same email body, so the call for the hotel sheet does not see the rail sheet and reads 'tickets' as a flight. Fix it at the input, not with a filter afterwards."
+    "why": "Reproduced on the live model: each page of a document goes to its own model call with the same cover message, so the call for the returns page does not see the delivery page and reads 'invoice' as a refund. Fix it at the input, not with a filter afterwards."
   },
   "checks": [
-    { "text": "Two-sheet file, note 'book tickets and a stay': false flight in 3 of 3 runs", "rate": { "hits": 3, "runs": 3 } },
-    { "text": "The ticket's own note: 1 of 3 runs", "rate": { "hits": 1, "runs": 3 } },
-    { "text": "Control, rail sheet only: 0 of 3 runs", "rate": { "hits": 0, "runs": 3 } }
+    { "text": "Two-page document, message 'invoice and return form attached': false refund in 3 of 3 runs", "rate": { "hits": 3, "runs": 3 } },
+    { "text": "The message from the request itself: 1 of 3 runs", "rate": { "hits": 1, "runs": 3 } },
+    { "text": "Control, delivery page only: 0 of 3 runs", "rate": { "hits": 0, "runs": 3 } }
   ],
   "notVerified": [
-    "I did not open the real cases from the ticket: the log viewer is not reachable from the sandbox.",
+    "I did not open the real cases from the request: the log viewer is not reachable from the sandbox.",
     "I compared the two fixes by reading the code only; the effect of option 2 is a prediction.",
-    "I did not check mixed flight and rail files, where the flight from the body must stay."
+    "I did not check documents with both a refund and a delivery, where the refund from the message must stay."
   ],
-  "cause": ["Hotel sheet + email body", "its own model call, no rail sheet", "'tickets' read as flight", "merge keeps the flight"],
+  "cause": ["Returns page + cover message", "its own model call, no delivery page", "'invoice' read as refund", "merge keeps the refund"],
   "whyYou": "Every item passes your Accept before any spec or code is written. Size and risk are the agent's reading.",
   "facts": [
     "Kind: bug. Size M, risk R1.",
-    "Root cause at `app/detector.py:425-432`: the sheet loop passes the same body with only one sheet.",
-    "Reproduced: `uv run python repro.py` → flight from body in 3 of 3 runs.",
+    "Root cause at `app/detector.py:425-432`: the page loop passes the same message with only one page.",
+    "Reproduced: `uv run python repro.py` → refund from the message in 3 of 3 runs.",
     "Assumption: the test model stands in for the production model."
   ],
   "options": [

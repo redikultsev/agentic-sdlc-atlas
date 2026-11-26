@@ -17,9 +17,9 @@ const OPTIONS: Option[] = [
 ];
 const TEXT: RequestText = {
   decide: 'PROJ-1: accept this bug as M, R1?',
-  headline: 'A cover phrase adds a false flight request.',
+  headline: 'A cover message adds a false refund request.',
   why: 'every item passes your Accept.',
-  check: ['Flight in 3 of 3 runs', 'Control: 0 of 3', 'Third', 'Fourth is dropped'],
+  check: ['Refund in 3 of 3 runs', 'Control: 0 of 3', 'Third', 'Fourth is dropped'],
   notVerified: ['I did not see which call returns it.'],
   facts: ['Kind: bug.', 'Root cause at a.py:1.'],
 };
@@ -36,7 +36,7 @@ describe('the message', () => {
   test('blocks in order: question, headline, recommendation, check, not verified, why, facts', () => {
     const q = buildRequest(TEXT, OPTIONS, REC).question;
     const at = (s: string) => q.indexOf(s);
-    expect(q.startsWith('PROJ-1: accept this bug as M, R1?\nA cover phrase adds a false flight request.\n')).toBe(true);
+    expect(q.startsWith('PROJ-1: accept this bug as M, R1?\nA cover message adds a false refund request.\n')).toBe(true);
     expect(at('Recommended: Accept as M, R1.')).toBeGreaterThan(0);
     expect(q).toContain(`Confidence medium: ${CONFIDENCE.medium}.`);
     expect(at('Recommended:')).toBeLessThan(at('Check it yourself:'));
